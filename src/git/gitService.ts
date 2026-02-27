@@ -33,14 +33,8 @@ async function execGit(args: string[], cwd: string): Promise<string> {
 export async function getFileHistory(filePath: string, cwd: string): Promise<CommitInfo[]> {
   const relativePath = path.relative(cwd, filePath);
 
-  const format = [
-    '%H',           // Full hash
-    'author %an <%ae>',  // Author name and email
-    '%at',          // Author date (Unix timestamp)
-    'msg %s',       // Subject (short message)
-    'fullmsg %b',   // Body (full message)
-    '---COMMIT-END---' // Custom separator
-  ].join('%n');
+  // Use %x00 as field separator for cleaner parsing
+  const format = '%H%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n';
 
   const args = [
     'log',
