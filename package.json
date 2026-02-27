@@ -1,0 +1,74 @@
+{
+  "name": "vscode-git-history",
+  "displayName": "Git History",
+  "description": "View git history for files and line selections with diff viewer",
+  "version": "0.0.1",
+  "publisher": "vitalivu992",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:gitHistory.showFileHistory",
+    "onCommand:gitHistory.showSelectionHistory"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitHistory.showFileHistory",
+        "title": "Git History (File)",
+        "category": "Git"
+      },
+      {
+        "command": "gitHistory.showSelectionHistory",
+        "title": "Git History for Selection",
+        "category": "Git"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "gitHistory.showFileHistory",
+          "group": "git",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gitHistory.showFileHistory",
+          "group": "git",
+          "when": "!editorHasSelection"
+        },
+        {
+          "command": "gitHistory.showSelectionHistory",
+          "group": "git",
+          "when": "editorHasSelection"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "webpack --mode production",
+    "watch": "webpack --mode development --watch",
+    "test": "node ./test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.5",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.3.9",
+    "copy-webpack-plugin": "^12.0.2",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "diff2html": "^3.4.47"
+  }
+}
