@@ -1,0 +1,103 @@
+# Git History for VS Code
+
+A powerful VS Code extension that provides git history visualization inspired by IntelliJ's Git History. View file history, selection history, and explore diffs with an intuitive interface.
+
+![Screenshot placeholder](docs/screenshot.png)
+
+## Features
+
+- **File History**: Right-click anywhere in an editor to view the complete git history of that file
+- **Selection History**: Select lines of code and view only commits that affected those specific lines
+- **Multi-Select**: Select multiple commits to see a combined diff showing all changes
+- **Diff Viewer**: Toggle between unified and side-by-side diff views
+- **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
+- **Dark/Light Theme**: Automatically adapts to your VS Code theme using native CSS variables
+
+## Installation
+
+1. Press `F1` (or `Ctrl+Shift+P` / `Cmd+Shift+P`) to open the Command Palette
+2. Type "Extensions: Install Extensions"
+3. Search for "Git History"
+4. Click Install
+
+## Usage
+
+### View File History
+
+1. Open any file in a git repository
+2. Right-click in the editor
+3. Select "Git History (File)"
+4. The history panel will open showing all commits
+
+### View Selection History
+
+1. Select one or more lines of code
+2. Right-click in the editor
+3. Select "Git History for Selection"
+4. The history panel will show only commits that affected your selection
+
+### Using the History Panel
+
+- **Click a commit row** to view its diff and changed files
+- **Check multiple commits** to see a combined diff
+- **Toggle view mode** between Unified and Side-by-Side
+- **Scroll the diff viewer** to see all changes
+
+## Requirements
+
+- Visual Studio Code 1.85.0 or higher
+- Git installed and available in your PATH
+- A git repository
+
+## Extension Settings
+
+This extension contributes the following settings:
+
+* `gitHistory.maxCommits`: Maximum number of commits to display (default: 500)
+
+## Keyboard Shortcuts
+
+| Command | Keybinding |
+|---------|------------|
+| Git History (File) | (none - customize as desired) |
+| Git History for Selection | (none - customize as desired) |
+
+## Development
+
+### Building
+
+```bash
+npm install
+npm run compile
+```
+
+### Testing
+
+```bash
+npm test
+```
+
+### Running in Development
+
+1. Press `F5` in VS Code
+2. A new Extension Development Host window will open
+3. Open a git repo and test the extension
+
+## Credits
+
+Built with:
+- [diff2html](https://diff2html.com/) for beautiful diff rendering
+- [TypeScript](https://www.typescriptlang.org/) for type safety
+- [Webpack](https://webpack.js.org/) for bundling
+
+## License
+
+MIT
+
+## Issues
+
+Report issues at: https://github.com/vitalivu992/vscode-git-history/issues
+
+## Release Notes
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
