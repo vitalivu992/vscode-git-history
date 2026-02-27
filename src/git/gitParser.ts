@@ -3,13 +3,17 @@ import { CommitInfo } from '../types';
 const COMMIT_SEPARATOR = '---COMMIT-END---';
 
 /**
- * Parse git log output with custom separator
+ * Parse git log output with null-separated fields
+ * Format: %H%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n
  */
 export function parseGitLog(output: string): CommitInfo[] {
   const commits: CommitInfo[] = [];
-  const commitBlocks = output.split(COMMIT_SEPARATOR).filter(b => b.trim());
 
-  for (const block of commitBlocks) {
+  // Trim the output and split by separator - each block is one commit
+  // The git format ends with ---COMMIT-END---\n, so the last split will be empty
+  const blocks = output.trim().split(COMMIT_SEPARATOR).filter(b => b.trim());
+
+  for (const block of blocks) {
     const commit = parseCommitBlock(block.trim());
     if (commit) {
       commits.push(commit);
@@ -20,73 +24,50 @@ export function parseGitLog(output: string): CommitInfo[] {
 }
 
 /**
- * Parse a single commit block
+ * Parse a single commit block with null-separated fields
  */
 function parseCommitBlock(block: string): CommitInfo | null {
-  const lines = block.split('\n');
-  const commit: Partial<CommitInfo> = {};
+  // Split by null character to get fields
+  const fields = block.split('\x00').map(f => f.trim()).filter(f => f);
 
-  let currentLine = 0;
-
-  // Parse hash line (first line)
-  const hashMatch = lines[currentLine]?.match(/^([0-9a-f]{40})$/);
-  if (hashMatch) {
-    commit.hash = hashMatch[1];
-    commit.shortHash = hashMatch[1].substring(0, 7);
-    currentLine++;
-  } else {
+  // Need at least: hash, author, email, date, message
+  if (fields.length < 5) {
     return null;
   }
 
-  // Parse author line
-  const authorMatch = lines[currentLine]?.match(/^author (.*) <(.*)>$/);
-  if (authorMatch) {
-    commit.author = authorMatch[1];
-    commit.email = authorMatch[2];
-    currentLine++;
+  const hash = fields[0];
+  const author = fields[1];
+  const email = fields[2];
+  const dateStr = fields[3];
+  const subject = fields[4];
+  const body = fields[5] || '';
+
+  // Validate hash format
+  if (!/^[0-9a-f]{40}$/i.test(hash)) {
+    return null;
   }
 
-  // Parse date line (Unix timestamp)
-  const dateMatch = lines[currentLine]?.match(/^date (\d+)$/);
-  if (dateMatch) {
-    commit.date = new Date(parseInt(dateMatch[1]) * 1000).toISOString();
-    currentLine++;
+  const date = new Date(parseInt(dateStr) * 1000);
+  if (isNaN(date.getTime())) {
+    return null;
   }
 
-  // Parse message lines
-  const messageLines: string[] = [];
-  while (currentLine < lines.length && lines[currentLine]) {
-    const line = lines[currentLine];
-    if (line.startsWith('msg ')) {
-      messageLines.push(line.substring(4));
-    } else if (line.startsWith('fullmsg ')) {
-      if (!commit.message) {
-        commit.message = messageLines.join('\n').trim();
-      }
-      commit.fullMessage = line.substring(9).trim();
-    } else {
-      messageLines.push(line);
-    }
-    currentLine++;
-  }
+  const fullMessage = body ? `${subject}\n\n${body}` : subject;
 
-  if (!commit.message && messageLines.length > 0) {
-    commit.message = messageLines.join('\n').trim();
-  }
-
-  if (!commit.fullMessage) {
-    commit.fullMessage = commit.message || '';
-  }
-
-  if (commit.hash && commit.author && commit.date && commit.message) {
-    return commit as CommitInfo;
-  }
-
-  return null;
+  return {
+    hash,
+    shortHash: hash.substring(0, 7),
+    author,
+    email,
+    date: date.toISOString(),
+    message: subject,
+    fullMessage: fullMessage.trim()
+  };
 }
 
 /**
  * Parse git show --name-status output
+ * Format: A/M/D/R/C<optional_number>\tpath or R100\toldPath\tnewPath
  */
 export function parseNameStatus(output: string): Map<string, { status: string; previousPath?: string }> {
   const result = new Map();
@@ -94,17 +75,24 @@ export function parseNameStatus(output: string): Map<string, { status: string; p
 
   for (const line of lines) {
     const parts = line.split('\t');
-    const status = parts[0];
+    const statusCode = parts[0];
 
-    if (status === 'R' || status === 'C') {
+    // Extract the base status (first character), ignoring numbers (e.g., R100 -> R)
+    const baseStatus = statusCode?.charAt(0);
+
+    if (!baseStatus) {
+      continue;
+    }
+
+    if (baseStatus === 'R' || baseStatus === 'C') {
       // Renamed or copied: R100\toldPath\tnewPath
       if (parts.length >= 3) {
-        result.set(parts[2], { status, previousPath: parts[1] });
+        result.set(parts[2], { status: baseStatus, previousPath: parts[1] });
       }
     } else {
       // Added, Modified, Deleted: A/M/D\tpath
       if (parts.length >= 2) {
-        result.set(parts[1], { status });
+        result.set(parts[1], { status: baseStatus });
       }
     }
   }
