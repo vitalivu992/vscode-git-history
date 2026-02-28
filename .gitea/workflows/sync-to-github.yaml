@@ -1,0 +1,43 @@
+name: Sync to GitHub
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  sync-to-github:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Gitea Actions Bot"
+          git config --global user.email "actions@gitea.local"
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.MY_GITHUB_SSH_KEY }}" > ~/.ssh/github_deploy_key
+          chmod 600 ~/.ssh/github_deploy_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Add GitHub remote
+        run: |
+          REPO_NAME=${GITHUB_REPOSITORY##*/}
+          git remote add github git@github.com:${{ secrets.MY_GITHUB_ORG }}/$REPO_NAME.git
+
+      - name: Push to GitHub
+        run: |
+          REPO_NAME=${GITHUB_REPOSITORY##*/}
+          # Push all branches
+          git push github master --force
+          # Push all tags if they exist
+          git push github --tags --force || true
+        env:
+          GIT_SSH_COMMAND: 'ssh -i ~/.ssh/github_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no'
+
