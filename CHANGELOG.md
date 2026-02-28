@@ -2,6 +2,18 @@
 
 All notable changes to the "vscode-git-history" extension will be documented in this file.
 
+## [0.0.2] - 2026-03-01
+
+### Fixed
+- **Security**: Restored nonce-based CSP for `script-src` instead of `unsafe-inline`
+- **Security**: Added `https://cdn.jsdelivr.net` to `style-src` CSP so diff2html CSS loads correctly
+- **Bug**: Copied file status (`C`) now maps to `.copied` CSS class (purple) instead of `.renamed` (blue)
+- **Config**: `gitHistory.maxCommits` setting is now actually read from VS Code configuration (was hardcoded to 500)
+
+### Added
+- Webview HTML structure and CSP tests
+- Status class mapping unit tests
+
 ## [0.0.1] - 2024-02-27
 
 ### Initial Release
