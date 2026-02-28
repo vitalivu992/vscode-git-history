@@ -209,6 +209,11 @@ body {
   color: #fff;
 }
 
+.file-status.copied {
+  background-color: #c586c0;
+  color: #fff;
+}
+
 .file-path {
   flex: 1;
   font-family: 'Consolas', 'Monaco', monospace;
