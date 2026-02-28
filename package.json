@@ -4,6 +4,10 @@
   "description": "View git history for files and line selections with diff viewer",
   "version": "0.0.1",
   "publisher": "vitalivu992",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lvsoftwares/vscode-git-history"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
