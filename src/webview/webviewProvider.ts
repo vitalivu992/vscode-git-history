@@ -134,35 +134,45 @@ export class GitHistoryPanel {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdn.jsdelivr.net;">
   <title>Git History</title>
   <link rel="stylesheet" href="${this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel', 'styles.css'))}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/css/diff2html.min.css">
 </head>
 <body>
-  <div id="diff-viewer"></div>
-  <div id="commit-table-container">
-    <table id="commit-table">
-      <thead>
-        <tr>
-          <th class="checkbox-col"></th>
-          <th class="hash-col">Hash</th>
-          <th class="author-col">Author</th>
-          <th class="date-col">Date</th>
-          <th class="message-col">Message</th>
-        </tr>
-      </thead>
-      <tbody id="commit-list"></tbody>
-    </table>
+  <div id="app">
+    <div id="diff-controls">
+      <button id="unified-btn" class="active">Unified</button>
+      <button id="side-by-side-btn">Side-by-Side</button>
+    </div>
+
+    <div id="main-content">
+      <div id="diff-viewer"></div>
+
+      <div id="bottom-panel">
+        <div id="commit-table-container">
+          <table id="commit-table">
+            <thead>
+              <tr>
+                <th class="checkbox-col"><input type="checkbox" id="select-all"></th>
+                <th class="hash-col">Hash</th>
+                <th class="author-col">Author</th>
+                <th class="date-col">Date</th>
+                <th class="message-col">Message</th>
+              </tr>
+            </thead>
+            <tbody id="commit-list"></tbody>
+          </table>
+        </div>
+
+        <div id="commit-detail">
+          <h3>Changed Files</h3>
+          <ul id="file-list"></ul>
+        </div>
+      </div>
+    </div>
   </div>
-  <div id="commit-detail">
-    <h3>Changed Files</h3>
-    <ul id="file-list"></ul>
-  </div>
-  <div id="diff-controls">
-    <button id="unified-btn" class="active">Unified</button>
-    <button id="side-by-side-btn">Side-by-Side</button>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/lib/diff2html.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/js/diff2html-ui.min.js"></script>
   <script nonce="${nonce}" src="${this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel', 'main.js'))}"></script>
 </body>
 </html>`;
