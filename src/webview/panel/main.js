@@ -281,7 +281,7 @@ function getStatusClass(status) {
     case 'M': return 'modified';
     case 'D': return 'deleted';
     case 'R': return 'renamed';
-    case 'C': return 'renamed';
+    case 'C': return 'copied';
     default: return '';
   }
 }
