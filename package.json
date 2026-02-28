@@ -50,6 +50,16 @@
           "when": "editorHasSelection"
         }
       ]
+    },
+    "configuration": {
+      "title": "Git History",
+      "properties": {
+        "gitHistory.maxCommits": {
+          "type": "number",
+          "default": 500,
+          "description": "Maximum number of commits to display"
+        }
+      }
     }
   },
   "scripts": {
