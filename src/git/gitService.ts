@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as util from 'util';
+import * as vscode from 'vscode';
 import { execFile } from 'child_process';
 import { CommitInfo, CommitFileChange, DiffResult } from '../types';
 import { parseGitLog, parseNameStatus, isBinaryFile, parseLineHistoryLog } from './gitParser';
@@ -7,7 +8,6 @@ import { parseGitLog, parseNameStatus, isBinaryFile, parseLineHistoryLog } from 
 const execFileAsync = util.promisify(execFile);
 
 const EMPTY_TREE_HASH = '4b825dc642cb6eb9a060e54bf899d69f82cf0163';
-const MAX_COMMITS = 500;
 
 /**
  * Execute a git command in a directory
@@ -32,6 +32,7 @@ async function execGit(args: string[], cwd: string): Promise<string> {
  */
 export async function getFileHistory(filePath: string, cwd: string): Promise<CommitInfo[]> {
   const relativePath = path.relative(cwd, filePath);
+  const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   // Use %x00 as field separator for cleaner parsing
   const format = '%H%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n';
@@ -40,7 +41,7 @@ export async function getFileHistory(filePath: string, cwd: string): Promise<Com
     'log',
     '--follow',
     `--format=${format}`,
-    '-n', MAX_COMMITS.toString(),
+    '-n', maxCommits.toString(),
     '--',
     relativePath
   ];
