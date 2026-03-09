@@ -8,6 +8,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 
 - **File History**: Right-click anywhere in an editor to view the complete git history of that file
 - **Selection History**: Select lines of code and view only commits that affected those specific lines
+- **Search Commits**: Filter commits in real time by message, author name, or commit hash
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
@@ -40,6 +41,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 
 - **Click a commit row** to view its diff and changed files
 - **Check multiple commits** to see a combined diff
+- **Search commits** using the search box to filter by message, author, or hash
 - **Toggle view mode** between Unified and Side-by-Side
 - **Scroll the diff viewer** to see all changes
 
