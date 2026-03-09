@@ -88,6 +88,34 @@ body {
   flex: 0 0 60%;
   overflow: auto;
   border-right: 1px solid var(--vscode-border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.search-container {
+  padding: 8px;
+  background-color: var(--vscode-widget-background);
+  border-bottom: 1px solid var(--vscode-border-color);
+}
+
+#search-input {
+  width: 100%;
+  padding: 6px 8px;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 2px;
+  font-size: 13px;
+  font-family: var(--vscode-font-family);
+}
+
+#search-input::placeholder {
+  color: var(--vscode-descriptionForeground);
+}
+
+#search-input:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
 }
 
 #commit-table {

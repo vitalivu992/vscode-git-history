@@ -7,6 +7,7 @@ let selectedCommits = new Set();
 let currentDiff = '';
 let currentDiffType = 'unified'; // 'unified' or 'side-by-side'
 let diff2htmlUi = null;
+let searchQuery = '';
 
 // DOM Elements
 const diffViewer = document.getElementById('diff-viewer');
@@ -15,6 +16,7 @@ const selectAllCheckbox = document.getElementById('select-all');
 const unifiedBtn = document.getElementById('unified-btn');
 const sideBySideBtn = document.getElementById('side-by-side-btn');
 const fileList = document.getElementById('file-list');
+const searchInput = document.getElementById('search-input');
 
 // Initialize
 function init() {
@@ -25,6 +27,7 @@ function init() {
   selectAllCheckbox.addEventListener('change', handleSelectAll);
   unifiedBtn.addEventListener('click', () => setDiffType('unified'));
   sideBySideBtn.addEventListener('click', () => setDiffType('side-by-side'));
+  searchInput.addEventListener('input', handleSearch);
 
   // Listen for messages from extension
   window.addEventListener('message', handleMessage);
@@ -63,19 +66,31 @@ function handleMessage(event) {
 function renderCommits() {
   commitList.innerHTML = '';
 
-  if (commits.length === 0) {
+  // Filter commits based on search query
+  const filteredCommits = commits.filter(commit => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      commit.hash.toLowerCase().includes(query) ||
+      commit.shortHash.toLowerCase().includes(query) ||
+      commit.author.toLowerCase().includes(query) ||
+      commit.message.toLowerCase().includes(query)
+    );
+  });
+
+  if (filteredCommits.length === 0) {
     commitList.innerHTML = `
       <tr>
         <td colspan="5" class="empty-state">
           <div class="empty-state-icon">📭</div>
-          <div class="empty-state-text">No commits found</div>
+          <div class="empty-state-text">${searchQuery ? 'No commits match your search' : 'No commits found'}</div>
         </td>
       </tr>
     `;
     return;
   }
 
-  commits.forEach(commit => {
+  filteredCommits.forEach(commit => {
     const tr = document.createElement('tr');
     tr.dataset.hash = commit.hash;
 
@@ -335,6 +350,11 @@ function showError(message) {
       <div class="empty-state-text">${escapeHtml(message)}</div>
     </div>
   `;
+}
+
+function handleSearch(e) {
+  searchQuery = e.target.value.trim();
+  renderCommits();
 }
 
 // Initialize on load
