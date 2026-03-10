@@ -17,7 +17,7 @@ export async function handleMessage(
 
   switch (message.type) {
     case 'ready':
-      // Data already loaded in createOrShow
+      panel.onWebviewReady();
       break;
 
     case 'requestDiff':

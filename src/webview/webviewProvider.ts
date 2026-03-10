@@ -19,6 +19,8 @@ export class GitHistoryPanel {
   private readonly _cwd: string;
   private readonly _selection?: SelectionRange;
   private _commits: CommitInfo[] = [];
+  private _webviewReady: boolean = false;
+  private _pendingInit: (() => void) | null = null;
 
   public static async createOrShow(
     extensionUri: vscode.Uri,
@@ -97,28 +99,44 @@ export class GitHistoryPanel {
     return this._commits;
   }
 
+  public onWebviewReady(): void {
+    this._webviewReady = true;
+    if (this._pendingInit) {
+      this._pendingInit();
+      this._pendingInit = null;
+    }
+  }
+
   public async loadData(): Promise<void> {
-    try {
-      let commits: CommitInfo[];
+    const sendInit = async () => {
+      try {
+        let commits: CommitInfo[];
 
-      if (this._selection) {
-        commits = await getSelectionHistory(
-          this._filePath,
-          this._selection.startLine,
-          this._selection.endLine,
-          this._cwd
-        );
-      } else {
-        commits = await getFileHistory(this._filePath, this._cwd);
+        if (this._selection) {
+          commits = await getSelectionHistory(
+            this._filePath,
+            this._selection.startLine,
+            this._selection.endLine,
+            this._cwd
+          );
+        } else {
+          commits = await getFileHistory(this._filePath, this._cwd);
+        }
+
+        this._commits = commits;
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath });
+      } catch (error) {
+        this.postMessage({
+          type: 'error',
+          message: error instanceof Error ? error.message : String(error)
+        });
       }
+    };
 
-      this._commits = commits;
-      this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath });
-    } catch (error) {
-      this.postMessage({
-        type: 'error',
-        message: error instanceof Error ? error.message : String(error)
-      });
+    if (this._webviewReady) {
+      await sendInit();
+    } else {
+      this._pendingInit = () => { void sendInit(); };
     }
   }
 
@@ -151,6 +169,9 @@ export class GitHistoryPanel {
 
       <div id="bottom-panel">
         <div id="commit-table-container">
+          <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search commits...">
+          </div>
           <table id="commit-table">
             <thead>
               <tr>

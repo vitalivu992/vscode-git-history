@@ -27,7 +27,9 @@ function init() {
   selectAllCheckbox.addEventListener('change', handleSelectAll);
   unifiedBtn.addEventListener('click', () => setDiffType('unified'));
   sideBySideBtn.addEventListener('click', () => setDiffType('side-by-side'));
-  searchInput.addEventListener('input', handleSearch);
+  if (searchInput) {
+    searchInput.addEventListener('input', handleSearch);
+  }
 
   // Listen for messages from extension
   window.addEventListener('message', handleMessage);
