@@ -64,6 +64,7 @@ suite('Git Service Integration Tests', () => {
     assert.ok(firstCommit.author);
     assert.ok(firstCommit.date);
     assert.ok(firstCommit.message);
+    assert.ok(Array.isArray(firstCommit.parentHashes));
   });
 
   test('getCommitDiff should return diff for a commit', async () => {
