@@ -37,9 +37,17 @@ This is a VS Code extension for viewing git history of files and line selections
 
 The extension uses a custom git log format with null separators:
 ```
-%H%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n
+%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n
 ```
-Commits are separated by `---COMMIT-END---` markers.
+Fields: hash, parent hashes (space-separated), author, email, timestamp, subject, body.
+Commits are separated by `---COMMIT-END---` markers. `%P` is empty for root commits.
+
+### Commit Graph
+
+The webview renders a per-row SVG graph column (like `git log --graph`) using a lane-based algorithm:
+- `src/webview/panel/graphLayout.js` – pure JS lane computation, exports `computeGraphLayout(commits)`
+- `src/webview/panel/main.js` – calls `computeGraphLayout` after filtering, renders SVG per row via `renderGraphSvg()`
+- Controlled by `gitHistory.showGraph` config setting (default: true)
 
 ### Message Protocol
 

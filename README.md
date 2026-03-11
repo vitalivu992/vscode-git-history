@@ -8,6 +8,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 
 - **File History**: Right-click anywhere in an editor to view the complete git history of that file
 - **Selection History**: Select lines of code and view only commits that affected those specific lines
+- **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
 - **Search Commits**: Filter commits in real time by message, author name, or commit hash
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views
@@ -56,6 +57,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 This extension contributes the following settings:
 
 * `gitHistory.maxCommits`: Maximum number of commits to display (default: 500)
+* `gitHistory.showGraph`: Show commit graph visualization in the history view (default: true)
 
 ## Keyboard Shortcuts
 

@@ -2,6 +2,20 @@
 
 All notable changes to the "vscode-git-history" extension will be documented in this file.
 
+## [1.0.0] - 2026-03-11
+
+### Added
+- **Commit Graph**: Visual branch and merge graph column in the history table, rendered as per-row inline SVG
+  - Lane-based algorithm computes node positions and edge connections from parent hash data
+  - 8-color palette using VS Code token colors, visible on dark and light themes
+  - Merge commits show bezier curves connecting branches
+- **`gitHistory.showGraph` setting**: Toggle the graph column on or off (default: `true`)
+- `graphLayout.js` – standalone, dependency-free graph layout algorithm with unit tests
+
+### Changed
+- Git log format now includes `%P` (parent hashes) for graph computation
+- `CommitInfo` type now includes `parentHashes: string[]`
+
 ## [0.0.2] - 2026-03-01
 
 ### Fixed
