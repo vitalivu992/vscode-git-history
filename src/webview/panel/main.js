@@ -8,6 +8,13 @@ let currentDiff = '';
 let currentDiffType = 'unified'; // 'unified' or 'side-by-side'
 let diff2htmlUi = null;
 let searchQuery = '';
+let showGraph = true;
+
+// Graph rendering constants
+const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
+const LANE_W = 14;  // pixels per lane column
+const ROW_H = 28;   // row height in pixels
+const NODE_R = 4;   // commit node circle radius
 
 // DOM Elements
 const diffViewer = document.getElementById('diff-viewer');
@@ -17,6 +24,46 @@ const unifiedBtn = document.getElementById('unified-btn');
 const sideBySideBtn = document.getElementById('side-by-side-btn');
 const fileList = document.getElementById('file-list');
 const searchInput = document.getElementById('search-input');
+
+/**
+ * Render a single commit row's graph cell as an inline SVG string.
+ * @param {object} cell - Layout cell from computeGraphLayout
+ * @param {number} totalCols - Total number of lane columns (for SVG width)
+ * @returns {string} Inline SVG markup
+ */
+function renderGraphSvg(cell, totalCols) {
+  const width = Math.max(totalCols * LANE_W, LANE_W);
+  const cy = ROW_H / 2;
+
+  const paths = [];
+
+  for (let i = 0; i < cell.segments.length; i++) {
+    const seg = cell.segments[i];
+    const color = GRAPH_COLORS[seg.color % GRAPH_COLORS.length];
+
+    if (seg.type === 'vertical') {
+      const x = seg.col * LANE_W + LANE_W / 2;
+      paths.push(`<line x1="${x}" y1="0" x2="${x}" y2="${ROW_H}" stroke="${color}" stroke-width="2"/>`);
+    } else if (seg.type === 'top-half') {
+      const x = seg.col * LANE_W + LANE_W / 2;
+      paths.push(`<line x1="${x}" y1="0" x2="${x}" y2="${cy}" stroke="${color}" stroke-width="2"/>`);
+    } else if (seg.type === 'bottom-half') {
+      const x = seg.col * LANE_W + LANE_W / 2;
+      paths.push(`<line x1="${x}" y1="${cy}" x2="${x}" y2="${ROW_H}" stroke="${color}" stroke-width="2"/>`);
+    } else if (seg.type === 'merge') {
+      const fromX = seg.fromCol * LANE_W + LANE_W / 2;
+      const toX = seg.toCol * LANE_W + LANE_W / 2;
+      paths.push(`<path d="M ${fromX} ${cy} C ${fromX} ${ROW_H} ${toX} ${cy} ${toX} ${ROW_H}" stroke="${color}" stroke-width="2" fill="none"/>`);
+    }
+  }
+
+  // Draw commit node circle on top of lines
+  const cx = cell.nodeCol * LANE_W + LANE_W / 2;
+  const nodeColor = GRAPH_COLORS[cell.nodeColor % GRAPH_COLORS.length];
+  paths.push(`<circle cx="${cx}" cy="${cy}" r="${NODE_R}" fill="${nodeColor}"/>`);
+
+  return `<svg width="${width}" height="${ROW_H}" viewBox="0 0 ${width} ${ROW_H}" xmlns="http://www.w3.org/2000/svg">${paths.join('')}</svg>`;
+}
 
 // Initialize
 function init() {
@@ -41,6 +88,10 @@ function handleMessage(event) {
   switch (message.type) {
     case 'init':
       commits = message.commits;
+      showGraph = message.showGraph !== false;
+      // Show or hide the graph column header
+      const graphTh = document.querySelector('th.graph-col');
+      if (graphTh) { graphTh.style.display = showGraph ? '' : 'none'; }
       renderCommits();
       break;
 
@@ -94,10 +145,12 @@ function renderCommits() {
     );
   });
 
+  const colspan = showGraph ? 6 : 5;
+
   if (filteredCommits.length === 0) {
     commitList.innerHTML = `
       <tr>
-        <td colspan="5" class="empty-state">
+        <td colspan="${colspan}" class="empty-state">
           <div class="empty-state-icon">📭</div>
           <div class="empty-state-text">${searchQuery ? 'No commits match your search' : 'No commits found'}</div>
         </td>
@@ -106,16 +159,30 @@ function renderCommits() {
     return;
   }
 
-  filteredCommits.forEach(commit => {
+  // Compute graph layout for all filtered commits
+  let graphData = [];
+  let maxCols = 1;
+  if (showGraph && typeof computeGraphLayout === 'function') {
+    graphData = computeGraphLayout(filteredCommits);
+    for (let g = 0; g < graphData.length; g++) {
+      if (graphData[g].maxColumns > maxCols) { maxCols = graphData[g].maxColumns; }
+    }
+  }
+
+  filteredCommits.forEach((commit, index) => {
     const tr = document.createElement('tr');
     tr.dataset.hash = commit.hash;
 
     const date = formatDate(commit.date);
+    const graphCell = showGraph && graphData[index]
+      ? `<td class="graph-col">${renderGraphSvg(graphData[index], maxCols)}</td>`
+      : '';
 
     tr.innerHTML = `
       <td class="checkbox-col">
         <input type="checkbox" class="commit-checkbox" data-hash="${commit.hash}">
       </td>
+      ${graphCell}
       <td class="hash-col" title="${commit.hash}">${commit.shortHash}</td>
       <td class="author-col" title="${commit.author}">${truncate(commit.author, 20)}</td>
       <td class="date-col">${date}</td>
