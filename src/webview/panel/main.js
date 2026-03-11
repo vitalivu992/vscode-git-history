@@ -62,6 +62,20 @@ function handleMessage(event) {
     case 'error':
       showError(message.message);
       break;
+
+    case 'selectCommit':
+      handleSelectCommit(message.hash);
+      break;
+  }
+}
+
+function handleSelectCommit(hash) {
+  // Find the row by hash and select it
+  const row = document.querySelector(`#commit-table tbody tr[data-hash="${hash}"]`);
+  if (row) {
+    clearSelection();
+    selectCommit(hash);
+    row.scrollIntoView({ block: 'nearest' });
   }
 }
 

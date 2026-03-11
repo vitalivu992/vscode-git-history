@@ -22,6 +22,17 @@ export class GitHistoryPanel {
   private _webviewReady: boolean = false;
   private _pendingInit: (() => void) | null = null;
 
+  public static async showCommitDiff(
+    extensionUri: vscode.Uri,
+    filePath: string,
+    cwd: string,
+    commitHash: string
+  ): Promise<void> {
+    await GitHistoryPanel.createOrShow(extensionUri, filePath, cwd);
+    // After panel is ready, select the commit
+    GitHistoryPanel.currentPanel?.postMessage({ type: 'selectCommit', hash: commitHash });
+  }
+
   public static async createOrShow(
     extensionUri: vscode.Uri,
     filePath: string,
