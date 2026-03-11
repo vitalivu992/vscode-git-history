@@ -4,6 +4,7 @@
 export interface CommitInfo {
   hash: string;
   shortHash: string;
+  parentHashes: string[];
   author: string;
   email: string;
   date: string;
@@ -56,7 +57,7 @@ export interface BlameResult {
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
-  | { type: 'init'; commits: CommitInfo[]; filePath: string }
+  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean }
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[] }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'commitFiles'; hash: string; files: CommitFileChange[] }
