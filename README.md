@@ -87,6 +87,10 @@ npm test
 2. A new Extension Development Host window will open
 3. Open a git repo and test the extension
 
+### Capturing Screenshots
+
+See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for how to capture extension screenshots for PR review.
+
 ## Credits
 
 Built with:
