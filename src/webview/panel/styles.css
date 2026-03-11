@@ -272,38 +272,172 @@ body {
   font-size: 12px;
 }
 
-/* diff2html overrides */
+/* diff2html overrides – GitHub-like rendering with VS Code theme integration */
 .d2h-wrapper {
   background-color: transparent !important;
   border: none !important;
 }
 
-.d2h-file-header {
-  background-color: var(--vscode-widget-background) !important;
-  border-color: var(--vscode-border-color) !important;
+.d2h-file-wrapper {
+  border: 1px solid var(--vscode-border-color) !important;
+  border-radius: 6px !important;
+  margin-bottom: 16px !important;
+  overflow: hidden !important;
 }
 
-.d2h-code-line-ctn {
-  font-family: 'Consolas', 'Monaco', monospace !important;
+.d2h-file-header {
+  background-color: var(--vscode-widget-background) !important;
+  border-bottom: 1px solid var(--vscode-border-color) !important;
+  color: var(--vscode-editor-foreground) !important;
+  padding: 8px 12px !important;
+}
+
+.d2h-file-name-wrapper {
+  color: var(--vscode-editor-foreground) !important;
+}
+
+.d2h-file-name {
+  color: var(--vscode-textLink-foreground, #569cd6) !important;
+}
+
+.d2h-file-stats {
+  color: var(--vscode-editor-foreground) !important;
+}
+
+.d2h-file-stats .d2h-lines-added {
+  color: #3fb950 !important;
+}
+
+.d2h-file-stats .d2h-lines-deleted {
+  color: #f85149 !important;
+}
+
+/* Code content */
+.d2h-code-line-ctn,
+.d2h-code-side-line {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
   font-size: 13px !important;
 }
 
-.d2h-code-side-linenumber {
-  background-color: var(--vscode-textCodeBlock-background) !important;
-  color: var(--vscode-editorLineNumber-foreground) !important;
-}
-
-.d2h-ins {
-  background-color: rgba(78, 201, 176, 0.2) !important;
-}
-
-.d2h-del {
-  background-color: rgba(244, 135, 113, 0.2) !important;
-}
-
-.d2h-info {
-  background-color: var(--vscode-widget-background) !important;
+.d2h-code-line-ctn {
   color: var(--vscode-editor-foreground) !important;
+}
+
+/* Line numbers */
+.d2h-code-linenumber,
+.d2h-code-side-linenumber {
+  background-color: var(--vscode-editorGutter-background, var(--vscode-editor-background)) !important;
+  color: var(--vscode-editorLineNumber-foreground) !important;
+  border-right: 1px solid var(--vscode-border-color) !important;
+  cursor: default;
+}
+
+/* Diff table body */
+.d2h-diff-table {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+}
+
+.d2h-diff-tbody > tr > td {
+  border-bottom: none !important;
+}
+
+/* Default (unchanged) lines */
+.d2h-code-line,
+.d2h-code-side-line {
+  background-color: var(--vscode-editor-background) !important;
+}
+
+/* Added lines – green tint (GitHub-like) */
+.d2h-ins {
+  background-color: rgba(46, 160, 67, 0.15) !important;
+}
+
+.d2h-ins .d2h-code-line-ctn {
+  background-color: transparent !important;
+}
+
+.d2h-ins .d2h-code-side-linenumber,
+.d2h-ins .d2h-code-linenumber {
+  background-color: rgba(46, 160, 67, 0.25) !important;
+  color: var(--vscode-editorLineNumber-foreground) !important;
+  border-color: var(--vscode-border-color) !important;
+}
+
+/* Inline word-level highlight for additions */
+.d2h-ins ins,
+.d2h-ins .d2h-change {
+  background-color: rgba(46, 160, 67, 0.4) !important;
+  text-decoration: none !important;
+}
+
+/* Deleted lines – red tint (GitHub-like) */
+.d2h-del {
+  background-color: rgba(248, 81, 73, 0.15) !important;
+}
+
+.d2h-del .d2h-code-line-ctn {
+  background-color: transparent !important;
+}
+
+.d2h-del .d2h-code-side-linenumber,
+.d2h-del .d2h-code-linenumber {
+  background-color: rgba(248, 81, 73, 0.25) !important;
+  color: var(--vscode-editorLineNumber-foreground) !important;
+  border-color: var(--vscode-border-color) !important;
+}
+
+/* Inline word-level highlight for deletions */
+.d2h-del del,
+.d2h-del .d2h-change {
+  background-color: rgba(248, 81, 73, 0.4) !important;
+  text-decoration: none !important;
+}
+
+/* Hunk header / info line (@@) */
+.d2h-info {
+  background-color: rgba(56, 139, 253, 0.1) !important;
+  color: var(--vscode-descriptionForeground) !important;
+  border-bottom: 1px solid var(--vscode-border-color) !important;
+}
+
+.d2h-info .d2h-code-line-ctn {
+  color: var(--vscode-descriptionForeground) !important;
+}
+
+/* Empty / filler cells in side-by-side view */
+.d2h-emptyplaceholder,
+.d2h-code-side-emptyplaceholder {
+  background-color: var(--vscode-editorGutter-background, var(--vscode-editor-background)) !important;
+  border-color: var(--vscode-border-color) !important;
+}
+
+/* Side-by-side specific: separator between left/right panes */
+.d2h-code-side-line .d2h-code-side-emptyplaceholder {
+  background-color: var(--vscode-editor-background) !important;
+}
+
+/* Collapse/expand controls */
+.d2h-file-collapse {
+  color: var(--vscode-editor-foreground) !important;
+}
+
+/* Scrollbar styling inside diff viewer */
+#diff-viewer::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+#diff-viewer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#diff-viewer::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background);
+  border-radius: 5px;
+}
+
+#diff-viewer::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-hoverBackground);
 }
 
 .empty-state {
