@@ -12,7 +12,6 @@ async function main() {
       extensionTestsPath,
       launchArgs: [
         workspacePath,
-        '--disable-gpu',
         '--disable-extensions'
       ]
     });
