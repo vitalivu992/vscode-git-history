@@ -1,4 +1,4 @@
-.PHONY: compile publish clean install
+.PHONY: compile publish clean test install
 
 # Compile the extension
 compile:
@@ -12,6 +12,11 @@ publish: compile
 # Clean build artifacts
 clean:
 	rm -rf dist out *.vsix
+
+test: 
+	npm run test
+
+	npm run screenshot
 
 # Install the packaged extension locally
 install: publish
