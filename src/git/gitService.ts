@@ -2,8 +2,9 @@ import * as path from 'path';
 import * as util from 'util';
 import * as vscode from 'vscode';
 import { execFile } from 'child_process';
-import { CommitInfo, CommitFileChange, DiffResult } from '../types';
+import { CommitInfo, CommitFileChange, DiffResult, BlameLineInfo } from '../types';
 import { parseGitLog, parseNameStatus, isBinaryFile, parseLineHistoryLog } from './gitParser';
+import { parseBlameOutput } from './blameParser';
 
 const execFileAsync = util.promisify(execFile);
 
@@ -177,6 +178,15 @@ export async function getCommitFiles(
   }
 
   return changes;
+}
+
+/**
+ * Get blame information for a file
+ */
+export async function getFileBlame(filePath: string, cwd: string): Promise<BlameLineInfo[]> {
+  const relativePath = path.relative(cwd, filePath);
+  const output = await execGit(['blame', '--porcelain', '--', relativePath], cwd);
+  return parseBlameOutput(output);
 }
 
 /**
