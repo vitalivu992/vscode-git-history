@@ -89,35 +89,30 @@ suite('WebviewProvider HTML Tests', () => {
     assert.ok(!source.includes("script-src 'unsafe-inline'"), 'script-src should not use unsafe-inline');
   });
 
-  test('webviewProvider CSP should allow cdn.jsdelivr.net for scripts and styles', () => {
+  test('webviewProvider CSP should use cspSource for scripts and styles', () => {
     const fs = require('fs');
     const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
-    // Extract the full CSP content attribute value
-    const cspMatch = source.match(/Content-Security-Policy" content="([^"]+)"/);
-    assert.ok(cspMatch, 'CSP meta tag should exist');
-    const csp = cspMatch[1];
-
-    assert.ok(csp.includes('script-src') && csp.includes('https://cdn.jsdelivr.net'), 'script-src should allow CDN');
-    assert.ok(csp.includes('style-src') && csp.includes('https://cdn.jsdelivr.net'), 'style-src should allow CDN');
+    assert.ok(source.includes('cspSource'), 'CSP should use webview.cspSource for local resources');
+    assert.ok(!source.includes('https://cdn.jsdelivr.net'), 'CSP should not use CDN (diff2html is bundled locally)');
   });
 
-  test('diff2html script should use bundles/js path', () => {
+  test('diff2html script should be loaded locally (not from CDN)', () => {
     const fs = require('fs');
     const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
-    assert.ok(source.includes('bundles/js/diff2html-ui.min.js'), 'Should use bundles/js path for diff2html');
-    assert.ok(!source.includes('lib/ui/js/diff2html-ui.min.js'), 'Should not use old lib/ path');
+    assert.ok(source.includes('diff2html-ui.min.js'), 'Should reference diff2html-ui.min.js');
+    assert.ok(!source.includes('cdn.jsdelivr.net'), 'Should not load from CDN');
   });
 
-  test('diff2html CSS should use bundles/css path', () => {
+  test('diff2html CSS should be loaded locally (not from CDN)', () => {
     const fs = require('fs');
     const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
-    assert.ok(source.includes('bundles/css/diff2html.min.css'), 'Should use bundles/css path for diff2html CSS');
+    assert.ok(source.includes('diff2html.min.css'), 'Should reference diff2html.min.css locally');
   });
 
   test('HTML should contain expected structural elements', () => {
