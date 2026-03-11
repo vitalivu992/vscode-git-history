@@ -130,6 +130,34 @@ suite('WebviewProvider HTML Tests', () => {
   });
 });
 
+suite('Message Type Tests', () => {
+  test('requestFileDiff message type should be defined in WebviewToExtMessage', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes("type: 'requestFileDiff'"), 'WebviewToExtMessage should include requestFileDiff type');
+    assert.ok(source.includes('filePath: string'), 'requestFileDiff should have filePath field');
+  });
+
+  test('diff message should support optional selectedFile field', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes('selectedFile?: string'), 'diff message should have optional selectedFile field');
+  });
+
+  test('messageHandler should handle requestFileDiff without error', () => {
+    const fs = require('fs');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    assert.ok(source.includes("case 'requestFileDiff'"), 'messageHandler should have requestFileDiff case');
+    assert.ok(source.includes('handleRequestFileDiff'), 'messageHandler should call handleRequestFileDiff');
+  });
+});
+
 suite('Status Class Mapping Tests', () => {
   function getStatusClass(status: string): string {
     switch (status) {

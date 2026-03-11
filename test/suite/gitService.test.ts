@@ -112,6 +112,30 @@ suite('Git Service Integration Tests', () => {
     assert.strictEqual(diffResult.isBinary, false);
   });
 
+  test('getCommitDiff with filePath should return diff for only that file', async () => {
+    const { execSync } = require('child_process');
+
+    // Create a second file and commit touching both files
+    const testFile2 = path.join(tempDir, 'test2.txt');
+    fs.writeFileSync(testFile2, 'File 2 content\n');
+    fs.writeFileSync(testFile, 'Line 1\nLine 2 modified\nLine 3\nLine 4\nLine 5\n');
+    execSync('git add .', { cwd: tempDir });
+    execSync('git commit -m "Modify test.txt and add test2.txt"', { cwd: tempDir });
+
+    const commits = await getFileHistory(testFile, tempDir);
+    const latestHash = commits[0].hash;
+
+    // File-scoped diff should only contain the specified file
+    const fileDiff = await getCommitDiff(latestHash, tempDir, testFile);
+    assert.ok(fileDiff.diff.includes('test.txt'), 'File-scoped diff should include test.txt');
+    assert.ok(!fileDiff.diff.includes('test2.txt'), 'File-scoped diff should not include test2.txt');
+
+    // Full commit diff should contain both files
+    const fullDiff = await getCommitDiff(latestHash, tempDir);
+    assert.ok(fullDiff.diff.includes('test.txt'), 'Full diff should include test.txt');
+    assert.ok(fullDiff.diff.includes('test2.txt'), 'Full diff should include test2.txt');
+  });
+
   test('getSelectionHistory should return commits for line selection', async () => {
     const history = await getSelectionHistory(testFile, 2, 2, tempDir);
 
