@@ -15,4 +15,4 @@ clean:
 
 # Install the packaged extension locally
 install: publish
-	code --install-extension vscode-git-history-*.vsix
+	cursor --install-extension vscode-git-history-*.vsix
