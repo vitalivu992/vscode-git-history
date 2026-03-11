@@ -30,6 +30,29 @@ export interface DiffResult {
 }
 
 /**
+ * Blame info for a single line
+ */
+export interface BlameLineInfo {
+  hash: string;
+  shortHash: string;
+  author: string;
+  authorEmail: string;
+  authorTime: number;
+  summary: string;
+  lineNumber: number;
+  originalLineNumber: number;
+  filename: string;
+}
+
+/**
+ * Blame result for a file
+ */
+export interface BlameResult {
+  filePath: string;
+  lines: BlameLineInfo[];
+}
+
+/**
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
@@ -37,7 +60,8 @@ export type ExtToWebviewMessage =
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[] }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'commitFiles'; hash: string; files: CommitFileChange[] }
-  | { type: 'error'; message: string };
+  | { type: 'error'; message: string }
+  | { type: 'selectCommit'; hash: string };
 
 /**
  * Messages from webview to extension
