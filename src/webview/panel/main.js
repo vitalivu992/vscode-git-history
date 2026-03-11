@@ -9,6 +9,8 @@ let currentDiffType = 'unified'; // 'unified' or 'side-by-side'
 let diff2htmlUi = null;
 let searchQuery = '';
 let showGraph = true;
+let selectedFile = null;
+let currentCommitHash = null;
 
 // Graph rendering constants
 const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
@@ -97,8 +99,9 @@ function handleMessage(event) {
 
     case 'diff':
       currentDiff = message.diff;
+      selectedFile = message.selectedFile || null;
       renderDiff(currentDiff);
-      renderFiles(message.files);
+      renderFiles(message.files, selectedFile);
       break;
 
     case 'combinedDiff':
@@ -223,6 +226,8 @@ function renderCommits() {
 function selectCommit(hash) {
   selectedCommits.clear();
   selectedCommits.add(hash);
+  currentCommitHash = hash;
+  selectedFile = null;
 
   // Update checkboxes
   document.querySelectorAll('.commit-checkbox').forEach(cb => {
@@ -345,13 +350,27 @@ function setDiffType(type) {
   }
 }
 
-function renderFiles(files) {
+function renderFiles(files, activeFile) {
   fileList.innerHTML = '';
 
   if (!files || files.length === 0) {
     fileList.innerHTML = '<li class="empty-state-text">No files changed</li>';
     return;
   }
+
+  // Show back-link when viewing a single file's diff
+  if (activeFile && currentCommitHash) {
+    const backLi = document.createElement('li');
+    backLi.className = 'file-back-link';
+    backLi.textContent = '\u2190 Show full commit diff';
+    backLi.addEventListener('click', () => {
+      selectedFile = null;
+      requestDiff(currentCommitHash);
+    });
+    fileList.appendChild(backLi);
+  }
+
+  const isMultiSelect = selectedCommits.size > 1;
 
   files.forEach(file => {
     const li = document.createElement('li');
@@ -364,10 +383,26 @@ function renderFiles(files) {
       displayPath = `${file.previousPath} → ${file.path}`;
     }
 
+    if (activeFile && file.path === activeFile) {
+      li.classList.add('file-selected');
+    }
+
     li.innerHTML = `
       <span class="file-status ${statusClass}">${statusLabel}</span>
       <span class="file-path" title="${displayPath}">${displayPath}</span>
     `;
+
+    // Add click handler for single-commit mode only
+    if (!isMultiSelect && currentCommitHash) {
+      li.addEventListener('click', () => {
+        selectedFile = file.path;
+        vscode.postMessage({
+          type: 'requestFileDiff',
+          hash: currentCommitHash,
+          filePath: file.path
+        });
+      });
+    }
 
     fileList.appendChild(li);
   });

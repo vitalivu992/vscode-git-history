@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { GitHistoryPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitFiles } from '../git/gitService';
@@ -30,6 +31,10 @@ export async function handleMessage(
 
     case 'requestCommitFiles':
       await handleRequestCommitFiles(message.hash, panel);
+      break;
+
+    case 'requestFileDiff':
+      await handleRequestFileDiff(message.hash, message.filePath, panel);
       break;
 
     default:
@@ -110,6 +115,44 @@ async function handleRequestCommitFiles(
       type: 'commitFiles',
       hash,
       files
+    });
+  } catch (error) {
+    panel.postMessage({
+      type: 'error',
+      message: error instanceof Error ? error.message : String(error)
+    });
+  }
+}
+
+async function handleRequestFileDiff(
+  hash: string,
+  filePath: string,
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const absolutePath = path.join(cwd, filePath);
+    const diffResult = await getCommitDiff(hash, cwd, absolutePath);
+
+    if (diffResult.isBinary) {
+      const files = await getCommitFiles(hash, cwd);
+      panel.postMessage({
+        type: 'diff',
+        hash,
+        diff: 'Binary file - cannot display diff',
+        files,
+        selectedFile: filePath
+      });
+      return;
+    }
+
+    const files = await getCommitFiles(hash, cwd);
+    panel.postMessage({
+      type: 'diff',
+      hash,
+      diff: diffResult.diff,
+      files,
+      selectedFile: filePath
     });
   } catch (error) {
     panel.postMessage({

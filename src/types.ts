@@ -58,7 +58,7 @@ export interface BlameResult {
  */
 export type ExtToWebviewMessage =
   | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean }
-  | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[] }
+  | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[]; selectedFile?: string }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'commitFiles'; hash: string; files: CommitFileChange[] }
   | { type: 'error'; message: string }
@@ -71,4 +71,5 @@ export type WebviewToExtMessage =
   | { type: 'ready' }
   | { type: 'requestDiff'; hash: string }
   | { type: 'requestCombinedDiff'; hashes: string[] }
-  | { type: 'requestCommitFiles'; hash: string };
+  | { type: 'requestCommitFiles'; hash: string }
+  | { type: 'requestFileDiff'; hash: string; filePath: string };
