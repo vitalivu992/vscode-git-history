@@ -82,11 +82,10 @@ export async function getCommitDiff(
 ): Promise<DiffResult> {
   const args = ['show', '--patch', '--no-color'];
 
+  args.push(hash);
   if (filePath) {
     const relativePath = path.relative(cwd, filePath);
     args.push('--', relativePath);
-  } else {
-    args.push(hash);
   }
 
   const output = await execGit(args, cwd);
