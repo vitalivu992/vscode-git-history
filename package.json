@@ -16,7 +16,9 @@
   ],
   "activationEvents": [
     "onCommand:gitHistory.showFileHistory",
-    "onCommand:gitHistory.showSelectionHistory"
+    "onCommand:gitHistory.showSelectionHistory",
+    "onCommand:gitHistory.toggleBlame",
+    "onCommand:gitHistory.showBlameCommit"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -30,6 +32,14 @@
         "command": "gitHistory.showSelectionHistory",
         "title": "Git History for Selection",
         "category": "Git"
+      },
+      {
+        "command": "gitHistory.toggleBlame",
+        "title": "Git: Toggle Blame Annotations"
+      },
+      {
+        "command": "gitHistory.showBlameCommit",
+        "title": "Git: Show Blame Commit"
       }
     ],
     "menus": {
@@ -48,9 +58,22 @@
           "command": "gitHistory.showSelectionHistory",
           "group": "git",
           "when": "editorHasSelection"
+        },
+        {
+          "command": "gitHistory.toggleBlame",
+          "group": "git",
+          "when": "editorTextFocus"
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "gitHistory.toggleBlame",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "editorTextFocus"
+      }
+    ],
     "configuration": {
       "title": "Git History",
       "properties": {
@@ -58,6 +81,12 @@
           "type": "number",
           "default": 500,
           "description": "Maximum number of commits to display"
+        },
+        "gitHistory.blame.dateFormat": {
+          "type": "string",
+          "default": "relative",
+          "enum": ["relative", "short", "iso"],
+          "description": "Date format for blame annotations"
         }
       }
     }
