@@ -4,7 +4,7 @@ const COMMIT_SEPARATOR = '---COMMIT-END---';
 
 /**
  * Parse git log output with null-separated fields
- * Format: %H%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n
+ * Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n
  */
 export function parseGitLog(output: string): CommitInfo[] {
   const commits: CommitInfo[] = [];
@@ -27,23 +27,28 @@ export function parseGitLog(output: string): CommitInfo[] {
  * Parse a single commit block with null-separated fields
  */
 function parseCommitBlock(block: string): CommitInfo | null {
-  // Split by null character to get fields
-  const fields = block.split('\x00').map(f => f.trim()).filter(f => f);
+  // Split by null character to get fields (keep empty strings for optional fields like parentHashes)
+  const fields = block.split('\x00').map(f => f.trim());
 
-  // Need at least: hash, author, email, date, message
-  if (fields.length < 5) {
+  // Need at least: hash, parentHashes, author, email, date, message
+  if (fields.length < 6) {
     return null;
   }
 
   const hash = fields[0];
-  const author = fields[1];
-  const email = fields[2];
-  const dateStr = fields[3];
-  const subject = fields[4];
-  const body = fields[5] || '';
+  const parentHashes = fields[1] ? fields[1].split(' ').filter(Boolean) : [];
+  const author = fields[2];
+  const email = fields[3];
+  const dateStr = fields[4];
+  const subject = fields[5];
+  const body = fields[6] || '';
 
   // Validate hash format
   if (!/^[0-9a-f]{40}$/i.test(hash)) {
+    return null;
+  }
+
+  if (!author || !email || !dateStr) {
     return null;
   }
 
@@ -57,6 +62,7 @@ function parseCommitBlock(block: string): CommitInfo | null {
   return {
     hash,
     shortHash: hash.substring(0, 7),
+    parentHashes,
     author,
     email,
     date: date.toISOString(),
@@ -118,6 +124,7 @@ export function parseLineHistoryLog(output: string): CommitInfo[] {
       const commit: CommitInfo = {
         hash: hashMatch[1],
         shortHash: hashMatch[1].substring(0, 7),
+        parentHashes: [],
         author: hashMatch[2],
         email: hashMatch[3],
         date: new Date(parseInt(hashMatch[4]) * 1000).toISOString(),
