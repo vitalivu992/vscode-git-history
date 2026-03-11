@@ -24,6 +24,33 @@ jobs:
       - name: Run tests
         run: xvfb-run -a npm test
 
+  screenshot:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run compile
+
+      - run: sudo apt-get install -y imagemagick
+
+      - name: Capture screenshots
+        run: xvfb-run -a --server-args="-screen 0 1920x1080x24" npm run screenshot
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ github.sha }}
+          path: screenshots/
+          retention-days: 30
+
   package:
     runs-on: ubuntu-latest
     needs: test
