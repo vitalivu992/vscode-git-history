@@ -101,7 +101,8 @@
     "compile": "webpack --mode production && npm run compile-tests",
     "compile-tests": "tsc -p test/tsconfig.json",
     "watch": "webpack --mode development --watch",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "screenshot": "npm run compile-tests && node ./out/test/runScreenshot.js"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",

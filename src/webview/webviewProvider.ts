@@ -158,17 +158,22 @@ export class GitHistoryPanel {
 
   private _getHtmlForWebview(): string {
     const nonce = this.getNonce();
-    const graphLayoutUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel', 'graphLayout.js'));
+    const panelDir = vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel');
+    const stylesUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'styles.css'));
+    const diff2htmlCssUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'diff2html.min.css'));
+    const diff2htmlJsUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'diff2html-ui.min.js'));
+    const graphLayoutUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'graphLayout.js'));
+    const mainJsUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'main.js'));
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'nonce-${nonce}' https://cdn.jsdelivr.net;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' ${this._panel.webview.cspSource}; script-src 'nonce-${nonce}' ${this._panel.webview.cspSource};">
   <title>Git History</title>
-  <link rel="stylesheet" href="${this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel', 'styles.css'))}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/css/diff2html.min.css">
+  <link rel="stylesheet" href="${stylesUri}">
+  <link rel="stylesheet" href="${diff2htmlCssUri}">
 </head>
 <body>
   <div id="app">
@@ -207,9 +212,9 @@ export class GitHistoryPanel {
       </div>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/js/diff2html-ui.min.js"></script>
+  <script nonce="${nonce}" src="${diff2htmlJsUri}"></script>
   <script nonce="${nonce}" src="${graphLayoutUri}"></script>
-  <script nonce="${nonce}" src="${this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel', 'main.js'))}"></script>
+  <script nonce="${nonce}" src="${mainJsUri}"></script>
 </body>
 </html>`;
   }
