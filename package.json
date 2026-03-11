@@ -82,6 +82,11 @@
           "default": 500,
           "description": "Maximum number of commits to display"
         },
+        "gitHistory.showGraph": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show commit graph visualization in the history view"
+        },
         "gitHistory.blame.dateFormat": {
           "type": "string",
           "default": "relative",

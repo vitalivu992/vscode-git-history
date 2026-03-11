@@ -36,7 +36,7 @@ export async function getFileHistory(filePath: string, cwd: string): Promise<Com
   const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   // Use %x00 as field separator for cleaner parsing
-  const format = '%H%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n';
+  const format = '%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n';
 
   const args = [
     'log',

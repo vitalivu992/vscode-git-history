@@ -135,7 +135,8 @@ export class GitHistoryPanel {
         }
 
         this._commits = commits;
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath });
+        const showGraph = vscode.workspace.getConfiguration('gitHistory').get<boolean>('showGraph', true);
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph });
       } catch (error) {
         this.postMessage({
           type: 'error',
@@ -157,6 +158,7 @@ export class GitHistoryPanel {
 
   private _getHtmlForWebview(): string {
     const nonce = this.getNonce();
+    const graphLayoutUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel', 'graphLayout.js'));
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -187,6 +189,7 @@ export class GitHistoryPanel {
             <thead>
               <tr>
                 <th class="checkbox-col"><input type="checkbox" id="select-all"></th>
+                <th class="graph-col">Graph</th>
                 <th class="hash-col">Hash</th>
                 <th class="author-col">Author</th>
                 <th class="date-col">Date</th>
@@ -205,6 +208,7 @@ export class GitHistoryPanel {
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/js/diff2html-ui.min.js"></script>
+  <script nonce="${nonce}" src="${graphLayoutUri}"></script>
   <script nonce="${nonce}" src="${this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel', 'main.js'))}"></script>
 </body>
 </html>`;
