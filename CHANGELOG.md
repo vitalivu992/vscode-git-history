@@ -2,6 +2,17 @@
 
 All notable changes to the "vscode-git-history" extension will be documented in this file.
 
+## [1.1.0] - 2026-03-11
+
+### Added
+- **Click file to view individual diff**: Click any file in the changed files panel to see only that file's diff
+- **Visual file selection**: Selected file is highlighted in the file list
+- **Back-to-full-diff link**: "Show full commit diff" link appears when viewing a single file's diff
+- File clicking is automatically disabled during multi-select (combined diff) mode
+
+### Fixed
+- **Bug**: File-scoped diff (`getCommitDiff` with `filePath`) now correctly includes the commit hash, ensuring it targets the specified commit instead of HEAD
+
 ## [1.0.0] - 2026-03-11
 
 ### Added
