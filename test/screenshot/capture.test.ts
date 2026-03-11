@@ -6,37 +6,65 @@ import * as vscode from 'vscode';
 
 const screenshotsDir = path.resolve(__dirname, '../../..', 'screenshots');
 
+function findAndFocusVSCodeWindow(): void {
+  // Walk up the process tree from this extension host process to find the VS Code
+  // main window. This is more reliable than searching by class name.
+  // xdotool works for XWayland apps (VS Code/Electron) even on GNOME Wayland.
+  const display = process.env.DISPLAY;
+  if (!display) { return; }
+
+  const env = { ...process.env, DISPLAY: display };
+  let pid = process.pid;
+  const seen = new Set<number>();
+
+  while (pid > 1 && !seen.has(pid)) {
+    seen.add(pid);
+    try {
+      const result = cp.execFileSync(
+        'xdotool', ['search', '--onlyvisible', '--pid', String(pid)],
+        { encoding: 'utf8', env }
+      );
+      const windowIds = result.trim().split('\n').filter(Boolean);
+      if (windowIds.length > 0) {
+        const windowId = windowIds[windowIds.length - 1];
+        try { cp.execFileSync('xdotool', ['windowfocus', '--sync', windowId], { env }); } catch {}
+        try { cp.execFileSync('xdotool', ['windowraise', windowId], { env }); } catch {}
+        return;
+      }
+    } catch {}
+
+    // Move to parent process
+    try {
+      const ppid = cp.execFileSync('ps', ['-p', String(pid), '-o', 'ppid='],
+        { encoding: 'utf8' }).trim();
+      pid = parseInt(ppid, 10);
+    } catch { break; }
+  }
+}
+
 function captureScreen(outputPath: string): void {
   const platform = process.platform;
   if (platform === 'linux') {
+    findAndFocusVSCodeWindow();
+
     const tools: [string, string[]][] = [
-      ['import', ['-window', 'root', outputPath]],
-      ['scrot', [outputPath]],
+      ['gnome-screenshot', ['-w', '-f', outputPath]],
       ['grim', [outputPath]],
+      ['scrot', ['-u', outputPath]],
     ];
     for (const [cmd, args] of tools) {
       try {
         cp.execFileSync(cmd, args);
         return;
-      } catch (err: any) {
-        // Continue to next tool regardless of error (ENOENT = not installed, others = display issues)
+      } catch {
         continue;
       }
     }
-    // Fallback: use Python PIL to create a placeholder image
-    try {
-      cp.execFileSync('python3', [
-        '-c',
-        `from PIL import Image; Image.new('RGB', (1920, 1080), color=(40, 44, 52)).save('${outputPath}')`
-      ]);
-      console.warn('No screen capture tool found (imagemagick/scrot/grim). Created placeholder PNG.');
-    } catch {
-      console.warn('Screenshot capture unavailable. Install imagemagick, scrot, or grim for real screenshots.');
-    }
+    throw new Error('Screenshot capture failed. Install gnome-screenshot (GNOME), grim (wlroots Wayland), or scrot (X11).');
   } else if (platform === 'darwin') {
     cp.execFileSync('screencapture', ['-x', outputPath]);
   } else {
-    console.warn('Screenshot capture not supported on this platform');
+    throw new Error(`Screenshot capture not supported on platform: ${platform}`);
   }
 }
 
@@ -65,12 +93,10 @@ suite('Screenshot Capture', () => {
     await sleep(3000);
 
     const outputPath = path.join(screenshotsDir, 'selection-history.png');
+    findAndFocusVSCodeWindow();
+    await sleep(500);
     captureScreen(outputPath);
-    if (!fs.existsSync(outputPath)) {
-      console.warn('Screenshot not created - no capture tool available. Skipping file assertion.');
-    } else {
-      assert.ok(fs.existsSync(outputPath), 'Screenshot file should exist');
-    }
+    assert.ok(fs.existsSync(outputPath), 'Screenshot file should exist');
   });
 
   test('capture file history', async () => {
@@ -82,11 +108,9 @@ suite('Screenshot Capture', () => {
     await sleep(3000);
 
     const outputPath = path.join(screenshotsDir, 'file-history.png');
+    findAndFocusVSCodeWindow();
+    await sleep(500);
     captureScreen(outputPath);
-    if (!fs.existsSync(outputPath)) {
-      console.warn('Screenshot not created - no capture tool available. Skipping file assertion.');
-    } else {
-      assert.ok(fs.existsSync(outputPath), 'Screenshot file should exist');
-    }
+    assert.ok(fs.existsSync(outputPath), 'Screenshot file should exist');
   });
 });
