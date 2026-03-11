@@ -95,6 +95,10 @@ function handleMessage(event) {
       const graphTh = document.querySelector('th.graph-col');
       if (graphTh) { graphTh.style.display = showGraph ? '' : 'none'; }
       renderCommits();
+      // Auto-select the latest commit to show its diff immediately
+      if (commits.length > 0) {
+        selectCommit(commits[0].hash);
+      }
       break;
 
     case 'diff':
