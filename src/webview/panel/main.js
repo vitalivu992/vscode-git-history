@@ -6,7 +6,6 @@ let commits = [];
 let selectedCommits = new Set();
 let currentDiff = '';
 let currentDiffType = 'unified'; // 'unified' or 'side-by-side'
-let diff2htmlUi = null;
 let searchQuery = '';
 let showGraph = true;
 let selectedFile = null;
@@ -322,7 +321,6 @@ function renderDiff(diffText) {
   try {
     const diff2htmlInstance = new Diff2HtmlUI(targetElement, diffText, configuration);
     diff2htmlInstance.draw();
-    diff2htmlInstance.highlightAll();
   } catch (error) {
     console.error('Error rendering diff:', error);
     diffViewer.innerHTML = `<pre style="white-space: pre-wrap;">${escapeHtml(diffText)}</pre>`;
