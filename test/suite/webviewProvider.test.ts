@@ -128,6 +128,14 @@ suite('WebviewProvider HTML Tests', () => {
   test('main.js script tag should have nonce attribute', () => {
     assert.ok(html.includes('nonce="test-nonce-12345"'), 'main.js script should have nonce');
   });
+
+  test('main.js should not call non-existent diff2html methods', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(!source.includes('.highlightAll('),
+      'Should not call highlightAll (not a Diff2HtmlUI method)');
+  });
 });
 
 suite('Message Type Tests', () => {
