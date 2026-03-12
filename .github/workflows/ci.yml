@@ -24,9 +24,8 @@ jobs:
       - name: Run tests
         run: xvfb-run -a npm test
 
-  screenshot:
+  pr: # Combined job for PRs - test, screenshot, and package in one run
     runs-on: ubuntu-latest
-    needs: test
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
@@ -40,6 +39,9 @@ jobs:
 
       - run: npm run compile
 
+      - name: Run tests
+        run: xvfb-run -a npm test
+
       - run: sudo apt-get install -y scrot
 
       - name: Capture screenshots
@@ -51,9 +53,17 @@ jobs:
           path: screenshots/
           retention-days: 7
 
+      - run: npx @vscode/vsce package --no-dependencies
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix-${{ github.sha }}
+          path: "*.vsix"
+
   package:
     runs-on: ubuntu-latest
     needs: test
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
 
