@@ -22,11 +22,12 @@ Screenshots are saved to the `screenshots/` directory (gitignored). Two files ar
 
 ## CI
 
-On pull requests, the CI `screenshot` job automatically:
-1. Runs `npm run screenshot` in an Xvfb virtual display (1920×1080)
-2. Uploads the `screenshots/` directory as a GitHub Actions artifact
+On pull requests, the CI `test` job automatically:
+1. Runs tests and captures screenshots in an Xvfb virtual display (1920×1080)
+2. Packages the extension as a `.vsix` file
+3. Uploads both `screenshots/` and the `.vsix` as GitHub Actions artifacts (retained for 7 days)
 
-PR reviewers can download the artifact from the **Actions** tab on GitHub.
+PR reviewers can download the artifacts from the **Actions** tab on GitHub. Artifacts are named with the extension version and commit SHA for easy identification.
 
 ## Manual Workflow
 

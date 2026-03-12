@@ -2,6 +2,18 @@
 
 All notable changes to the "vscode-git-history" extension will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **CI**: Merged screenshot capture and packaging into the test job for faster builds
+- **CI**: Artifacts now include version in filename (e.g., `screenshots-v1.1.0-<sha>`)
+- **CI**: Artifacts retained for 7 days instead of 90
+- **Release**: Version bump now happens AFTER release upload (bumps to next version)
+- **Makefile**: Renamed `publish` target to `package` (more conventional)
+- **Makefile**: Added `help` target for self-documenting targets
+- **Makefile**: `make test` now captures screenshots along with running tests
+- **Makefile**: `make install` installs to Cursor editor
+
 ## [1.1.0] - 2026-03-11
 
 ### Added

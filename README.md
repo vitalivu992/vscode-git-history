@@ -75,10 +75,26 @@ npm install
 npm run compile
 ```
 
+Or use the Makefile:
+
+```bash
+make help          # Show all available targets
+make compile       # Compile the extension
+make package       # Package as .vsix file
+make test          # Run tests and capture screenshots
+make clean         # Clean build artifacts
+```
+
 ### Testing
 
 ```bash
 npm test
+```
+
+Or use the Makefile:
+
+```bash
+make test          # Runs tests + captures screenshots
 ```
 
 ### Running in Development
