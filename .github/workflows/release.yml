@@ -79,4 +79,4 @@ jobs:
         run: |
           git add package.json
           git commit -m "chore: bump version to v${{ steps.bump.outputs.version }}"
-          git push
+          git push origin HEAD:master
