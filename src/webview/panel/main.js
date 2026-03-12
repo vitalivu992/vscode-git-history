@@ -10,6 +10,7 @@ let searchQuery = '';
 let showGraph = true;
 let selectedFile = null;
 let currentCommitHash = null;
+let trackedFilePath = null;
 
 // Graph rendering constants
 const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
@@ -90,6 +91,7 @@ function handleMessage(event) {
     case 'init':
       commits = message.commits;
       showGraph = message.showGraph !== false;
+      trackedFilePath = message.filePath || null;
       // Show or hide the graph column header
       const graphTh = document.querySelector('th.graph-col');
       if (graphTh) { graphTh.style.display = showGraph ? '' : 'none'; }
@@ -291,7 +293,11 @@ function handleSelectAll(e) {
 }
 
 function requestDiff(hash) {
-  vscode.postMessage({ type: 'requestDiff', hash });
+  if (trackedFilePath) {
+    vscode.postMessage({ type: 'requestFileDiff', hash, filePath: trackedFilePath });
+  } else {
+    vscode.postMessage({ type: 'requestDiff', hash });
+  }
 }
 
 function requestCombinedDiff() {
@@ -315,7 +321,9 @@ function renderDiff(diffText) {
     drawFileList: false,
     matching: 'lines',
     outputFormat: currentDiffType === 'side-by-side' ? 'side-by-side' : 'line-by-line',
-    highlight: true
+    highlight: true,
+    stickyFileHeaders: false,
+    fileListToggle: false
   };
 
   try {
@@ -367,7 +375,7 @@ function renderFiles(files, activeFile) {
     backLi.textContent = '\u2190 Show full commit diff';
     backLi.addEventListener('click', () => {
       selectedFile = null;
-      requestDiff(currentCommitHash);
+      vscode.postMessage({ type: 'requestDiff', hash: currentCommitHash });
     });
     fileList.appendChild(backLi);
   }
