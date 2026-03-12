@@ -76,7 +76,6 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Commit version bump
-        if: github.event_name == 'workflow_dispatch'
         run: |
           git add package.json
           git commit -m "chore: bump version to v${{ steps.bump.outputs.version }}"

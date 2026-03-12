@@ -7,3 +7,6 @@ out/
 .DS_Store
 *.log
 screenshots/
+.playwright-cli/
+.playwright-mcp/
+.claude/skills/playwright-cli/
