@@ -24,49 +24,27 @@ jobs:
       - name: Run tests
         run: xvfb-run -a npm test
 
-  screenshot:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - run: npm ci
-
-      - run: npm run compile
-
       - run: sudo apt-get install -y scrot
 
       - name: Capture screenshots
         run: xvfb-run -a --server-args="-screen 0 1920x1080x24" npm run screenshot
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: screenshots-${{ github.sha }}
-          path: screenshots/
-          retention-days: 7
-
-  package:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - run: npm ci
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - run: npx @vscode/vsce package --no-dependencies
 
       - uses: actions/upload-artifact@v4
         with:
-          name: vsix-${{ github.sha }}
+          name: screenshots-v${{ steps.version.outputs.version }}-${{ github.sha }}
+          path: screenshots/
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix-v${{ steps.version.outputs.version }}-${{ github.sha }}
           path: "*.vsix"
+          retention-days: 7
