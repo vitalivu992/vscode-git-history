@@ -136,7 +136,7 @@ export class GitHistoryPanel {
 
         this._commits = commits;
         const showGraph = vscode.workspace.getConfiguration('gitHistory').get<boolean>('showGraph', true);
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph });
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection });
       } catch (error) {
         this.postMessage({
           type: 'error',
