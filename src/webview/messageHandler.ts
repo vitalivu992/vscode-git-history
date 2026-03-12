@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as vscode from 'vscode';
 import { GitHistoryPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitFiles } from '../git/gitService';
@@ -131,8 +130,7 @@ async function handleRequestFileDiff(
 ): Promise<void> {
   try {
     const cwd = panel.getCwd();
-    const absolutePath = path.join(cwd, filePath);
-    const diffResult = await getCommitDiff(hash, cwd, absolutePath);
+    const diffResult = await getCommitDiff(hash, cwd, filePath);
 
     if (diffResult.isBinary) {
       const files = await getCommitFiles(hash, cwd);
