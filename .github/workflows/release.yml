@@ -32,25 +32,6 @@ jobs:
 
       - run: npm ci
 
-      - name: Bump version
-        id: bump
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          if [ "${{ github.event_name }}" = "release" ]; then
-            # Use the release tag as the version (strip leading 'v' if present)
-            TAG="${{ github.event.release.tag_name }}"
-            VERSION="${TAG#v}"
-            npm version "$VERSION" --no-git-tag-version
-          else
-            # Bump based on workflow_dispatch input
-            npm version "${{ inputs.bump }}" --no-git-tag-version
-          fi
-
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
       - name: Run tests
         run: |
           npm run compile
@@ -59,10 +40,16 @@ jobs:
       - name: Package extension
         run: npx @vscode/vsce package --no-dependencies
 
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vscode-git-history-v${{ steps.bump.outputs.version }}
+          name: vscode-git-history-v${{ steps.version.outputs.version }}
           path: "*.vsix"
 
       - name: Upload to release
@@ -70,6 +57,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "${{ github.event.release.tag_name }}" *.vsix
+
+      - name: Bump next version
+        id: bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ "${{ github.event_name }}" = "release" ]; then
+            npm version "patch" --no-git-tag-version
+          else
+            # Bump based on workflow_dispatch input
+            npm version "${{ inputs.bump }}" --no-git-tag-version
+          fi
+
+          VERSION=$(node -p "require('./package.json').version")
+          echo "the next version is $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Commit version bump
         if: github.event_name == 'workflow_dispatch'
