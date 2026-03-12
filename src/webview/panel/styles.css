@@ -76,12 +76,16 @@ body {
   overflow: auto;
   border-bottom: 1px solid var(--vscode-border-color);
   padding: 8px;
+  position: relative;
+  z-index: 0;
 }
 
 #bottom-panel {
   display: flex;
   height: 50%;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 #commit-table-container {
