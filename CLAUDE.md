@@ -10,6 +10,18 @@ npm run compile       # Production build (webpack + compile tests)
 npm run watch         # Development build with watch mode
 npm run compile-tests # Compile tests only (tsc -p test/tsconfig.json)
 npm test              # Run tests (on Linux: xvfb-run -a npm test)
+npm run screenshot    # Capture extension screenshots
+```
+
+### Makefile (convenience wrapper)
+
+```bash
+make help            # Show all available targets
+make compile         # npm install + npm run compile
+make test            # Run tests + capture screenshots
+make package         # Package as .vsix file
+make install         # Install .vsix to Cursor
+make clean           # Remove dist/, out/, .vsix, screenshots/
 ```
 
 ## Architecture Overview
@@ -64,4 +76,4 @@ Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessag
 
 ## Testing
 
-Tests use VS Code's test framework with Mocha. Run with `npm test`. On Linux CI, tests require `xvfb-run` because VS Code needs a display.
+Tests use VS Code's test framework with Mocha. Run with `npm test` or `make test`. On Linux CI, tests require `xvfb-run` because VS Code needs a display. The test job also captures screenshots for PR review.
