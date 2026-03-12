@@ -23,5 +23,5 @@ package: compile ### Package the extension into a .vsix file
 	@command -v vsce >/dev/null 2>&1 || { echo "Installing vsce..."; npm install -g @vscode/vsce; }
 	vsce package
 
-install: package ### Install the packaged extension locally (Cursor)
-	cursor --install-extension vscode-git-history-*.vsix
+install: package ### Install the packaged extension locally
+	code --install-extension vscode-git-history-*.vsix
