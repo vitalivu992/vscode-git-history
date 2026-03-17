@@ -47,19 +47,37 @@ This is a VS Code extension for viewing git history of files and line selections
 
 ### Git Log Format
 
-The extension uses a custom git log format with null separators:
+File history uses:
 ```
-%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n
+%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00---COMMIT-END---%n
 ```
-Fields: hash, parent hashes (space-separated), author, email, timestamp, subject, body.
+Fields: hash, parent hashes (space-separated), author, email, timestamp, subject, body, decorations.
 Commits are separated by `---COMMIT-END---` markers. `%P` is empty for root commits.
+
+The `%d` decorations field contains tag references (e.g., `tag: v1.0.0`, `tag: v1.0.0, origin/main`). Tags are parsed from this field and rendered as badges in the webview commit list. Both annotated and lightweight tags are supported.
+
+Selection history (`git log -L`) uses the same null-separated format (without body/`---COMMIT-END---`):
+```
+%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d
+```
+Each commit appears as a single header line; inline diff lines (no null chars) are skipped by the parser.
 
 ### Commit Graph
 
 The webview renders a per-row SVG graph column (like `git log --graph`) using a lane-based algorithm:
-- `src/webview/panel/graphLayout.js` – pure JS lane computation, exports `computeGraphLayout(commits)`
-- `src/webview/panel/main.js` – calls `computeGraphLayout` after filtering, renders SVG per row via `renderGraphSvg()`
+- `src/webview/panel/graphLayout.js` – pure JS lane computation, exports `computeGraphLayout(commits)` and `simplifyParentsForDisplay(commits)`
+- `src/webview/panel/main.js` – calls `simplifyParentsForDisplay` then `computeGraphLayout` on the filtered list, renders SVG per row via `renderGraphSvg()`
 - Controlled by `gitHistory.showGraph` config setting (default: true)
+
+`simplifyParentsForDisplay` remaps each commit's `parentHashes` to only reference commits present in the displayed list. This prevents "ghost" lanes when the list is filtered (e.g. `--follow -- file` or `-L`). Commits whose parents are all absent get the next commit in the list assigned as a synthetic first parent.
+
+### UI Features
+
+- **Date Tooltips**: Commit dates are displayed in relative format (e.g., "2 days ago") in the commit list. Hovering over a date reveals the absolute timestamp in ISO format. Implemented in `src/webview/panel/main.js` with a `title` attribute on date elements.
+
+- **Git Tag Badges**: Tags parsed from the `%d` decorations field are rendered as colored badges next to commit messages. Lightweight and annotated tags are both supported. Badge styling is defined in `src/webview/panel/styles.css`.
+
+- **Blame Annotations**: The extension provides line-by-line blame annotations via the `toggleBlame` and `showBlameCommit` commands. Blame information is displayed as inline decorations showing commit hash, author, and date for each line. Date format is configurable via `gitHistory.blame.dateFormat` (relative, short, or iso).
 
 ### Message Protocol
 
