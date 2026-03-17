@@ -125,39 +125,45 @@ export function parseNameStatus(output: string): Map<string, { status: string; p
 
 /**
  * Parse git log -L output (line history)
- * This is more complex as it includes inline diffs
+ * Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d
+ * Each commit header line contains null-separated fields; diff lines are skipped.
  */
 export function parseLineHistoryLog(output: string): CommitInfo[] {
   const commits: CommitInfo[] = [];
+  const seen = new Set<string>();
   const lines = output.split('\n');
 
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
+  for (const line of lines) {
+    const nullIdx = line.indexOf('\x00');
+    if (nullIdx < 0) { continue; }
 
-    // Look for commit header pattern: ^hash author <email> timestamp subject[\x00decorations]
-    const hashMatch = line.match(/^([0-9a-f]{40})\s+(.*) <(.*)>\s+(\d+)\s+(.*)$/);
-    if (hashMatch) {
-      const rest = hashMatch[5];
-      const nullIdx = rest.indexOf('\x00');
-      const subject = nullIdx >= 0 ? rest.substring(0, nullIdx) : rest;
-      const decorations = nullIdx >= 0 ? rest.substring(nullIdx + 1) : '';
-      const tags = parseTagsFromDecorations(decorations);
-      const commit: CommitInfo = {
-        hash: hashMatch[1],
-        shortHash: hashMatch[1].substring(0, 7),
-        parentHashes: [],
-        author: hashMatch[2],
-        email: hashMatch[3],
-        date: new Date(parseInt(hashMatch[4]) * 1000).toISOString(),
-        message: subject,
-        fullMessage: subject,
-        ...(tags.length > 0 ? { tags } : {})
-      };
-      commits.push(commit);
-    }
+    const fields = line.split('\x00');
+    const hash = fields[0];
+    if (!/^[0-9a-f]{40}$/i.test(hash)) { continue; }
+    if (seen.has(hash)) { continue; }
+    seen.add(hash);
 
-    i++;
+    const parentHashes = fields[1] ? fields[1].split(' ').filter(Boolean) : [];
+    const author = fields[2] || '';
+    const email = fields[3] || '';
+    const dateStr = fields[4] || '';
+    const subject = fields[5] || '';
+    const decorations = fields[6] || '';
+    const tags = parseTagsFromDecorations(decorations);
+    const date = new Date(parseInt(dateStr) * 1000);
+    if (!author || isNaN(date.getTime())) { continue; }
+
+    commits.push({
+      hash,
+      shortHash: hash.substring(0, 7),
+      parentHashes,
+      author,
+      email,
+      date: date.toISOString(),
+      message: subject,
+      fullMessage: subject,
+      ...(tags.length > 0 ? { tags } : {})
+    });
   }
 
   return commits;
