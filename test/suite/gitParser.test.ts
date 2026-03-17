@@ -39,16 +39,27 @@ suite('Git Parser Tests', () => {
   });
 
   test('parseLineHistoryLog should parse -L output', () => {
-    // Note: hashes must be valid hex (0-9, a-f)
-    const input = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 John Doe <john@example.com> 1234567890 Added line\nb1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0 Jane Smith <jane@example.com> 1234567900 Modified line';
+    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d (one header line per commit, diff lines have no nulls)
+    const hash1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
+    const hash2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0';
+    const input = [
+      `${hash1}\x00${hash2}\x00John Doe\x00john@example.com\x001234567890\x00Added line\x00`,
+      'diff --git a/file.ts b/file.ts',
+      '--- a/file.ts',
+      '+++ b/file.ts',
+      `${hash2}\x00\x00Jane Smith\x00jane@example.com\x001234567900\x00Modified line\x00`,
+    ].join('\n');
 
     const commits = parseLineHistoryLog(input);
 
     assert.strictEqual(commits.length, 2);
-    assert.strictEqual(commits[0].hash, 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0');
+    assert.strictEqual(commits[0].hash, hash1);
     assert.strictEqual(commits[0].author, 'John Doe');
     assert.strictEqual(commits[0].message, 'Added line');
+    assert.deepStrictEqual(commits[0].parentHashes, [hash2]);
+    assert.strictEqual(commits[1].hash, hash2);
     assert.strictEqual(commits[1].message, 'Modified line');
+    assert.deepStrictEqual(commits[1].parentHashes, []);
   });
 
   test('isBinaryFile should detect binary files', () => {

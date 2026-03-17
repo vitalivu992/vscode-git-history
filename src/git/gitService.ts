@@ -65,7 +65,7 @@ export async function getSelectionHistory(
   const args = [
     'log',
     `-L${startLine},${endLine}:${relativePath}`,
-    '--format=%H %an <%ae> %at %s%x00%d'
+    '--format=%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d'
   ];
 
   const output = await execGit(args, cwd);
