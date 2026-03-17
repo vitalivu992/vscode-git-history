@@ -180,6 +180,10 @@ function renderCommits() {
     tr.dataset.hash = commit.hash;
 
     const date = formatDate(commit.date);
+    const absoluteDate = new Date(commit.date).toLocaleString(undefined, {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
     const graphCell = showGraph && graphData[index]
       ? `<td class="graph-col">${renderGraphSvg(graphData[index], maxCols)}</td>`
       : '';
@@ -192,7 +196,7 @@ function renderCommits() {
       ${graphCell}
       <td class="hash-col" title="${commit.hash}">${commit.shortHash}</td>
       <td class="author-col" title="${commit.author}">${truncate(commit.author, 20)}</td>
-      <td class="date-col">${date}</td>
+      <td class="date-col" title="${absoluteDate}">${date}</td>
       <td class="message-col" title="${commit.message}">${tagBadges}${escapeHtml(commit.message)}</td>
     `;
 
