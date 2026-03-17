@@ -142,11 +142,6 @@ body {
   border-bottom: 1px solid var(--vscode-border-color);
 }
 
-.checkbox-col {
-  width: 32px;
-  text-align: center;
-}
-
 .graph-col {
   width: auto;
   min-width: 24px;
@@ -420,9 +415,9 @@ body {
   background-color: var(--vscode-editor-background) !important;
 }
 
-/* Collapse/expand controls */
+/* Hide diff2html Viewed checkbox */
 .d2h-file-collapse {
-  color: var(--vscode-editor-foreground) !important;
+  display: none !important;
 }
 
 /* Scrollbar styling inside diff viewer */
@@ -442,6 +437,18 @@ body {
 
 #diff-viewer::-webkit-scrollbar-thumb:hover {
   background: var(--vscode-scrollbarSlider-hoverBackground);
+}
+
+.tag-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  margin-right: 4px;
+  background-color: var(--vscode-badge-background, #4d5770);
+  color: var(--vscode-badge-foreground, #fff);
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  vertical-align: middle;
 }
 
 .empty-state {

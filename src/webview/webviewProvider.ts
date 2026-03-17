@@ -41,12 +41,24 @@ export class GitHistoryPanel {
   ): Promise<void> {
     const column = vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One;
 
-    // If panel already exists, show it
+    // If panel already exists, reuse it only if context is the same
     if (GitHistoryPanel.currentPanel) {
-      GitHistoryPanel.currentPanel._panel.reveal(column);
-      // Reload with new data
-      await GitHistoryPanel.currentPanel.loadData();
-      return;
+      const existingPanel = GitHistoryPanel.currentPanel;
+      const existingSel = existingPanel.getSelection();
+      const sameContext =
+        existingPanel.getFilePath() === filePath &&
+        existingPanel.getCwd() === cwd &&
+        existingSel?.startLine === selection?.startLine &&
+        existingSel?.endLine === selection?.endLine;
+
+      if (sameContext) {
+        existingPanel._panel.reveal(column);
+        await existingPanel.loadData();
+        return;
+      }
+
+      // Different context: dispose old panel and create a new one
+      existingPanel.dispose();
     }
 
     // Create new panel
@@ -193,7 +205,6 @@ export class GitHistoryPanel {
           <table id="commit-table">
             <thead>
               <tr>
-                <th class="checkbox-col"><input type="checkbox" id="select-all"></th>
                 <th class="graph-col">Graph</th>
                 <th class="hash-col">Hash</th>
                 <th class="author-col">Author</th>
