@@ -80,13 +80,13 @@ suite('Screenshot Capture', () => {
   });
 
   test('capture selection history', async () => {
-    const readmePath = path.resolve(__dirname, '../../..', 'README.md');
-    const doc = await vscode.workspace.openTextDocument(readmePath);
+    const packageJsonPath = path.resolve(__dirname, '../../..', 'package.json');
+    const doc = await vscode.workspace.openTextDocument(packageJsonPath);
     const editor = await vscode.window.showTextDocument(doc);
 
-    // Select the "Features" paragraph (lines 7-17, 0-indexed: 6-16)
-    const startLine = 6;
-    const endLine = 16;
+    // Select line 5 (the version line, 0-indexed: 4)
+    const startLine = 4;
+    const endLine = 4;
     editor.selection = new vscode.Selection(startLine, 0, endLine, doc.lineAt(endLine).text.length);
 
     await vscode.commands.executeCommand('gitHistory.showSelectionHistory');
