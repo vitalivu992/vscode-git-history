@@ -21,7 +21,6 @@ const NODE_R = 4;   // commit node circle radius
 // DOM Elements
 const diffViewer = document.getElementById('diff-viewer');
 const commitList = document.getElementById('commit-list');
-const selectAllCheckbox = document.getElementById('select-all');
 const unifiedBtn = document.getElementById('unified-btn');
 const sideBySideBtn = document.getElementById('side-by-side-btn');
 const fileList = document.getElementById('file-list');
@@ -73,7 +72,6 @@ function init() {
   vscode.postMessage({ type: 'ready' });
 
   // Event listeners
-  selectAllCheckbox.addEventListener('change', handleSelectAll);
   unifiedBtn.addEventListener('click', () => setDiffType('unified'));
   sideBySideBtn.addEventListener('click', () => setDiffType('side-by-side'));
   if (searchInput) {
@@ -153,7 +151,7 @@ function renderCommits() {
     );
   });
 
-  const colspan = showGraph ? 6 : 5;
+  const colspan = showGraph ? 5 : 4;
 
   if (filteredCommits.length === 0) {
     commitList.innerHTML = `
@@ -186,41 +184,35 @@ function renderCommits() {
       ? `<td class="graph-col">${renderGraphSvg(graphData[index], maxCols)}</td>`
       : '';
 
+    const tagBadges = (commit.tags || [])
+      .map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`)
+      .join('');
+
     tr.innerHTML = `
-      <td class="checkbox-col">
-        <input type="checkbox" class="commit-checkbox" data-hash="${commit.hash}">
-      </td>
       ${graphCell}
       <td class="hash-col" title="${commit.hash}">${commit.shortHash}</td>
       <td class="author-col" title="${commit.author}">${truncate(commit.author, 20)}</td>
       <td class="date-col">${date}</td>
-      <td class="message-col" title="${commit.message}">${commit.message}</td>
+      <td class="message-col" title="${commit.message}">${tagBadges}${escapeHtml(commit.message)}</td>
     `;
 
-    // Row click handler
+    // Row click handler: normal click = single select; Ctrl/Cmd+Click = toggle multi-select
     tr.addEventListener('click', (e) => {
-      if (e.target.type !== 'checkbox') {
+      if (e.ctrlKey || e.metaKey) {
+        if (selectedCommits.has(commit.hash)) {
+          selectedCommits.delete(commit.hash);
+        } else {
+          selectedCommits.add(commit.hash);
+        }
+        updateSelectedRows();
+        if (selectedCommits.size > 1) {
+          requestCombinedDiff();
+        } else if (selectedCommits.size === 1) {
+          requestDiff([...selectedCommits][0]);
+        }
+      } else {
         clearSelection();
         selectCommit(commit.hash);
-      }
-    });
-
-    // Checkbox change handler
-    const checkbox = tr.querySelector('.commit-checkbox');
-    checkbox.addEventListener('change', () => {
-      if (checkbox.checked) {
-        selectedCommits.add(commit.hash);
-      } else {
-        selectedCommits.delete(commit.hash);
-      }
-      updateSelectedRows();
-      updateSelectAllState();
-
-      if (selectedCommits.size > 1) {
-        requestCombinedDiff();
-      } else if (selectedCommits.size === 1) {
-        const hash = [...selectedCommits][0];
-        requestDiff(hash);
       }
     });
 
@@ -234,23 +226,13 @@ function selectCommit(hash) {
   currentCommitHash = hash;
   selectedFile = null;
 
-  // Update checkboxes
-  document.querySelectorAll('.commit-checkbox').forEach(cb => {
-    cb.checked = cb.dataset.hash === hash;
-  });
-
   updateSelectedRows();
-  updateSelectAllState();
   requestDiff(hash);
 }
 
 function clearSelection() {
   selectedCommits.clear();
-  document.querySelectorAll('.commit-checkbox').forEach(cb => {
-    cb.checked = false;
-  });
   updateSelectedRows();
-  updateSelectAllState();
 }
 
 function updateSelectedRows() {
@@ -261,35 +243,6 @@ function updateSelectedRows() {
       tr.classList.remove('selected');
     }
   });
-}
-
-function updateSelectAllState() {
-  const totalCheckboxes = document.querySelectorAll('.commit-checkbox').length;
-  selectAllCheckbox.checked = selectedCommits.size === totalCheckboxes && totalCheckboxes > 0;
-  selectAllCheckbox.indeterminate = selectedCommits.size > 0 && selectedCommits.size < totalCheckboxes;
-}
-
-function handleSelectAll(e) {
-  const checked = e.target.checked;
-  document.querySelectorAll('.commit-checkbox').forEach(cb => {
-    cb.checked = checked;
-    const hash = cb.dataset.hash;
-    if (checked) {
-      selectedCommits.add(hash);
-    } else {
-      selectedCommits.delete(hash);
-    }
-  });
-  updateSelectedRows();
-
-  if (selectedCommits.size > 1) {
-    requestCombinedDiff();
-  } else if (selectedCommits.size === 1) {
-    const hash = [...selectedCommits][0];
-    requestDiff(hash);
-  } else {
-    clearDiff();
-  }
 }
 
 function requestDiff(hash) {

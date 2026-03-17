@@ -49,7 +49,6 @@ suite('WebviewProvider HTML Tests', () => {
           <table id="commit-table">
             <thead>
               <tr>
-                <th class="checkbox-col"><input type="checkbox" id="select-all"></th>
                 <th class="hash-col">Hash</th>
                 <th class="author-col">Author</th>
                 <th class="date-col">Date</th>
@@ -119,7 +118,6 @@ suite('WebviewProvider HTML Tests', () => {
     assert.ok(html.includes('id="app"'), 'Should have #app');
     assert.ok(html.includes('id="main-content"'), 'Should have #main-content');
     assert.ok(html.includes('id="bottom-panel"'), 'Should have #bottom-panel');
-    assert.ok(html.includes('id="select-all"'), 'Should have #select-all');
     assert.ok(html.includes('id="diff-viewer"'), 'Should have #diff-viewer');
     assert.ok(html.includes('id="commit-list"'), 'Should have #commit-list');
     assert.ok(html.includes('id="file-list"'), 'Should have #file-list');
