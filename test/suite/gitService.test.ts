@@ -136,6 +136,16 @@ suite('Git Service Integration Tests', () => {
     assert.ok(fullDiff.diff.includes('test2.txt'), 'Full diff should include test2.txt');
   });
 
+  test('getCommitDiff with relative filePath should work correctly', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+    const latestHash = commits[0].hash;
+
+    // Use a relative path (as returned by parseNameStatus / git --name-status)
+    const relPath = 'test.txt';
+    const diffResult = await getCommitDiff(latestHash, tempDir, relPath);
+    assert.ok(diffResult.diff.includes('test.txt'), 'Diff with relative path should include filename');
+  });
+
   test('getSelectionHistory should return commits for line selection', async () => {
     const history = await getSelectionHistory(testFile, 2, 2, tempDir);
 
