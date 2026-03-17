@@ -147,7 +147,8 @@ body {
   min-width: 24px;
   max-width: 160px;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
+  vertical-align: middle;
 }
 
 .hash-col {

@@ -63,7 +63,9 @@ function renderGraphSvg(cell, totalCols) {
   const nodeColor = GRAPH_COLORS[cell.nodeColor % GRAPH_COLORS.length];
   paths.push(`<circle cx="${cx}" cy="${cy}" r="${NODE_R}" fill="${nodeColor}"/>`);
 
-  return `<svg width="${width}" height="${ROW_H}" viewBox="0 0 ${width} ${ROW_H}" xmlns="http://www.w3.org/2000/svg">${paths.join('')}</svg>`;
+  // height/width are set via CSS (100% of the td); the viewBox uses ROW_H so coordinates stay stable.
+  // overflow: visible lets vertical lines extend into the td's padding area, closing the gap between rows.
+  return `<svg style="display:block;width:${width}px;height:100%;overflow:visible;" viewBox="0 0 ${width} ${ROW_H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">${paths.join('')}</svg>`;
 }
 
 // Initialize
@@ -165,11 +167,13 @@ function renderCommits() {
     return;
   }
 
-  // Compute graph layout for all filtered commits
   let graphData = [];
   let maxCols = 1;
   if (showGraph && typeof computeGraphLayout === 'function') {
-    graphData = computeGraphLayout(filteredCommits);
+    const graphCommits = typeof simplifyParentsForDisplay === 'function'
+      ? simplifyParentsForDisplay(filteredCommits)
+      : filteredCommits;
+    graphData = computeGraphLayout(graphCommits);
     for (let g = 0; g < graphData.length; g++) {
       if (graphData[g].maxColumns > maxCols) { maxCols = graphData[g].maxColumns; }
     }

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 
 // Load graphLayout.js directly from source (it's a plain JS browser file, not compiled by TS)
-const { computeGraphLayout } = require(path.resolve(__dirname, '../../../src/webview/panel/graphLayout'));
+const { computeGraphLayout, simplifyParentsForDisplay } = require(path.resolve(__dirname, '../../../src/webview/panel/graphLayout'));
 
 interface GraphCell {
   nodeCol: number;
@@ -135,17 +135,86 @@ suite('Graph Layout Tests', () => {
     assert.strictEqual(result[0].nodeCol, 0);
   });
 
-  test('filtered subset with broken parent chains', () => {
-    // Simulate a filtered list where parent commits are not present
+  test('filtered subset with broken parent chains - no ghost lanes', () => {
+    // Simulate a filtered list where parent commits are not present.
+    // After simplification, 'cccc' should chain to 'aaaa' as a synthetic parent.
     const commits = [
       makeCommit('cccc', ['bbbb']), // parent 'bbbb' not in list
       makeCommit('aaaa', [])
     ];
-    const result: GraphCell[] = computeGraphLayout(commits);
+    const simplified = simplifyParentsForDisplay(commits);
+    const result: GraphCell[] = computeGraphLayout(simplified);
 
     assert.strictEqual(result.length, 2);
-    // Should not throw; lanes for missing parents are opened but may not close
-    assert.strictEqual(typeof result[0].nodeCol, 'number');
-    assert.strictEqual(typeof result[1].nodeCol, 'number');
+    // 'cccc' should now use 'aaaa' as synthetic parent → both in column 0, no extra lanes
+    assert.strictEqual(result[0].nodeCol, 0);
+    assert.strictEqual(result[1].nodeCol, 0);
+    // No lanes open beyond column 0
+    for (const cell of result) {
+      assert.ok(cell.maxColumns <= 1, `Expected maxColumns <= 1 (no ghost lanes), got ${cell.maxColumns}`);
+    }
+  });
+});
+
+suite('simplifyParentsForDisplay Tests', () => {
+  test('empty list returns empty array', () => {
+    assert.deepStrictEqual(simplifyParentsForDisplay([]), []);
+    assert.deepStrictEqual(simplifyParentsForDisplay(null), []);
+    assert.deepStrictEqual(simplifyParentsForDisplay(undefined), []);
+  });
+
+  test('visible parents are kept as-is', () => {
+    const commits = [
+      makeCommit('cccc', ['bbbb']),
+      makeCommit('bbbb', ['aaaa']),
+      makeCommit('aaaa', [])
+    ];
+    const result = simplifyParentsForDisplay(commits);
+    assert.deepStrictEqual(result[0].parentHashes, ['bbbb']);
+    assert.deepStrictEqual(result[1].parentHashes, ['aaaa']);
+    assert.deepStrictEqual(result[2].parentHashes, []);
+  });
+
+  test('invisible parent replaced with next commit in list', () => {
+    const commits = [
+      makeCommit('cccc', ['bbbb']), // bbbb not in list
+      makeCommit('aaaa', [])
+    ];
+    const result = simplifyParentsForDisplay(commits);
+    assert.deepStrictEqual(result[0].parentHashes, ['aaaa']);
+    assert.deepStrictEqual(result[1].parentHashes, []);
+  });
+
+  test('root commit (no original parents) stays a root', () => {
+    const commits = [makeCommit('aaaa', [])];
+    const result = simplifyParentsForDisplay(commits);
+    assert.deepStrictEqual(result[0].parentHashes, []);
+  });
+
+  test('last commit with invisible parent becomes a root', () => {
+    // Only one commit, its parent is not in the list and there's no next commit
+    const commits = [makeCommit('aaaa', ['bbbb'])];
+    const result = simplifyParentsForDisplay(commits);
+    assert.deepStrictEqual(result[0].parentHashes, []);
+  });
+
+  test('partial visibility: keeps only visible parents', () => {
+    const commits = [
+      makeCommit('dddd', ['cccc', 'bbbb']), // 'bbbb' not in list
+      makeCommit('cccc', ['aaaa']),
+      makeCommit('aaaa', [])
+    ];
+    const result = simplifyParentsForDisplay(commits);
+    assert.deepStrictEqual(result[0].parentHashes, ['cccc']);
+    assert.deepStrictEqual(result[1].parentHashes, ['aaaa']);
+  });
+
+  test('does not mutate original commits', () => {
+    const original = [
+      makeCommit('bbbb', ['xxxx']),
+      makeCommit('aaaa', [])
+    ];
+    simplifyParentsForDisplay(original);
+    assert.deepStrictEqual(original[0].parentHashes, ['xxxx']);
   });
 });

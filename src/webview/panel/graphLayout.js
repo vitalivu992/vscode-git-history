@@ -127,7 +127,69 @@ function computeGraphLayout(commits) {
   return result;
 }
 
+/**
+ * Simplify parent hashes for a filtered/sparse commit list before graph layout.
+ *
+ * When commits are filtered (e.g. git log --follow -- file, or git log -L),
+ * many parent hashes point to commits not present in the displayed list.
+ * This produces "ghost" lanes that open but never close.
+ *
+ * Strategy:
+ *   - Keep only parent hashes that actually exist in the displayed list.
+ *   - If a commit originally had parents but all were filtered out, assign
+ *     the next commit in the list as a synthetic first parent so the lane
+ *     connects forward (mirrors git log --graph simplification mode).
+ *   - Root commits (originally empty parentHashes) are left unchanged.
+ *
+ * Returns a new array of shallow-cloned commit objects; originals are untouched.
+ *
+ * @param {Array} commits - Array of CommitInfo objects (newest first)
+ * @returns {Array} Same commits with parentHashes remapped to visible set
+ */
+function simplifyParentsForDisplay(commits) {
+  if (!commits || commits.length === 0) { return []; }
+
+  var hashSet = {};
+  for (var i = 0; i < commits.length; i++) {
+    hashSet[commits[i].hash] = true;
+  }
+
+  var result = [];
+  for (var j = 0; j < commits.length; j++) {
+    var c = commits[j];
+    var original = c.parentHashes || [];
+
+    var visible = [];
+    for (var k = 0; k < original.length; k++) {
+      if (hashSet[original[k]]) { visible.push(original[k]); }
+    }
+
+    var newParents;
+    if (visible.length > 0) {
+      newParents = visible;
+    } else if (original.length > 0 && j + 1 < commits.length) {
+      newParents = [commits[j + 1].hash];
+    } else {
+      newParents = [];
+    }
+
+    result.push({
+      hash: c.hash,
+      shortHash: c.shortHash,
+      parentHashes: newParents,
+      author: c.author,
+      email: c.email,
+      date: c.date,
+      message: c.message,
+      fullMessage: c.fullMessage,
+      tags: c.tags
+    });
+  }
+
+  return result;
+}
+
 // Export for Node.js/CommonJS environments (used by tests)
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { computeGraphLayout: computeGraphLayout };
+  module.exports = { computeGraphLayout: computeGraphLayout, simplifyParentsForDisplay: simplifyParentsForDisplay };
 }
