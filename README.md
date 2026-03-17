@@ -2,7 +2,13 @@
 
 A powerful VS Code extension that provides git history visualization inspired by IntelliJ's Git History. View file history, selection history, and explore diffs with an intuitive interface.
 
-![Screenshot placeholder](docs/screenshot.png)
+### File History
+
+![File History](docs/file-history.png)
+
+### Selection History
+
+![Selection History](docs/selection-history.png)
 
 ## Features
 
@@ -13,6 +19,8 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
+- **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
+- **Date Tooltips**: Hover over commit dates to see absolute timestamps
 - **Dark/Light Theme**: Automatically adapts to your VS Code theme using native CSS variables
 
 ## Installation
@@ -58,6 +66,7 @@ This extension contributes the following settings:
 
 * `gitHistory.maxCommits`: Maximum number of commits to display (default: 500)
 * `gitHistory.showGraph`: Show commit graph visualization in the history view (default: true)
+* `gitHistory.blame.dateFormat`: Date format for blame annotations - `relative` (e.g., "2 days ago"), `short` (e.g., "2024-03-15"), or `iso` (e.g., "2024-03-15T10:30:00Z") (default: `relative`)
 
 ## Keyboard Shortcuts
 
@@ -65,54 +74,7 @@ This extension contributes the following settings:
 |---------|------------|
 | Git History (File) | (none - customize as desired) |
 | Git History for Selection | (none - customize as desired) |
-
-## Development
-
-### Building
-
-```bash
-npm install
-npm run compile
-```
-
-Or use the Makefile:
-
-```bash
-make help          # Show all available targets
-make compile       # Compile the extension
-make package       # Package as .vsix file
-make test          # Run tests and capture screenshots
-make clean         # Clean build artifacts
-```
-
-### Testing
-
-```bash
-npm test
-```
-
-Or use the Makefile:
-
-```bash
-make test          # Runs tests + captures screenshots
-```
-
-### Running in Development
-
-1. Press `F5` in VS Code
-2. A new Extension Development Host window will open
-3. Open a git repo and test the extension
-
-### Capturing Screenshots
-
-See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for how to capture extension screenshots for PR review.
-
-## Credits
-
-Built with:
-- [diff2html](https://diff2html.com/) for beautiful diff rendering
-- [TypeScript](https://www.typescriptlang.org/) for type safety
-- [Webpack](https://webpack.js.org/) for bundling
+| Toggle Blame Annotations | `Ctrl+Shift+B` / `Cmd+Shift+B` |
 
 ## License
 
@@ -122,6 +84,3 @@ MIT
 
 Report issues at: https://github.com/vitalivu992/vscode-git-history/issues
 
-## Release Notes
-
-See [CHANGELOG.md](CHANGELOG.md) for version history.
