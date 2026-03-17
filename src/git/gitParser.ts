@@ -4,7 +4,7 @@ const COMMIT_SEPARATOR = '---COMMIT-END---';
 
 /**
  * Parse git log output with null-separated fields
- * Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n
+ * Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00---COMMIT-END---%n
  */
 export function parseGitLog(output: string): CommitInfo[] {
   const commits: CommitInfo[] = [];
@@ -42,6 +42,8 @@ function parseCommitBlock(block: string): CommitInfo | null {
   const dateStr = fields[4];
   const subject = fields[5];
   const body = fields[6] || '';
+  const decorations = fields[7] || '';
+  const tags = parseTagsFromDecorations(decorations);
 
   // Validate hash format
   if (!/^[0-9a-f]{40}$/i.test(hash)) {
@@ -67,8 +69,23 @@ function parseCommitBlock(block: string): CommitInfo | null {
     email,
     date: date.toISOString(),
     message: subject,
-    fullMessage: fullMessage.trim()
+    fullMessage: fullMessage.trim(),
+    ...(tags.length > 0 ? { tags } : {})
   };
+}
+
+/**
+ * Extract tag names from git %d decorations string
+ * Example input: " (HEAD -> main, tag: v1.0.0, origin/main)"
+ */
+function parseTagsFromDecorations(decorations: string): string[] {
+  const tags: string[] = [];
+  const tagRegex = /tag:\s*([^,)]+)/g;
+  let match: RegExpExecArray | null;
+  while ((match = tagRegex.exec(decorations)) !== null) {
+    tags.push(match[1].trim());
+  }
+  return tags;
 }
 
 /**
