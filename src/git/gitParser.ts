@@ -135,9 +135,14 @@ export function parseLineHistoryLog(output: string): CommitInfo[] {
   while (i < lines.length) {
     const line = lines[i];
 
-    // Look for commit header pattern: ^hash author date
+    // Look for commit header pattern: ^hash author <email> timestamp subject[\x00decorations]
     const hashMatch = line.match(/^([0-9a-f]{40})\s+(.*) <(.*)>\s+(\d+)\s+(.*)$/);
     if (hashMatch) {
+      const rest = hashMatch[5];
+      const nullIdx = rest.indexOf('\x00');
+      const subject = nullIdx >= 0 ? rest.substring(0, nullIdx) : rest;
+      const decorations = nullIdx >= 0 ? rest.substring(nullIdx + 1) : '';
+      const tags = parseTagsFromDecorations(decorations);
       const commit: CommitInfo = {
         hash: hashMatch[1],
         shortHash: hashMatch[1].substring(0, 7),
@@ -145,8 +150,9 @@ export function parseLineHistoryLog(output: string): CommitInfo[] {
         author: hashMatch[2],
         email: hashMatch[3],
         date: new Date(parseInt(hashMatch[4]) * 1000).toISOString(),
-        message: hashMatch[5],
-        fullMessage: hashMatch[5]
+        message: subject,
+        fullMessage: subject,
+        ...(tags.length > 0 ? { tags } : {})
       };
       commits.push(commit);
     }
