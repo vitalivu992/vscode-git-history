@@ -3,11 +3,11 @@ import { parseGitLog, parseNameStatus, parseLineHistoryLog, isBinaryFile } from 
 
 suite('Git Parser Tests', () => {
   test('parseGitLog should parse commit blocks', () => {
-    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n
+    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00---COMMIT-END---%n
     // Note: hashes must be valid hex (0-9, a-f) for the parser to accept them
     // commit1 is a root commit (no parents), commit2 has commit1 as parent
-    const commit1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Initial commit\x00\x00---COMMIT-END---';
-    const commit2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00Jane Smith\x00jane@example.com\x001234567900\x00Add feature\x00This adds a new feature.\x00---COMMIT-END---';
+    const commit1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Initial commit\x00\x00\x00---COMMIT-END---';
+    const commit2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00Jane Smith\x00jane@example.com\x001234567900\x00Add feature\x00This adds a new feature.\x00\x00---COMMIT-END---';
     const input = commit1 + '\n' + commit2;
 
     const commits = parseGitLog(input);
@@ -58,6 +58,17 @@ suite('Git Parser Tests', () => {
     assert.strictEqual(isBinaryFile('--- a/file.ts\n+++ b/file.ts'), false);
   });
 
+  test('parseGitLog should parse tags from decorations field', () => {
+    const commitWithTag = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Release\x00\x00 (HEAD -> main, tag: v1.0.0, origin/main)\x00---COMMIT-END---';
+    const commitNoTag = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00John Doe\x00john@example.com\x001234567900\x00Normal commit\x00\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitWithTag + '\n' + commitNoTag);
+
+    assert.strictEqual(commits.length, 2);
+    assert.deepStrictEqual(commits[0].tags, ['v1.0.0']);
+    assert.ok(!commits[1].tags || commits[1].tags.length === 0);
+  });
+
   test('parseGitLog should handle empty input', () => {
     const commits = parseGitLog('');
     assert.strictEqual(commits.length, 0);
@@ -67,7 +78,7 @@ suite('Git Parser Tests', () => {
     // First is invalid (not enough fields), second is valid
     // Note: hash must be valid hex (0-9, a-f) and exactly 40 chars
     const invalidCommit = 'invalid\x00data\x00---COMMIT-END---';
-    const validCommit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Valid commit\x00\x00---COMMIT-END---';
+    const validCommit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Valid commit\x00\x00\x00---COMMIT-END---';
     const input = invalidCommit + '\n' + validCommit;
 
     const commits = parseGitLog(input);

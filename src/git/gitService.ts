@@ -36,7 +36,7 @@ export async function getFileHistory(filePath: string, cwd: string): Promise<Com
   const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   // Use %x00 as field separator for cleaner parsing
-  const format = '%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00---COMMIT-END---%n';
+  const format = '%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00---COMMIT-END---%n';
 
   const args = [
     'log',
@@ -84,7 +84,7 @@ export async function getCommitDiff(
 
   args.push(hash);
   if (filePath) {
-    const relativePath = path.relative(cwd, filePath);
+    const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
     args.push('--', relativePath);
   }
 
@@ -126,7 +126,7 @@ export async function getCombinedDiff(
   const args = ['diff', '--no-color', `${earliest}~1..${latest}`];
 
   if (filePath) {
-    const relativePath = path.relative(cwd, filePath);
+    const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
     args.push('--', relativePath);
   }
 
@@ -142,7 +142,7 @@ export async function getCombinedDiff(
     // Fallback for initial commits: use empty tree
     const args2 = ['diff', '--no-color', `${EMPTY_TREE_HASH}..${latest}`];
     if (filePath) {
-      const relativePath = path.relative(cwd, filePath);
+      const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
       args2.push('--', relativePath);
     }
 

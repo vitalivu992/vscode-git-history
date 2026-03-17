@@ -10,6 +10,7 @@ export interface CommitInfo {
   date: string;
   message: string;
   fullMessage: string;
+  tags?: string[];
 }
 
 /**
