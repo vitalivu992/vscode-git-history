@@ -219,6 +219,7 @@ export class GitHistoryPanel {
                 <th class="hash-col">Hash</th>
                 <th class="author-col">Author</th>
                 <th class="date-col">Date</th>
+                <th class="stats-col">Stats</th>
                 <th class="message-col">Message</th>
               </tr>
             </thead>
