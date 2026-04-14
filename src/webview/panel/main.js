@@ -12,6 +12,7 @@ let selectedFile = null;
 let currentCommitHash = null;
 let trackedFilePath = null;
 let expandedMessages = new Set(); // Track which commit messages are expanded
+let focusedIndex = -1; // Keyboard focus index for commit list navigation
 
 // Graph rendering constants
 const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
@@ -90,6 +91,140 @@ function getAuthorInitials(author) {
   return author.substring(0, 2).toUpperCase();
 }
 
+// ─── Keyboard Navigation ───────────────────────────────────────────────────
+
+function handleKeyDown(e) {
+  // Ctrl+Shift+R: Refresh
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'r') {
+    e.preventDefault();
+    handleRefresh();
+    return;
+  }
+
+  // / or Ctrl+F: Focus search
+  if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
+    e.preventDefault();
+    if (searchInput) {
+      searchInput.focus();
+      searchInput.select();
+    }
+    return;
+  }
+
+  // Escape: Clear selection and focus
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    clearSelection();
+    focusedIndex = -1;
+    updateFocusedRow();
+    if (document.activeElement === searchInput) {
+      searchInput.blur();
+    }
+    return;
+  }
+
+  // Only handle arrow keys and Enter if not in an input
+  if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+    return;
+  }
+
+  const filteredCommits = getFilteredCommits();
+  if (filteredCommits.length === 0) return;
+
+  switch (e.key) {
+    case 'ArrowDown':
+      e.preventDefault();
+      if (focusedIndex < filteredCommits.length - 1) {
+        focusedIndex++;
+      } else {
+        focusedIndex = 0; // Wrap to top
+      }
+      updateFocusedRow();
+      scrollFocusedIntoView();
+      break;
+
+    case 'ArrowUp':
+      e.preventDefault();
+      if (focusedIndex > 0) {
+        focusedIndex--;
+      } else {
+        focusedIndex = filteredCommits.length - 1; // Wrap to bottom
+      }
+      updateFocusedRow();
+      scrollFocusedIntoView();
+      break;
+
+    case 'Home':
+      e.preventDefault();
+      focusedIndex = 0;
+      updateFocusedRow();
+      scrollFocusedIntoView();
+      break;
+
+    case 'End':
+      e.preventDefault();
+      focusedIndex = filteredCommits.length - 1;
+      updateFocusedRow();
+      scrollFocusedIntoView();
+      break;
+
+    case 'Enter':
+      e.preventDefault();
+      if (focusedIndex >= 0 && focusedIndex < filteredCommits.length) {
+        const commit = filteredCommits[focusedIndex];
+        if (e.ctrlKey || e.metaKey) {
+          // Ctrl/Cmd+Enter: Toggle multi-select
+          if (selectedCommits.has(commit.hash)) {
+            selectedCommits.delete(commit.hash);
+          } else {
+            selectedCommits.add(commit.hash);
+          }
+          updateSelectedRows();
+          if (selectedCommits.size > 1) {
+            requestCombinedDiff();
+          } else if (selectedCommits.size === 1) {
+            requestDiff([...selectedCommits][0]);
+          }
+        } else {
+          // Enter: Select commit
+          clearSelection();
+          selectCommit(commit.hash);
+        }
+      }
+      break;
+  }
+}
+
+function getFilteredCommits() {
+  if (!searchQuery) return commits;
+  const query = searchQuery.toLowerCase();
+  return commits.filter(commit =>
+    commit.hash.toLowerCase().includes(query) ||
+    commit.shortHash.toLowerCase().includes(query) ||
+    commit.author.toLowerCase().includes(query) ||
+    commit.email.toLowerCase().includes(query) ||
+    commit.message.toLowerCase().includes(query) ||
+    (commit.tags && commit.tags.some(t => t.toLowerCase().includes(query)))
+  );
+}
+
+function updateFocusedRow() {
+  document.querySelectorAll('#commit-table tbody tr').forEach((tr, index) => {
+    if (index === focusedIndex) {
+      tr.classList.add('focused');
+    } else {
+      tr.classList.remove('focused');
+    }
+  });
+}
+
+function scrollFocusedIntoView() {
+  const focusedRow = document.querySelector('#commit-table tbody tr.focused');
+  if (focusedRow) {
+    focusedRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+}
+
 // ─── Initialize ─────────────────────────────────────────────────────────────
 
 function init() {
@@ -103,13 +238,10 @@ function init() {
 
   if (refreshBtn) {
     refreshBtn.addEventListener('click', handleRefresh);
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
-        e.preventDefault();
-        handleRefresh();
-      }
-    });
   }
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', handleKeyDown);
 
   // Hash chip copy-on-click and message expand (event delegation)
   commitList.addEventListener('click', (e) => {
@@ -269,18 +401,12 @@ function handleSelectCommit(hash) {
 function renderCommits() {
   commitList.innerHTML = '';
 
-  const filteredCommits = commits.filter(commit => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      commit.hash.toLowerCase().includes(query) ||
-      commit.shortHash.toLowerCase().includes(query) ||
-      commit.author.toLowerCase().includes(query) ||
-      commit.email.toLowerCase().includes(query) ||
-      commit.message.toLowerCase().includes(query) ||
-      (commit.tags && commit.tags.some(t => t.toLowerCase().includes(query)))
-    );
-  });
+  const filteredCommits = getFilteredCommits();
+
+  // Reset focus if out of bounds after filtering
+  if (focusedIndex >= filteredCommits.length) {
+    focusedIndex = filteredCommits.length > 0 ? 0 : -1;
+  }
 
   const colspan = showGraph ? 5 : 4;
 
@@ -311,6 +437,7 @@ function renderCommits() {
   filteredCommits.forEach((commit, index) => {
     const tr = document.createElement('tr');
     tr.dataset.hash = commit.hash;
+    tr.dataset.index = index;
 
     const isMerge = commit.parentHashes && commit.parentHashes.length > 1;
     if (isMerge) {
@@ -369,6 +496,10 @@ function renderCommits() {
     `;
 
     tr.addEventListener('click', (e) => {
+      // Update focused index on mouse click
+      focusedIndex = index;
+      updateFocusedRow();
+
       if (e.ctrlKey || e.metaKey) {
         if (selectedCommits.has(commit.hash)) {
           selectedCommits.delete(commit.hash);
@@ -389,6 +520,8 @@ function renderCommits() {
 
     commitList.appendChild(tr);
   });
+
+  updateFocusedRow();
 }
 
 function selectCommit(hash) {
@@ -636,6 +769,7 @@ function showError(message) {
 
 function handleSearch(e) {
   searchQuery = e.target.value.trim();
+  focusedIndex = -1; // Reset keyboard focus on search change
   renderCommits();
 }
 

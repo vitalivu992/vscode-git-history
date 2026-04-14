@@ -330,6 +330,17 @@ body {
   color: var(--vscode-list-activeSelectionForeground);
 }
 
+/* Keyboard focus indicator - distinct from selection */
+#commit-table tbody tr.focused {
+  outline: 2px solid var(--vscode-focusBorder, var(--vscode-button-background));
+  outline-offset: -2px;
+}
+
+#commit-table tbody tr.focused.selected {
+  outline: 2px solid var(--vscode-focusBorder, var(--vscode-button-background));
+  outline-offset: -2px;
+}
+
 /* Merge commit: very subtle left accent */
 #commit-table tbody tr.commit-merge td:first-child {
   border-left: 2px solid var(--vscode-gitDecoration-addedResourceForeground, #4ec9b0);

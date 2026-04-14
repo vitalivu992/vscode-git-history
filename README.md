@@ -57,6 +57,20 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Toggle view mode** between Unified and Side-by-Side
 - **Scroll the diff viewer** to see all changes
 
+#### Keyboard Navigation
+
+Navigate the commit list using keyboard shortcuts:
+
+| Key | Action |
+|-----|--------|
+| `↑` / `↓` | Navigate up/down through commits |
+| `Home` | Jump to first commit |
+| `End` | Jump to last commit |
+| `Enter` | Select focused commit and show its diff |
+| `Ctrl+Enter` / `Cmd+Enter` | Add/remove focused commit from multi-selection |
+| `/` or `Ctrl+F` / `Cmd+F` | Focus the search input |
+| `Escape` | Clear selection and search focus |
+
 ### Using Blame Annotations
 
 1. Open any file in a git repository
@@ -81,12 +95,26 @@ This extension contributes the following settings:
 
 ## Keyboard Shortcuts
 
+### Global Commands
+
 | Command | Keybinding |
 |---------|------------|
 | Git History (File) | (none - customize as desired) |
 | Git History for Selection | (none - customize as desired) |
 | Toggle Blame Annotations | `Ctrl+Shift+B` / `Cmd+Shift+B` |
 | Refresh History | `Ctrl+Shift+R` / `Cmd+Shift+R` |
+
+### History Panel Navigation
+
+| Command | Keybinding |
+|---------|------------|
+| Navigate commits (up/down) | `↑` / `↓` |
+| First commit | `Home` |
+| Last commit | `End` |
+| Select commit | `Enter` |
+| Multi-select toggle | `Ctrl+Enter` / `Cmd+Enter` |
+| Focus search | `/` or `Ctrl+F` / `Cmd+F` |
+| Clear selection | `Escape` |
 
 ## License
 
