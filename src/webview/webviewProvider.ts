@@ -205,6 +205,7 @@ export class GitHistoryPanel {
         <div id="commit-table-container">
           <div class="search-container">
             <input type="text" id="search-input" placeholder="Search commits by message, author, email, hash, or tag...">
+            <div id="commit-count" class="commit-count"></div>
           </div>
           <table id="commit-table">
             <thead>

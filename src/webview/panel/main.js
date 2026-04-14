@@ -28,6 +28,7 @@ const sideBySideBtn = document.getElementById('side-by-side-btn');
 const fileList = document.getElementById('file-list');
 const searchInput = document.getElementById('search-input');
 const refreshBtn = document.getElementById('refresh-btn');
+const commitCountEl = document.getElementById('commit-count');
 
 let isRefreshing = false;
 
@@ -206,6 +207,16 @@ function getFilteredCommits() {
     commit.message.toLowerCase().includes(query) ||
     (commit.tags && commit.tags.some(t => t.toLowerCase().includes(query)))
   );
+}
+
+function updateCommitCount() {
+  if (!commitCountEl) return;
+  const filtered = getFilteredCommits();
+  if (searchQuery && filtered.length !== commits.length) {
+    commitCountEl.textContent = `${filtered.length} of ${commits.length}`;
+  } else {
+    commitCountEl.textContent = '';
+  }
 }
 
 function updateFocusedRow() {
@@ -771,6 +782,7 @@ function handleSearch(e) {
   searchQuery = e.target.value.trim();
   focusedIndex = -1; // Reset keyboard focus on search change
   renderCommits();
+  updateCommitCount();
 }
 
 async function handleRefresh() {
