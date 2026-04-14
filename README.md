@@ -28,6 +28,8 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Jump to Hash**: Press `Ctrl+G` / `Cmd+G` to open a dialog and quickly navigate to a specific commit by hash
 - **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
 - **Copy Commit Message**: Copy the commit message, author, email, and date to clipboard with the copy button or `Ctrl+Shift+C` / `Cmd+Shift+C` keyboard shortcut
+- **Copy Commit Hash**: Copy the full commit hash to clipboard with `Ctrl+Shift+H` / `Cmd+Shift+H` keyboard shortcut, or click any hash chip
+- **Open File at Commit**: Right-click on any file in the changed files list to view the file content as it was at that specific commit
 - **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
 - **Dark/Light Theme**: Automatically adapts to your VS Code theme using native CSS variables
 
@@ -64,6 +66,15 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Toggle view mode** between Unified and Side-by-Side
 - **Scroll the diff viewer** to see all changes
 
+#### Context Menu Actions
+
+Right-click on files in the changed files list to access additional options:
+
+| Action | Description |
+|--------|-------------|
+| **Open file at this commit** | View the file content as it was at the selected commit |
+| **View diff for this file** | Show the diff for this specific file only |
+
 #### Keyboard Navigation
 
 Navigate the commit list using keyboard shortcuts:
@@ -77,6 +88,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Enter` / `Cmd+Enter` | Add/remove focused commit from multi-selection |
 | `/` or `Ctrl+F` / `Cmd+F` | Focus the search input |
 | `Ctrl+Shift+C` / `Cmd+Shift+C` | Copy commit message to clipboard |
+| `Ctrl+Shift+H` / `Cmd+Shift+H` | Copy commit hash to clipboard |
 | `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
 | `Escape` | Clear selection and search focus |
 
@@ -125,6 +137,7 @@ This extension contributes the following settings:
 | Multi-select toggle | `Ctrl+Enter` / `Cmd+Enter` |
 | Focus search | `/` or `Ctrl+F` / `Cmd+F` |
 | Copy commit message | `Ctrl+Shift+C` / `Cmd+Shift+C` |
+| Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
 | Clear selection | `Escape` |
 
 ## License

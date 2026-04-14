@@ -211,3 +211,16 @@ export async function getCurrentBranch(cwd: string): Promise<string> {
     return 'HEAD';
   }
 }
+
+/**
+ * Get file content at a specific commit
+ */
+export async function getFileContentAtCommit(
+  filePath: string,
+  commitHash: string,
+  cwd: string
+): Promise<string> {
+  const relativePath = path.relative(cwd, filePath);
+  const output = await execGit(['show', `${commitHash}:${relativePath}`], cwd);
+  return output;
+}

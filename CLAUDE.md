@@ -100,6 +100,10 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Jump to Hash**: Press `Ctrl+G` / `Cmd+G` to open a modal dialog where you can type a commit hash (full or short). As you type, matching commits are displayed. Press `Enter` to jump to the first match, or click on a result. The commit is scrolled into view and selected. Implementation is in `main.js` (`showJumpToHashDialog`, `scrollToCommitByHash`) and styled in `styles.css` (`#jump-to-hash-modal`, related classes).
 
+- **Copy Commit Hash**: Press `Ctrl+Shift+H` / `Cmd+Shift+H` to copy the full commit hash of the focused or selected commit to clipboard. Hash chips in the commit list are also click-to-copy (using `navigator.clipboard`). The keyboard shortcut follows the same resolution pattern as copy message: `handleCopyHash` in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyCommitHash` message. The message is handled by `handleCopyCommitHash` in `messageHandler.ts` which writes `commit.hash` to `vscode.env.clipboard` and shows a confirmation with the short hash. The `copyCommitHash` message type is defined in `src/types.ts`.
+
+- **Open File at Commit**: Right-click on any file in the changed files list to open a context menu with "Open file at this commit" option. This opens the file content as it was at that specific commit in a new editor tab (read-only). The feature is implemented in `src/webview/panel/main.js` via the `showFileContextMenu` function which sends an `openFileAtCommit` message. The message handler in `src/webview/messageHandler.ts` (`handleOpenFileAtCommit`) retrieves the file content using `git show <hash>:<path>` via `getFileContentAtCommit` in `src/git/gitService.ts`, then opens it as a virtual document in VS Code.
+
 ### Message Protocol
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):

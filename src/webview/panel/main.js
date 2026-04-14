@@ -115,6 +115,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+H: Copy commit hash
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'h') {
+    e.preventDefault();
+    handleCopyHash();
+    return;
+  }
+
   // / or Ctrl+F: Focus search
   if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
     e.preventDefault();
@@ -822,7 +829,9 @@ function renderFiles(files, activeFile) {
     `;
 
     if (!isMultiSelect && currentCommitHash) {
-      li.addEventListener('click', () => {
+      li.addEventListener('click', (e) => {
+        // Only handle left-click, not right-click (context menu)
+        if (e.button !== 0) return;
         selectedFile = file.path;
         vscode.postMessage({
           type: 'requestFileDiff',
@@ -830,10 +839,78 @@ function renderFiles(files, activeFile) {
           filePath: file.path
         });
       });
+
+      // Add context menu handler for right-click
+      li.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showFileContextMenu(e, file.path, currentCommitHash);
+      });
     }
 
     fileList.appendChild(li);
   });
+}
+
+// ─── File Context Menu ─────────────────────────────────────────────────────────
+
+function showFileContextMenu(event, filePath, commitHash) {
+  // Remove any existing context menu
+  const existingMenu = document.getElementById('file-context-menu');
+  if (existingMenu) {
+    existingMenu.remove();
+  }
+
+  const menu = document.createElement('div');
+  menu.id = 'file-context-menu';
+  menu.className = 'context-menu';
+  menu.innerHTML = `
+    <div class="context-menu-item" data-action="open-at-commit">
+      <span class="context-menu-icon">📄</span>
+      <span class="context-menu-label">Open file at this commit</span>
+    </div>
+    <div class="context-menu-item" data-action="view-diff">
+      <span class="context-menu-icon">🔍</span>
+      <span class="context-menu-label">View diff for this file</span>
+    </div>
+  `;
+
+  // Position the menu at click location
+  menu.style.left = `${event.clientX}px`;
+  menu.style.top = `${event.clientY}px`;
+  document.body.appendChild(menu);
+
+  // Handle menu item clicks
+  menu.querySelectorAll('.context-menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const action = item.dataset.action;
+      if (action === 'open-at-commit') {
+        vscode.postMessage({
+          type: 'openFileAtCommit',
+          hash: commitHash,
+          filePath: filePath
+        });
+      } else if (action === 'view-diff') {
+        selectedFile = filePath;
+        vscode.postMessage({
+          type: 'requestFileDiff',
+          hash: commitHash,
+          filePath: filePath
+        });
+      }
+      menu.remove();
+    });
+  });
+
+  // Close menu when clicking outside
+  const closeMenu = (e) => {
+    if (!menu.contains(e.target)) {
+      menu.remove();
+      document.removeEventListener('click', closeMenu);
+    }
+  };
+  setTimeout(() => {
+    document.addEventListener('click', closeMenu);
+  }, 0);
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -934,6 +1011,17 @@ function handleCopyMessage() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitMessage', hash });
+  }
+}
+
+function handleCopyHash() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyCommitHash', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCommitHash', hash });
   }
 }
 

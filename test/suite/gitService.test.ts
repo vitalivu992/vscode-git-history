@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitFiles, getGitRoot, getCurrentBranch } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -206,5 +206,39 @@ suite('Git Service Integration Tests', () => {
       // Return to main branch
       execSync('git checkout -', { cwd: tempDir });
     }
+  });
+
+  test('getFileContentAtCommit should return file content at specific commit', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+    assert.ok(commits.length >= 3, 'Should have at least 3 commits');
+
+    // Get the oldest commit (last in array since commits are newest-first)
+    const oldestCommit = commits[commits.length - 1];
+    assert.strictEqual(oldestCommit.message, 'Initial commit', 'Oldest commit should be "Initial commit"');
+
+    // Get file content at the oldest commit
+    const content = await getFileContentAtCommit(testFile, oldestCommit.hash, tempDir);
+
+    // The initial commit had: 'Line 1\nLine 2\nLine 3\n'
+    assert.ok(content.includes('Line 1'), 'Content should include Line 1');
+    assert.ok(content.includes('Line 2'), 'Content should include Line 2');
+    assert.ok(content.includes('Line 3'), 'Content should include Line 3');
+    assert.ok(!content.includes('Line 4'), 'Content should not include Line 4 (added later)');
+  });
+
+  test('getFileContentAtCommit should return different content for different commits', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+    assert.ok(commits.length >= 2, 'Should have at least 2 commits');
+
+    // Get content from newest and oldest commits
+    const newestContent = await getFileContentAtCommit(testFile, commits[0].hash, tempDir);
+    const oldestContent = await getFileContentAtCommit(testFile, commits[commits.length - 1].hash, tempDir);
+
+    // The content should be different
+    assert.notStrictEqual(newestContent, oldestContent, 'Content should differ between commits');
+
+    // Newer content should have more lines (line 4 was added in a later commit)
+    assert.ok(newestContent.includes('Line 4') || newestContent.split('\n').length >= 4,
+      'Newer content should have more lines');
   });
 });

@@ -75,4 +75,6 @@ export type WebviewToExtMessage =
   | { type: 'requestCommitFiles'; hash: string }
   | { type: 'requestFileDiff'; hash: string; filePath: string }
   | { type: 'requestRefresh' }
-  | { type: 'copyCommitMessage'; hash: string };
+  | { type: 'copyCommitMessage'; hash: string }
+  | { type: 'copyCommitHash'; hash: string }
+  | { type: 'openFileAtCommit'; hash: string; filePath: string };
