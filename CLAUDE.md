@@ -45,6 +45,8 @@ This is a VS Code extension for viewing git history of files and line selections
   - `messageHandler.ts` - handles messages between extension and webview
   - `panel/` - static HTML/CSS/JS files for the UI (diff2html for rendering)
 
+- **Combined Diff**: `getCombinedDiff` in `src/git/gitService.ts` sorts selected commit hashes chronologically (oldest first) using `git log --format="%H %at" --no-walk` to determine commit dates. The `sortHashesByDate` helper maps hashes to timestamps and sorts ascending. This ensures the diff range `earliest~1..latest` always spans the correct chronological range regardless of hash input order. Falls back to lexicographic sort if the date lookup fails.
+
 - **Types**: `src/types.ts` defines shared interfaces (`CommitInfo`, `CommitFileChange`, `DiffResult`, message types)
 
 ### Git Log Format
@@ -93,6 +95,8 @@ The extension detects and displays the current git branch in the history panel:
 - **Expandable Commit Messages**: Commits with multi-line messages (subject + body) display an expand/collapse button (▼/▲) in the message column. Clicking expands to show the full commit body. The expanded state is tracked per commit hash during the session. Implementation is in `src/webview/panel/main.js` (render logic and event handling) and `src/webview/panel/styles.css` (flex layout and body styling).
 
 - **Commit Search**: The search input filters commits in real time by message, author name, author email, commit hash (full and short), and tag name. The filter is implemented as a case-insensitive `.includes()` match across all these fields in `src/webview/panel/main.js` (`renderCommits` function). Tag filtering uses `commit.tags.some()` to match any tag badge text.
+
+- **Date Range Filters**: The search input supports date filtering with special syntax: `after:YYYY-MM-DD` for commits after a date, `before:YYYY-MM-DD` for commits before a date, and `last:Ndays/weeks/months` for relative time filtering (e.g., `last:7days`, `last:2weeks`). Date filters can be combined with text search (e.g., `fix bug after:2024-01-01`). The `parseDateFilter()` function in `main.js` extracts date filters from the query, and active filters are displayed as removable badges below the search input. The remaining text after removing date filters is used for the standard text search.
 
 - **Sort Toggle**: The sort button in the toolbar toggles between newest-first (default) and oldest-first commit ordering. The state is tracked in `sortOldestFirst` in `src/webview/panel/main.js`. When toggled, `getOrderedCommits()` reverses the filtered commit list. The commit graph is hidden in oldest-first mode because the graph layout algorithm assumes newest-first order. The graph header visibility is controlled by `effectiveShowGraph` (true only when `showGraph` is enabled AND `sortOldestFirst` is false).
 

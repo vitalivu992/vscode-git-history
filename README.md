@@ -16,7 +16,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Selection History**: Select lines of code and view only commits that affected those specific lines
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
 - **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions)
-- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator
+- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`
 - **Sort Toggle**: Switch between newest-first and oldest-first commit ordering with the sort button in the toolbar
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views
@@ -63,7 +63,11 @@ A powerful VS Code extension that provides git history visualization inspired by
 
 - **Click a commit row** to view its diff and changed files
 - **Check multiple commits** to see a combined diff
-- **Search commits** using the search box to filter by message, author, email, hash, or tag name
+- **Search commits** using the search box to filter by message, author, email, hash, or tag name. You can also use date filters:
+  - `after:2024-01-01` - show commits after a specific date
+  - `before:2024-06-01` - show commits before a specific date
+  - `last:7days` or `last:2weeks` or `last:1month` - show commits within a recent time period
+  - Combine filters: `bug fix after:2024-01-01` - search for "bug fix" in commits after January 1st
 - **Toggle sort order** with the sort button to switch between newest-first and oldest-first
 - **Hide merge commits** with the "No Merge" button to focus on actual work commits; the count indicator shows "X of Y" when filters are active
 - **Toggle view mode** between Unified and Side-by-Side

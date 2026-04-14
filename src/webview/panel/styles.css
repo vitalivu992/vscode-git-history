@@ -264,6 +264,44 @@ body {
   padding-right: 4px;
 }
 
+/* ─── Filter badges for date filters ─────────────────────────────────────────── */
+
+.filter-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 8px 6px;
+  background-color: var(--vscode-widget-background);
+  border-bottom: 1px solid var(--vscode-border-color);
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  background-color: var(--vscode-badge-background, #4d5770);
+  color: var(--vscode-badge-foreground, #fff);
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.filter-badge-clear {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  margin-left: 2px;
+  opacity: 0.8;
+  transition: opacity 0.1s;
+}
+
+.filter-badge-clear:hover {
+  opacity: 1;
+}
+
 #search-input::placeholder {
   color: var(--vscode-descriptionForeground);
 }

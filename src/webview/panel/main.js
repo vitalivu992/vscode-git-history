@@ -17,6 +17,144 @@ let sortOldestFirst = false; // Sort order: false = newest first (default), true
 let currentBranch = null; // Current git branch name
 let hideMergeCommits = false; // Filter out merge commits (commits with multiple parents)
 
+/**
+ * Parse date filters from search query
+ * Supports: after:YYYY-MM-DD, before:YYYY-MM-DD, last:Ndays/weeks/months
+ * @param {string} query - The search query
+ * @returns {{textQuery: string, dateFilters: {after?: Date, before?: Date}}}
+ */
+function parseDateFilter(query) {
+  const dateFilters = {};
+  let textQuery = query;
+
+  // Parse after:YYYY-MM-DD or after:YYYY/MM/DD
+  const afterMatch = query.match(/after:([^\s]+)/i);
+  if (afterMatch) {
+    const dateStr = afterMatch[1];
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime())) {
+      dateFilters.after = date;
+    }
+    textQuery = textQuery.replace(afterMatch[0], '').trim();
+  }
+
+  // Parse before:YYYY-MM-DD or before:YYYY/MM/DD
+  const beforeMatch = query.match(/before:([^\s]+)/i);
+  if (beforeMatch) {
+    const dateStr = beforeMatch[1];
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime())) {
+      dateFilters.before = date;
+    }
+    textQuery = textQuery.replace(beforeMatch[0], '').trim();
+  }
+
+  // Parse last:Ndays/weeks/months (case-insensitive, singular/plural)
+  const lastMatch = query.match(/last:(\d+)\s*(day|days|week|weeks|month|months)/i);
+  if (lastMatch) {
+    const num = parseInt(lastMatch[1], 10);
+    const unit = lastMatch[2].toLowerCase();
+    const now = new Date();
+    const after = new Date(now);
+
+    if (unit === 'day' || unit === 'days') {
+      after.setDate(now.getDate() - num);
+    } else if (unit === 'week' || unit === 'weeks') {
+      after.setDate(now.getDate() - (num * 7));
+    } else if (unit === 'month' || unit === 'months') {
+      after.setMonth(now.getMonth() - num);
+    }
+
+    dateFilters.after = after;
+    textQuery = textQuery.replace(lastMatch[0], '').trim();
+  }
+
+  return { textQuery: textQuery.trim(), dateFilters };
+}
+
+/**
+ * Check if date filters are active
+ * @returns {boolean}
+ */
+function hasActiveDateFilters() {
+  const { dateFilters } = parseDateFilter(searchQuery);
+  return !!(dateFilters.after || dateFilters.before);
+}
+
+/**
+ * Render active date filter badges below search input
+ */
+function renderFilterBadges() {
+  const existingBadges = document.querySelector('.filter-badges');
+  if (existingBadges) {
+    existingBadges.remove();
+  }
+
+  const { dateFilters } = parseDateFilter(searchQuery);
+  const hasDateFilters = !!(dateFilters.after || dateFilters.before);
+
+  if (!hasDateFilters) {
+    return;
+  }
+
+  const searchContainer = document.querySelector('.search-container');
+  if (!searchContainer) {
+    return;
+  }
+
+  const badgesContainer = document.createElement('div');
+  badgesContainer.className = 'filter-badges';
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  if (dateFilters.after) {
+    const afterBadge = document.createElement('span');
+    afterBadge.className = 'filter-badge';
+    afterBadge.innerHTML = `after: ${formatDate(dateFilters.after)} <span class="filter-badge-clear" data-filter="after">&times;</span>`;
+    badgesContainer.appendChild(afterBadge);
+  }
+
+  if (dateFilters.before) {
+    const beforeBadge = document.createElement('span');
+    beforeBadge.className = 'filter-badge';
+    beforeBadge.innerHTML = `before: ${formatDate(dateFilters.before)} <span class="filter-badge-clear" data-filter="before">&times;</span>`;
+    badgesContainer.appendChild(beforeBadge);
+  }
+
+  // Insert after search container
+  searchContainer.parentNode.insertBefore(badgesContainer, searchContainer.nextSibling);
+
+  // Add click handlers for clear buttons
+  badgesContainer.querySelectorAll('.filter-badge-clear').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filterToRemove = btn.dataset.filter;
+      let newQuery = searchQuery;
+
+      if (filterToRemove === 'after') {
+        newQuery = newQuery.replace(/after:[^\s]+/i, '').trim();
+      } else if (filterToRemove === 'before') {
+        newQuery = newQuery.replace(/before:[^\s]+/i, '').trim();
+      }
+
+      // Also remove any orphaned "last:" filter if it was the only thing
+      newQuery = newQuery.replace(/last:\d+\s*(day|days|week|weeks|month|months)/i, '').trim();
+
+      searchInput.value = newQuery;
+      searchQuery = newQuery;
+      focusedIndex = -1;
+      renderCommits();
+      updateCommitCount();
+      renderFilterBadges();
+    });
+  });
+}
+
 // Graph rendering constants
 const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
 const LANE_W = 14;  // pixels per lane column
@@ -245,9 +383,23 @@ function getFilteredCommits() {
     filtered = filtered.filter(commit => !(commit.parentHashes && commit.parentHashes.length > 1));
   }
 
-  // Apply search query filter
-  if (searchQuery) {
-    const query = searchQuery.toLowerCase();
+  // Parse date filters and get remaining text query
+  const { textQuery, dateFilters } = parseDateFilter(searchQuery);
+
+  // Apply date filters
+  if (dateFilters.after) {
+    const afterMs = dateFilters.after.getTime();
+    filtered = filtered.filter(commit => new Date(commit.date).getTime() >= afterMs);
+  }
+
+  if (dateFilters.before) {
+    const beforeMs = dateFilters.before.getTime();
+    filtered = filtered.filter(commit => new Date(commit.date).getTime() <= beforeMs);
+  }
+
+  // Apply text search query filter (using textQuery which has date filters removed)
+  if (textQuery) {
+    const query = textQuery.toLowerCase();
     filtered = filtered.filter(commit =>
       commit.hash.toLowerCase().includes(query) ||
       commit.shortHash.toLowerCase().includes(query) ||
@@ -566,11 +718,20 @@ function renderCommits() {
   const colspan = effectiveShowGraph ? 6 : 5;
 
   if (displayCommits.length === 0) {
+    const hasDateFilters = hasActiveDateFilters();
+    let emptyMessage = 'No commits found';
+    if (searchQuery && hasDateFilters) {
+      emptyMessage = 'No commits match your search and date filters';
+    } else if (searchQuery) {
+      emptyMessage = 'No commits match your search';
+    } else if (hasDateFilters) {
+      emptyMessage = 'No commits match your date filters';
+    }
     commitList.innerHTML = `
       <tr>
         <td colspan="${colspan}" class="empty-state">
           <div class="empty-state-icon">📭</div>
-          <div class="empty-state-text">${searchQuery ? 'No commits match your search' : 'No commits found'}</div>
+          <div class="empty-state-text">${emptyMessage}</div>
         </td>
       </tr>
     `;
@@ -1122,6 +1283,7 @@ function handleSearch(e) {
   focusedIndex = -1; // Reset keyboard focus on search change
   renderCommits();
   updateCommitCount();
+  renderFilterBadges();
 }
 
 async function handleRefresh() {
