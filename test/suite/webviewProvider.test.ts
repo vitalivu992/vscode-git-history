@@ -41,8 +41,9 @@ suite('WebviewProvider HTML Tests', () => {
         <button id="unified-btn" class="active">Unified</button>
         <button id="side-by-side-btn">Side by Side</button>
       </div>
-      <button id="copy-btn" class="copy-btn" title="Copy commit message (Ctrl+Shift+C)">Copy</button>
+      <button id="copy-btn" class="copy-btn" title="Copy commit message (Ctrl+Shift+C) / Copy hash (Ctrl+Shift+H) / Copy info (Ctrl+Shift+I)">Copy</button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
+      <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>
 
@@ -53,7 +54,7 @@ suite('WebviewProvider HTML Tests', () => {
       <div id="bottom-panel">
         <div id="commit-table-container">
           <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search commits by message, author, or hash...">
+            <input type="text" id="search-input" placeholder="Search commits by message, author, email, hash, or tag...">
           </div>
           <table id="commit-table">
             <thead>
@@ -62,6 +63,7 @@ suite('WebviewProvider HTML Tests', () => {
                 <th class="hash-col">Hash</th>
                 <th class="author-col">Author</th>
                 <th class="date-col">Date</th>
+                <th class="stats-col">Stats</th>
                 <th class="message-col">Message</th>
               </tr>
             </thead>
@@ -135,6 +137,34 @@ suite('WebviewProvider HTML Tests', () => {
     assert.ok(html.includes('id="diff-viewer"'), 'Should have #diff-viewer');
     assert.ok(html.includes('id="commit-list"'), 'Should have #commit-list');
     assert.ok(html.includes('id="file-list"'), 'Should have #file-list');
+  });
+
+  test('HTML table header should include Stats column', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('class="stats-col"'),
+      'Table header should have stats-col class');
+    assert.ok(source.includes('>Stats</th>'),
+      'Table header should have Stats text label');
+  });
+
+  test('HTML table header columns should match data row columns', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const providerSource = fs.readFileSync(providerPath, 'utf-8');
+
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const mainSource = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const headerColumns = ['graph-col', 'hash-col', 'author-col', 'date-col', 'stats-col', 'message-col'];
+    for (const col of headerColumns) {
+      assert.ok(providerSource.includes(`class="${col}"`),
+        `webviewProvider HTML header should include ${col} column`);
+      assert.ok(mainSource.includes(col),
+        `main.js data rows should include ${col} column`);
+    }
   });
 
   test('main.js script tag should have nonce attribute', () => {
