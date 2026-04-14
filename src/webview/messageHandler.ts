@@ -40,6 +40,10 @@ export async function handleMessage(
       await panel.loadData();
       break;
 
+    case 'copyCommitMessage':
+      handleCopyCommitMessage(message.hash, panel);
+      break;
+
     default:
       console.error('Unknown message type:', message);
   }
@@ -162,4 +166,19 @@ async function handleRequestFileDiff(
       message: error instanceof Error ? error.message : String(error)
     });
   }
+}
+
+function handleCopyCommitMessage(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const messageText = commit.fullMessage || commit.message;
+  const copyText = `${commit.author} <${commit.email}>\nDate: ${new Date(commit.date).toISOString()}\n\n${messageText}`;
+
+  void vscode.env.clipboard.writeText(copyText).then(() => {
+    void vscode.window.showInformationMessage('Commit message copied to clipboard');
+  });
 }

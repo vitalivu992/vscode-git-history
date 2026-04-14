@@ -41,6 +41,7 @@ suite('WebviewProvider HTML Tests', () => {
         <button id="unified-btn" class="active">Unified</button>
         <button id="side-by-side-btn">Side by Side</button>
       </div>
+      <button id="copy-btn" class="copy-btn" title="Copy commit message (Ctrl+Shift+C)">Copy</button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>
@@ -300,5 +301,95 @@ suite('Search Filter Source Verification', () => {
 
     assert.ok(source.includes('email') && source.includes('tag'),
       'Search placeholder should mention email and tag as searchable fields');
+  });
+});
+
+suite('Copy Commit Message Tests', () => {
+  test('copyCommitMessage message type should be defined in WebviewToExtMessage', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes("type: 'copyCommitMessage'"), 'WebviewToExtMessage should include copyCommitMessage type');
+    assert.ok(source.includes('hash: string'), 'copyCommitMessage should have hash field');
+  });
+
+  test('messageHandler should handle copyCommitMessage without error', () => {
+    const fs = require('fs');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    assert.ok(source.includes("case 'copyCommitMessage'"), 'messageHandler should have copyCommitMessage case');
+    assert.ok(source.includes('handleCopyCommitMessage'), 'messageHandler should call handleCopyCommitMessage');
+  });
+
+  test('messageHandler should implement handleCopyCommitMessage function', () => {
+    const fs = require('fs');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    assert.ok(source.includes('function handleCopyCommitMessage'), 'messageHandler should have handleCopyCommitMessage function');
+    assert.ok(source.includes('vscode.env.clipboard'), 'handleCopyCommitMessage should use clipboard API');
+    assert.ok(source.includes('panel.getCommits()'), 'handleCopyCommitMessage should access commits via panel');
+  });
+
+  test('main.js should have handleCopyMessage function', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('function handleCopyMessage'), 'main.js should have handleCopyMessage function');
+  });
+
+  test('main.js should handle Ctrl+Shift+C keyboard shortcut for copy', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("e.shiftKey && e.key === 'c'"), 'handleKeyDown should check for Shift+C');
+    assert.ok(source.includes('handleCopyMessage()'), 'Ctrl+Shift+C should trigger handleCopyMessage');
+  });
+
+  test('main.js should send copyCommitMessage to extension', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("type: 'copyCommitMessage'"), 'handleCopyMessage should send copyCommitMessage');
+    assert.ok(source.includes('hash: commit.hash'), 'handleCopyMessage should include hash in message');
+  });
+
+  test('main.js should reference copy-btn element', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("document.getElementById('copy-btn')"), 'main.js should get copy-btn element');
+  });
+
+  test('main.js should add click listener for copy button', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("copyBtn.addEventListener('click', handleCopyMessage)"), 'main.js should add click listener to copyBtn');
+  });
+
+  test('webviewProvider should have copy-btn in HTML', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('id="copy-btn"'), 'webviewProvider HTML should have copy-btn');
+    assert.ok(source.includes('title="Copy commit message'), 'copy-btn should have title with Ctrl+Shift+C');
+  });
+
+  test('styles.css should have copy-btn styling', () => {
+    const fs = require('fs');
+    const stylesPath = path.resolve(__dirname, '../../../src/webview/panel/styles.css');
+    const source = fs.readFileSync(stylesPath, 'utf-8');
+
+    assert.ok(source.includes('.copy-btn'), 'styles.css should have copy-btn class');
+    assert.ok(source.includes('cursor: pointer'), 'copy-btn should have cursor pointer');
   });
 });

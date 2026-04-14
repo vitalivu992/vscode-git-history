@@ -31,6 +31,7 @@ const fileList = document.getElementById('file-list');
 const searchInput = document.getElementById('search-input');
 const refreshBtn = document.getElementById('refresh-btn');
 const sortBtn = document.getElementById('sort-btn');
+const copyBtn = document.getElementById('copy-btn');
 const commitCountEl = document.getElementById('commit-count');
 
 let isRefreshing = false;
@@ -102,6 +103,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'r') {
     e.preventDefault();
     handleRefresh();
+    return;
+  }
+
+  // Ctrl+Shift+C: Copy commit message
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'c') {
+    e.preventDefault();
+    handleCopyMessage();
     return;
   }
 
@@ -303,6 +311,10 @@ function init() {
 
   if (sortBtn) {
     sortBtn.addEventListener('click', handleSortToggle);
+  }
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', handleCopyMessage);
   }
 
   // Keyboard shortcuts
@@ -860,6 +872,16 @@ async function handleRefresh() {
   if (refreshBtn) {
     refreshBtn.classList.remove('spinning');
     refreshBtn.disabled = false;
+  }
+}
+
+function handleCopyMessage() {
+  if (focusedIndex >= 0 && focusedIndex < commits.length) {
+    const commit = commits[focusedIndex];
+    vscode.postMessage({ type: 'copyCommitMessage', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCommitMessage', hash });
   }
 }
 
