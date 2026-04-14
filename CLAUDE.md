@@ -71,6 +71,15 @@ The webview renders a per-row SVG graph column (like `git log --graph`) using a 
 
 `simplifyParentsForDisplay` remaps each commit's `parentHashes` to only reference commits present in the displayed list. This prevents "ghost" lanes when the list is filtered (e.g. `--follow -- file` or `-L`). Commits whose parents are all absent get the next commit in the list assigned as a synthetic first parent.
 
+### Branch Detection
+
+The extension detects and displays the current git branch in the history panel:
+- `src/git/gitService.ts` – `getCurrentBranch(cwd)` uses `git rev-parse --abbrev-ref HEAD`
+- `src/webview/webviewProvider.ts` – fetches branch during `loadData()` and passes it in the `init` message
+- `src/webview/panel/main.js` – `renderBranchBadge()` displays the branch as a badge in the commit detail header
+- `src/types.ts` – `init` message type includes optional `branch?: string` field
+- Falls back to `'HEAD'` when in detached HEAD state
+
 ### UI Features
 
 - **Date Tooltips**: Commit dates are displayed in relative format (e.g., "2 days ago") in the commit list. Hovering over a date reveals the absolute timestamp in ISO format. Implemented in `src/webview/panel/main.js` with a `title` attribute on date elements.

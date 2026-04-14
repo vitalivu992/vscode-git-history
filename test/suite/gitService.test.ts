@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitFiles, getGitRoot } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitFiles, getGitRoot, getCurrentBranch } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -180,5 +180,31 @@ suite('Git Service Integration Tests', () => {
 
     // Clean up tag
     execSync('git tag -d v-test-tag', { cwd: tempDir });
+  });
+
+  test('getCurrentBranch should return the current branch name', async () => {
+    const branch = await getCurrentBranch(tempDir);
+
+    assert.ok(typeof branch === 'string', 'Branch should be a string');
+    assert.ok(branch.length > 0, 'Branch name should not be empty');
+    // Default branch in test repo is 'main' or 'master' depending on git version
+    assert.ok(branch === 'main' || branch === 'master', 'Should be on main or master branch');
+  });
+
+  test('getCurrentBranch should handle detached HEAD state', async () => {
+    const { execSync } = require('child_process');
+    const commits = await getFileHistory(testFile, tempDir);
+
+    // Create a detached HEAD state by checking out a specific commit
+    execSync(`git checkout ${commits[0].hash}`, { cwd: tempDir });
+
+    try {
+      const branch = await getCurrentBranch(tempDir);
+      // In detached HEAD state, git rev-parse --abbrev-ref HEAD returns "HEAD"
+      assert.strictEqual(branch, 'HEAD', 'Should return HEAD in detached state');
+    } finally {
+      // Return to main branch
+      execSync('git checkout -', { cwd: tempDir });
+    }
   });
 });

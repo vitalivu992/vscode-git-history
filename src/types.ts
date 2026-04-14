@@ -58,7 +58,7 @@ export interface BlameResult {
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
-  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number } }
+  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string }
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[]; selectedFile?: string }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'commitFiles'; hash: string; files: CommitFileChange[] }

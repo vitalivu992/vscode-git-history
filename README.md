@@ -25,6 +25,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Date Tooltips**: Hover over commit dates to see absolute timestamps
 - **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
 - **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
+- **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
 - **Dark/Light Theme**: Automatically adapts to your VS Code theme using native CSS variables
 
 ## Installation

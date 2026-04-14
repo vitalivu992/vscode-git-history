@@ -14,6 +14,7 @@ let trackedFilePath = null;
 let expandedMessages = new Set(); // Track which commit messages are expanded
 let focusedIndex = -1; // Keyboard focus index for commit list navigation
 let sortOldestFirst = false; // Sort order: false = newest first (default), true = oldest first
+let currentBranch = null; // Current git branch name
 
 // Graph rendering constants
 const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
@@ -247,6 +248,27 @@ function updateCommitCount() {
   }
 }
 
+// ─── Branch Badge ───────────────────────────────────────────────────────────
+
+function renderBranchBadge() {
+  const header = document.getElementById('commit-detail-header');
+  if (!header) return;
+
+  // Remove existing branch badge if any
+  const existingBadge = header.querySelector('.branch-badge');
+  if (existingBadge) {
+    existingBadge.remove();
+  }
+
+  if (currentBranch) {
+    const branchBadge = document.createElement('span');
+    branchBadge.className = 'branch-badge';
+    branchBadge.textContent = currentBranch;
+    branchBadge.title = `Current branch: ${currentBranch}`;
+    header.insertBefore(branchBadge, header.firstChild);
+  }
+}
+
 function updateFocusedRow() {
   document.querySelectorAll('#commit-table tbody tr').forEach((tr, index) => {
     if (index === focusedIndex) {
@@ -396,8 +418,10 @@ function handleMessage(event) {
       commits = message.commits;
       showGraph = message.showGraph !== false;
       trackedFilePath = message.filePath || null;
+      currentBranch = message.branch || null;
       const graphTh = document.querySelector('th.graph-col');
       if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
+      renderBranchBadge();
       renderCommits();
       if (commits.length > 0) {
         selectCommit(commits[0].hash);

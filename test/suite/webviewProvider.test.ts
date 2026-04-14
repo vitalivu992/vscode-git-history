@@ -193,6 +193,50 @@ suite('Message Type Tests', () => {
   });
 });
 
+suite('Branch Indicator Tests', () => {
+  test('init message type should include branch field', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes("branch?: string"), 'init message should have optional branch field');
+  });
+
+  test('gitService should export getCurrentBranch function', () => {
+    const fs = require('fs');
+    const servicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
+    const source = fs.readFileSync(servicePath, 'utf-8');
+
+    assert.ok(source.includes('export async function getCurrentBranch'), 'gitService should export getCurrentBranch');
+  });
+
+  test('main.js should render branch badge', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('renderBranchBadge'), 'main.js should have renderBranchBadge function');
+    assert.ok(source.includes('currentBranch'), 'main.js should track currentBranch state');
+  });
+
+  test('styles.css should have branch badge styling', () => {
+    const fs = require('fs');
+    const stylesPath = path.resolve(__dirname, '../../../src/webview/panel/styles.css');
+    const source = fs.readFileSync(stylesPath, 'utf-8');
+
+    assert.ok(source.includes('.branch-badge'), 'styles.css should have branch-badge class');
+  });
+
+  test('webviewProvider should call getCurrentBranch in loadData', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('getCurrentBranch'), 'webviewProvider should import getCurrentBranch');
+    assert.ok(source.includes('branch'), 'webviewProvider should reference branch in init message');
+  });
+});
+
 suite('Status Class Mapping Tests', () => {
   function getStatusClass(status: string): string {
     switch (status) {

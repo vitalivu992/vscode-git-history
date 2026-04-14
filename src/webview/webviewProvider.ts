@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getFileHistory, getSelectionHistory } from '../git/gitService';
+import { getFileHistory, getSelectionHistory, getCurrentBranch } from '../git/gitService';
 import { CommitInfo } from '../types';
 import { handleMessage } from './messageHandler';
 
@@ -148,7 +148,8 @@ export class GitHistoryPanel {
 
         this._commits = commits;
         const showGraph = vscode.workspace.getConfiguration('gitHistory').get<boolean>('showGraph', true);
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection });
+        const branch = await getCurrentBranch(this._cwd);
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch });
       } catch (error) {
         this.postMessage({
           type: 'error',

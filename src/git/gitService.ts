@@ -198,3 +198,16 @@ export async function getGitRoot(filePath: string): Promise<string> {
   });
   return stdout.trim();
 }
+
+/**
+ * Get the current branch name for a git repository
+ */
+export async function getCurrentBranch(cwd: string): Promise<string> {
+  try {
+    const output = await execGit(['rev-parse', '--abbrev-ref', 'HEAD'], cwd);
+    return output.trim();
+  } catch (error) {
+    // If HEAD is detached or other error, return a default indicator
+    return 'HEAD';
+  }
+}
