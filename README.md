@@ -24,6 +24,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Blame Annotations**: Toggle inline blame annotations showing commit author and date per line, with a status bar showing commit details for the current line
 - **Date Tooltips**: Hover over commit dates to see absolute timestamps
 - **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
+- **Hide Merge Commits**: Toggle the "No Merge" button to filter out merge commits and focus on actual work commits
 - **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
 - **Copy Commit Message**: Copy the commit message, author, email, and date to clipboard with the copy button or `Ctrl+Shift+C` / `Cmd+Shift+C` keyboard shortcut
 - **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
@@ -58,6 +59,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Check multiple commits** to see a combined diff
 - **Search commits** using the search box to filter by message, author, email, hash, or tag name
 - **Toggle sort order** with the sort button to switch between newest-first and oldest-first
+- **Hide merge commits** with the "No Merge" button to focus on actual work commits
 - **Toggle view mode** between Unified and Side-by-Side
 - **Scroll the diff viewer** to see all changes
 
@@ -96,6 +98,7 @@ This extension contributes the following settings:
 
 * `gitHistory.maxCommits`: Maximum number of commits to display (default: 500)
 * `gitHistory.showGraph`: Show commit graph visualization in the history view (default: true)
+* `gitHistory.hideMergeCommits`: Hide merge commits in the history view (default: false)
 * `gitHistory.blame.dateFormat`: Date format for blame annotations - `relative` (e.g., "2 days ago"), `short` (e.g., "2024-03-15"), or `iso` (e.g., "2024-03-15T10:30:00Z") (default: `relative`)
 
 ## Keyboard Shortcuts
