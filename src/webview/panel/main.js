@@ -555,7 +555,7 @@ function renderCommits() {
 
   // Graph is only shown in newest-first order
   const effectiveShowGraph = showGraph && !sortOldestFirst;
-  const colspan = effectiveShowGraph ? 5 : 4;
+  const colspan = effectiveShowGraph ? 6 : 5;
 
   if (displayCommits.length === 0) {
     commitList.innerHTML = `
@@ -601,6 +601,9 @@ function renderCommits() {
       ? `<td class="graph-col">${renderGraphSvg(graphData[index], maxCols)}</td>`
       : '';
 
+    // Format stats for display
+    const statsHtml = formatCommitStats(commit.stats);
+
     const tagBadges = (commit.tags || [])
       .map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`)
       .join('');
@@ -639,6 +642,7 @@ function renderCommits() {
         </div>
       </td>
       <td class="date-col" title="${absoluteDate}">${date}</td>
+      <td class="stats-col" title="${commit.stats ? `${commit.stats.filesChanged} file${commit.stats.filesChanged !== 1 ? 's' : ''} changed, ${commit.stats.insertions} insertion${commit.stats.insertions !== 1 ? 's' : ''}(+), ${commit.stats.deletions} deletion${commit.stats.deletions !== 1 ? 's' : ''}(-)` : ''}">${statsHtml}</td>
       <td class="message-col ${hasBody ? 'has-expand' : ''}">${messageHtml}</td>
     `;
 
@@ -973,6 +977,44 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+/**
+ * Format commit statistics for display in the stats column
+ * @param {Object} stats - Commit stats object with filesChanged, insertions, deletions
+ * @returns {string} HTML string with formatted stats
+ */
+function formatCommitStats(stats) {
+  if (!stats) {
+    return '<span class="stats-empty">-</span>';
+  }
+
+  const { filesChanged, insertions, deletions } = stats;
+
+  // Format: files | +insertions -deletions (compact view)
+  let html = '';
+
+  if (filesChanged > 0) {
+    html += `<span class="stats-files">${filesChanged}</span>`;
+  }
+
+  if (insertions > 0 || deletions > 0) {
+    html += '<span class="stats-changes">';
+    if (insertions > 0) {
+      html += `<span class="stats-insertions">+${insertions}</span>`;
+    }
+    if (deletions > 0) {
+      html += `<span class="stats-deletions">-${deletions}</span>`;
+    }
+    html += '</span>';
+  }
+
+  // If there are no changes (e.g., merge commit with no actual file changes to this file)
+  if (!html) {
+    html = '<span class="stats-empty">-</span>';
+  }
+
+  return html;
 }
 
 function showError(message) {

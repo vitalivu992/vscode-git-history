@@ -325,6 +325,39 @@ body {
   color: var(--vscode-descriptionForeground);
 }
 
+.stats-col {
+  width: 100px;
+  font-size: 11px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  white-space: nowrap;
+}
+
+.stats-col .stats-files {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.stats-col .stats-changes {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.stats-col .stats-insertions {
+  color: var(--vscode-gitDecoration-addedResourceForeground, #3fb950);
+  font-weight: 600;
+}
+
+.stats-col .stats-deletions {
+  color: var(--vscode-gitDecoration-deletedResourceForeground, #f85149);
+  font-weight: 600;
+}
+
+.stats-col .stats-empty {
+  color: var(--vscode-descriptionForeground);
+  opacity: 0.5;
+}
+
 .message-col {
   overflow: hidden;
   text-overflow: ellipsis;
