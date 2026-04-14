@@ -306,7 +306,8 @@ function handleMergeToggle() {
 function updateCommitCount() {
   if (!commitCountEl) return;
   const filtered = getFilteredCommits();
-  if (searchQuery && filtered.length !== commits.length) {
+  const hasFilter = searchQuery || hideMergeCommits;
+  if (hasFilter && filtered.length !== commits.length) {
     commitCountEl.textContent = `${filtered.length} of ${commits.length}`;
   } else {
     commitCountEl.textContent = '';

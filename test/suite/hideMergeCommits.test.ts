@@ -291,4 +291,40 @@ suite('Hide Merge Commits Source Verification', () => {
       'webviewProvider.ts HTML should include merge-toggle-btn'
     );
   });
+
+  test('main.js updateCommitCount shows count when hideMergeCommits is active', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    const fnStart = source.indexOf('function updateCommitCount');
+    assert.ok(fnStart >= 0, 'updateCommitCount function should exist');
+
+    const fnEnd = source.indexOf('\nfunction', fnStart + 1);
+    const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
+
+    assert.ok(
+      fnBody.includes('hideMergeCommits'),
+      'updateCommitCount should check hideMergeCommits flag'
+    );
+    assert.ok(
+      fnBody.includes('searchQuery || hideMergeCommits'),
+      'updateCommitCount should show count when either searchQuery or hideMergeCommits is active'
+    );
+  });
+
+  test('main.js updateCommitCount uses correct count display logic', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    const fnStart = source.indexOf('function updateCommitCount');
+    assert.ok(fnStart >= 0, 'updateCommitCount function should exist');
+
+    const fnEnd = source.indexOf('\nfunction', fnStart + 1);
+    const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
+
+    assert.ok(
+      fnBody.includes('filtered.length !== commits.length'),
+      'updateCommitCount should only show count when filtered differs from total'
+    );
+    assert.ok(
+      fnBody.includes('${filtered.length} of ${commits.length}'),
+      'updateCommitCount should display "X of Y" format'
+    );
+  });
 });

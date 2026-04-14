@@ -25,7 +25,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Blame Annotations**: Toggle inline blame annotations showing commit author and date per line, with a status bar showing commit details for the current line
 - **Date Display**: Commit dates show relative time (e.g., "Today 2:30 PM", "Yesterday 3:45 PM") with time for recent commits; hover to see absolute timestamps
 - **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
-- **Hide Merge Commits**: Toggle the "No Merge" button to filter out merge commits and focus on actual work commits
+- **Hide Merge Commits**: Toggle the "No Merge" button to filter out merge commits and focus on actual work commits; the count indicator shows how many commits are hidden
 - **Jump to Hash**: Press `Ctrl+G` / `Cmd+G` to open a dialog and quickly navigate to a specific commit by hash
 - **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
 - **Copy Commit Message**: Copy the commit message, author, email, and date to clipboard with the copy button or `Ctrl+Shift+C` / `Cmd+Shift+C` keyboard shortcut
@@ -65,7 +65,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Check multiple commits** to see a combined diff
 - **Search commits** using the search box to filter by message, author, email, hash, or tag name
 - **Toggle sort order** with the sort button to switch between newest-first and oldest-first
-- **Hide merge commits** with the "No Merge" button to focus on actual work commits
+- **Hide merge commits** with the "No Merge" button to focus on actual work commits; the count indicator shows "X of Y" when filters are active
 - **Toggle view mode** between Unified and Side-by-Side
 - **Scroll the diff viewer** to see all changes
 
