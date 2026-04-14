@@ -870,3 +870,129 @@ body {
 #commit-detail::-webkit-scrollbar-thumb:hover {
   background: var(--vscode-scrollbarSlider-hoverBackground);
 }
+
+/* ─── Jump to Hash Modal ─────────────────────────────────────────────────────── */
+
+#jump-to-hash-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+#jump-to-hash-modal .modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+#jump-to-hash-modal .modal-content {
+  position: relative;
+  width: 400px;
+  max-width: 90vw;
+  background-color: var(--vscode-widget-background);
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+#jump-to-hash-modal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--vscode-border-color);
+}
+
+#jump-to-hash-modal .modal-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#jump-to-hash-modal .modal-close {
+  background: transparent;
+  border: none;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+#jump-to-hash-modal .modal-close:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+#jump-to-hash-modal .modal-body {
+  padding: 12px;
+}
+
+#jump-to-hash-modal .jump-to-hash-input {
+  width: 100%;
+  padding: 8px 10px;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: var(--vscode-font-family);
+}
+
+#jump-to-hash-modal .jump-to-hash-input:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+#jump-to-hash-modal .jump-to-hash-results {
+  margin-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#jump-to-hash-modal .jump-no-results {
+  padding: 8px;
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+  text-align: center;
+}
+
+#jump-to-hash-modal .jump-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#jump-to-hash-modal .jump-result-item:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+#jump-to-hash-modal .jump-result-hash {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  padding: 2px 5px;
+  background-color: var(--vscode-textCodeBlock-background, rgba(128,128,128,0.15));
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+#jump-to-hash-modal .jump-result-message {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--vscode-descriptionForeground);
+}

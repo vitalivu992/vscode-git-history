@@ -25,6 +25,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Date Tooltips**: Hover over commit dates to see absolute timestamps
 - **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
 - **Hide Merge Commits**: Toggle the "No Merge" button to filter out merge commits and focus on actual work commits
+- **Jump to Hash**: Press `Ctrl+G` / `Cmd+G` to open a dialog and quickly navigate to a specific commit by hash
 - **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
 - **Copy Commit Message**: Copy the commit message, author, email, and date to clipboard with the copy button or `Ctrl+Shift+C` / `Cmd+Shift+C` keyboard shortcut
 - **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
@@ -76,6 +77,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Enter` / `Cmd+Enter` | Add/remove focused commit from multi-selection |
 | `/` or `Ctrl+F` / `Cmd+F` | Focus the search input |
 | `Ctrl+Shift+C` / `Cmd+Shift+C` | Copy commit message to clipboard |
+| `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
 | `Escape` | Clear selection and search focus |
 
 ### Using Blame Annotations

@@ -125,6 +125,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+G or Cmd+G: Jump to hash
+  if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+    e.preventDefault();
+    showJumpToHashDialog();
+    return;
+  }
+
   // Escape: Clear selection and focus
   if (e.key === 'Escape') {
     e.preventDefault();
@@ -927,6 +934,102 @@ function handleCopyMessage() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitMessage', hash });
+  }
+}
+
+// ─── Jump to Hash ───────────────────────────────────────────────────────────────
+
+function showJumpToHashDialog() {
+  const existingModal = document.getElementById('jump-to-hash-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'jump-to-hash-modal';
+  modal.innerHTML = `
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">Jump to Commit</span>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="jump-to-hash-input" class="jump-to-hash-input" placeholder="Paste commit hash (full or short)..." autofocus>
+        <div id="jump-to-hash-results" class="jump-to-hash-results"></div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const input = document.getElementById('jump-to-hash-input');
+  const results = document.getElementById('jump-to-hash-results');
+  const overlay = modal.querySelector('.modal-overlay');
+  const closeBtn = modal.querySelector('.modal-close');
+
+  const closeModal = () => modal.remove();
+
+  overlay.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+
+  input.addEventListener('input', () => {
+    const query = input.value.trim().toLowerCase();
+    if (!query) {
+      results.innerHTML = '';
+      return;
+    }
+
+    const matches = commits.filter(c =>
+      c.hash.toLowerCase().startsWith(query) ||
+      c.shortHash.toLowerCase() === query
+    ).slice(0, 5);
+
+    if (matches.length === 0) {
+      results.innerHTML = '<div class="jump-no-results">No matching commit found</div>';
+      return;
+    }
+
+    results.innerHTML = matches.map(commit => `
+      <div class="jump-result-item" data-hash="${commit.hash}">
+        <span class="jump-result-hash">${commit.shortHash}</span>
+        <span class="jump-result-message">${escapeHtml(truncate(commit.message, 40))}</span>
+      </div>
+    `).join('');
+
+    results.querySelectorAll('.jump-result-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const hash = item.dataset.hash;
+        closeModal();
+        scrollToCommitByHash(hash);
+      });
+    });
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const firstResult = results.querySelector('.jump-result-item');
+      if (firstResult) {
+        firstResult.click();
+      }
+    } else if (e.key === 'Escape') {
+      closeModal();
+    }
+  });
+
+  input.focus();
+}
+
+function scrollToCommitByHash(hash) {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  const index = displayCommits.findIndex(c => c.hash === hash || c.shortHash === hash);
+  if (index >= 0) {
+    focusedIndex = index;
+    updateFocusedRow();
+    selectCommit(hash);
+    scrollFocusedIntoView();
+  } else {
+    showError('Commit not found in current list');
   }
 }
 
