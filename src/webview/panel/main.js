@@ -955,17 +955,28 @@ function formatDate(isoString) {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return 'Today';
+    // Today: show time (e.g., "Today 2:30 PM")
+    return `Today ${formatTime(date)}`;
   } else if (diffDays === 1) {
-    return 'Yesterday';
+    // Yesterday: show time (e.g., "Yesterday 3:45 PM")
+    return `Yesterday ${formatTime(date)}`;
   } else if (diffDays < 7) {
+    // 2-6 days: show days ago (e.g., "3 days ago")
     return `${diffDays} days ago`;
   } else if (diffDays < 30) {
+    // 1-4 weeks: show weeks ago (e.g., "2 weeks ago")
     const weeks = Math.floor(diffDays / 7);
     return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
   } else {
     return date.toLocaleDateString();
   }
+}
+
+function formatTime(date) {
+  return date.toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 }
 
 function truncate(str, maxLength) {
