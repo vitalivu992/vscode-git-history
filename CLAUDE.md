@@ -33,6 +33,7 @@ This is a VS Code extension for viewing git history of files and line selections
 - **Entry Point**: `src/extension.ts` registers two commands:
   - `gitHistory.showFileHistory` - history for entire file
   - `gitHistory.showSelectionHistory` - history for selected lines
+  - Also registers `GitHistoryContentProvider` for the `git-history` URI scheme
 
 - **Git Layer** (`src/git/`):
   - `gitService.ts` - executes git commands via `child_process.execFile`
@@ -104,13 +105,13 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Copy Commit Info**: Press `Ctrl+Shift+I` / `Cmd+Shift+I` to copy the full commit information including hash, author (name and email), date, and commit message. The format is: `hash\nAuthor: name <email>\nDate: date\n\nmessage`. The `handleCopyInfo` function in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyCommitInfo` message. The message is handled by `handleCopyCommitInfo` in `messageHandler.ts` which formats the commit data and writes it to `vscode.env.clipboard`. The `copyCommitInfo` message type is defined in `src/types.ts`.
 
-- **Open File at Commit**: Right-click on any file in the changed files list to open a context menu with "Open file at this commit" option. This opens the file content as it was at that specific commit in a new editor tab (read-only). The feature is implemented in `src/webview/panel/main.js` via the `showFileContextMenu` function which sends an `openFileAtCommit` message. The message handler in `src/webview/messageHandler.ts` (`handleOpenFileAtCommit`) retrieves the file content using `git show <hash>:<path>` via `getFileContentAtCommit` in `src/git/gitService.ts`, then opens it as a virtual document in VS Code.
+- **Open File at Commit**: Right-click on any file in the changed files list to open a context menu with "Open file at this commit" option. This opens the file content as it was at that specific commit in a new editor tab using a virtual document with the `git-history` URI scheme. The `GitHistoryContentProvider` (registered in `src/gitHistoryContentProvider.ts`) implements VS Code's `TextDocumentContentProvider` to serve file content on demand. The message handler in `src/webview/messageHandler.ts` (`handleOpenFileAtCommit`) constructs a `git-history` URI with the commit hash and working directory encoded in the query string, then calls `vscode.window.showTextDocument(uri)`. The provider parses the URI and fetches content via `getFileContentAtCommit` from `src/git/gitService.ts`. Tab titles display the relative file path with syntax highlighting based on the file extension.
 
 ### Message Protocol
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):
 - Extension sends: `init`, `diff`, `combinedDiff`, `commitFiles`, `error`, `selectCommit`
-- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`
+- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `openFileAtCommit`
 
 ### Build System
 
