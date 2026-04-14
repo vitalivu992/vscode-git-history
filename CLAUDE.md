@@ -99,8 +99,8 @@ The extension detects and displays the current git branch in the history panel:
 ### Message Protocol
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):
-- Extension sends: `init`, `diff`, `combinedDiff`, `commitFiles`, `error`
-- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestCommitFiles`
+- Extension sends: `init`, `diff`, `combinedDiff`, `commitFiles`, `error`, `selectCommit`
+- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`
 
 ### Build System
 
