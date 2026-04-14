@@ -228,3 +228,32 @@ suite('Status Class Mapping Tests', () => {
     assert.strictEqual(getStatusClass('X'), '');
   });
 });
+
+suite('Search Filter Source Verification', () => {
+  test('main.js search filter should include email field', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('commit.email.toLowerCase().includes(query)'),
+      'Search filter should match against commit.email');
+  });
+
+  test('main.js search filter should include tags field', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('commit.tags') && source.includes('.some('),
+      'Search filter should match against commit.tags using .some()');
+  });
+
+  test('search placeholder should mention email and tag', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('email') && source.includes('tag'),
+      'Search placeholder should mention email and tag as searchable fields');
+  });
+});

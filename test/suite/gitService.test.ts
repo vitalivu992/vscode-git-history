@@ -153,4 +153,32 @@ suite('Git Service Integration Tests', () => {
     // Line 2 has been modified, so there should be at least one commit
     assert.ok(history.length >= 1);
   });
+
+  test('getFileHistory commits should include email field for search', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+
+    assert.ok(commits.length > 0);
+    for (const commit of commits) {
+      assert.ok(commit.email, 'Each commit should have an email field');
+      assert.ok(typeof commit.email === 'string', 'Email should be a string');
+    }
+  });
+
+  test('getFileHistory commits should include tags field when tags exist', async () => {
+    const { execSync } = require('child_process');
+    const commits = await getFileHistory(testFile, tempDir);
+
+    // Tag the latest commit
+    execSync('git tag v-test-tag ' + commits[0].hash, { cwd: tempDir });
+
+    const commitsAfterTag = await getFileHistory(testFile, tempDir);
+    const tagged = commitsAfterTag.find(c => c.hash === commits[0].hash);
+
+    assert.ok(tagged, 'Tagged commit should be found');
+    assert.ok(Array.isArray(tagged.tags), 'Tags should be an array');
+    assert.ok(tagged.tags!.includes('v-test-tag'), 'Tag should include v-test-tag');
+
+    // Clean up tag
+    execSync('git tag -d v-test-tag', { cwd: tempDir });
+  });
 });
