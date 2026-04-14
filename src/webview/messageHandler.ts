@@ -49,6 +49,10 @@ export async function handleMessage(
       handleCopyCommitHash(message.hash, panel);
       break;
 
+    case 'copyCommitInfo':
+      handleCopyCommitInfo(message.hash, panel);
+      break;
+
     case 'openFileAtCommit':
       await handleOpenFileAtCommit(message.hash, message.filePath, panel);
       break;
@@ -201,6 +205,22 @@ function handleCopyCommitHash(hash: string, panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(commit.hash).then(() => {
     void vscode.window.showInformationMessage(`Commit hash ${commit.shortHash} copied to clipboard`);
+  });
+}
+
+function handleCopyCommitInfo(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const messageText = commit.fullMessage || commit.message;
+  const dateStr = new Date(commit.date).toLocaleString();
+  const copyText = `${commit.hash}\nAuthor: ${commit.author} <${commit.email}>\nDate: ${dateStr}\n\n${messageText}`;
+
+  void vscode.env.clipboard.writeText(copyText).then(() => {
+    void vscode.window.showInformationMessage('Commit info copied to clipboard');
   });
 }
 

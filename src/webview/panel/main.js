@@ -122,6 +122,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+I: Copy full commit info
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'i') {
+    e.preventDefault();
+    handleCopyInfo();
+    return;
+  }
+
   // / or Ctrl+F: Focus search
   if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
     e.preventDefault();
@@ -1022,6 +1029,17 @@ function handleCopyHash() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitHash', hash });
+  }
+}
+
+function handleCopyInfo() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyCommitInfo', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCommitInfo', hash });
   }
 }
 
