@@ -38,6 +38,7 @@ This is a VS Code extension for viewing git history of files and line selections
 - **Git Layer** (`src/git/`):
   - `gitService.ts` - executes git commands via `child_process.execFile`
   - `gitParser.ts` - parses git output using null-separated format
+  - `gitStatsParser.ts` - parses commit statistics (files changed, insertions, deletions) from git --stat output
 
 - **Webview Layer** (`src/webview/`):
   - `webviewProvider.ts` - manages the webview panel lifecycle
@@ -106,6 +107,8 @@ The extension detects and displays the current git branch in the history panel:
 - **Copy Commit Info**: Press `Ctrl+Shift+I` / `Cmd+Shift+I` to copy the full commit information including hash, author (name and email), date, and commit message. The format is: `hash\nAuthor: name <email>\nDate: date\n\nmessage`. The `handleCopyInfo` function in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyCommitInfo` message. The message is handled by `handleCopyCommitInfo` in `messageHandler.ts` which formats the commit data and writes it to `vscode.env.clipboard`. The `copyCommitInfo` message type is defined in `src/types.ts`.
 
 - **Open File at Commit**: Right-click on any file in the changed files list to open a context menu with "Open file at this commit" option. This opens the file content as it was at that specific commit in a new editor tab using a virtual document with the `git-history` URI scheme. The `GitHistoryContentProvider` (registered in `src/gitHistoryContentProvider.ts`) implements VS Code's `TextDocumentContentProvider` to serve file content on demand. The message handler in `src/webview/messageHandler.ts` (`handleOpenFileAtCommit`) constructs a `git-history` URI with the commit hash and working directory encoded in the query string, then calls `vscode.window.showTextDocument(uri)`. The provider parses the URI and fetches content via `getFileContentAtCommit` from `src/git/gitService.ts`. Tab titles display the relative file path with syntax highlighting based on the file extension.
+
+- **Commit Statistics**: The commit list displays statistics for each commit including the number of files changed, insertions (green `+X`), and deletions (red `-Y`). These are shown in a dedicated "Stats" column between the Date and Message columns. The stats are parsed from `git log --stat` output (see `src/git/gitStatsParser.ts`), merged with commit data in `src/git/gitService.ts`, and rendered in the webview by `formatCommitStats()` in `src/webview/panel/main.js`. The stats column styling uses green (`--vscode-gitDecoration-addedResourceForeground`) for insertions and red (`--vscode-gitDecoration-deletedResourceForeground`) for deletions. Hovering over the stats cell shows a tooltip with the full stats breakdown (e.g., "3 files changed, 45 insertions(+), 12 deletions(-)").
 
 ### Message Protocol
 
