@@ -1,4 +1,13 @@
 /**
+ * Statistics for a single commit
+ */
+export interface CommitStats {
+  filesChanged: number;
+  insertions: number;
+  deletions: number;
+}
+
+/**
  * Represents a single git commit
  */
 export interface CommitInfo {
@@ -11,6 +20,7 @@ export interface CommitInfo {
   message: string;
   fullMessage: string;
   tags?: string[];
+  stats?: CommitStats;
 }
 
 /**
