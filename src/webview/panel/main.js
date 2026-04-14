@@ -13,6 +13,7 @@ let currentCommitHash = null;
 let trackedFilePath = null;
 let expandedMessages = new Set(); // Track which commit messages are expanded
 let focusedIndex = -1; // Keyboard focus index for commit list navigation
+let sortOldestFirst = false; // Sort order: false = newest first (default), true = oldest first
 
 // Graph rendering constants
 const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
@@ -28,6 +29,7 @@ const sideBySideBtn = document.getElementById('side-by-side-btn');
 const fileList = document.getElementById('file-list');
 const searchInput = document.getElementById('search-input');
 const refreshBtn = document.getElementById('refresh-btn');
+const sortBtn = document.getElementById('sort-btn');
 const commitCountEl = document.getElementById('commit-count');
 
 let isRefreshing = false;
@@ -209,6 +211,32 @@ function getFilteredCommits() {
   );
 }
 
+function getOrderedCommits(filteredCommits) {
+  if (sortOldestFirst) {
+    return filteredCommits.slice().reverse();
+  }
+  return filteredCommits;
+}
+
+function handleSortToggle() {
+  sortOldestFirst = !sortOldestFirst;
+  if (sortBtn) {
+    if (sortOldestFirst) {
+      sortBtn.innerHTML = '&#x2191; Oldest';
+      sortBtn.title = 'Sort: Oldest first (click to toggle)';
+      sortBtn.classList.add('sort-active');
+    } else {
+      sortBtn.innerHTML = '&#x2193; Newest';
+      sortBtn.title = 'Sort: Newest first (click to toggle)';
+      sortBtn.classList.remove('sort-active');
+    }
+  }
+  const graphTh = document.querySelector('th.graph-col');
+  if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
+  focusedIndex = -1;
+  renderCommits();
+}
+
 function updateCommitCount() {
   if (!commitCountEl) return;
   const filtered = getFilteredCommits();
@@ -249,6 +277,10 @@ function init() {
 
   if (refreshBtn) {
     refreshBtn.addEventListener('click', handleRefresh);
+  }
+
+  if (sortBtn) {
+    sortBtn.addEventListener('click', handleSortToggle);
   }
 
   // Keyboard shortcuts
@@ -365,7 +397,7 @@ function handleMessage(event) {
       showGraph = message.showGraph !== false;
       trackedFilePath = message.filePath || null;
       const graphTh = document.querySelector('th.graph-col');
-      if (graphTh) { graphTh.style.display = showGraph ? '' : 'none'; }
+      if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
       renderCommits();
       if (commits.length > 0) {
         selectCommit(commits[0].hash);
@@ -413,15 +445,18 @@ function renderCommits() {
   commitList.innerHTML = '';
 
   const filteredCommits = getFilteredCommits();
+  const displayCommits = getOrderedCommits(filteredCommits);
 
   // Reset focus if out of bounds after filtering
-  if (focusedIndex >= filteredCommits.length) {
-    focusedIndex = filteredCommits.length > 0 ? 0 : -1;
+  if (focusedIndex >= displayCommits.length) {
+    focusedIndex = displayCommits.length > 0 ? 0 : -1;
   }
 
-  const colspan = showGraph ? 5 : 4;
+  // Graph is only shown in newest-first order
+  const effectiveShowGraph = showGraph && !sortOldestFirst;
+  const colspan = effectiveShowGraph ? 5 : 4;
 
-  if (filteredCommits.length === 0) {
+  if (displayCommits.length === 0) {
     commitList.innerHTML = `
       <tr>
         <td colspan="${colspan}" class="empty-state">
@@ -435,17 +470,17 @@ function renderCommits() {
 
   let graphData = [];
   let maxCols = 1;
-  if (showGraph && typeof computeGraphLayout === 'function') {
+  if (effectiveShowGraph && typeof computeGraphLayout === 'function') {
     const graphCommits = typeof simplifyParentsForDisplay === 'function'
-      ? simplifyParentsForDisplay(filteredCommits)
-      : filteredCommits;
+      ? simplifyParentsForDisplay(displayCommits)
+      : displayCommits;
     graphData = computeGraphLayout(graphCommits);
     for (let g = 0; g < graphData.length; g++) {
       if (graphData[g].maxColumns > maxCols) { maxCols = graphData[g].maxColumns; }
     }
   }
 
-  filteredCommits.forEach((commit, index) => {
+  displayCommits.forEach((commit, index) => {
     const tr = document.createElement('tr');
     tr.dataset.hash = commit.hash;
     tr.dataset.index = index;
@@ -461,7 +496,7 @@ function renderCommits() {
       hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
 
-    const graphCell = showGraph && graphData[index]
+    const graphCell = effectiveShowGraph && graphData[index]
       ? `<td class="graph-col">${renderGraphSvg(graphData[index], maxCols)}</td>`
       : '';
 

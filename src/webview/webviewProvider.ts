@@ -194,6 +194,7 @@ export class GitHistoryPanel {
         <button id="unified-btn" class="active">Unified</button>
         <button id="side-by-side-btn">Side by Side</button>
       </div>
+      <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>
 

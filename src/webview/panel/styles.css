@@ -105,6 +105,29 @@ body {
   cursor: not-allowed;
 }
 
+/* Sort toggle button */
+.sort-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s;
+}
+
+.sort-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.sort-btn.sort-active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--vscode-button-background);
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
