@@ -98,6 +98,19 @@ suite('Git Service Integration Tests', () => {
     assert.strictEqual(diffResult.isBinary, false);
   });
 
+  test('getCombinedDiff should produce same result regardless of hash order', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+
+    if (commits.length >= 2) {
+      const hashes = commits.slice(0, 2).map(c => c.hash);
+      const forwardResult = await getCombinedDiff(hashes, tempDir);
+      const reverseResult = await getCombinedDiff([...hashes].reverse(), tempDir);
+
+      assert.strictEqual(forwardResult.diff, reverseResult.diff,
+        'Combined diff should be identical regardless of input hash order');
+    }
+  });
+
   test('getCombinedDiff should handle single commit', async () => {
     const commits = await getFileHistory(testFile, tempDir);
     const diffResult = await getCombinedDiff([commits[0].hash], tempDir);

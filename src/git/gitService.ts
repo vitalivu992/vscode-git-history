@@ -117,6 +117,27 @@ export async function getCommitDiff(
   };
 }
 
+async function sortHashesByDate(hashes: string[], cwd: string): Promise<string[]> {
+  if (hashes.length <= 1) return [...hashes];
+  try {
+    const output = await execGit(
+      ['log', '--format=%H %at', '--no-walk', ...hashes],
+      cwd
+    );
+    const entries = output.trim().split('\n').filter(Boolean).map(line => {
+      const spaceIdx = line.indexOf(' ');
+      return {
+        hash: line.substring(0, spaceIdx),
+        timestamp: parseInt(line.substring(spaceIdx + 1), 10)
+      };
+    });
+    entries.sort((a, b) => a.timestamp - b.timestamp);
+    return entries.map(e => e.hash);
+  } catch {
+    return [...hashes].sort();
+  }
+}
+
 /**
  * Get combined diff for multiple commits
  * Uses git diff earliest~1..latest to show all changes
@@ -134,8 +155,7 @@ export async function getCombinedDiff(
     return getCommitDiff(hashes[0], cwd, filePath);
   }
 
-  // Sort hashes by date (oldest first)
-  const sortedHashes = [...hashes].sort();
+  const sortedHashes = await sortHashesByDate(hashes, cwd);
   const earliest = sortedHashes[0];
   const latest = sortedHashes[sortedHashes.length - 1];
 
