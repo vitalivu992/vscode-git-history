@@ -876,8 +876,9 @@ async function handleRefresh() {
 }
 
 function handleCopyMessage() {
-  if (focusedIndex >= 0 && focusedIndex < commits.length) {
-    const commit = commits[focusedIndex];
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
     vscode.postMessage({ type: 'copyCommitMessage', hash: commit.hash });
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
