@@ -21,6 +21,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
 - **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
 - **Date Tooltips**: Hover over commit dates to see absolute timestamps
+- **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
 - **Dark/Light Theme**: Automatically adapts to your VS Code theme using native CSS variables
 
 ## Installation

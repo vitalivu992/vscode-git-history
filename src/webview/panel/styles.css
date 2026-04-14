@@ -37,32 +37,50 @@ body {
   height: 100%;
 }
 
+/* ─── Toolbar ─────────────────────────────────────────────────────────────── */
+
 #diff-controls {
   display: flex;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 6px 12px;
   background-color: var(--vscode-widget-background);
   border-bottom: 1px solid var(--vscode-border-color);
+  flex-shrink: 0;
 }
 
-#diff-controls button {
-  padding: 6px 12px;
+/* Segmented control */
+.segmented-control {
+  display: inline-flex;
+  border: 1px solid var(--vscode-button-background);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.segmented-control button {
+  padding: 4px 12px;
+  background-color: transparent;
+  color: var(--vscode-editor-foreground);
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s;
+}
+
+.segmented-control button:not(:last-child) {
+  border-right: 1px solid var(--vscode-button-background);
+}
+
+.segmented-control button:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.segmented-control button.active {
   background-color: var(--vscode-button-background);
   color: var(--vscode-button-foreground);
-  border: none;
-  border-radius: 2px;
-  cursor: pointer;
-  font-size: 13px;
 }
 
-#diff-controls button:hover {
-  background-color: var(--vscode-button-hoverBackground);
-}
-
-#diff-controls button.active {
-  background-color: var(--vscode-list-activeSelectionBackground);
-  color: var(--vscode-list-activeSelectionForeground);
-}
+/* ─── Main layout ─────────────────────────────────────────────────────────── */
 
 #main-content {
   display: flex;
@@ -73,16 +91,46 @@ body {
 
 #diff-viewer {
   height: 50%;
+  flex: none;
   overflow: auto;
-  border-bottom: 1px solid var(--vscode-border-color);
   padding: 8px;
   position: relative;
   z-index: 0;
 }
 
+/* ─── Resizers ────────────────────────────────────────────────────────────── */
+
+#vertical-resizer {
+  height: 4px;
+  background-color: var(--vscode-border-color);
+  cursor: row-resize;
+  flex-shrink: 0;
+  transition: background-color 0.15s;
+}
+
+#vertical-resizer:hover,
+#vertical-resizer.active {
+  background-color: var(--vscode-focusBorder, var(--vscode-button-background));
+}
+
+#horizontal-resizer {
+  width: 4px;
+  background-color: var(--vscode-border-color);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background-color 0.15s;
+}
+
+#horizontal-resizer:hover,
+#horizontal-resizer.active {
+  background-color: var(--vscode-focusBorder, var(--vscode-button-background));
+}
+
+/* ─── Bottom panel ────────────────────────────────────────────────────────── */
+
 #bottom-panel {
   display: flex;
-  height: 50%;
+  flex: 1;
   overflow: hidden;
   position: relative;
   z-index: 1;
@@ -90,26 +138,27 @@ body {
 
 #commit-table-container {
   flex: 0 0 60%;
+  width: 60%;
   overflow: auto;
-  border-right: 1px solid var(--vscode-border-color);
   display: flex;
   flex-direction: column;
 }
 
 .search-container {
-  padding: 8px;
+  padding: 6px 8px;
   background-color: var(--vscode-widget-background);
   border-bottom: 1px solid var(--vscode-border-color);
+  flex-shrink: 0;
 }
 
 #search-input {
   width: 100%;
-  padding: 6px 8px;
+  padding: 5px 8px;
   background-color: var(--vscode-input-background);
   color: var(--vscode-input-foreground);
   border: 1px solid var(--vscode-border-color);
   border-radius: 2px;
-  font-size: 13px;
+  font-size: 12px;
   font-family: var(--vscode-font-family);
 }
 
@@ -122,10 +171,12 @@ body {
   outline-offset: -1px;
 }
 
+/* ─── Commit table ────────────────────────────────────────────────────────── */
+
 #commit-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 #commit-table thead {
@@ -137,9 +188,17 @@ body {
 
 #commit-table th,
 #commit-table td {
-  padding: 8px;
+  padding: 6px 8px;
   text-align: left;
   border-bottom: 1px solid var(--vscode-border-color);
+}
+
+#commit-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--vscode-descriptionForeground);
 }
 
 .graph-col {
@@ -152,17 +211,15 @@ body {
 }
 
 .hash-col {
-  width: 80px;
-  font-family: 'Consolas', 'Monaco', monospace;
+  width: 84px;
 }
 
 .author-col {
-  width: 150px;
+  width: 160px;
 }
 
 .date-col {
-  width: 140px;
-  font-size: 12px;
+  width: 120px;
   color: var(--vscode-descriptionForeground);
 }
 
@@ -171,6 +228,63 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 300px;
+}
+
+.message-col.has-expand {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding-right: 4px;
+}
+
+.message-content {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-content.expanded {
+  overflow: visible;
+  white-space: normal;
+}
+
+.message-subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message-content.expanded .message-subject {
+  white-space: normal;
+  margin-bottom: 4px;
+}
+
+.message-body {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  white-space: pre-wrap;
+  line-height: 1.4;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--vscode-border-color);
+}
+
+.message-expand-btn {
+  background: transparent;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.message-expand-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+  color: var(--vscode-editor-foreground);
 }
 
 #commit-table tbody tr {
@@ -186,26 +300,121 @@ body {
   color: var(--vscode-list-activeSelectionForeground);
 }
 
+/* Merge commit: very subtle left accent */
+#commit-table tbody tr.commit-merge td:first-child {
+  border-left: 2px solid var(--vscode-gitDecoration-addedResourceForeground, #4ec9b0);
+}
+
+/* ─── Hash chip ───────────────────────────────────────────────────────────── */
+
+.hash-chip {
+  display: inline-block;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  padding: 1px 5px;
+  background-color: var(--vscode-textCodeBlock-background, rgba(128,128,128,0.15));
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.1s, opacity 0.1s;
+  user-select: none;
+}
+
+.hash-chip:hover {
+  background-color: var(--vscode-list-hoverBackground);
+  opacity: 0.8;
+}
+
+.hash-chip.copied {
+  background-color: var(--vscode-gitDecoration-addedResourceForeground, #4ec9b0);
+  color: #000;
+}
+
+/* ─── Author avatar ───────────────────────────────────────────────────────── */
+
+.author-col-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.author-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  color: #000;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.author-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Commit detail panel ─────────────────────────────────────────────────── */
+
 #commit-detail {
   flex: 1;
   overflow: auto;
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
   background-color: var(--vscode-sideBar-background);
   color: var(--vscode-sideBar-foreground);
 }
 
-#commit-detail h3 {
-  margin-bottom: 12px;
-  font-size: 14px;
-  font-weight: 600;
+#commit-detail-header {
+  padding: 8px 12px;
+  background-color: var(--vscode-widget-background);
+  border-bottom: 1px solid var(--vscode-border-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 34px;
 }
+
+.detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--vscode-descriptionForeground);
+}
+
+.detail-hash-chip {
+  display: inline-block;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  padding: 1px 5px;
+  background-color: var(--vscode-textCodeBlock-background, rgba(128,128,128,0.15));
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.detail-subject {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--vscode-editor-foreground);
+}
+
+/* ─── File list ───────────────────────────────────────────────────────────── */
 
 #file-list {
   list-style: none;
+  overflow: auto;
+  flex: 1;
 }
 
 #file-list li {
-  padding: 6px 8px;
+  padding: 5px 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -225,7 +434,7 @@ body {
   font-size: 12px;
   color: var(--vscode-textLink-foreground);
   cursor: pointer;
-  padding: 6px 8px;
+  padding: 5px 8px;
 }
 
 .file-back-link:hover {
@@ -233,46 +442,131 @@ body {
 }
 
 .file-status {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 16px;
+  height: 16px;
   text-align: center;
-  font-weight: bold;
-  border-radius: 2px;
-  font-size: 11px;
+  font-weight: 700;
+  border-radius: 3px;
+  font-size: 10px;
+  flex-shrink: 0;
 }
 
 .file-status.added {
-  background-color: #4ec9b0;
-  color: #000;
+  background-color: rgba(78, 201, 176, 0.25);
+  color: var(--vscode-gitDecoration-addedResourceForeground, #4ec9b0);
 }
 
 .file-status.modified {
-  background-color: #dcdcaa;
-  color: #000;
+  background-color: rgba(220, 220, 170, 0.25);
+  color: var(--vscode-gitDecoration-modifiedResourceForeground, #dcdcaa);
 }
 
 .file-status.deleted {
-  background-color: #f48771;
-  color: #000;
+  background-color: rgba(244, 135, 113, 0.25);
+  color: var(--vscode-gitDecoration-deletedResourceForeground, #f48771);
 }
 
 .file-status.renamed {
-  background-color: #569cd6;
-  color: #fff;
+  background-color: rgba(86, 156, 214, 0.25);
+  color: #569cd6;
 }
 
 .file-status.copied {
-  background-color: #c586c0;
-  color: #fff;
+  background-color: rgba(197, 134, 192, 0.25);
+  color: #c586c0;
 }
 
 .file-path {
   flex: 1;
   font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 12px;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* diff2html overrides – GitHub-like rendering with VS Code theme integration */
+/* ─── Tag badges ──────────────────────────────────────────────────────────── */
+
+.tag-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  margin-right: 4px;
+  background-color: var(--vscode-badge-background, #4d5770);
+  color: var(--vscode-badge-foreground, #fff);
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+/* ─── Merge badge ─────────────────────────────────────────────────────────── */
+
+.merge-badge {
+  display: inline-block;
+  padding: 1px 4px;
+  margin-right: 4px;
+  background-color: rgba(86, 156, 214, 0.2);
+  color: #569cd6;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Loading skeleton ────────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0% { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.diff-loading {
+  padding: 16px;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  background: linear-gradient(
+    90deg,
+    var(--vscode-editor-background) 25%,
+    var(--vscode-list-hoverBackground, rgba(128,128,128,0.1)) 50%,
+    var(--vscode-editor-background) 75%
+  );
+  background-size: 1200px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+/* ─── Empty state ─────────────────────────────────────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--vscode-descriptionForeground);
+  text-align: center;
+  padding: 32px;
+}
+
+.empty-state-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+.empty-state-text {
+  font-size: 13px;
+}
+
+/* ─── diff2html overrides ─────────────────────────────────────────────────── */
+
 .d2h-wrapper {
   background-color: transparent !important;
   border: none !important;
@@ -312,7 +606,6 @@ body {
   color: #f85149 !important;
 }
 
-/* Code content */
 .d2h-code-line-ctn,
 .d2h-code-side-line {
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
@@ -323,7 +616,6 @@ body {
   color: var(--vscode-editor-foreground) !important;
 }
 
-/* Line numbers */
 .d2h-code-linenumber,
 .d2h-code-side-linenumber {
   background-color: var(--vscode-editorGutter-background, var(--vscode-editor-background)) !important;
@@ -332,7 +624,6 @@ body {
   cursor: default;
 }
 
-/* Diff table body */
 .d2h-diff-table {
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
 }
@@ -341,13 +632,11 @@ body {
   border-bottom: none !important;
 }
 
-/* Default (unchanged) lines */
 .d2h-code-line,
 .d2h-code-side-line {
   background-color: var(--vscode-editor-background) !important;
 }
 
-/* Added lines – green tint (GitHub-like) */
 .d2h-ins {
   background-color: rgba(46, 160, 67, 0.15) !important;
 }
@@ -363,14 +652,12 @@ body {
   border-color: var(--vscode-border-color) !important;
 }
 
-/* Inline word-level highlight for additions */
 .d2h-ins ins,
 .d2h-ins .d2h-change {
   background-color: rgba(46, 160, 67, 0.4) !important;
   text-decoration: none !important;
 }
 
-/* Deleted lines – red tint (GitHub-like) */
 .d2h-del {
   background-color: rgba(248, 81, 73, 0.15) !important;
 }
@@ -386,14 +673,12 @@ body {
   border-color: var(--vscode-border-color) !important;
 }
 
-/* Inline word-level highlight for deletions */
 .d2h-del del,
 .d2h-del .d2h-change {
   background-color: rgba(248, 81, 73, 0.4) !important;
   text-decoration: none !important;
 }
 
-/* Hunk header / info line (@@) */
 .d2h-info {
   background-color: rgba(56, 139, 253, 0.1) !important;
   color: var(--vscode-descriptionForeground) !important;
@@ -404,71 +689,44 @@ body {
   color: var(--vscode-descriptionForeground) !important;
 }
 
-/* Empty / filler cells in side-by-side view */
 .d2h-emptyplaceholder,
 .d2h-code-side-emptyplaceholder {
   background-color: var(--vscode-editorGutter-background, var(--vscode-editor-background)) !important;
   border-color: var(--vscode-border-color) !important;
 }
 
-/* Side-by-side specific: separator between left/right panes */
 .d2h-code-side-line .d2h-code-side-emptyplaceholder {
   background-color: var(--vscode-editor-background) !important;
 }
 
-/* Hide diff2html Viewed checkbox */
 .d2h-file-collapse {
   display: none !important;
 }
 
-/* Scrollbar styling inside diff viewer */
-#diff-viewer::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+/* ─── Scrollbar ───────────────────────────────────────────────────────────── */
+
+#diff-viewer::-webkit-scrollbar,
+#commit-table-container::-webkit-scrollbar,
+#commit-detail::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-#diff-viewer::-webkit-scrollbar-track {
+#diff-viewer::-webkit-scrollbar-track,
+#commit-table-container::-webkit-scrollbar-track,
+#commit-detail::-webkit-scrollbar-track {
   background: transparent;
 }
 
-#diff-viewer::-webkit-scrollbar-thumb {
+#diff-viewer::-webkit-scrollbar-thumb,
+#commit-table-container::-webkit-scrollbar-thumb,
+#commit-detail::-webkit-scrollbar-thumb {
   background: var(--vscode-scrollbarSlider-background);
-  border-radius: 5px;
+  border-radius: 4px;
 }
 
-#diff-viewer::-webkit-scrollbar-thumb:hover {
+#diff-viewer::-webkit-scrollbar-thumb:hover,
+#commit-table-container::-webkit-scrollbar-thumb:hover,
+#commit-detail::-webkit-scrollbar-thumb:hover {
   background: var(--vscode-scrollbarSlider-hoverBackground);
-}
-
-.tag-badge {
-  display: inline-block;
-  padding: 1px 5px;
-  margin-right: 4px;
-  background-color: var(--vscode-badge-background, #4d5770);
-  color: var(--vscode-badge-foreground, #fff);
-  border-radius: 3px;
-  font-size: 11px;
-  font-weight: 500;
-  vertical-align: middle;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--vscode-descriptionForeground);
-  text-align: center;
-  padding: 32px;
-}
-
-.empty-state-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-  opacity: 0.5;
-}
-
-.empty-state-text {
-  font-size: 14px;
 }

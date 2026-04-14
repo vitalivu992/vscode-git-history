@@ -11,6 +11,7 @@ let showGraph = true;
 let selectedFile = null;
 let currentCommitHash = null;
 let trackedFilePath = null;
+let expandedMessages = new Set(); // Track which commit messages are expanded
 
 // Graph rendering constants
 const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
@@ -68,21 +69,136 @@ function renderGraphSvg(cell, totalCols) {
   return `<svg style="display:block;width:${width}px;height:100%;overflow:visible;" viewBox="0 0 ${width} ${ROW_H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">${paths.join('')}</svg>`;
 }
 
-// Initialize
+// ─── Author avatar helpers ───────────────────────────────────────────────────
+
+function getAuthorColor(author) {
+  let hash = 0;
+  for (let i = 0; i < author.length; i++) {
+    hash = author.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return GRAPH_COLORS[Math.abs(hash) % GRAPH_COLORS.length];
+}
+
+function getAuthorInitials(author) {
+  const parts = author.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return author.substring(0, 2).toUpperCase();
+}
+
+// ─── Initialize ─────────────────────────────────────────────────────────────
+
 function init() {
-  // Send ready message
   vscode.postMessage({ type: 'ready' });
 
-  // Event listeners
   unifiedBtn.addEventListener('click', () => setDiffType('unified'));
   sideBySideBtn.addEventListener('click', () => setDiffType('side-by-side'));
   if (searchInput) {
     searchInput.addEventListener('input', handleSearch);
   }
 
-  // Listen for messages from extension
+  // Hash chip copy-on-click and message expand (event delegation)
+  commitList.addEventListener('click', (e) => {
+    if (e.target.classList.contains('hash-chip')) {
+      e.stopPropagation();
+      const hash = e.target.dataset.hash;
+      navigator.clipboard.writeText(hash).then(() => {
+        e.target.classList.add('copied');
+        setTimeout(() => e.target.classList.remove('copied'), 1200);
+      }).catch(() => {
+        // Clipboard API unavailable in some webview contexts — silently ignore
+      });
+    }
+    if (e.target.classList.contains('message-expand-btn')) {
+      e.stopPropagation();
+      const hash = e.target.dataset.hash;
+      if (expandedMessages.has(hash)) {
+        expandedMessages.delete(hash);
+      } else {
+        expandedMessages.add(hash);
+      }
+      renderCommits();
+    }
+  });
+
+  initResizers();
+
   window.addEventListener('message', handleMessage);
 }
+
+// ─── Resizable panels ────────────────────────────────────────────────────────
+
+function initResizers() {
+  const mainContent = document.getElementById('main-content');
+  const verticalResizer = document.getElementById('vertical-resizer');
+  const horizontalResizer = document.getElementById('horizontal-resizer');
+  const bottomPanel = document.getElementById('bottom-panel');
+  const commitTableContainer = document.getElementById('commit-table-container');
+
+  // Vertical resizer (between diff-viewer and bottom-panel)
+  let isResizingV = false;
+  let vStartY = 0;
+  let vStartHeight = 0;
+
+  verticalResizer.addEventListener('mousedown', (e) => {
+    isResizingV = true;
+    vStartY = e.clientY;
+    vStartHeight = diffViewer.getBoundingClientRect().height;
+    verticalResizer.classList.add('active');
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  // Horizontal resizer (between commit table and detail panel)
+  let isResizingH = false;
+  let hStartX = 0;
+  let hStartWidth = 0;
+
+  horizontalResizer.addEventListener('mousedown', (e) => {
+    isResizingH = true;
+    hStartX = e.clientX;
+    hStartWidth = commitTableContainer.getBoundingClientRect().width;
+    horizontalResizer.classList.add('active');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (isResizingV) {
+      const delta = e.clientY - vStartY;
+      const totalH = mainContent.getBoundingClientRect().height;
+      const newHeight = Math.max(60, Math.min(vStartHeight + delta, totalH - 80));
+      diffViewer.style.height = newHeight + 'px';
+    }
+    if (isResizingH) {
+      const delta = e.clientX - hStartX;
+      const totalW = bottomPanel.getBoundingClientRect().width;
+      const newWidth = Math.max(120, Math.min(hStartWidth + delta, totalW - 120));
+      commitTableContainer.style.flex = 'none';
+      commitTableContainer.style.width = newWidth + 'px';
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isResizingV) {
+      isResizingV = false;
+      verticalResizer.classList.remove('active');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+    if (isResizingH) {
+      isResizingH = false;
+      horizontalResizer.classList.remove('active');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+  });
+}
+
+// ─── Message handler ─────────────────────────────────────────────────────────
 
 function handleMessage(event) {
   const message = event.data;
@@ -92,11 +208,9 @@ function handleMessage(event) {
       commits = message.commits;
       showGraph = message.showGraph !== false;
       trackedFilePath = message.filePath || null;
-      // Show or hide the graph column header
       const graphTh = document.querySelector('th.graph-col');
       if (graphTh) { graphTh.style.display = showGraph ? '' : 'none'; }
       renderCommits();
-      // Auto-select the latest commit to show its diff immediately
       if (commits.length > 0) {
         selectCommit(commits[0].hash);
       }
@@ -129,7 +243,6 @@ function handleMessage(event) {
 }
 
 function handleSelectCommit(hash) {
-  // Find the row by hash and select it
   const row = document.querySelector(`#commit-table tbody tr[data-hash="${hash}"]`);
   if (row) {
     clearSelection();
@@ -138,10 +251,11 @@ function handleSelectCommit(hash) {
   }
 }
 
+// ─── Commit rendering ────────────────────────────────────────────────────────
+
 function renderCommits() {
   commitList.innerHTML = '';
 
-  // Filter commits based on search query
   const filteredCommits = commits.filter(commit => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -183,11 +297,17 @@ function renderCommits() {
     const tr = document.createElement('tr');
     tr.dataset.hash = commit.hash;
 
+    const isMerge = commit.parentHashes && commit.parentHashes.length > 1;
+    if (isMerge) {
+      tr.classList.add('commit-merge');
+    }
+
     const date = formatDate(commit.date);
     const absoluteDate = new Date(commit.date).toLocaleString(undefined, {
       year: 'numeric', month: 'short', day: 'numeric',
       hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
+
     const graphCell = showGraph && graphData[index]
       ? `<td class="graph-col">${renderGraphSvg(graphData[index], maxCols)}</td>`
       : '';
@@ -196,15 +316,43 @@ function renderCommits() {
       .map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`)
       .join('');
 
+    const mergeBadge = isMerge ? '<span class="merge-badge">merge</span>' : '';
+
+    const avatarColor = getAuthorColor(commit.author);
+    const initials = getAuthorInitials(commit.author);
+
+    // Build message content with expand/collapse for commits with body
+    const hasBody = commit.fullMessage && commit.fullMessage !== commit.message;
+    const isExpanded = expandedMessages.has(commit.hash);
+    let messageHtml;
+    if (hasBody) {
+      const bodyContent = commit.fullMessage.substring(commit.message.length).trim();
+      messageHtml = `
+        <div class="message-content ${isExpanded ? 'expanded' : ''}">
+          <div class="message-subject">${mergeBadge}${tagBadges}${escapeHtml(commit.message)}</div>
+          ${isExpanded ? `<div class="message-body">${escapeHtml(bodyContent)}</div>` : ''}
+        </div>
+        <button class="message-expand-btn" data-hash="${commit.hash}" title="${isExpanded ? 'Collapse' : 'Expand'} message">
+          ${isExpanded ? '▲' : '▼'}
+        </button>
+      `;
+    } else {
+      messageHtml = `<div class="message-content">${mergeBadge}${tagBadges}${escapeHtml(commit.message)}</div>`;
+    }
+
     tr.innerHTML = `
       ${graphCell}
-      <td class="hash-col" title="${commit.hash}">${commit.shortHash}</td>
-      <td class="author-col" title="${commit.author}">${truncate(commit.author, 20)}</td>
+      <td class="hash-col"><span class="hash-chip" data-hash="${commit.hash}" title="Click to copy full hash">${commit.shortHash}</span></td>
+      <td class="author-col" title="${escapeHtml(commit.author)}">
+        <div class="author-col-inner">
+          <span class="author-avatar" style="background-color:${avatarColor}">${initials}</span>
+          <span class="author-name">${escapeHtml(truncate(commit.author, 16))}</span>
+        </div>
+      </td>
       <td class="date-col" title="${absoluteDate}">${date}</td>
-      <td class="message-col" title="${commit.message}">${tagBadges}${escapeHtml(commit.message)}</td>
+      <td class="message-col ${hasBody ? 'has-expand' : ''}">${messageHtml}</td>
     `;
 
-    // Row click handler: normal click = single select; Ctrl/Cmd+Click = toggle multi-select
     tr.addEventListener('click', (e) => {
       if (e.ctrlKey || e.metaKey) {
         if (selectedCommits.has(commit.hash)) {
@@ -235,6 +383,8 @@ function selectCommit(hash) {
   selectedFile = null;
 
   updateSelectedRows();
+  updateCommitDetailHeader(commits.find(c => c.hash === hash) || null);
+  showDiffLoading();
   requestDiff(hash);
 }
 
@@ -253,6 +403,31 @@ function updateSelectedRows() {
   });
 }
 
+// ─── Diff loading skeleton ────────────────────────────────────────────────────
+
+function showDiffLoading() {
+  const widths = ['38%', '100%', '100%', '72%', '100%', '100%', '55%', '100%', '85%', '100%'];
+  const lines = widths.map(w => `<div class="skeleton-line" style="width:${w}"></div>`).join('');
+  diffViewer.innerHTML = `<div class="diff-loading">${lines}</div>`;
+}
+
+// ─── Commit detail header ────────────────────────────────────────────────────
+
+function updateCommitDetailHeader(commit) {
+  const header = document.getElementById('commit-detail-header');
+  if (!header) return;
+  if (!commit) {
+    header.innerHTML = '<span class="detail-label">Changed Files</span>';
+    return;
+  }
+  header.innerHTML = `
+    <span class="detail-hash-chip">${escapeHtml(commit.shortHash)}</span>
+    <span class="detail-subject" title="${escapeHtml(commit.message)}">${escapeHtml(truncate(commit.message, 50))}</span>
+  `;
+}
+
+// ─── Message sending ─────────────────────────────────────────────────────────
+
 function requestDiff(hash) {
   if (trackedFilePath) {
     vscode.postMessage({ type: 'requestFileDiff', hash, filePath: trackedFilePath });
@@ -266,6 +441,8 @@ function requestCombinedDiff() {
   vscode.postMessage({ type: 'requestCombinedDiff', hashes });
 }
 
+// ─── Diff rendering ───────────────────────────────────────────────────────────
+
 function renderDiff(diffText) {
   if (!diffText || diffText.trim() === '') {
     diffViewer.innerHTML = `
@@ -277,7 +454,6 @@ function renderDiff(diffText) {
     return;
   }
 
-  const targetElement = diffViewer;
   const configuration = {
     drawFileList: false,
     matching: 'lines',
@@ -288,7 +464,7 @@ function renderDiff(diffText) {
   };
 
   try {
-    const diff2htmlInstance = new Diff2HtmlUI(targetElement, diffText, configuration);
+    const diff2htmlInstance = new Diff2HtmlUI(diffViewer, diffText, configuration);
     diff2htmlInstance.draw();
   } catch (error) {
     console.error('Error rendering diff:', error);
@@ -321,15 +497,16 @@ function setDiffType(type) {
   }
 }
 
+// ─── File list ────────────────────────────────────────────────────────────────
+
 function renderFiles(files, activeFile) {
   fileList.innerHTML = '';
 
   if (!files || files.length === 0) {
-    fileList.innerHTML = '<li class="empty-state-text">No files changed</li>';
+    fileList.innerHTML = '<li class="empty-state-text" style="padding:8px">No files changed</li>';
     return;
   }
 
-  // Show back-link when viewing a single file's diff
   if (activeFile && currentCommitHash) {
     const backLi = document.createElement('li');
     backLi.className = 'file-back-link';
@@ -360,10 +537,9 @@ function renderFiles(files, activeFile) {
 
     li.innerHTML = `
       <span class="file-status ${statusClass}">${statusLabel}</span>
-      <span class="file-path" title="${displayPath}">${displayPath}</span>
+      <span class="file-path" title="${escapeHtml(displayPath)}">${escapeHtml(displayPath)}</span>
     `;
 
-    // Add click handler for single-commit mode only
     if (!isMultiSelect && currentCommitHash) {
       li.addEventListener('click', () => {
         selectedFile = file.path;
@@ -378,6 +554,8 @@ function renderFiles(files, activeFile) {
     fileList.appendChild(li);
   });
 }
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getStatusClass(status) {
   switch (status) {

@@ -96,4 +96,29 @@ suite('Git Parser Tests', () => {
     assert.strictEqual(commits.length, 1);
     assert.strictEqual(commits[0].author, 'John Doe');
   });
+
+  test('parseGitLog should parse commit body into fullMessage', () => {
+    // Format includes body field after subject
+    const subject = 'Add new feature';
+    const body = 'This commit adds a new feature\nwith multiple lines\nof description.';
+    const commitWithBody = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00' + subject + '\x00' + body + '\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitWithBody);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].message, subject);
+    assert.strictEqual(commits[0].fullMessage, subject + '\n\n' + body);
+  });
+
+  test('parseGitLog should handle commit without body', () => {
+    // Empty body field
+    const subject = 'Simple commit';
+    const commitNoBody = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00' + subject + '\x00\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitNoBody);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].message, subject);
+    assert.strictEqual(commits[0].fullMessage, subject);
+  });
 });

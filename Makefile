@@ -24,4 +24,4 @@ package: compile ### Package the extension into a .vsix file
 	vsce package
 
 install: package ### Install the packaged extension locally
-	code --install-extension vscode-git-history-*.vsix
+	cursor --install-extension vscode-git-history-*.vsix
