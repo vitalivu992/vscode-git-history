@@ -5,6 +5,7 @@ import { execFile } from 'child_process';
 import { CommitInfo, CommitFileChange, DiffResult, BlameLineInfo } from '../types';
 import { parseGitLog, parseNameStatus, isBinaryFile, parseLineHistoryLog } from './gitParser';
 import { parseBlameOutput } from './blameParser';
+import { parseMultipleCommitStats } from './gitStatsParser';
 
 const execFileAsync = util.promisify(execFile);
 
@@ -42,13 +43,28 @@ export async function getFileHistory(filePath: string, cwd: string): Promise<Com
     'log',
     '--follow',
     `--format=${format}`,
+    '--stat',  // Include stats for files changed, insertions, deletions
     '-n', maxCommits.toString(),
     '--',
     relativePath
   ];
 
   const output = await execGit(args, cwd);
-  return parseGitLog(output);
+  const commits = parseGitLog(output);
+
+  // Parse stats from the same output and merge with commits
+  const stats = parseMultipleCommitStats(output);
+  commits.forEach((commit, index) => {
+    if (stats[index]) {
+      commit.stats = {
+        filesChanged: stats[index].filesChanged,
+        insertions: stats[index].insertions,
+        deletions: stats[index].deletions
+      };
+    }
+  });
+
+  return commits;
 }
 
 /**
