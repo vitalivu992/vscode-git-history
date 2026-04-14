@@ -26,6 +26,9 @@ const unifiedBtn = document.getElementById('unified-btn');
 const sideBySideBtn = document.getElementById('side-by-side-btn');
 const fileList = document.getElementById('file-list');
 const searchInput = document.getElementById('search-input');
+const refreshBtn = document.getElementById('refresh-btn');
+
+let isRefreshing = false;
 
 /**
  * Render a single commit row's graph cell as an inline SVG string.
@@ -96,6 +99,16 @@ function init() {
   sideBySideBtn.addEventListener('click', () => setDiffType('side-by-side'));
   if (searchInput) {
     searchInput.addEventListener('input', handleSearch);
+  }
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', handleRefresh);
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        handleRefresh();
+      }
+    });
   }
 
   // Hash chip copy-on-click and message expand (event delegation)
@@ -622,6 +635,25 @@ function showError(message) {
 function handleSearch(e) {
   searchQuery = e.target.value.trim();
   renderCommits();
+}
+
+async function handleRefresh() {
+  if (isRefreshing) return;
+  isRefreshing = true;
+  if (refreshBtn) {
+    refreshBtn.classList.add('spinning');
+    refreshBtn.disabled = true;
+  }
+
+  vscode.postMessage({ type: 'requestRefresh' });
+
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  isRefreshing = false;
+  if (refreshBtn) {
+    refreshBtn.classList.remove('spinning');
+    refreshBtn.disabled = false;
+  }
 }
 
 // Initialize on load

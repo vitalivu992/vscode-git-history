@@ -37,18 +37,26 @@ suite('WebviewProvider HTML Tests', () => {
 <body>
   <div id="app">
     <div id="diff-controls">
-      <button id="unified-btn" class="active">Unified</button>
-      <button id="side-by-side-btn">Side-by-Side</button>
+      <div class="segmented-control">
+        <button id="unified-btn" class="active">Unified</button>
+        <button id="side-by-side-btn">Side by Side</button>
+      </div>
+      <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>
 
     <div id="main-content">
       <div id="diff-viewer"></div>
+      <div id="vertical-resizer"></div>
 
       <div id="bottom-panel">
         <div id="commit-table-container">
+          <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search commits by message, author, or hash...">
+          </div>
           <table id="commit-table">
             <thead>
               <tr>
+                <th class="graph-col">Graph</th>
                 <th class="hash-col">Hash</th>
                 <th class="author-col">Author</th>
                 <th class="date-col">Date</th>
@@ -59,8 +67,12 @@ suite('WebviewProvider HTML Tests', () => {
           </table>
         </div>
 
+        <div id="horizontal-resizer"></div>
+
         <div id="commit-detail">
-          <h3>Changed Files</h3>
+          <div id="commit-detail-header">
+            <span class="detail-label">Changed Files</span>
+          </div>
           <ul id="file-list"></ul>
         </div>
       </div>
@@ -161,6 +173,22 @@ suite('Message Type Tests', () => {
 
     assert.ok(source.includes("case 'requestFileDiff'"), 'messageHandler should have requestFileDiff case');
     assert.ok(source.includes('handleRequestFileDiff'), 'messageHandler should call handleRequestFileDiff');
+  });
+
+  test('requestRefresh message type should be defined in WebviewToExtMessage', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes("type: 'requestRefresh'"), 'WebviewToExtMessage should include requestRefresh type');
+  });
+
+  test('messageHandler should handle requestRefresh without error', () => {
+    const fs = require('fs');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    assert.ok(source.includes("case 'requestRefresh'"), 'messageHandler should have requestRefresh case');
   });
 });
 

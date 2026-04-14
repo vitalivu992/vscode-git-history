@@ -73,4 +73,5 @@ export type WebviewToExtMessage =
   | { type: 'requestDiff'; hash: string }
   | { type: 'requestCombinedDiff'; hashes: string[] }
   | { type: 'requestCommitFiles'; hash: string }
-  | { type: 'requestFileDiff'; hash: string; filePath: string };
+  | { type: 'requestFileDiff'; hash: string; filePath: string }
+  | { type: 'requestRefresh' };

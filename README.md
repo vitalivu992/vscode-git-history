@@ -22,6 +22,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
 - **Date Tooltips**: Hover over commit dates to see absolute timestamps
 - **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
+- **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
 - **Dark/Light Theme**: Automatically adapts to your VS Code theme using native CSS variables
 
 ## Installation
@@ -76,6 +77,7 @@ This extension contributes the following settings:
 | Git History (File) | (none - customize as desired) |
 | Git History for Selection | (none - customize as desired) |
 | Toggle Blame Annotations | `Ctrl+Shift+B` / `Cmd+Shift+B` |
+| Refresh History | `Ctrl+Shift+R` / `Cmd+Shift+R` |
 
 ## License
 

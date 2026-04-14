@@ -36,6 +36,10 @@ export async function handleMessage(
       await handleRequestFileDiff(message.hash, message.filePath, panel);
       break;
 
+    case 'requestRefresh':
+      await panel.loadData();
+      break;
+
     default:
       console.error('Unknown message type:', message);
   }

@@ -80,6 +80,36 @@ body {
   color: var(--vscode-button-foreground);
 }
 
+#refresh-btn {
+  margin-left: auto;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.1s;
+}
+
+#refresh-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+#refresh-btn.spinning {
+  animation: spin 1s linear infinite;
+}
+
+#refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* ─── Main layout ─────────────────────────────────────────────────────────── */
 
 #main-content {

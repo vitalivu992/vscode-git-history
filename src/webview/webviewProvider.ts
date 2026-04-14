@@ -190,17 +190,21 @@ export class GitHistoryPanel {
 <body>
   <div id="app">
     <div id="diff-controls">
-      <button id="unified-btn" class="active">Unified</button>
-      <button id="side-by-side-btn">Side-by-Side</button>
+      <div class="segmented-control">
+        <button id="unified-btn" class="active">Unified</button>
+        <button id="side-by-side-btn">Side by Side</button>
+      </div>
+      <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>
 
     <div id="main-content">
       <div id="diff-viewer"></div>
+      <div id="vertical-resizer"></div>
 
       <div id="bottom-panel">
         <div id="commit-table-container">
           <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search commits...">
+            <input type="text" id="search-input" placeholder="Search commits by message, author, or hash...">
           </div>
           <table id="commit-table">
             <thead>
@@ -216,8 +220,12 @@ export class GitHistoryPanel {
           </table>
         </div>
 
+        <div id="horizontal-resizer"></div>
+
         <div id="commit-detail">
-          <h3>Changed Files</h3>
+          <div id="commit-detail-header">
+            <span class="detail-label">Changed Files</span>
+          </div>
           <ul id="file-list"></ul>
         </div>
       </div>
