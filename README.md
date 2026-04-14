@@ -31,6 +31,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Commit Message**: Copy the commit message, author, email, and date to clipboard with the copy button or `Ctrl+Shift+C` / `Cmd+Shift+C` keyboard shortcut
 - **Copy Commit Hash**: Copy the full commit hash to clipboard with `Ctrl+Shift+H` / `Cmd+Shift+H` keyboard shortcut, or click any hash chip
 - **Copy Commit Info**: Copy the full commit information (hash, author, date, message) to clipboard with `Ctrl+Shift+I` / `Cmd+Shift+I` keyboard shortcut
+- **Copy Cherry-Pick Command**: Copy a pre-formatted `git cherry-pick <hash>` command to the clipboard with `Ctrl+Shift+P` / `Cmd+Shift+P` keyboard shortcut, or right-click on any commit
 - **Open File at Commit**: Right-click on any file in the changed files list to view the file content as it was at that specific commit
 - **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
 - **Dark/Light Theme**: Automatically adapts to your VS Code theme using native CSS variables
@@ -70,7 +71,18 @@ A powerful VS Code extension that provides git history visualization inspired by
 
 #### Context Menu Actions
 
-Right-click on files in the changed files list to access additional options:
+Right-click on commits in the commit list or files in the changed files list to access additional options:
+
+**Commit Row Context Menu:**
+
+| Action | Description |
+|--------|-------------|
+| **Copy commit hash** | Copy the full commit hash to clipboard |
+| **Copy commit message** | Copy the commit message to clipboard |
+| **Copy commit info** | Copy full commit information (hash, author, date, message) |
+| **Copy cherry-pick command** | Copy a pre-formatted `git cherry-pick <hash>` command |
+
+**Changed Files Context Menu:**
 
 | Action | Description |
 |--------|-------------|
@@ -92,6 +104,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+C` / `Cmd+Shift+C` | Copy commit message to clipboard |
 | `Ctrl+Shift+H` / `Cmd+Shift+H` | Copy commit hash to clipboard |
 | `Ctrl+Shift+I` / `Cmd+Shift+I` | Copy full commit info to clipboard |
+| `Ctrl+Shift+P` / `Cmd+Shift+P` | Copy cherry-pick command to clipboard |
 | `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
 | `Escape` | Clear selection and search focus |
 

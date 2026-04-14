@@ -943,6 +943,12 @@ body {
   white-space: nowrap;
 }
 
+.context-menu-divider {
+  height: 1px;
+  background-color: var(--vscode-menu-border, var(--vscode-border-color));
+  margin: 4px 0;
+}
+
 /* ─── Jump to Hash Modal ─────────────────────────────────────────────────────── */
 
 #jump-to-hash-modal {

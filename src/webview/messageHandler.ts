@@ -53,6 +53,10 @@ export async function handleMessage(
       handleCopyCommitInfo(message.hash, panel);
       break;
 
+    case 'copyCherryPickCommand':
+      handleCopyCherryPickCommand(message.hash, panel);
+      break;
+
     case 'openFileAtCommit':
       await handleOpenFileAtCommit(message.hash, message.filePath, panel);
       break;
@@ -221,6 +225,20 @@ function handleCopyCommitInfo(hash: string, panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(copyText).then(() => {
     void vscode.window.showInformationMessage('Commit info copied to clipboard');
+  });
+}
+
+function handleCopyCherryPickCommand(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const cherryPickCommand = `git cherry-pick ${commit.hash}`;
+
+  void vscode.env.clipboard.writeText(cherryPickCommand).then(() => {
+    void vscode.window.showInformationMessage(`Cherry-pick command copied: ${commit.shortHash}`);
   });
 }
 

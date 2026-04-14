@@ -129,6 +129,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+P: Copy cherry-pick command
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'p') {
+    e.preventDefault();
+    handleCopyCherryPick();
+    return;
+  }
+
   // / or Ctrl+F: Focus search
   if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
     e.preventDefault();
@@ -669,6 +676,12 @@ function renderCommits() {
       }
     });
 
+    // Add context menu handler for right-click on commit rows
+    tr.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showCommitContextMenu(e, commit);
+    });
+
     commitList.appendChild(tr);
   });
 
@@ -924,6 +937,72 @@ function showFileContextMenu(event, filePath, commitHash) {
   }, 0);
 }
 
+// ─── Commit Context Menu ───────────────────────────────────────────────────────
+
+function showCommitContextMenu(event, commit) {
+  // Remove any existing context menu
+  const existingMenu = document.getElementById('commit-context-menu');
+  if (existingMenu) {
+    existingMenu.remove();
+  }
+
+  const menu = document.createElement('div');
+  menu.id = 'commit-context-menu';
+  menu.className = 'context-menu';
+  menu.innerHTML = `
+    <div class="context-menu-item" data-action="copy-hash">
+      <span class="context-menu-icon">#</span>
+      <span class="context-menu-label">Copy commit hash</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-message">
+      <span class="context-menu-icon">📝</span>
+      <span class="context-menu-label">Copy commit message</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-info">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy commit info</span>
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" data-action="copy-cherry-pick">
+      <span class="context-menu-icon">🍒</span>
+      <span class="context-menu-label">Copy cherry-pick command</span>
+    </div>
+  `;
+
+  // Position the menu at click location
+  menu.style.left = `${event.clientX}px`;
+  menu.style.top = `${event.clientY}px`;
+  document.body.appendChild(menu);
+
+  // Handle menu item clicks
+  menu.querySelectorAll('.context-menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const action = item.dataset.action;
+      if (action === 'copy-hash') {
+        vscode.postMessage({ type: 'copyCommitHash', hash: commit.hash });
+      } else if (action === 'copy-message') {
+        vscode.postMessage({ type: 'copyCommitMessage', hash: commit.hash });
+      } else if (action === 'copy-info') {
+        vscode.postMessage({ type: 'copyCommitInfo', hash: commit.hash });
+      } else if (action === 'copy-cherry-pick') {
+        vscode.postMessage({ type: 'copyCherryPickCommand', hash: commit.hash });
+      }
+      menu.remove();
+    });
+  });
+
+  // Close menu when clicking outside
+  const closeMenu = (e) => {
+    if (!menu.contains(e.target)) {
+      menu.remove();
+      document.removeEventListener('click', closeMenu);
+    }
+  };
+  setTimeout(() => {
+    document.addEventListener('click', closeMenu);
+  }, 0);
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getStatusClass(status) {
@@ -1093,6 +1172,17 @@ function handleCopyInfo() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitInfo', hash });
+  }
+}
+
+function handleCopyCherryPick() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyCherryPickCommand', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCherryPickCommand', hash });
   }
 }
 
