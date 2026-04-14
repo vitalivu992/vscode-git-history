@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { GitHistoryPanel } from './webview/webviewProvider';
 import { getGitRoot } from './git/gitService';
 import { BlameService } from './blame/blameService';
+import { GitHistoryContentProvider } from './gitHistoryContentProvider';
 
 export function activate(context: vscode.ExtensionContext) {
   const blameService = new BlameService();
@@ -119,7 +120,11 @@ export function activate(context: vscode.ExtensionContext) {
     showFileHistoryCommand,
     showSelectionHistoryCommand,
     toggleBlameCommand,
-    showBlameCommitCommand
+    showBlameCommitCommand,
+    vscode.workspace.registerTextDocumentContentProvider(
+      GitHistoryContentProvider.scheme,
+      new GitHistoryContentProvider()
+    )
   );
 }
 
