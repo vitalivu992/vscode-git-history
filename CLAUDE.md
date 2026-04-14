@@ -83,6 +83,8 @@ The webview renders a per-row SVG graph column (like `git log --graph`) using a 
 
 - **Commit Search**: The search input filters commits in real time by message, author name, author email, commit hash (full and short), and tag name. The filter is implemented as a case-insensitive `.includes()` match across all these fields in `src/webview/panel/main.js` (`renderCommits` function). Tag filtering uses `commit.tags.some()` to match any tag badge text.
 
+- **Sort Toggle**: The sort button in the toolbar toggles between newest-first (default) and oldest-first commit ordering. The state is tracked in `sortOldestFirst` in `src/webview/panel/main.js`. When toggled, `getOrderedCommits()` reverses the filtered commit list. The commit graph is hidden in oldest-first mode because the graph layout algorithm assumes newest-first order. The graph header visibility is controlled by `effectiveShowGraph` (true only when `showGraph` is enabled AND `sortOldestFirst` is false).
+
 - **Keyboard Navigation**: The commit list supports full keyboard navigation for accessibility and power users. Arrow keys (`↑`/`↓`) move focus between commits with wrapping support. `Home`/`End` jump to first/last commit. `Enter` selects the focused commit, while `Ctrl+Enter` toggles multi-selection. `/` or `Ctrl+F` focuses the search input. `Escape` clears selection and removes focus. The focused row has a distinct visual outline using the `focused` CSS class (separate from the `selected` class used for commit selection). Implementation spans `src/webview/panel/main.js` (`handleKeyDown`, `updateFocusedRow`, `scrollFocusedIntoView` functions) and `src/webview/panel/styles.css` (`.focused` class styling).
 
 ### Message Protocol
