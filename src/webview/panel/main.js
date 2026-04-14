@@ -274,6 +274,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+F: Copy changed files list
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'f') {
+    e.preventDefault();
+    handleCopyFiles();
+    return;
+  }
+
   // / or Ctrl+F: Focus search
   if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
     e.preventDefault();
@@ -1058,6 +1065,11 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">🔍</span>
       <span class="context-menu-label">View diff for this file</span>
     </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" data-action="copy-file-path">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy file path</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -1080,6 +1092,11 @@ function showFileContextMenu(event, filePath, commitHash) {
         vscode.postMessage({
           type: 'requestFileDiff',
           hash: commitHash,
+          filePath: filePath
+        });
+      } else if (action === 'copy-file-path') {
+        vscode.postMessage({
+          type: 'copyFilePath',
           filePath: filePath
         });
       }
@@ -1129,6 +1146,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🍒</span>
       <span class="context-menu-label">Copy cherry-pick command</span>
     </div>
+    <div class="context-menu-item" data-action="copy-files">
+      <span class="context-menu-icon">📁</span>
+      <span class="context-menu-label">Copy changed files</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -1148,6 +1169,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitInfo', hash: commit.hash });
       } else if (action === 'copy-cherry-pick') {
         vscode.postMessage({ type: 'copyCherryPickCommand', hash: commit.hash });
+      } else if (action === 'copy-files') {
+        vscode.postMessage({ type: 'copyCommitFiles', hash: commit.hash });
       }
       menu.remove();
     });
@@ -1346,6 +1369,17 @@ function handleCopyCherryPick() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCherryPickCommand', hash });
+  }
+}
+
+function handleCopyFiles() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyCommitFiles', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCommitFiles', hash });
   }
 }
 

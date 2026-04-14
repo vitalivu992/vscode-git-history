@@ -57,6 +57,14 @@ export async function handleMessage(
       handleCopyCherryPickCommand(message.hash, panel);
       break;
 
+    case 'copyCommitFiles':
+      handleCopyCommitFiles(message.hash, panel);
+      break;
+
+    case 'copyFilePath':
+      handleCopyFilePath(message.filePath, panel);
+      break;
+
     case 'openFileAtCommit':
       await handleOpenFileAtCommit(message.hash, message.filePath, panel);
       break;
@@ -239,6 +247,40 @@ function handleCopyCherryPickCommand(hash: string, panel: GitHistoryPanel): void
 
   void vscode.env.clipboard.writeText(cherryPickCommand).then(() => {
     void vscode.window.showInformationMessage(`Cherry-pick command copied: ${commit.shortHash}`);
+  });
+}
+
+async function handleCopyCommitFiles(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const files = await getCommitFiles(hash, cwd);
+
+    const filesList = files.map(file => {
+      if (file.previousPath && file.status === 'R') {
+        return `${file.previousPath} -> ${file.path}`;
+      }
+      return file.path;
+    }).join('\n');
+
+    if (filesList) {
+      await vscode.env.clipboard.writeText(filesList);
+      void vscode.window.showInformationMessage(`Copied ${files.length} file(s) to clipboard`);
+    } else {
+      void vscode.window.showInformationMessage('No files to copy');
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy files: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+function handleCopyFilePath(filePath: string, _panel: GitHistoryPanel): void {
+  // Extract just the filename for the display message
+  const fileName = path.basename(filePath);
+
+  void vscode.env.clipboard.writeText(filePath).then(() => {
+    void vscode.window.showInformationMessage(`Copied path: ${fileName}`);
   });
 }
 

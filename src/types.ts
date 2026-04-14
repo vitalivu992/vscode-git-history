@@ -89,4 +89,6 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitHash'; hash: string }
   | { type: 'copyCommitInfo'; hash: string }
   | { type: 'copyCherryPickCommand'; hash: string }
+  | { type: 'copyCommitFiles'; hash: string }
+  | { type: 'copyFilePath'; filePath: string }
   | { type: 'openFileAtCommit'; hash: string; filePath: string };
