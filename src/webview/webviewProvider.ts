@@ -148,8 +148,9 @@ export class GitHistoryPanel {
 
         this._commits = commits;
         const showGraph = vscode.workspace.getConfiguration('gitHistory').get<boolean>('showGraph', true);
+        const hideMergeCommits = vscode.workspace.getConfiguration('gitHistory').get<boolean>('hideMergeCommits', false);
         const branch = await getCurrentBranch(this._cwd);
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch });
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, hideMergeCommits });
       } catch (error) {
         this.postMessage({
           type: 'error',
@@ -197,6 +198,7 @@ export class GitHistoryPanel {
       </div>
       <button id="copy-btn" class="copy-btn" title="Copy commit message (Ctrl+Shift+C)">Copy</button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
+      <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>
 

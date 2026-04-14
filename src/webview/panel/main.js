@@ -15,6 +15,7 @@ let expandedMessages = new Set(); // Track which commit messages are expanded
 let focusedIndex = -1; // Keyboard focus index for commit list navigation
 let sortOldestFirst = false; // Sort order: false = newest first (default), true = oldest first
 let currentBranch = null; // Current git branch name
+let hideMergeCommits = false; // Filter out merge commits (commits with multiple parents)
 
 // Graph rendering constants
 const GRAPH_COLORS = ['#4ec9b0', '#569cd6', '#c586c0', '#dcdcaa', '#ce9178', '#4fc1ff', '#d16969', '#b5cea8'];
@@ -32,6 +33,7 @@ const searchInput = document.getElementById('search-input');
 const refreshBtn = document.getElementById('refresh-btn');
 const sortBtn = document.getElementById('sort-btn');
 const copyBtn = document.getElementById('copy-btn');
+const mergeToggleBtn = document.getElementById('merge-toggle-btn');
 const commitCountEl = document.getElementById('commit-count');
 
 let isRefreshing = false;
@@ -208,16 +210,27 @@ function handleKeyDown(e) {
 }
 
 function getFilteredCommits() {
-  if (!searchQuery) return commits;
-  const query = searchQuery.toLowerCase();
-  return commits.filter(commit =>
-    commit.hash.toLowerCase().includes(query) ||
-    commit.shortHash.toLowerCase().includes(query) ||
-    commit.author.toLowerCase().includes(query) ||
-    commit.email.toLowerCase().includes(query) ||
-    commit.message.toLowerCase().includes(query) ||
-    (commit.tags && commit.tags.some(t => t.toLowerCase().includes(query)))
-  );
+  let filtered = commits;
+
+  // Filter out merge commits if enabled
+  if (hideMergeCommits) {
+    filtered = filtered.filter(commit => !(commit.parentHashes && commit.parentHashes.length > 1));
+  }
+
+  // Apply search query filter
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+    filtered = filtered.filter(commit =>
+      commit.hash.toLowerCase().includes(query) ||
+      commit.shortHash.toLowerCase().includes(query) ||
+      commit.author.toLowerCase().includes(query) ||
+      commit.email.toLowerCase().includes(query) ||
+      commit.message.toLowerCase().includes(query) ||
+      (commit.tags && commit.tags.some(t => t.toLowerCase().includes(query)))
+    );
+  }
+
+  return filtered;
 }
 
 function getOrderedCommits(filteredCommits) {
@@ -244,6 +257,22 @@ function handleSortToggle() {
   if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
   focusedIndex = -1;
   renderCommits();
+}
+
+function handleMergeToggle() {
+  hideMergeCommits = !hideMergeCommits;
+  if (mergeToggleBtn) {
+    if (hideMergeCommits) {
+      mergeToggleBtn.classList.add('active');
+      mergeToggleBtn.title = 'Merge commits hidden (click to show)';
+    } else {
+      mergeToggleBtn.classList.remove('active');
+      mergeToggleBtn.title = 'Hide merge commits';
+    }
+  }
+  focusedIndex = -1;
+  renderCommits();
+  updateCommitCount();
 }
 
 function updateCommitCount() {
@@ -315,6 +344,10 @@ function init() {
 
   if (copyBtn) {
     copyBtn.addEventListener('click', handleCopyMessage);
+  }
+
+  if (mergeToggleBtn) {
+    mergeToggleBtn.addEventListener('click', handleMergeToggle);
   }
 
   // Keyboard shortcuts
@@ -429,10 +462,21 @@ function handleMessage(event) {
     case 'init':
       commits = message.commits;
       showGraph = message.showGraph !== false;
+      hideMergeCommits = message.hideMergeCommits === true;
       trackedFilePath = message.filePath || null;
       currentBranch = message.branch || null;
       const graphTh = document.querySelector('th.graph-col');
       if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
+      // Update merge toggle button state
+      if (mergeToggleBtn) {
+        if (hideMergeCommits) {
+          mergeToggleBtn.classList.add('active');
+          mergeToggleBtn.title = 'Merge commits hidden (click to show)';
+        } else {
+          mergeToggleBtn.classList.remove('active');
+          mergeToggleBtn.title = 'Hide merge commits';
+        }
+      }
       renderBranchBadge();
       renderCommits();
       if (commits.length > 0) {

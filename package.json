@@ -96,6 +96,11 @@
             "iso"
           ],
           "description": "Date format for blame annotations"
+        },
+        "gitHistory.hideMergeCommits": {
+          "type": "boolean",
+          "default": false,
+          "description": "Hide merge commits in the history view"
         }
       }
     }
