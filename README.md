@@ -23,7 +23,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
 - **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
 - **Blame Annotations**: Toggle inline blame annotations showing commit author and date per line, with a status bar showing commit details for the current line
-- **Date Tooltips**: Hover over commit dates to see absolute timestamps
+- **Date Display**: Commit dates show relative time (e.g., "Today 2:30 PM", "Yesterday 3:45 PM") with time for recent commits; hover to see absolute timestamps
 - **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
 - **Hide Merge Commits**: Toggle the "No Merge" button to filter out merge commits and focus on actual work commits
 - **Jump to Hash**: Press `Ctrl+G` / `Cmd+G` to open a dialog and quickly navigate to a specific commit by hash

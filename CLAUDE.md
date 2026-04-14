@@ -84,7 +84,7 @@ The extension detects and displays the current git branch in the history panel:
 
 ### UI Features
 
-- **Date Tooltips**: Commit dates are displayed in relative format (e.g., "2 days ago") in the commit list. Hovering over a date reveals the absolute timestamp in ISO format. Implemented in `src/webview/panel/main.js` with a `title` attribute on date elements.
+- **Date Display**: Commit dates are displayed in relative format with time for recent commits (e.g., "Today 2:30 PM", "Yesterday 3:45 PM", "2 days ago", "2 weeks ago"). Hovering over a date reveals the absolute timestamp in locale format. Implemented in `src/webview/panel/main.js` (`formatDate()` and `formatTime()` functions) and uses a `title` attribute on date elements.
 
 - **Git Tag Badges**: Tags parsed from the `%d` decorations field are rendered as colored badges next to commit messages. Lightweight and annotated tags are both supported. Badge styling is defined in `src/webview/panel/styles.css`.
 
