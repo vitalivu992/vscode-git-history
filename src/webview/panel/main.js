@@ -276,7 +276,9 @@ function renderCommits() {
       commit.hash.toLowerCase().includes(query) ||
       commit.shortHash.toLowerCase().includes(query) ||
       commit.author.toLowerCase().includes(query) ||
-      commit.message.toLowerCase().includes(query)
+      commit.email.toLowerCase().includes(query) ||
+      commit.message.toLowerCase().includes(query) ||
+      (commit.tags && commit.tags.some(t => t.toLowerCase().includes(query)))
     );
   });
 
