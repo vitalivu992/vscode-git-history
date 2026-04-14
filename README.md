@@ -15,11 +15,12 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **File History**: Right-click anywhere in an editor to view the complete git history of that file
 - **Selection History**: Select lines of code and view only commits that affected those specific lines
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
-- **Search Commits**: Filter commits in real time by message, author name, or commit hash
+- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
 - **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
+- **Blame Annotations**: Toggle inline blame annotations showing commit author and date per line, with a status bar showing commit details for the current line
 - **Date Tooltips**: Hover over commit dates to see absolute timestamps
 - **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
 - **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
@@ -52,9 +53,17 @@ A powerful VS Code extension that provides git history visualization inspired by
 
 - **Click a commit row** to view its diff and changed files
 - **Check multiple commits** to see a combined diff
-- **Search commits** using the search box to filter by message, author, or hash
+- **Search commits** using the search box to filter by message, author, email, hash, or tag name
 - **Toggle view mode** between Unified and Side-by-Side
 - **Scroll the diff viewer** to see all changes
+
+### Using Blame Annotations
+
+1. Open any file in a git repository
+2. Press `Ctrl+Shift+B` / `Cmd+Shift+B` or right-click and select "Toggle Blame Annotations"
+3. Inline decorations appear showing the author and date for each line's last commit
+4. The status bar shows commit details for the current line
+5. Click the status bar or use "Git: Show Blame Commit" to view the full commit diff
 
 ## Requirements
 
