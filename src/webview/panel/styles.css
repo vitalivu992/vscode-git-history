@@ -541,6 +541,14 @@ body {
   white-space: nowrap;
 }
 
+.author-filter-link {
+  cursor: pointer;
+}
+
+.author-filter-link:hover {
+  text-decoration: underline;
+}
+
 /* ─── Commit detail panel ─────────────────────────────────────────────────── */
 
 #commit-detail {

@@ -18,14 +18,20 @@ let currentBranch = null; // Current git branch name
 let hideMergeCommits = false; // Filter out merge commits (commits with multiple parents)
 
 /**
- * Parse date filters from search query
- * Supports: after:YYYY-MM-DD, before:YYYY-MM-DD, last:Ndays/weeks/months
+ * Parse filters from search query
+ * Supports: after:YYYY-MM-DD, before:YYYY-MM-DD, last:Ndays/weeks/months, author:name
  * @param {string} query - The search query
- * @returns {{textQuery: string, dateFilters: {after?: Date, before?: Date}}}
+ * @returns {{textQuery: string, dateFilters: {after?: Date, before?: Date}, authorFilter: string|null}}
  */
 function parseDateFilter(query) {
   const dateFilters = {};
   let textQuery = query;
+
+  const authorMatch = query.match(/author:([^\s]+)/i);
+  const authorFilter = authorMatch ? authorMatch[1].toLowerCase() : null;
+  if (authorMatch) {
+    textQuery = textQuery.replace(authorMatch[0], '').trim();
+  }
 
   // Parse after:YYYY-MM-DD or after:YYYY/MM/DD
   const afterMatch = query.match(/after:([^\s]+)/i);
@@ -69,16 +75,20 @@ function parseDateFilter(query) {
     textQuery = textQuery.replace(lastMatch[0], '').trim();
   }
 
-  return { textQuery: textQuery.trim(), dateFilters };
+  return { textQuery: textQuery.trim(), dateFilters, authorFilter };
 }
 
 /**
- * Check if date filters are active
+ * Check if date or author filters are active
  * @returns {boolean}
  */
+function hasActiveFilters() {
+  const { dateFilters, authorFilter } = parseDateFilter(searchQuery);
+  return !!(dateFilters.after || dateFilters.before || authorFilter);
+}
+
 function hasActiveDateFilters() {
-  const { dateFilters } = parseDateFilter(searchQuery);
-  return !!(dateFilters.after || dateFilters.before);
+  return hasActiveFilters();
 }
 
 /**
@@ -90,10 +100,11 @@ function renderFilterBadges() {
     existingBadges.remove();
   }
 
-  const { dateFilters } = parseDateFilter(searchQuery);
+  const { dateFilters, authorFilter } = parseDateFilter(searchQuery);
   const hasDateFilters = !!(dateFilters.after || dateFilters.before);
+  const hasFilters = hasDateFilters || authorFilter;
 
-  if (!hasDateFilters) {
+  if (!hasFilters) {
     return;
   }
 
@@ -112,6 +123,13 @@ function renderFilterBadges() {
       day: 'numeric'
     });
   };
+
+  if (authorFilter) {
+    const authorBadge = document.createElement('span');
+    authorBadge.className = 'filter-badge';
+    authorBadge.innerHTML = `author: ${escapeHtml(authorFilter)} <span class="filter-badge-clear" data-filter="author">&times;</span>`;
+    badgesContainer.appendChild(authorBadge);
+  }
 
   if (dateFilters.after) {
     const afterBadge = document.createElement('span');
@@ -140,6 +158,8 @@ function renderFilterBadges() {
         newQuery = newQuery.replace(/after:[^\s]+/i, '').trim();
       } else if (filterToRemove === 'before') {
         newQuery = newQuery.replace(/before:[^\s]+/i, '').trim();
+      } else if (filterToRemove === 'author') {
+        newQuery = newQuery.replace(/author:[^\s]+/i, '').trim();
       }
 
       // Also remove any orphaned "last:" filter if it was the only thing
@@ -281,6 +301,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+D: Copy commit diff
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'd') {
+    e.preventDefault();
+    handleCopyDiff();
+    return;
+  }
+
   // / or Ctrl+F: Focus search
   if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
     e.preventDefault();
@@ -391,7 +418,15 @@ function getFilteredCommits() {
   }
 
   // Parse date filters and get remaining text query
-  const { textQuery, dateFilters } = parseDateFilter(searchQuery);
+  const { textQuery, dateFilters, authorFilter } = parseDateFilter(searchQuery);
+
+  // Apply author filter
+  if (authorFilter) {
+    filtered = filtered.filter(commit =>
+      commit.author.toLowerCase().includes(authorFilter) ||
+      commit.email.toLowerCase().includes(authorFilter)
+    );
+  }
 
   // Apply date filters
   if (dateFilters.after) {
@@ -563,6 +598,16 @@ function init() {
       }
       renderCommits();
     }
+    if (e.target.classList.contains('author-filter-link')) {
+      e.stopPropagation();
+      const author = e.target.dataset.author;
+      searchInput.value = `author:${author}`;
+      searchQuery = `author:${author}`;
+      focusedIndex = -1;
+      renderCommits();
+      updateCommitCount();
+      renderFilterBadges();
+    }
   });
 
   initResizers();
@@ -725,14 +770,14 @@ function renderCommits() {
   const colspan = effectiveShowGraph ? 6 : 5;
 
   if (displayCommits.length === 0) {
-    const hasDateFilters = hasActiveDateFilters();
+    const hasFilters = hasActiveFilters();
     let emptyMessage = 'No commits found';
-    if (searchQuery && hasDateFilters) {
-      emptyMessage = 'No commits match your search and date filters';
+    if (searchQuery && hasFilters) {
+      emptyMessage = 'No commits match your search and filters';
     } else if (searchQuery) {
       emptyMessage = 'No commits match your search';
-    } else if (hasDateFilters) {
-      emptyMessage = 'No commits match your date filters';
+    } else if (hasFilters) {
+      emptyMessage = 'No commits match your filters';
     }
     commitList.innerHTML = `
       <tr>
@@ -814,7 +859,7 @@ function renderCommits() {
       <td class="author-col" title="${escapeHtml(commit.author)}">
         <div class="author-col-inner">
           <span class="author-avatar" style="background-color:${avatarColor}">${initials}</span>
-          <span class="author-name">${escapeHtml(truncate(commit.author, 16))}</span>
+           <span class="author-name author-filter-link" data-author="${escapeHtml(commit.author)}">${escapeHtml(truncate(commit.author, 16))}</span>
         </div>
       </td>
       <td class="date-col" title="${absoluteDate}">${date}</td>
@@ -1150,6 +1195,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📁</span>
       <span class="context-menu-label">Copy changed files</span>
     </div>
+    <div class="context-menu-item" data-action="copy-diff">
+      <span class="context-menu-icon">📄</span>
+      <span class="context-menu-label">Copy commit diff</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -1171,6 +1220,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCherryPickCommand', hash: commit.hash });
       } else if (action === 'copy-files') {
         vscode.postMessage({ type: 'copyCommitFiles', hash: commit.hash });
+      } else if (action === 'copy-diff') {
+        vscode.postMessage({ type: 'copyCommitDiff', hash: commit.hash });
       }
       menu.remove();
     });
@@ -1380,6 +1431,17 @@ function handleCopyFiles() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitFiles', hash });
+  }
+}
+
+function handleCopyDiff() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyCommitDiff', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCommitDiff', hash });
   }
 }
 

@@ -16,7 +16,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Selection History**: Select lines of code and view only commits that affected those specific lines
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
 - **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions)
-- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`
+- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter
 - **Sort Toggle**: Switch between newest-first and oldest-first commit ordering with the sort button in the toolbar
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views
@@ -33,6 +33,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Commit Info**: Copy the full commit information (hash, author, date, message) to clipboard with `Ctrl+Shift+I` / `Cmd+Shift+I` keyboard shortcut
 - **Copy Cherry-Pick Command**: Copy a pre-formatted `git cherry-pick <hash>` command to the clipboard with `Ctrl+Shift+P` / `Cmd+Shift+P` keyboard shortcut, or right-click on any commit
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
+- **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
 - **Copy File Path**: Right-click on any file in the changed files list to copy its full path to clipboard
 - **Open File at Commit**: Right-click on any file in the changed files list to view the file content as it was at that specific commit
 - **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
@@ -70,6 +71,10 @@ A powerful VS Code extension that provides git history visualization inspired by
   - `before:2024-06-01` - show commits before a specific date
   - `last:7days` or `last:2weeks` or `last:1month` - show commits within a recent time period
   - Combine filters: `bug fix after:2024-01-01` - search for "bug fix" in commits after January 1st
+- **Filter by author** using `author:` prefix or click any author name in the commit list:
+  - `author:Alice` - show commits by author name (case-insensitive)
+  - `author:alice@example.com` - show commits by email
+  - Combine with other filters: `author:Bob fix after:2024-01-01`
 - **Toggle sort order** with the sort button to switch between newest-first and oldest-first
 - **Hide merge commits** with the "No Merge" button to focus on actual work commits; the count indicator shows "X of Y" when filters are active
 - **Toggle view mode** between Unified and Side-by-Side
@@ -88,6 +93,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy commit info** | Copy full commit information (hash, author, date, message) |
 | **Copy cherry-pick command** | Copy a pre-formatted `git cherry-pick <hash>` command |
 | **Copy changed files** | Copy the list of changed files to clipboard |
+| **Copy commit diff** | Copy the full diff output to clipboard |
 
 **Changed Files Context Menu:**
 
@@ -114,6 +120,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+I` / `Cmd+Shift+I` | Copy full commit info to clipboard |
 | `Ctrl+Shift+P` / `Cmd+Shift+P` | Copy cherry-pick command to clipboard |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
+| `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
 | `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
 | `Escape` | Clear selection and search focus |
 
