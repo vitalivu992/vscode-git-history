@@ -298,3 +298,35 @@ export async function getCommitRangeDiff(
     isBinary: isBinaryFile(output)
   };
 }
+
+/**
+ * Get diff between a commit and its parent
+ * Useful for quick compare to see what changed in a specific commit
+ */
+export async function getCommitParentDiff(
+  hash: string,
+  cwd: string,
+  filePath?: string
+): Promise<DiffResult> {
+  const args = ['diff', '--no-color', `${hash}~1..${hash}`];
+
+  if (filePath) {
+    const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
+    args.push('--', relativePath);
+  }
+
+  try {
+    const output = await execGit(args, cwd);
+    return {
+      diff: output,
+      filePath,
+      isBinary: isBinaryFile(output)
+    };
+  } catch {
+    return {
+      diff: '',
+      filePath,
+      isBinary: false
+    };
+  }
+}
