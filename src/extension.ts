@@ -3,8 +3,12 @@ import { GitHistoryPanel } from './webview/webviewProvider';
 import { getGitRoot } from './git/gitService';
 import { BlameService } from './blame/blameService';
 import { GitHistoryContentProvider } from './gitHistoryContentProvider';
+import { SettingsService } from './settings';
 
 export function activate(context: vscode.ExtensionContext) {
+  // Initialize settings service
+  const settingsService = new SettingsService(context.globalState);
+
   const blameService = new BlameService();
   context.subscriptions.push(blameService);
   const showFileHistoryCommand = vscode.commands.registerCommand(
@@ -25,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       try {
         const cwd = await getGitRoot(filePath);
-        await GitHistoryPanel.createOrShow(context.extensionUri, filePath, cwd);
+        await GitHistoryPanel.createOrShow(context.extensionUri, filePath, cwd, settingsService);
       } catch (error) {
         vscode.window.showErrorMessage(
           `Failed to open git history: ${error instanceof Error ? error.message : String(error)}`
@@ -61,6 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
           context.extensionUri,
           filePath,
           cwd,
+          settingsService,
           { startLine, endLine }
         );
       } catch (error) {
@@ -107,7 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         const filePath = activeEditor.document.uri.fsPath;
         const cwd = await getGitRoot(filePath);
-        await GitHistoryPanel.showCommitDiff(context.extensionUri, filePath, cwd, bl.hash);
+        await GitHistoryPanel.showCommitDiff(context.extensionUri, filePath, cwd, settingsService, bl.hash);
       } catch (error) {
         vscode.window.showErrorMessage(
           `Failed to show commit: ${error instanceof Error ? error.message : String(error)}`

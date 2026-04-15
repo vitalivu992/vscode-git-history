@@ -3,6 +3,7 @@ import * as path from 'path';
 import { getFileHistory, getSelectionHistory, getCurrentBranch } from '../git/gitService';
 import { CommitInfo } from '../types';
 import { handleMessage } from './messageHandler';
+import { SettingsService } from '../settings';
 
 interface SelectionRange {
   startLine: number;
@@ -21,14 +22,16 @@ export class GitHistoryPanel {
   private _commits: CommitInfo[] = [];
   private _webviewReady: boolean = false;
   private _pendingInit: (() => void) | null = null;
+  private readonly _settingsService: SettingsService;
 
   public static async showCommitDiff(
     extensionUri: vscode.Uri,
     filePath: string,
     cwd: string,
+    settingsService: SettingsService,
     commitHash: string
   ): Promise<void> {
-    await GitHistoryPanel.createOrShow(extensionUri, filePath, cwd);
+    await GitHistoryPanel.createOrShow(extensionUri, filePath, cwd, settingsService);
     // After panel is ready, select the commit
     GitHistoryPanel.currentPanel?.postMessage({ type: 'selectCommit', hash: commitHash });
   }
@@ -37,6 +40,7 @@ export class GitHistoryPanel {
     extensionUri: vscode.Uri,
     filePath: string,
     cwd: string,
+    settingsService: SettingsService,
     selection?: SelectionRange
   ): Promise<void> {
     const column = vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One;
@@ -73,7 +77,7 @@ export class GitHistoryPanel {
       }
     );
 
-    GitHistoryPanel.currentPanel = new GitHistoryPanel(panel, extensionUri, filePath, cwd, selection);
+    GitHistoryPanel.currentPanel = new GitHistoryPanel(panel, extensionUri, filePath, cwd, settingsService, selection);
     await GitHistoryPanel.currentPanel.loadData();
   }
 
@@ -82,18 +86,20 @@ export class GitHistoryPanel {
     private readonly _extensionUri: vscode.Uri,
     filePath: string,
     cwd: string,
+    settingsService: SettingsService,
     selection?: SelectionRange
   ) {
     this._panel = panel;
     this._filePath = filePath;
     this._cwd = cwd;
+    this._settingsService = settingsService;
     this._selection = selection;
 
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
     this._panel.webview.onDidReceiveMessage(
       async (message) => {
-        await handleMessage(message, this);
+        await handleMessage(message, this, this._settingsService);
       },
       null,
       this._disposables
@@ -120,6 +126,10 @@ export class GitHistoryPanel {
 
   public getCommits(): CommitInfo[] {
     return this._commits;
+  }
+
+  public getSettingsService(): SettingsService {
+    return this._settingsService;
   }
 
   public onWebviewReady(): void {
@@ -151,7 +161,11 @@ export class GitHistoryPanel {
         const hideMergeCommits = vscode.workspace.getConfiguration('gitHistory').get<boolean>('hideMergeCommits', false);
         const defaultDiffView = vscode.workspace.getConfiguration('gitHistory').get<string>('defaultDiffView', 'unified');
         const branch = await getCurrentBranch(this._cwd);
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, hideMergeCommits, defaultDiffView });
+
+        // Get user settings from persistent storage
+        const userSettings = this._settingsService.getSettings();
+
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, hideMergeCommits, defaultDiffView, userSettings });
       } catch (error) {
         this.postMessage({
           type: 'error',

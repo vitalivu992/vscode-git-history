@@ -508,7 +508,7 @@ function getFilteredCommits() {
       isRegexMatch(commit.shortHash, textQuery) ||
       isRegexMatch(commit.author, textQuery) ||
       isRegexMatch(commit.email, textQuery) ||
-      isRegexMatch(commit.message, textQuery) ||
+      isRegexMatch(commit.fullMessage, textQuery) ||
       (commit.tags && commit.tags.some(t => isRegexMatch(t, textQuery)))
     );
   }
@@ -540,6 +540,9 @@ function handleSortToggle() {
   if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
   focusedIndex = -1;
   renderCommits();
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { sortOldestFirst } });
 }
 
 function handleMergeToggle() {
@@ -556,6 +559,9 @@ function handleMergeToggle() {
   focusedIndex = -1;
   renderCommits();
   updateCommitCount();
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { hideMergeCommits } });
 }
 
 function handleWordWrapToggle() {
@@ -576,6 +582,9 @@ function handleWordWrapToggle() {
       }
     }
   }
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { wordWrapEnabled } });
 }
 
 /**
@@ -634,6 +643,9 @@ function handleRegexToggle() {
   updateCommitCount();
   // Validate current pattern
   updateRegexValidation();
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { regexSearchEnabled } });
 }
 
 /**
@@ -865,14 +877,70 @@ function handleMessage(event) {
     case 'init':
       commits = message.commits;
       showGraph = message.showGraph !== false;
-      hideMergeCommits = message.hideMergeCommits === true;
       trackedFilePath = message.filePath || null;
       currentBranch = message.branch || null;
-      if (message.defaultDiffView === 'side-by-side') {
+
+      // Apply user settings from persistent storage (overrides defaultDiffView)
+      if (message.userSettings) {
+        const settings = message.userSettings;
+
+        // Apply diff type (user setting takes precedence over defaultDiffView config)
+        if (settings.diffType === 'side-by-side' || settings.diffType === 'unified') {
+          setDiffType(settings.diffType);
+        } else if (message.defaultDiffView === 'side-by-side') {
+          setDiffType('side-by-side');
+        }
+
+        // Apply word wrap
+        if (settings.wordWrapEnabled !== currentDiffType) {
+          wordWrapEnabled = settings.wordWrapEnabled;
+          if (wordWrapEnabled) {
+            diffViewer.classList.add('word-wrap');
+            if (wordWrapBtn) {
+              wordWrapBtn.classList.add('active');
+              wordWrapBtn.title = 'Word wrap enabled (Ctrl+Shift+W to toggle)';
+            }
+          }
+        }
+
+        // Apply sort order
+        if (settings.sortOldestFirst !== sortOldestFirst) {
+          sortOldestFirst = settings.sortOldestFirst;
+          if (sortBtn) {
+            if (sortOldestFirst) {
+              sortBtn.innerHTML = '&#x2191; Oldest';
+              sortBtn.title = 'Sort: Oldest first (click to toggle)';
+              sortBtn.classList.add('sort-active');
+            } else {
+              sortBtn.innerHTML = '&#x2193; Newest';
+              sortBtn.title = 'Sort: Newest first (click to toggle)';
+              sortBtn.classList.remove('sort-active');
+            }
+          }
+        }
+
+        // Apply merge commits filter
+        hideMergeCommits = settings.hideMergeCommits;
+
+        // Apply regex search mode
+        regexSearchEnabled = settings.regexSearchEnabled;
+        if (regexToggleBtn) {
+          if (regexSearchEnabled) {
+            regexToggleBtn.classList.add('active');
+            regexToggleBtn.title = 'Regex mode enabled (Ctrl+Shift+X to toggle)';
+          } else {
+            regexToggleBtn.classList.remove('active');
+            regexToggleBtn.classList.remove('invalid');
+            regexToggleBtn.title = 'Toggle regex search mode (Ctrl+Shift+X)';
+          }
+        }
+      } else if (message.defaultDiffView === 'side-by-side') {
         setDiffType('side-by-side');
       }
+
       const graphTh = document.querySelector('th.graph-col');
       if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
+
       // Update merge toggle button state
       if (mergeToggleBtn) {
         if (hideMergeCommits) {
@@ -1263,6 +1331,9 @@ function setDiffType(type) {
   if (currentDiff) {
     renderDiff(currentDiff);
   }
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { diffType: type } });
 }
 
 // ─── File list ────────────────────────────────────────────────────────────────

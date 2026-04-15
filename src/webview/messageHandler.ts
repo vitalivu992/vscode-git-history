@@ -3,13 +3,15 @@ import * as path from 'path';
 import { GitHistoryPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch } from '../git/gitService';
 import { ExtToWebviewMessage } from '../types';
+import { SettingsService, UserSettings } from '../settings';
 
 /**
  * Handle messages from webview
  */
 export async function handleMessage(
   message: unknown,
-  panel: GitHistoryPanel
+  panel: GitHistoryPanel,
+  settingsService: SettingsService
 ): Promise<void> {
   if (!isValidMessage(message)) {
     console.error('Invalid message from webview:', message);
@@ -83,6 +85,10 @@ export async function handleMessage(
 
     case 'openFileAtCommit':
       await handleOpenFileAtCommit(message.hash, message.filePath, panel);
+      break;
+
+    case 'saveSettings':
+      await handleSaveSettings(message.settings, settingsService);
       break;
 
     default:
@@ -412,5 +418,16 @@ async function handleCopyCommitPatch(hash: string, panel: GitHistoryPanel): Prom
     void vscode.window.showErrorMessage(
       `Failed to copy patch: ${error instanceof Error ? error.message : String(error)}`
     );
+  }
+}
+
+async function handleSaveSettings(
+  settings: Partial<UserSettings>,
+  settingsService: SettingsService
+): Promise<void> {
+  try {
+    await settingsService.saveSettings(settings);
+  } catch (error) {
+    console.error('Failed to save settings:', error);
   }
 }
