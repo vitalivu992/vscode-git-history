@@ -121,4 +121,32 @@ suite('Git Parser Tests', () => {
     assert.strictEqual(commits[0].message, subject);
     assert.strictEqual(commits[0].fullMessage, subject);
   });
+
+  test('parseGitLog should parse multiple tags from decorations', () => {
+    const commitMultipleTags = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Release\x00\x00 (HEAD -> main, tag: v1.0.0, tag: v1.1.0)\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitMultipleTags);
+
+    assert.strictEqual(commits.length, 1);
+    assert.deepStrictEqual(commits[0].tags, ['v1.0.0', 'v1.1.0']);
+  });
+
+  test('parseGitLog should parse tags with special characters', () => {
+    const commitSpecial = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Release\x00\x00 (tag: release/v1.x, tag: v1.0.0-beta)\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitSpecial);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].tags![0], 'release/v1.x');
+    assert.strictEqual(commits[0].tags![1], 'v1.0.0-beta');
+  });
+
+  test('parseGitLog should handle empty decorations', () => {
+    const commitEmptyDecorations = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Commit\x00\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitEmptyDecorations);
+
+    assert.strictEqual(commits.length, 1);
+    assert.ok(!commits[0].tags || commits[0].tags.length === 0);
+  });
 });
