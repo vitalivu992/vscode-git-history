@@ -423,3 +423,41 @@ suite('Copy Commit Message Tests', () => {
     assert.ok(source.includes('cursor: pointer'), 'copy-btn should have cursor pointer');
   });
 });
+
+suite('Word Wrap Button in WebviewProvider HTML Tests', () => {
+  test('webviewProvider should have word-wrap-btn in toolbar HTML', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('id="word-wrap-btn"'), 'webviewProvider HTML should have word-wrap-btn');
+  });
+
+  test('webviewProvider word-wrap-btn should be between copy-btn and sort-btn', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    const copyBtnIdx = source.indexOf('id="copy-btn"');
+    const wordWrapIdx = source.indexOf('id="word-wrap-btn"');
+    const sortBtnIdx = source.indexOf('id="sort-btn"');
+
+    assert.ok(copyBtnIdx > 0, 'copy-btn should exist');
+    assert.ok(wordWrapIdx > 0, 'word-wrap-btn should exist');
+    assert.ok(sortBtnIdx > 0, 'sort-btn should exist');
+    assert.ok(copyBtnIdx < wordWrapIdx, 'word-wrap-btn should come after copy-btn');
+    assert.ok(wordWrapIdx < sortBtnIdx, 'word-wrap-btn should come before sort-btn');
+  });
+
+  test('webviewProvider and index.html should both have word-wrap-btn', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const providerSource = fs.readFileSync(providerPath, 'utf-8');
+
+    const htmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
+    const htmlSource = fs.readFileSync(htmlPath, 'utf-8');
+
+    assert.ok(providerSource.includes('id="word-wrap-btn"'), 'webviewProvider should have word-wrap-btn');
+    assert.ok(htmlSource.includes('id="word-wrap-btn"'), 'index.html should have word-wrap-btn');
+  });
+});

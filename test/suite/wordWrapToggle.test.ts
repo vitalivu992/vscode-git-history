@@ -167,4 +167,60 @@ suite('Word Wrap Toggle Tests', () => {
 
     assert.ok(initFn.includes('wordWrapBtn') && initFn.includes('addEventListener'), 'init should add click listener to wordWrapBtn');
   });
+
+  test('webviewProvider HTML should have word-wrap-btn button', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('id="word-wrap-btn"'), 'webviewProvider HTML should have word-wrap-btn button');
+  });
+
+  test('webviewProvider HTML word-wrap-btn should have Wrap text', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('>Wrap</button>'), 'webviewProvider HTML should have Wrap text on word-wrap button');
+  });
+
+  test('webviewProvider HTML word-wrap-btn should have word-wrap-btn class', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('class="word-wrap-btn"'), 'webviewProvider HTML should have word-wrap-btn class on button');
+  });
+
+  test('webviewProvider HTML word-wrap-btn title should mention Ctrl+Shift+W', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('Toggle word wrap (Ctrl+Shift+W)'), 'webviewProvider HTML should mention Ctrl+Shift+W in word-wrap-btn title');
+  });
+
+  test('webviewProvider HTML word-wrap-btn should be in diff-controls toolbar', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    const toolbarIdx = source.indexOf('id="diff-controls"');
+    const mainContentIdx = source.indexOf('id="main-content"');
+    const toolbarSection = source.substring(toolbarIdx, mainContentIdx);
+
+    assert.ok(toolbarSection.includes('id="word-wrap-btn"'), 'word-wrap-btn should be inside diff-controls toolbar');
+  });
+
+  test('main.js handleWordWrapToggle title should include keyboard shortcut when enabled', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const toggleStart = source.indexOf('function handleWordWrapToggle');
+    const toggleEnd = source.indexOf('\nfunction', toggleStart + 1);
+    const toggleFn = source.substring(toggleStart, toggleEnd > toggleStart ? toggleEnd : undefined);
+
+    assert.ok(toggleFn.includes('Ctrl+Shift+W'), 'handleWordWrapToggle title should mention Ctrl+Shift+W');
+  });
 });
