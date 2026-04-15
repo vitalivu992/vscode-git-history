@@ -165,7 +165,19 @@ This extension contributes the following settings:
 * `gitHistory.showGraph`: Show commit graph visualization in the history view (default: true)
 * `gitHistory.hideMergeCommits`: Hide merge commits in the history view (default: false)
 * `gitHistory.blame.dateFormat`: Date format for blame annotations - `relative` (e.g., "2 days ago"), `short` (e.g., "2024-03-15"), or `iso` (e.g., "2024-03-15T10:30:00Z") (default: `relative`)
-* `gitHistory.defaultDiffView`: Default diff view mode when opening Git History - `unified` or `side-by-side` (default: `unified`)
+* `gitHistory.defaultDiffView`: Default diff view mode when opening Git History - `unified` or `side-by-side` (default: `unified`). **Note**: User settings from the previous session take precedence over this configuration.
+
+### Persistent User Preferences
+
+Git History automatically saves and restores your view preferences across VS Code sessions. The following settings are remembered:
+
+- **Diff Type**: Your choice of unified or side-by-side diff view
+- **Word Wrap**: Whether word wrap is enabled in the diff viewer
+- **Sort Order**: Newest-first or oldest-first commit ordering
+- **Hide Merge Commits**: Whether merge commits are filtered out
+- **Regex Search Mode**: Whether regex search is enabled
+
+These preferences are saved automatically when you change them in the UI, and restored the next time you open Git History. This allows you to maintain your preferred workflow without reconfiguring each time.
 
 ## Keyboard Shortcuts
 

@@ -28,6 +28,24 @@ make clean           # Remove dist/, out/, .vsix, screenshots/
 
 This is a VS Code extension for viewing git history of files and line selections.
 
+### User Preference Persistence
+
+User preferences are automatically persisted across VS Code sessions using VS Code's `ExtensionContext.globalState`. The following settings are saved and restored when reopening Git History:
+
+- **Diff Type**: Unified or side-by-side view preference
+- **Word Wrap**: Whether word wrap is enabled in diff viewer
+- **Sort Order**: Newest-first or oldest-first commit ordering
+- **Hide Merge Commits**: Whether to filter out merge commits
+- **Regex Search Mode**: Whether regex search is enabled
+
+**Implementation**:
+- `src/settings/settingsService.ts` - Service for saving/loading settings via `globalState`
+- `src/settings/settingsTypes.ts` - Type definitions and default values
+- Settings are saved automatically when toggles change in the UI (via `saveSettings` message)
+- Settings are applied on panel initialization via the `init` message's `userSettings` field
+- User settings take precedence over `gitHistory.defaultDiffView` configuration
+- Settings merge with defaults for backward compatibility when new settings are added
+
 ### Extension Structure
 
 - **Entry Point**: `src/extension.ts` registers two commands:
@@ -138,7 +156,9 @@ The extension detects and displays the current git branch in the history panel:
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):
 - Extension sends: `init`, `diff`, `combinedDiff`, `rangeDiff`, `commitFiles`, `error`, `selectCommit`
-- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFilePath`, `copyCommitPatch`, `openFileAtCommit`
+- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFilePath`, `copyCommitPatch`, `openFileAtCommit`, `saveSettings`
+
+The `saveSettings` message is sent by the webview when UI preferences change (diff type, word wrap, sort order, hide merge commits, regex mode) to persist them across sessions.
 
 ### Build System
 
