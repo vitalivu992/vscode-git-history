@@ -904,7 +904,7 @@ function handleMessage(event) {
         }
 
         // Apply word wrap
-        if (settings.wordWrapEnabled !== currentDiffType) {
+        if (settings.wordWrapEnabled !== wordWrapEnabled) {
           wordWrapEnabled = settings.wordWrapEnabled;
           if (wordWrapEnabled) {
             diffViewer.classList.add('word-wrap');
@@ -1532,6 +1532,11 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🩹</span>
       <span class="context-menu-label">Copy as patch</span>
     </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" data-action="compare-parent">
+      <span class="context-menu-icon">⧁</span>
+      <span class="context-menu-label">Compare with parent</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -1559,6 +1564,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitDiff', hash: commit.hash });
       } else if (action === 'copy-patch') {
         vscode.postMessage({ type: 'copyCommitPatch', hash: commit.hash });
+      } else if (action === 'compare-parent') {
+        vscode.postMessage({ type: 'quickCompare', hash: commit.hash });
       }
       menu.remove();
     });
