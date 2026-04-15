@@ -196,6 +196,23 @@ body {
   background-color: var(--vscode-list-hoverBackground);
 }
 
+/* Compare parent button */
+.compare-parent-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s;
+}
+
+.compare-parent-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
 /* Word wrap toggle button */
 .word-wrap-btn {
   padding: 4px 10px;

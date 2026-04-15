@@ -209,6 +209,7 @@ const searchInput = document.getElementById('search-input');
 const refreshBtn = document.getElementById('refresh-btn');
 const sortBtn = document.getElementById('sort-btn');
 const copyBtn = document.getElementById('copy-btn');
+const compareParentBtn = document.getElementById('compare-parent-btn');
 const wordWrapBtn = document.getElementById('word-wrap-btn');
 const mergeToggleBtn = document.getElementById('merge-toggle-btn');
 const regexToggleBtn = document.getElementById('regex-toggle-btn');
@@ -339,6 +340,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'e') {
     e.preventDefault();
     handleCopyPatch();
+    return;
+  }
+
+  // Ctrl+Alt+P: Quick compare with parent
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'p') {
+    e.preventDefault();
+    handleQuickCompare();
     return;
   }
 
@@ -731,6 +739,10 @@ function init() {
 
   if (copyBtn) {
     copyBtn.addEventListener('click', handleCopyMessage);
+  }
+
+  if (compareParentBtn) {
+    compareParentBtn.addEventListener('click', handleQuickCompare);
   }
 
   if (wordWrapBtn) {
@@ -1790,6 +1802,20 @@ function handleCopyPatch() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitPatch', hash });
+  }
+}
+
+function handleQuickCompare() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetHash = null;
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetHash = displayCommits[focusedIndex].hash;
+  } else if (selectedCommits.size === 1) {
+    targetHash = [...selectedCommits][0];
+  }
+
+  if (targetHash) {
+    vscode.postMessage({ type: 'quickCompare', hash: targetHash });
   }
 }
 
