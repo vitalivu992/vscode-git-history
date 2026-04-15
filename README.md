@@ -20,7 +20,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Sort Toggle**: Switch between newest-first and oldest-first commit ordering with the sort button in the toolbar
 - **Compare Any Two Commits**: Shift+click (or Shift+Enter) two commits to see the diff between them
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
-- **Diff Viewer**: Toggle between unified and side-by-side diff views with optional word wrap for long lines
+- **Diff Viewer**: Toggle between unified and side-by-side diff views with optional word wrap for long lines. Set your preferred default view via `gitHistory.defaultDiffView` setting
 - **Word Wrap Toggle**: Enable word wrap in the diff viewer to handle long lines in JSON, minified code, and other content
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
 - **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
@@ -159,6 +159,7 @@ This extension contributes the following settings:
 * `gitHistory.showGraph`: Show commit graph visualization in the history view (default: true)
 * `gitHistory.hideMergeCommits`: Hide merge commits in the history view (default: false)
 * `gitHistory.blame.dateFormat`: Date format for blame annotations - `relative` (e.g., "2 days ago"), `short` (e.g., "2024-03-15"), or `iso` (e.g., "2024-03-15T10:30:00Z") (default: `relative`)
+* `gitHistory.defaultDiffView`: Default diff view mode when opening Git History - `unified` or `side-by-side` (default: `unified`)
 
 ## Keyboard Shortcuts
 
