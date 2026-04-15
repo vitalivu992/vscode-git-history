@@ -91,6 +91,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitHash'; hash: string }
   | { type: 'copyCommitInfo'; hash: string }
   | { type: 'copyCherryPickCommand'; hash: string }
+  | { type: 'copyRevertCommand'; hash: string }
     | { type: 'copyCommitFiles'; hash: string }
   | { type: 'copyCommitDiff'; hash: string }
   | { type: 'copyFilePath'; filePath: string }

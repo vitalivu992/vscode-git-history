@@ -34,6 +34,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Commit Hash**: Copy the full commit hash to clipboard with `Ctrl+Shift+H` / `Cmd+Shift+H` keyboard shortcut, or click any hash chip
 - **Copy Commit Info**: Copy the full commit information (hash, author, date, message) to clipboard with `Ctrl+Shift+I` / `Cmd+Shift+I` keyboard shortcut
 - **Copy Cherry-Pick Command**: Copy a pre-formatted `git cherry-pick <hash>` command to the clipboard with `Ctrl+Shift+P` / `Cmd+Shift+P` keyboard shortcut, or right-click on any commit
+- **Copy Revert Command**: Copy a pre-formatted `git revert <hash>` command to the clipboard with `Ctrl+Shift+U` / `Cmd+Shift+U` keyboard shortcut, or right-click on any commit
 - **Copy Commit as Patch**: Copy the commit as a unified diff patch (with git headers) suitable for `git apply` or `git am` with `Ctrl+Shift+E` / `Cmd+Shift+E` keyboard shortcut, or right-click on any commit
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
@@ -129,6 +130,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+H` / `Cmd+Shift+H` | Copy commit hash to clipboard |
 | `Ctrl+Shift+I` / `Cmd+Shift+I` | Copy full commit info to clipboard |
 | `Ctrl+Shift+P` / `Cmd+Shift+P` | Copy cherry-pick command to clipboard |
+| `Ctrl+Shift+U` / `Cmd+Shift+U` | Copy revert command to clipboard |
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |

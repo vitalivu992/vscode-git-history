@@ -312,6 +312,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+U: Copy revert command
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'u') {
+    e.preventDefault();
+    handleCopyRevert();
+    return;
+  }
+
   // Ctrl+Shift+F: Copy changed files list
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'f') {
     e.preventDefault();
@@ -1340,6 +1347,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🍒</span>
       <span class="context-menu-label">Copy cherry-pick command</span>
     </div>
+    <div class="context-menu-item" data-action="copy-revert">
+      <span class="context-menu-icon">↩️</span>
+      <span class="context-menu-label">Copy revert command</span>
+    </div>
     <div class="context-menu-item" data-action="copy-files">
       <span class="context-menu-icon">📁</span>
       <span class="context-menu-label">Copy changed files</span>
@@ -1371,6 +1382,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitInfo', hash: commit.hash });
       } else if (action === 'copy-cherry-pick') {
         vscode.postMessage({ type: 'copyCherryPickCommand', hash: commit.hash });
+      } else if (action === 'copy-revert') {
+        vscode.postMessage({ type: 'copyRevertCommand', hash: commit.hash });
       } else if (action === 'copy-files') {
         vscode.postMessage({ type: 'copyCommitFiles', hash: commit.hash });
       } else if (action === 'copy-diff') {
@@ -1575,6 +1588,17 @@ function handleCopyCherryPick() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCherryPickCommand', hash });
+  }
+}
+
+function handleCopyRevert() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyRevertCommand', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyRevertCommand', hash });
   }
 }
 

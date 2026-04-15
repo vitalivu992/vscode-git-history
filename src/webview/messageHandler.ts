@@ -61,6 +61,10 @@ export async function handleMessage(
       handleCopyCherryPickCommand(message.hash, panel);
       break;
 
+    case 'copyRevertCommand':
+      handleCopyRevertCommand(message.hash, panel);
+      break;
+
     case 'copyCommitFiles':
       handleCopyCommitFiles(message.hash, panel);
       break;
@@ -291,6 +295,20 @@ function handleCopyCherryPickCommand(hash: string, panel: GitHistoryPanel): void
 
   void vscode.env.clipboard.writeText(cherryPickCommand).then(() => {
     void vscode.window.showInformationMessage(`Cherry-pick command copied: ${commit.shortHash}`);
+  });
+}
+
+function handleCopyRevertCommand(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const revertCommand = `git revert ${commit.hash}`;
+
+  void vscode.env.clipboard.writeText(revertCommand).then(() => {
+    void vscode.window.showInformationMessage(`Revert command copied: ${commit.shortHash}`);
   });
 }
 
