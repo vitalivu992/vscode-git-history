@@ -57,6 +57,16 @@ User preferences are automatically persisted across VS Code sessions using VS Co
   - `gitService.ts` - executes git commands via `child_process.execFile`
   - `gitParser.ts` - parses git output using null-separated format
   - `gitStatsParser.ts` - parses commit statistics (files changed, insertions, deletions) from git --stat output
+  - `blameParser.ts` - parses `git blame --porcelain` output into `BlameLineInfo` objects
+
+- **Blame Layer** (`src/blame/`):
+  - `blameService.ts` - manages inline blame decorations and status bar, toggles blame annotations
+
+- **Settings Layer** (`src/settings/`):
+  - `settingsService.ts` - persists `UserSettings` via VS Code's `ExtensionContext.globalState`
+  - `settingsTypes.ts` - type definitions and default values for user settings
+
+- **Content Provider**: `src/gitHistoryContentProvider.ts` implements VS Code's `TextDocumentContentProvider` for the `git-history` URI scheme, serving file content at specific commits.
 
 - **Webview Layer** (`src/webview/`):
   - `webviewProvider.ts` - manages the webview panel lifecycle
@@ -108,6 +118,8 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Date Display**: Commit dates are displayed in relative format with time for recent commits (e.g., "Today 2:30 PM", "Yesterday 3:45 PM", "2 days ago", "2 weeks ago"). Hovering over a date reveals the absolute timestamp in locale format. Implemented in `src/webview/panel/main.js` (`formatDate()` and `formatTime()` functions) and uses a `title` attribute on date elements.
 
+- **Commit Count Display**: The search bar always shows the number of commits in the current view. When no filters are active, it displays "N commits" (e.g., "142 commits"). When filters are active and reduce the visible count, it displays "X of N commits" (e.g., "12 of 142 commits"). The count updates in real-time as search, author, tag, date, regex, and merge-commit filters change. Implemented via the `updateCommitCount()` function in `src/webview/panel/main.js`, which is called from `renderCommits()`, filter toggle handlers, and the `init` message handler. The HTML element (`#commit-count` with class `.commit-count`) exists in both `webviewProvider.ts` and `index.html`. Styled in `styles.css` with muted foreground color.
+
 - **Git Tag Badges**: Tags parsed from the `%d` decorations field are rendered as colored badges next to commit messages. Lightweight and annotated tags are both supported. Badge styling is defined in `src/webview/panel/styles.css`.
 
 - **Blame Annotations**: The extension provides line-by-line blame annotations via the `toggleBlame` and `showBlameCommit` commands. Blame information is displayed as inline decorations showing commit hash, author, and date for each line. Date format is configurable via `gitHistory.blame.dateFormat` (relative, short, or iso).
@@ -158,11 +170,13 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to a JSON or CSV file. The export dialog shows the number of commits to be exported and offers two format options: JSON (full commit data with stats and tags) or CSV (tabular format for spreadsheet analysis). The export respects all active filters (search, author, tag, date, hide merge commits). The `handleExportCommits` function in `messageHandler.ts` uses `vscode.window.showSaveDialog` for file selection and `fs.promises.writeFile` to write the formatted data. CSV fields are properly escaped for commas, quotes, and newlines. The formatter functions `formatCommitsAsJson` and `formatCommitsAsCsv` are pure functions that can be unit tested independently.
 
+- **Keyboard Help**: Press `?` in the history panel to show a modal dialog displaying all available keyboard shortcuts organized by category (Navigation, Search & Filter, View Options, Copy Commands, Actions). The dialog detects the platform (Mac/Windows/Linux) and displays the appropriate modifier keys (Cmd/Ctrl, Option/Alt). Shortcuts are rendered with styled key badges and organized sections. The modal can be closed by clicking the overlay, clicking the X button, or pressing Escape. Implementation is in `src/webview/panel/main.js` (`showKeyboardHelpDialog` function) with styling in `styles.css` (`#keyboard-help-modal` and related classes). The shortcuts data structure is defined inline in the function and includes all keyboard shortcuts documented in the README.
+
 ### Message Protocol
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):
 - Extension sends: `init`, `diff`, `combinedDiff`, `rangeDiff`, `commitFiles`, `error`, `selectCommit`
-- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFilePath`, `copyCommitPatch`, `openFileAtCommit`, `quickCompare`, `saveSettings`
+- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFilePath`, `copyCommitPatch`, `openFileAtCommit`, `quickCompare`, `saveSettings`, `exportCommits`
 
 The `saveSettings` message is sent by the webview when UI preferences change (diff type, word wrap, sort order, hide merge commits, regex mode) to persist them across sessions.
 

@@ -382,6 +382,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // ?: Show keyboard help
+  if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    e.preventDefault();
+    showKeyboardHelpDialog();
+    return;
+  }
+
   // Ctrl+G or Cmd+G: Jump to hash
   if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
     e.preventDefault();
@@ -680,11 +687,11 @@ function updateRegexValidation() {
 function updateCommitCount() {
   if (!commitCountEl) return;
   const filtered = getFilteredCommits();
-  const hasFilter = searchQuery || hideMergeCommits;
-  if (hasFilter && filtered.length !== commits.length) {
-    commitCountEl.textContent = `${filtered.length} of ${commits.length}`;
+  const hasActiveFilter = searchQuery || hideMergeCommits;
+  if (hasActiveFilter && filtered.length !== commits.length) {
+    commitCountEl.textContent = `${filtered.length} of ${commits.length} commits`;
   } else {
-    commitCountEl.textContent = '';
+    commitCountEl.textContent = `${commits.length} commit${commits.length !== 1 ? 's' : ''}`;
   }
 }
 
@@ -1744,6 +1751,8 @@ function handleCopyMessage() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitMessage', hash });
+  } else {
+    showError('Select a commit to copy its message');
   }
 }
 
@@ -1755,6 +1764,8 @@ function handleCopyHash() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitHash', hash });
+  } else {
+    showError('Select a commit to copy its hash');
   }
 }
 
@@ -1766,6 +1777,8 @@ function handleCopyInfo() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitInfo', hash });
+  } else {
+    showError('Select a commit to copy its info');
   }
 }
 
@@ -1777,6 +1790,8 @@ function handleCopyCherryPick() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCherryPickCommand', hash });
+  } else {
+    showError('Select a commit to copy cherry-pick command');
   }
 }
 
@@ -1788,6 +1803,8 @@ function handleCopyRevert() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyRevertCommand', hash });
+  } else {
+    showError('Select a commit to copy revert command');
   }
 }
 
@@ -1799,6 +1816,8 @@ function handleCopyFiles() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitFiles', hash });
+  } else {
+    showError('Select a commit to copy its file list');
   }
 }
 
@@ -1810,6 +1829,8 @@ function handleCopyDiff() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitDiff', hash });
+  } else {
+    showError('Select a commit to copy its diff');
   }
 }
 
@@ -1821,6 +1842,8 @@ function handleCopyPatch() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitPatch', hash });
+  } else {
+    showError('Select a commit to copy its patch');
   }
 }
 
@@ -2010,6 +2033,140 @@ function scrollToCommitByHash(hash) {
   } else {
     showError('Commit not found in current list');
   }
+}
+
+// ─── Keyboard Help Dialog ────────────────────────────────────────────────────
+
+/**
+ * Show keyboard shortcuts help dialog
+ */
+function showKeyboardHelpDialog() {
+  const existingModal = document.getElementById('keyboard-help-modal');
+  if (existingModal) {
+    existingModal.remove();
+    return;
+  }
+
+  const isMac = navigator.platform.toLowerCase().includes('mac');
+  const cmdKey = isMac ? 'Cmd' : 'Ctrl';
+  const altKey = isMac ? 'Option' : 'Alt';
+
+  const shortcuts = [
+    {
+      category: 'Navigation',
+      items: [
+        { keys: ['↑', '↓'], description: 'Navigate up/down through commits' },
+        { keys: ['Home'], description: 'Jump to first commit' },
+        { keys: ['End'], description: 'Jump to last commit' },
+        { keys: ['Enter'], description: 'Select focused commit' },
+        { keys: ['Shift', 'Enter'], description: 'Select range from anchor to focused' },
+        { keys: [cmdKey, 'Enter'], description: 'Add/remove from multi-selection' },
+        { keys: ['?'], description: 'Show this help dialog' },
+        { keys: ['Esc'], description: 'Clear selection and close dialogs' }
+      ]
+    },
+    {
+      category: 'Search & Filter',
+      items: [
+        { keys: ['/'], description: 'Focus search input' },
+        { keys: [cmdKey, 'F'], description: 'Focus search input' },
+        { keys: [cmdKey, 'Shift', 'X'], description: 'Toggle regex search mode' },
+        { keys: [cmdKey, 'G'], description: 'Jump to commit by hash' }
+      ]
+    },
+    {
+      category: 'View Options',
+      items: [
+        { keys: [cmdKey, 'Shift', 'W'], description: 'Toggle word wrap' },
+        { keys: [cmdKey, 'Alt', 'P'], description: 'Quick compare with parent' }
+      ]
+    },
+    {
+      category: 'Copy Commands',
+      items: [
+        { keys: [cmdKey, 'Shift', 'C'], description: 'Copy commit message' },
+        { keys: [cmdKey, 'Shift', 'H'], description: 'Copy commit hash' },
+        { keys: [cmdKey, 'Shift', 'I'], description: 'Copy commit info' },
+        { keys: [cmdKey, 'Shift', 'P'], description: 'Copy cherry-pick command' },
+        { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
+        { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
+        { keys: [cmdKey, 'Shift', 'D'], description: 'Copy commit diff' },
+        { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' }
+      ]
+    },
+    {
+      category: 'Actions',
+      items: [
+        { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history' },
+        { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' }
+      ]
+    }
+  ];
+
+  const modal = document.createElement('div');
+  modal.id = 'keyboard-help-modal';
+
+  const formatKey = (key) => {
+    const isModifier = key === 'Cmd' || key === 'Ctrl' || key === 'Shift' || key === 'Alt' || key === 'Option';
+    return `<span class="keyboard-help-key ${isModifier ? 'modifier' : ''}">${escapeHtml(key)}</span>`;
+  };
+
+  const formatShortcut = (item) => {
+    const keysHtml = item.keys.map((key, index) => {
+      const keyHtml = formatKey(key);
+      const plusHtml = index < item.keys.length - 1 ? '<span class="keyboard-help-plus">+</span>' : '';
+      return keyHtml + plusHtml;
+    }).join('');
+
+    return `
+      <div class="keyboard-help-row">
+        <span class="keyboard-help-description">${escapeHtml(item.description)}</span>
+        <span class="keyboard-help-keys">${keysHtml}</span>
+      </div>
+    `;
+  };
+
+  const sectionsHtml = shortcuts.map(section => `
+    <div class="keyboard-help-section">
+      <div class="keyboard-help-section-title">${escapeHtml(section.category)}</div>
+      ${section.items.map(formatShortcut).join('')}
+    </div>
+  `).join('');
+
+  modal.innerHTML = `
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">⌨️ Keyboard Shortcuts</span>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        ${sectionsHtml}
+        <div class="keyboard-help-footer">
+          Tip: Right-click on commits and files for additional options
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const overlay = modal.querySelector('.modal-overlay');
+  const closeBtn = modal.querySelector('.modal-close');
+
+  const closeModal = () => modal.remove();
+
+  overlay.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+
+  // Close on Escape
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
 }
 
 // Initialize on load
