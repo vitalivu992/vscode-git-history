@@ -228,7 +228,7 @@ export class GitHistoryPanel {
       <div id="bottom-panel">
         <div id="commit-table-container">
           <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | after:2024-01-01 | last:7days">
+            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | after:2024-01-01 | last:7days">
             <button id="regex-toggle-btn" class="regex-toggle-btn" title="Toggle regex search mode (Ctrl+Shift+X)">.*</button>
             <div id="commit-count" class="commit-count"></div>
           </div>
