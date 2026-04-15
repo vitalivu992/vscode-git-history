@@ -18,6 +18,8 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions)
 - **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter
 - **Sort Toggle**: Switch between newest-first and oldest-first commit ordering with the sort button in the toolbar
+- **Compare Any Two Commits**: Shift+click (or Shift+Enter) two commits to see the diff between them
+- **Compare Any Two Commits**: Shift+click (or Shift+Enter) two commits to see the diff between them
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views with optional word wrap for long lines
 - **Word Wrap Toggle**: Enable word wrap in the diff viewer to handle long lines in JSON, minified code, and other content
@@ -67,7 +69,8 @@ A powerful VS Code extension that provides git history visualization inspired by
 ### Using the History Panel
 
 - **Click a commit row** to view its diff and changed files
-- **Check multiple commits** to see a combined diff
+- **Shift+click two commits** to compare any two commits and see what changed between them (e.g., compare v1.0 to v2.0)
+- **Ctrl+click** to multi-select non-consecutive commits for a combined diff
 - **Search commits** using the search box to filter by message, author, email, hash, or tag name. You can also use date filters:
   - `after:2024-01-01` - show commits after a specific date
   - `before:2024-06-01` - show commits before a specific date
@@ -116,6 +119,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Home` | Jump to first commit |
 | `End` | Jump to last commit |
 | `Enter` | Select focused commit and show its diff |
+| `Shift+Enter` | Select range from anchor to focused commit |
 | `Ctrl+Enter` / `Cmd+Enter` | Add/remove focused commit from multi-selection |
 | `/` or `Ctrl+F` / `Cmd+F` | Focus the search input |
 | `Ctrl+Shift+C` / `Cmd+Shift+C` | Copy commit message to clipboard |

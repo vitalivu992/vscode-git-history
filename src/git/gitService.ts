@@ -272,3 +272,29 @@ export async function getCommitPatch(
   const output = await execGit(['format-patch', '-1', '--stdout', hash], cwd);
   return output;
 }
+
+/**
+ * Get diff between two specific commits (fromHash..toHash)
+ * Shows all changes between two arbitrary commits
+ */
+export async function getCommitRangeDiff(
+  fromHash: string,
+  toHash: string,
+  cwd: string,
+  filePath?: string
+): Promise<DiffResult> {
+  const args = ['diff', '--no-color', `${fromHash}..${toHash}`];
+
+  if (filePath) {
+    const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
+    args.push('--', relativePath);
+  }
+
+  const output = await execGit(args, cwd);
+
+  return {
+    diff: output,
+    filePath,
+    isBinary: isBinaryFile(output)
+  };
+}

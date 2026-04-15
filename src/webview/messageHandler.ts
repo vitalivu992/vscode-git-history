@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitFiles, getCommitPatch } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch } from '../git/gitService';
 import { ExtToWebviewMessage } from '../types';
 
 /**
@@ -27,6 +27,10 @@ export async function handleMessage(
 
     case 'requestCombinedDiff':
       await handleRequestCombinedDiff(message.hashes, panel);
+      break;
+
+    case 'requestRangeDiff':
+      await handleRequestRangeDiff(message.fromHash, message.toHash, panel);
       break;
 
     case 'requestCommitFiles':
@@ -135,6 +139,38 @@ async function handleRequestCombinedDiff(
     panel.postMessage({
       type: 'combinedDiff',
       hashes,
+      diff: diffResult.diff
+    });
+  } catch (error) {
+    panel.postMessage({
+      type: 'error',
+      message: error instanceof Error ? error.message : String(error)
+    });
+  }
+}
+
+async function handleRequestRangeDiff(
+  fromHash: string,
+  toHash: string,
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const diffResult = await getCommitRangeDiff(fromHash, toHash, panel.getCwd());
+
+    if (diffResult.isBinary) {
+      panel.postMessage({
+        type: 'rangeDiff',
+        fromHash,
+        toHash,
+        diff: 'Binary file - cannot display diff'
+      });
+      return;
+    }
+
+    panel.postMessage({
+      type: 'rangeDiff',
+      fromHash,
+      toHash,
       diff: diffResult.diff
     });
   } catch (error) {

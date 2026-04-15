@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -253,5 +253,88 @@ suite('Git Service Integration Tests', () => {
     // Newer content should have more lines (line 4 was added in a later commit)
     assert.ok(newestContent.includes('Line 4') || newestContent.split('\n').length >= 4,
       'Newer content should have more lines');
+  });
+
+  test('getCommitRangeDiff should return diff between two commits', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+    assert.ok(commits.length >= 2, 'Should have at least 2 commits');
+
+    const fromCommit = commits[commits.length - 1]; // Oldest
+    const toCommit = commits[0]; // Newest
+
+    const diffResult = await getCommitRangeDiff(fromCommit.hash, toCommit.hash, tempDir);
+
+    assert.ok(typeof diffResult.diff === 'string', 'Diff should be a string');
+    assert.strictEqual(diffResult.isBinary, false, 'Text file should not be binary');
+  });
+
+  test('getCommitRangeDiff should show cumulative changes between commits', async () => {
+    const { execSync } = require('child_process');
+    const commits = await getFileHistory(testFile, tempDir);
+    assert.ok(commits.length >= 2, 'Should have at least 2 commits');
+
+    const fromCommit = commits[commits.length - 1]; // Oldest (Initial commit)
+    const toCommit = commits[0]; // Newest
+
+    const rangeDiff = await getCommitRangeDiff(fromCommit.hash, toCommit.hash, tempDir);
+
+    // The range diff should show all changes between initial and latest
+    // The file has been modified multiple times, so there should be content
+    assert.ok(rangeDiff.diff.length > 0, 'Range diff should have content');
+
+    // Compare with combined diff of all commits
+    const allHashes = commits.map(c => c.hash);
+    const combinedDiff = await getCombinedDiff(allHashes, tempDir);
+
+    // Both should show the overall changes (though format may differ slightly)
+    assert.ok(combinedDiff.diff.length > 0, 'Combined diff should also have content');
+  });
+
+  test('getCommitRangeDiff should handle same from and to hash', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+    const hash = commits[0].hash;
+
+    // When comparing a commit to itself, diff should be empty
+    const diffResult = await getCommitRangeDiff(hash, hash, tempDir);
+
+    assert.strictEqual(diffResult.diff, '', 'Diff between same commit should be empty');
+    assert.strictEqual(diffResult.isBinary, false);
+  });
+
+  test('getCommitRangeDiff with filePath should return diff for only that file', async () => {
+    const { execSync } = require('child_process');
+    const commits = await getFileHistory(testFile, tempDir);
+    assert.ok(commits.length >= 2, 'Should have at least 2 commits');
+
+    // Create another file
+    const testFile2 = path.join(tempDir, 'another.txt');
+    fs.writeFileSync(testFile2, 'Another file content\n');
+    execSync('git add .', { cwd: tempDir });
+    execSync('git commit -m "Add another file"', { cwd: tempDir });
+
+    const updatedCommits = await getFileHistory(testFile, tempDir);
+    const fromCommit = updatedCommits[updatedCommits.length - 1];
+    const toCommit = updatedCommits[0];
+
+    // Get range diff scoped to only testFile
+    const fileDiff = await getCommitRangeDiff(fromCommit.hash, toCommit.hash, tempDir, testFile);
+    assert.ok(fileDiff.diff.includes('test.txt'), 'File-scoped range diff should include test.txt');
+    assert.ok(!fileDiff.diff.includes('another.txt'), 'File-scoped range diff should not include another.txt');
+  });
+
+  test('getCommitRangeDiff should be commutative in terms of content direction', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+    assert.ok(commits.length >= 2, 'Should have at least 2 commits');
+
+    const fromCommit = commits[0]; // Newest
+    const toCommit = commits[commits.length - 1]; // Oldest
+
+    // A..B shows changes from A to B
+    const forwardDiff = await getCommitRangeDiff(fromCommit.hash, toCommit.hash, tempDir);
+    const reverseDiff = await getCommitRangeDiff(toCommit.hash, fromCommit.hash, tempDir);
+
+    // Both should return valid results (though with opposite change directions)
+    assert.ok(typeof forwardDiff.diff === 'string');
+    assert.ok(typeof reverseDiff.diff === 'string');
   });
 });

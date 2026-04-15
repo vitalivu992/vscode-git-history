@@ -47,6 +47,8 @@ This is a VS Code extension for viewing git history of files and line selections
 
 - **Combined Diff**: `getCombinedDiff` in `src/git/gitService.ts` sorts selected commit hashes chronologically (oldest first) using `git log --format="%H %at" --no-walk` to determine commit dates. The `sortHashesByDate` helper maps hashes to timestamps and sorts ascending. This ensures the diff range `earliest~1..latest` always spans the correct chronological range regardless of hash input order. Falls back to lexicographic sort if the date lookup fails.
 
+- **Compare Any Two Commits (Range Diff)**: Users can Shift+click (or Shift+Enter) two commits to see the diff between them using `git diff A..B`. The `handleRangeSelection` function in `main.js` finds all commits between the anchor (first clicked) and target, selects them all, and requests the range diff via `requestRangeDiff`. The `getCommitRangeDiff` function in `gitService.ts` executes `git diff fromHash..toHash`. The header shows "Comparing: `short1`..`short2`" to indicate range mode. This differs from multi-select (Ctrl+click) which shows a combined diff of all changes across the range. Range selection supports the same file-path scoping as single commits.
+
 - **Types**: `src/types.ts` defines shared interfaces (`CommitInfo`, `CommitFileChange`, `DiffResult`, message types)
 
 ### Git Log Format
@@ -122,11 +124,13 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Commit Statistics**: The commit list displays statistics for each commit including the number of files changed, insertions (green `+X`), and deletions (red `-Y`). These are shown in a dedicated "Stats" column between the Date and Message columns. The stats are parsed from `git log --stat` output (see `src/git/gitStatsParser.ts`), merged with commit data in `src/git/gitService.ts`, and rendered in the webview by `formatCommitStats()` in `src/webview/panel/main.js`. The stats column styling uses green (`--vscode-gitDecoration-addedResourceForeground`) for insertions and red (`--vscode-gitDecoration-deletedResourceForeground`) for deletions. Hovering over the stats cell shows a tooltip with the full stats breakdown (e.g., "3 files changed, 45 insertions(+), 12 deletions(-)").
 
+- **Compare Any Two Commits (Range Diff)**: Users can Shift+click (or Shift+Enter) two commits to see the diff between them using `git diff A..B`. The `handleRangeSelection` function in `main.js` finds all commits between the anchor (first clicked) and target, selects them all, and requests the range diff via `requestRangeDiff`. The `getCommitRangeDiff` function in `gitService.ts` executes `git diff fromHash..toHash`. The header shows "Comparing: `short1`..`short2`" to indicate range mode. This differs from multi-select (Ctrl+click) which shows a combined diff of all changes across the range. Range selection supports the same file-path scoping as single commits.
+
 ### Message Protocol
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):
-- Extension sends: `init`, `diff`, `combinedDiff`, `commitFiles`, `error`, `selectCommit`
-- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyCommitPatch`, `openFileAtCommit`
+- Extension sends: `init`, `diff`, `combinedDiff`, `rangeDiff`, `commitFiles`, `error`, `selectCommit`
+- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyCommitPatch`, `openFileAtCommit`
 
 ### Build System
 

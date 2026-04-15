@@ -17,6 +17,7 @@ let sortOldestFirst = false; // Sort order: false = newest first (default), true
 let currentBranch = null; // Current git branch name
 let hideMergeCommits = false; // Filter out merge commits (commits with multiple parents)
 let wordWrapEnabled = false; // Word wrap toggle for diff view
+let rangeSelectionAnchor = null; // Anchor commit for Shift+click range selection
 
 /**
  * Parse filters from search query
@@ -402,12 +403,19 @@ function handleKeyDown(e) {
       e.preventDefault();
       if (focusedIndex >= 0 && focusedIndex < filteredCommits.length) {
         const commit = filteredCommits[focusedIndex];
-        if (e.ctrlKey || e.metaKey) {
+        if (e.shiftKey && rangeSelectionAnchor && rangeSelectionAnchor !== commit.hash) {
+          // Shift+Enter: Select range between anchor and focused commit
+          handleRangeSelection(rangeSelectionAnchor, commit.hash);
+        } else if (e.ctrlKey || e.metaKey) {
           // Ctrl/Cmd+Enter: Toggle multi-select
           if (selectedCommits.has(commit.hash)) {
             selectedCommits.delete(commit.hash);
+            if (selectedCommits.size === 0) {
+              rangeSelectionAnchor = null;
+            }
           } else {
             selectedCommits.add(commit.hash);
+            rangeSelectionAnchor = commit.hash;
           }
           updateSelectedRows();
           if (selectedCommits.size > 1) {
@@ -416,9 +424,10 @@ function handleKeyDown(e) {
             requestDiff([...selectedCommits][0]);
           }
         } else {
-          // Enter: Select commit
+          // Enter: Select commit, set as anchor
           clearSelection();
           selectCommit(commit.hash);
+          rangeSelectionAnchor = commit.hash;
         }
       }
       break;
@@ -769,6 +778,13 @@ function handleMessage(event) {
       renderDiff(currentDiff);
       break;
 
+    case 'rangeDiff':
+      currentDiff = message.diff;
+      renderDiff(currentDiff);
+      // Update header to show range comparison
+      updateCommitDetailHeaderForRange(message.fromHash, message.toHash);
+      break;
+
     case 'commitFiles':
       renderFiles(message.files);
       break;
@@ -912,11 +928,20 @@ function renderCommits() {
       focusedIndex = index;
       updateFocusedRow();
 
-      if (e.ctrlKey || e.metaKey) {
+      if (e.shiftKey && rangeSelectionAnchor && rangeSelectionAnchor !== commit.hash) {
+        // Shift+click: Select range between anchor and clicked commit
+        e.preventDefault();
+        handleRangeSelection(rangeSelectionAnchor, commit.hash);
+      } else if (e.ctrlKey || e.metaKey) {
+        // Ctrl/Cmd+click: Toggle multi-select
         if (selectedCommits.has(commit.hash)) {
           selectedCommits.delete(commit.hash);
+          if (selectedCommits.size === 0) {
+            rangeSelectionAnchor = null;
+          }
         } else {
           selectedCommits.add(commit.hash);
+          rangeSelectionAnchor = commit.hash; // Update anchor to last selected
         }
         updateSelectedRows();
         if (selectedCommits.size > 1) {
@@ -925,8 +950,10 @@ function renderCommits() {
           requestDiff([...selectedCommits][0]);
         }
       } else {
+        // Regular click: Select single commit, set as anchor
         clearSelection();
         selectCommit(commit.hash);
+        rangeSelectionAnchor = commit.hash;
       }
     });
 
@@ -956,7 +983,37 @@ function selectCommit(hash) {
 
 function clearSelection() {
   selectedCommits.clear();
+  rangeSelectionAnchor = null;
   updateSelectedRows();
+}
+
+function handleRangeSelection(anchorHash, targetHash) {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  const anchorIndex = displayCommits.findIndex(c => c.hash === anchorHash);
+  const targetIndex = displayCommits.findIndex(c => c.hash === targetHash);
+
+  if (anchorIndex === -1 || targetIndex === -1) {
+    return;
+  }
+
+  // Select all commits between anchor and target (inclusive)
+  const startIndex = Math.min(anchorIndex, targetIndex);
+  const endIndex = Math.max(anchorIndex, targetIndex);
+
+  selectedCommits.clear();
+  for (let i = startIndex; i <= endIndex; i++) {
+    selectedCommits.add(displayCommits[i].hash);
+  }
+
+  updateSelectedRows();
+
+  // Request range diff between the two endpoints
+  const fromIndex = Math.min(anchorIndex, targetIndex);
+  const toIndex = Math.max(anchorIndex, targetIndex);
+  const fromHash = displayCommits[fromIndex].hash;
+  const toHash = displayCommits[toIndex].hash;
+
+  requestRangeDiff(fromHash, toHash);
 }
 
 function updateSelectedRows() {
@@ -992,6 +1049,23 @@ function updateCommitDetailHeader(commit) {
   `;
 }
 
+function updateCommitDetailHeaderForRange(fromHash, toHash) {
+  const header = document.getElementById('commit-detail-header');
+  if (!header) return;
+
+  const fromCommit = commits.find(c => c.hash === fromHash);
+  const toCommit = commits.find(c => c.hash === toHash);
+  const fromShort = fromCommit ? fromCommit.shortHash : fromHash.substring(0, 7);
+  const toShort = toCommit ? toCommit.shortHash : toHash.substring(0, 7);
+
+  header.innerHTML = `
+    <span class="detail-label">Comparing:</span>
+    <span class="detail-hash-chip">${escapeHtml(fromShort)}</span>
+    <span style="color: var(--vscode-descriptionForeground);">..</span>
+    <span class="detail-hash-chip">${escapeHtml(toShort)}</span>
+  `;
+}
+
 // ─── Message sending ─────────────────────────────────────────────────────────
 
 function requestDiff(hash) {
@@ -1005,6 +1079,10 @@ function requestDiff(hash) {
 function requestCombinedDiff() {
   const hashes = Array.from(selectedCommits);
   vscode.postMessage({ type: 'requestCombinedDiff', hashes });
+}
+
+function requestRangeDiff(fromHash, toHash) {
+  vscode.postMessage({ type: 'requestRangeDiff', fromHash, toHash });
 }
 
 // ─── Diff rendering ───────────────────────────────────────────────────────────
