@@ -19,7 +19,8 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter
 - **Sort Toggle**: Switch between newest-first and oldest-first commit ordering with the sort button in the toolbar
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
-- **Diff Viewer**: Toggle between unified and side-by-side diff views
+- **Diff Viewer**: Toggle between unified and side-by-side diff views with optional word wrap for long lines
+- **Word Wrap Toggle**: Enable word wrap in the diff viewer to handle long lines in JSON, minified code, and other content
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
 - **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
 - **Blame Annotations**: Toggle inline blame annotations showing commit author and date per line, with a status bar showing commit details for the current line
@@ -172,6 +173,7 @@ This extension contributes the following settings:
 | Multi-select toggle | `Ctrl+Enter` / `Cmd+Enter` |
 | Focus search | `/` or `Ctrl+F` / `Cmd+F` |
 | Copy commit message | `Ctrl+Shift+C` / `Cmd+Shift+C` |
+| Toggle word wrap | `Ctrl+Shift+W` / `Cmd+Shift+W` |
 | Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
 | Clear selection | `Escape` |
 

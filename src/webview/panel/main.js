@@ -16,6 +16,7 @@ let focusedIndex = -1; // Keyboard focus index for commit list navigation
 let sortOldestFirst = false; // Sort order: false = newest first (default), true = oldest first
 let currentBranch = null; // Current git branch name
 let hideMergeCommits = false; // Filter out merge commits (commits with multiple parents)
+let wordWrapEnabled = false; // Word wrap toggle for diff view
 
 /**
  * Parse filters from search query
@@ -191,6 +192,7 @@ const searchInput = document.getElementById('search-input');
 const refreshBtn = document.getElementById('refresh-btn');
 const sortBtn = document.getElementById('sort-btn');
 const copyBtn = document.getElementById('copy-btn');
+const wordWrapBtn = document.getElementById('word-wrap-btn');
 const mergeToggleBtn = document.getElementById('merge-toggle-btn');
 const commitCountEl = document.getElementById('commit-count');
 
@@ -312,6 +314,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'e') {
     e.preventDefault();
     handleCopyPatch();
+    return;
+  }
+
+  // Ctrl+Shift+W: Toggle word wrap
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'w') {
+    e.preventDefault();
+    handleWordWrapToggle();
     return;
   }
 
@@ -504,6 +513,26 @@ function handleMergeToggle() {
   updateCommitCount();
 }
 
+function handleWordWrapToggle() {
+  wordWrapEnabled = !wordWrapEnabled;
+  const diffViewer = document.getElementById('diff-viewer');
+  if (diffViewer) {
+    if (wordWrapEnabled) {
+      diffViewer.classList.add('word-wrap');
+      if (wordWrapBtn) {
+        wordWrapBtn.classList.add('active');
+        wordWrapBtn.title = 'Word wrap enabled (click to disable)';
+      }
+    } else {
+      diffViewer.classList.remove('word-wrap');
+      if (wordWrapBtn) {
+        wordWrapBtn.classList.remove('active');
+        wordWrapBtn.title = 'Toggle word wrap';
+      }
+    }
+  }
+}
+
 function updateCommitCount() {
   if (!commitCountEl) return;
   const filtered = getFilteredCommits();
@@ -574,6 +603,10 @@ function init() {
 
   if (copyBtn) {
     copyBtn.addEventListener('click', handleCopyMessage);
+  }
+
+  if (wordWrapBtn) {
+    wordWrapBtn.addEventListener('click', handleWordWrapToggle);
   }
 
   if (mergeToggleBtn) {

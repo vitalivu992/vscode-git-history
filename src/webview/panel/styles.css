@@ -167,6 +167,36 @@ body {
   background-color: var(--vscode-list-hoverBackground);
 }
 
+/* Word wrap toggle button */
+.word-wrap-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s, border-color 0.1s;
+}
+
+.word-wrap-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.word-wrap-btn.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--vscode-button-background);
+}
+
+/* Word wrap state for diff viewer */
+#diff-viewer.word-wrap .d2h-code-line,
+#diff-viewer.word-wrap .d2h-code-side-line {
+  white-space: pre-wrap !important;
+  word-break: break-all !important;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
