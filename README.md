@@ -36,6 +36,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Cherry-Pick Command**: Copy a pre-formatted `git cherry-pick <hash>` command to the clipboard with `Ctrl+Shift+P` / `Cmd+Shift+P` keyboard shortcut, or right-click on any commit
 - **Copy Revert Command**: Copy a pre-formatted `git revert <hash>` command to the clipboard with `Ctrl+Shift+U` / `Cmd+Shift+U` keyboard shortcut, or right-click on any commit
 - **Copy Commit as Patch**: Copy the commit as a unified diff patch (with git headers) suitable for `git apply` or `git am` with `Ctrl+Shift+E` / `Cmd+Shift+E` keyboard shortcut, or right-click on any commit
+- **Quick Compare with Parent**: Instantly compare the selected commit with its parent to see what changed in that specific commit. Use the "Compare" button or press `Ctrl+Alt+P` / `Cmd+Alt+P`. For root commits (first commit), an error is shown since there's no parent.
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
 - **Copy File Path**: Right-click on any file in the changed files list to copy its full path to clipboard
@@ -137,6 +138,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+P` / `Cmd+Shift+P` | Copy cherry-pick command to clipboard |
 | `Ctrl+Shift+U` / `Cmd+Shift+U` | Copy revert command to clipboard |
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
+| `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
 | `Ctrl+Shift+X` / `Cmd+Shift+X` | Toggle regex search mode |

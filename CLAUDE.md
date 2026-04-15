@@ -152,11 +152,13 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Compare Any Two Commits (Range Diff)**: Users can Shift+click (or Shift+Enter) two commits to see the diff between them using `git diff A..B`. The `handleRangeSelection` function in `main.js` finds all commits between the anchor (first clicked) and target, selects them all, and requests the range diff via `requestRangeDiff`. The `getCommitRangeDiff` function in `gitService.ts` executes `git diff fromHash..toHash`. The header shows "Comparing: `short1`..`short2`" to indicate range mode. This differs from multi-select (Ctrl+click) which shows a combined diff of all changes across the range. Range selection supports the same file-path scoping as single commits.
 
+- **Quick Compare with Parent**: Users can quickly compare a commit with its direct parent using the "Compare" button or `Ctrl+Alt+P` / `Cmd+Alt+P` keyboard shortcut. This shows the diff between the commit and its parent (`git diff parent..commit`), useful for quickly reviewing what changed in each individual commit without requiring manual selection. The feature is implemented in `src/webview/panel/main.js` (`handleQuickCompare` function), `src/git/gitService.ts` (`getCommitParentDiff` function using `git diff hash~1..hash`), and `src/webview/messageHandler.ts` (`handleQuickCompare` handler). The button is added in `webviewProvider.ts` with id `compare-parent-btn`. For root commits (no parent), an error message is shown indicating there's no parent to compare with.
+
 ### Message Protocol
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):
 - Extension sends: `init`, `diff`, `combinedDiff`, `rangeDiff`, `commitFiles`, `error`, `selectCommit`
-- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFilePath`, `copyCommitPatch`, `openFileAtCommit`, `saveSettings`
+- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFilePath`, `copyCommitPatch`, `openFileAtCommit`, `quickCompare`, `saveSettings`
 
 The `saveSettings` message is sent by the webview when UI preferences change (diff type, word wrap, sort order, hide merge commits, regex mode) to persist them across sessions.
 
