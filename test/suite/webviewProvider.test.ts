@@ -42,6 +42,8 @@ suite('WebviewProvider HTML Tests', () => {
         <button id="side-by-side-btn">Side by Side</button>
       </div>
       <button id="copy-btn" class="copy-btn" title="Copy commit message (Ctrl+Shift+C) / Copy hash (Ctrl+Shift+H) / Copy info (Ctrl+Shift+I)">Copy</button>
+      <button id="compare-parent-btn" class="compare-parent-btn" title="Compare with parent (Ctrl+Alt+P)">Compare</button>
+      <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
@@ -54,7 +56,9 @@ suite('WebviewProvider HTML Tests', () => {
       <div id="bottom-panel">
         <div id="commit-table-container">
           <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search commits by message, author, email, hash, or tag...">
+            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | after:2024-01-01 | last:7days">
+            <button id="regex-toggle-btn" class="regex-toggle-btn" title="Toggle regex search mode (Ctrl+Shift+X)">.*</button>
+            <div id="commit-count" class="commit-count"></div>
           </div>
           <table id="commit-table">
             <thead>
