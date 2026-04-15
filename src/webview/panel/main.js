@@ -35,6 +35,12 @@ function parseDateFilter(query) {
     textQuery = textQuery.replace(authorMatch[0], '').trim();
   }
 
+  const tagMatch = query.match(/tag:([^\s]+)/i);
+  const tagFilter = tagMatch ? tagMatch[1].toLowerCase() : null;
+  if (tagMatch) {
+    textQuery = textQuery.replace(tagMatch[0], '').trim();
+  }
+
   // Parse after:YYYY-MM-DD or after:YYYY/MM/DD
   const afterMatch = query.match(/after:([^\s]+)/i);
   if (afterMatch) {
@@ -77,7 +83,7 @@ function parseDateFilter(query) {
     textQuery = textQuery.replace(lastMatch[0], '').trim();
   }
 
-  return { textQuery: textQuery.trim(), dateFilters, authorFilter };
+  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter };
 }
 
 /**
@@ -85,8 +91,8 @@ function parseDateFilter(query) {
  * @returns {boolean}
  */
 function hasActiveFilters() {
-  const { dateFilters, authorFilter } = parseDateFilter(searchQuery);
-  return !!(dateFilters.after || dateFilters.before || authorFilter);
+  const { dateFilters, authorFilter, tagFilter } = parseDateFilter(searchQuery);
+  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter);
 }
 
 function hasActiveDateFilters() {
@@ -102,9 +108,9 @@ function renderFilterBadges() {
     existingBadges.remove();
   }
 
-  const { dateFilters, authorFilter } = parseDateFilter(searchQuery);
+  const { dateFilters, authorFilter, tagFilter } = parseDateFilter(searchQuery);
   const hasDateFilters = !!(dateFilters.after || dateFilters.before);
-  const hasFilters = hasDateFilters || authorFilter;
+  const hasFilters = hasDateFilters || authorFilter || tagFilter;
 
   if (!hasFilters) {
     return;
@@ -131,6 +137,13 @@ function renderFilterBadges() {
     authorBadge.className = 'filter-badge';
     authorBadge.innerHTML = `author: ${escapeHtml(authorFilter)} <span class="filter-badge-clear" data-filter="author">&times;</span>`;
     badgesContainer.appendChild(authorBadge);
+  }
+
+  if (tagFilter) {
+    const tagBadge = document.createElement('span');
+    tagBadge.className = 'filter-badge';
+    tagBadge.innerHTML = `tag: ${escapeHtml(tagFilter)} <span class="filter-badge-clear" data-filter="tag">&times;</span>`;
+    badgesContainer.appendChild(tagBadge);
   }
 
   if (dateFilters.after) {
@@ -162,6 +175,8 @@ function renderFilterBadges() {
         newQuery = newQuery.replace(/before:[^\s]+/i, '').trim();
       } else if (filterToRemove === 'author') {
         newQuery = newQuery.replace(/author:[^\s]+/i, '').trim();
+      } else if (filterToRemove === 'tag') {
+        newQuery = newQuery.replace(/tag:[^\s]+/i, '').trim();
       }
 
       // Also remove any orphaned "last:" filter if it was the only thing
@@ -443,13 +458,19 @@ function getFilteredCommits() {
   }
 
   // Parse date filters and get remaining text query
-  const { textQuery, dateFilters, authorFilter } = parseDateFilter(searchQuery);
+  const { textQuery, dateFilters, authorFilter, tagFilter } = parseDateFilter(searchQuery);
 
   // Apply author filter
   if (authorFilter) {
     filtered = filtered.filter(commit =>
       commit.author.toLowerCase().includes(authorFilter) ||
       commit.email.toLowerCase().includes(authorFilter)
+    );
+  }
+
+  if (tagFilter) {
+    filtered = filtered.filter(commit =>
+      commit.tags && commit.tags.some(t => t.toLowerCase().includes(tagFilter))
     );
   }
 
@@ -652,6 +673,16 @@ function init() {
       const author = e.target.dataset.author;
       searchInput.value = `author:${author}`;
       searchQuery = `author:${author}`;
+      focusedIndex = -1;
+      renderCommits();
+      updateCommitCount();
+      renderFilterBadges();
+    }
+    if (e.target.classList.contains('tag-filter-link')) {
+      e.stopPropagation();
+      const tag = e.target.dataset.tag;
+      searchInput.value = `tag:${tag}`;
+      searchQuery = `tag:${tag}`;
       focusedIndex = -1;
       renderCommits();
       updateCommitCount();
@@ -882,7 +913,7 @@ function renderCommits() {
     const statsHtml = formatCommitStats(commit.stats);
 
     const tagBadges = (commit.tags || [])
-      .map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`)
+      .map(t => `<span class="tag-badge tag-filter-link" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`)
       .join('');
 
     const mergeBadge = isMerge ? '<span class="merge-badge">merge</span>' : '';

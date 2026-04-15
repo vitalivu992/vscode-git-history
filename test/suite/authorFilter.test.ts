@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 
-function parseDateFilter(query: string): { textQuery: string; dateFilters: { after?: Date; before?: Date }; authorFilter: string | null } {
+function parseDateFilter(query: string): { textQuery: string; dateFilters: { after?: Date; before?: Date }; authorFilter: string | null; tagFilter: string | null } {
   const dateFilters: { after?: Date; before?: Date } = {};
   let textQuery = query;
 
@@ -10,6 +10,12 @@ function parseDateFilter(query: string): { textQuery: string; dateFilters: { aft
   const authorFilter = authorMatch ? authorMatch[1].toLowerCase() : null;
   if (authorMatch) {
     textQuery = textQuery.replace(authorMatch[0], '').trim();
+  }
+
+  const tagMatch = query.match(/tag:([^\s]+)/i);
+  const tagFilter = tagMatch ? tagMatch[1].toLowerCase() : null;
+  if (tagMatch) {
+    textQuery = textQuery.replace(tagMatch[0], '').trim();
   }
 
   const afterMatch = query.match(/after:([^\s]+)/i);
@@ -51,7 +57,7 @@ function parseDateFilter(query: string): { textQuery: string; dateFilters: { aft
     textQuery = textQuery.replace(lastMatch[0], '').trim();
   }
 
-  return { textQuery: textQuery.trim(), dateFilters, authorFilter };
+  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter };
 }
 
 interface TestCommit {
@@ -70,7 +76,7 @@ function filterCommitsWithAuthor(
   commits: TestCommit[],
   query: string
 ): TestCommit[] {
-  const { textQuery, dateFilters, authorFilter } = parseDateFilter(query);
+  const { textQuery, dateFilters, authorFilter, tagFilter } = parseDateFilter(query);
 
   let filtered = commits;
 
@@ -78,6 +84,12 @@ function filterCommitsWithAuthor(
     filtered = filtered.filter(commit =>
       commit.author.toLowerCase().includes(authorFilter) ||
       commit.email.toLowerCase().includes(authorFilter)
+    );
+  }
+
+  if (tagFilter) {
+    filtered = filtered.filter(commit =>
+      commit.tags && commit.tags.some(t => t.toLowerCase().includes(tagFilter))
     );
   }
 

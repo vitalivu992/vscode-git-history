@@ -762,6 +762,14 @@ body {
   vertical-align: middle;
 }
 
+.tag-filter-link {
+  cursor: pointer;
+}
+
+.tag-filter-link:hover {
+  text-decoration: underline;
+}
+
 /* ─── Merge badge ─────────────────────────────────────────────────────────── */
 
 .merge-badge {
