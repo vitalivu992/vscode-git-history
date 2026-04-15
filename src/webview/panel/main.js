@@ -521,13 +521,13 @@ function handleWordWrapToggle() {
       diffViewer.classList.add('word-wrap');
       if (wordWrapBtn) {
         wordWrapBtn.classList.add('active');
-        wordWrapBtn.title = 'Word wrap enabled (click to disable)';
+        wordWrapBtn.title = 'Word wrap enabled (Ctrl+Shift+W to toggle)';
       }
     } else {
       diffViewer.classList.remove('word-wrap');
       if (wordWrapBtn) {
         wordWrapBtn.classList.remove('active');
-        wordWrapBtn.title = 'Toggle word wrap';
+        wordWrapBtn.title = 'Toggle word wrap (Ctrl+Shift+W)';
       }
     }
   }
