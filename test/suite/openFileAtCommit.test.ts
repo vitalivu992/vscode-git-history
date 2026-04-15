@@ -104,8 +104,23 @@ suite('Open File at Commit Feature', () => {
       filePath: testFile
     };
 
+    // Create a mock settings service for the test
+    const mockSettingsService = {
+      saveSettings: async () => {},
+      getSettings: () => ({
+        diffType: 'unified' as const,
+        wordWrapEnabled: false,
+        sortOldestFirst: false,
+        hideMergeCommits: false,
+        regexSearchEnabled: false
+      }),
+      resetSettings: async () => {},
+      getSetting: () => undefined,
+      setSetting: async () => {}
+    };
+
     try {
-      await handleMessage(message, mockPanel);
+      await handleMessage(message, mockPanel, mockSettingsService as any);
       assert.ok(true, 'Message handler processed openFileAtCommit without error');
     } catch (error) {
       assert.ok(true, 'Handler attempted to process (may fail due to missing VS Code APIs in test)');

@@ -6,6 +6,7 @@ interface TestCommit {
   author: string;
   email: string;
   message: string;
+  fullMessage: string;
   tags?: string[];
 }
 
@@ -17,7 +18,7 @@ function filterCommits(commits: TestCommit[], query: string | null | undefined):
     commit.shortHash.toLowerCase().includes(q) ||
     commit.author.toLowerCase().includes(q) ||
     commit.email.toLowerCase().includes(q) ||
-    commit.message.toLowerCase().includes(q) ||
+    commit.fullMessage.toLowerCase().includes(q) ||
     (commit.tags && commit.tags.some((t: string) => t.toLowerCase().includes(q)))
   );
 }
@@ -30,6 +31,7 @@ suite('Commit Search Filter Tests', () => {
       author: 'Alice Cooper',
       email: 'alice@example.com',
       message: 'Initial commit',
+      fullMessage: 'Initial commit',
       tags: ['v1.0.0']
     },
     {
@@ -38,6 +40,7 @@ suite('Commit Search Filter Tests', () => {
       author: 'Bob Marley',
       email: 'bob@company.org',
       message: 'Add feature X',
+      fullMessage: 'Add feature X\n\nThis adds the new authentication module\nwith OAuth2 support. Resolves #42.',
       tags: ['v2.0.0', 'release-2']
     },
     {
@@ -46,6 +49,7 @@ suite('Commit Search Filter Tests', () => {
       author: 'Charlie Day',
       email: 'charlie@example.com',
       message: 'Fix bug in parser',
+      fullMessage: 'Fix bug in parser\n\nThe parser was incorrectly handling\nnested brackets. Fixes #99.',
       tags: undefined
     },
     {
@@ -54,6 +58,7 @@ suite('Commit Search Filter Tests', () => {
       author: 'Diana Prince',
       email: 'diana@company.org',
       message: 'Update documentation',
+      fullMessage: 'Update documentation',
       tags: []
     }
   ];
@@ -168,5 +173,29 @@ suite('Commit Search Filter Tests', () => {
   test('multiple results for common substring', () => {
     const result = filterCommits(commits, 'example.com');
     assert.strictEqual(result.length, 2);
+  });
+
+  test('filter by text in commit body only', () => {
+    const result = filterCommits(commits, 'OAuth2');
+    assert.strictEqual(result.length, 1);
+    assert.strictEqual(result[0].shortHash, 'bbbbbbb');
+  });
+
+  test('filter by issue reference in commit body', () => {
+    const result = filterCommits(commits, '#42');
+    assert.strictEqual(result.length, 1);
+    assert.strictEqual(result[0].shortHash, 'bbbbbbb');
+  });
+
+  test('filter by text in another commit body', () => {
+    const result = filterCommits(commits, 'nested brackets');
+    assert.strictEqual(result.length, 1);
+    assert.strictEqual(result[0].shortHash, 'ccccccc');
+  });
+
+  test('subject match still works via fullMessage', () => {
+    const result = filterCommits(commits, 'Initial commit');
+    assert.strictEqual(result.length, 1);
+    assert.strictEqual(result[0].shortHash, 'aaaaaaa');
   });
 });

@@ -8,6 +8,7 @@ interface TestCommit {
   author: string;
   email: string;
   message: string;
+  fullMessage: string;
   parentHashes: string[];
 }
 
@@ -35,7 +36,7 @@ function getFilteredCommits(
       commit.shortHash.toLowerCase().includes(query) ||
       commit.author.toLowerCase().includes(query) ||
       commit.email.toLowerCase().includes(query) ||
-      commit.message.toLowerCase().includes(query)
+      commit.fullMessage.toLowerCase().includes(query)
     );
   }
 
@@ -57,6 +58,7 @@ suite('Hide Merge Commits Logic Tests', () => {
       author: 'Alice Cooper',
       email: 'alice@example.com',
       message: 'Initial commit',
+      fullMessage: 'Initial commit',
       parentHashes: [] // Root commit
     },
     {
@@ -65,6 +67,7 @@ suite('Hide Merge Commits Logic Tests', () => {
       author: 'Bob Marley',
       email: 'bob@example.com',
       message: 'Add feature X',
+      fullMessage: 'Add feature X',
       parentHashes: ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'] // Regular commit
     },
     {
@@ -73,6 +76,7 @@ suite('Hide Merge Commits Logic Tests', () => {
       author: 'Charlie Day',
       email: 'charlie@example.com',
       message: 'Merge pull request #42',
+      fullMessage: 'Merge pull request #42',
       parentHashes: ['bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'dddddddddddddddddddddddddddddddddddddddd'] // Merge commit
     },
     {
@@ -81,6 +85,7 @@ suite('Hide Merge Commits Logic Tests', () => {
       author: 'Diana Prince',
       email: 'diana@example.com',
       message: 'Feature branch work',
+      fullMessage: 'Feature branch work',
       parentHashes: ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'] // Regular commit
     },
     {
@@ -89,6 +94,7 @@ suite('Hide Merge Commits Logic Tests', () => {
       author: 'Eve Johnson',
       email: 'eve@example.com',
       message: 'Merge branch develop',
+      fullMessage: 'Merge branch develop',
       parentHashes: ['cccccccccccccccccccccccccccccccccccccccc', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'] // Merge commit
     }
   ];
@@ -159,6 +165,7 @@ suite('Hide Merge Commits Logic Tests', () => {
         author: 'Charlie Day',
         email: 'charlie@example.com',
         message: 'Merge pull request',
+        fullMessage: 'Merge pull request',
         parentHashes: ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb']
       }
     ];

@@ -6,6 +6,7 @@ interface TestCommit {
   author: string;
   email: string;
   message: string;
+  fullMessage: string;
   tags?: string[];
 }
 
@@ -55,7 +56,7 @@ function filterCommits(
     isRegexMatch(commit.shortHash, query, regexEnabled) ||
     isRegexMatch(commit.author, query, regexEnabled) ||
     isRegexMatch(commit.email, query, regexEnabled) ||
-    isRegexMatch(commit.message, query, regexEnabled) ||
+    isRegexMatch(commit.fullMessage, query, regexEnabled) ||
     (commit.tags && commit.tags.some(t => isRegexMatch(t, query, regexEnabled)))
   );
 }
@@ -68,6 +69,7 @@ suite('Regex Search Mode Tests', () => {
       author: 'Alice Cooper',
       email: 'alice@example.com',
       message: 'feat: add new authentication feature',
+      fullMessage: 'feat: add new authentication feature\n\nImplements JWT-based auth with\nrefresh token rotation. Closes PROJ-123.',
       tags: ['v1.0.0']
     },
     {
@@ -76,6 +78,7 @@ suite('Regex Search Mode Tests', () => {
       author: 'Bob Marley',
       email: 'bob@company.org',
       message: 'fix: resolve memory leak in parser',
+      fullMessage: 'fix: resolve memory leak in parser\n\nThe SAX parser was not releasing\nbuffer references. Resolves #456.',
       tags: ['v2.0.0', 'release-2']
     },
     {
@@ -84,6 +87,7 @@ suite('Regex Search Mode Tests', () => {
       author: 'Charlie Day',
       email: 'charlie@example.com',
       message: 'bugfix: handle edge case in validator',
+      fullMessage: 'bugfix: handle edge case in validator',
       tags: undefined
     },
     {
@@ -92,6 +96,7 @@ suite('Regex Search Mode Tests', () => {
       author: 'Diana Prince',
       email: 'diana@company.org',
       message: 'docs: update API documentation',
+      fullMessage: 'docs: update API documentation\n\nAdded examples for POST /api/v2/users\nand PUT /api/v2/settings endpoints.',
       tags: []
     },
     {
@@ -100,6 +105,7 @@ suite('Regex Search Mode Tests', () => {
       author: 'Eve Johnson',
       email: 'eve@startup.io',
       message: 'refactor: simplify data processing pipeline',
+      fullMessage: 'refactor: simplify data processing pipeline',
       tags: ['v3.0.0-beta']
     }
   ];
@@ -258,6 +264,49 @@ suite('Regex Search Mode Tests', () => {
     test('should match commit type prefixes', () => {
       const result = filterCommits(commits, '^(feat|fix|docs|refactor|bugfix):', true);
       assert.strictEqual(result.length, 5);
+    });
+  });
+
+  suite('Search in commit body via fullMessage', () => {
+    test('should match text in commit body with regex disabled', () => {
+      const result = filterCommits(commits, 'PROJ-123', false);
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].shortHash, 'aaaaaaa');
+    });
+
+    test('should match text in commit body with regex enabled', () => {
+      const result = filterCommits(commits, 'PROJ-\\d+', true);
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].shortHash, 'aaaaaaa');
+    });
+
+    test('should match issue reference in body', () => {
+      const result = filterCommits(commits, '#456', false);
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].shortHash, 'bbbbbbb');
+    });
+
+    test('should match API endpoint in body with regex', () => {
+      const result = filterCommits(commits, 'POST /api/v2/', true);
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].shortHash, 'ddddddd');
+    });
+
+    test('should match body text "buffer references" with regex disabled', () => {
+      const result = filterCommits(commits, 'buffer references', false);
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].shortHash, 'bbbbbbb');
+    });
+
+    test('should not find text that exists nowhere', () => {
+      const result = filterCommits(commits, 'nonexistent_body_text', false);
+      assert.strictEqual(result.length, 0);
+    });
+
+    test('subject match still works via fullMessage', () => {
+      const result = filterCommits(commits, 'feat: add new authentication', false);
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].shortHash, 'aaaaaaa');
     });
   });
 });
