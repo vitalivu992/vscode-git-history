@@ -151,6 +151,35 @@ body {
   border-color: var(--vscode-button-background);
 }
 
+/* Regex toggle button */
+.regex-toggle-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  transition: background-color 0.1s, border-color 0.1s;
+  flex-shrink: 0;
+}
+
+.regex-toggle-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.regex-toggle-btn.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--vscode-button-background);
+}
+
+.regex-toggle-btn.invalid {
+  border-color: var(--vscode-gitDecoration-deletedResourceForeground, #f85149);
+  color: var(--vscode-gitDecoration-deletedResourceForeground, #f85149);
+}
+
 .copy-btn {
   padding: 4px 10px;
   background: transparent;

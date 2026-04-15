@@ -18,6 +18,7 @@ let currentBranch = null; // Current git branch name
 let hideMergeCommits = false; // Filter out merge commits (commits with multiple parents)
 let wordWrapEnabled = false; // Word wrap toggle for diff view
 let rangeSelectionAnchor = null; // Anchor commit for Shift+click range selection
+let regexSearchEnabled = false; // Regex search mode toggle
 
 /**
  * Parse filters from search query
@@ -210,6 +211,7 @@ const sortBtn = document.getElementById('sort-btn');
 const copyBtn = document.getElementById('copy-btn');
 const wordWrapBtn = document.getElementById('word-wrap-btn');
 const mergeToggleBtn = document.getElementById('merge-toggle-btn');
+const regexToggleBtn = document.getElementById('regex-toggle-btn');
 const commitCountEl = document.getElementById('commit-count');
 
 let isRefreshing = false;
@@ -344,6 +346,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'w') {
     e.preventDefault();
     handleWordWrapToggle();
+    return;
+  }
+
+  // Ctrl+Shift+X: Toggle regex search mode
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'x') {
+    e.preventDefault();
+    handleRegexToggle();
     return;
   }
 
@@ -494,14 +503,13 @@ function getFilteredCommits() {
 
   // Apply text search query filter (using textQuery which has date filters removed)
   if (textQuery) {
-    const query = textQuery.toLowerCase();
     filtered = filtered.filter(commit =>
-      commit.hash.toLowerCase().includes(query) ||
-      commit.shortHash.toLowerCase().includes(query) ||
-      commit.author.toLowerCase().includes(query) ||
-      commit.email.toLowerCase().includes(query) ||
-      commit.message.toLowerCase().includes(query) ||
-      (commit.tags && commit.tags.some(t => t.toLowerCase().includes(query)))
+      isRegexMatch(commit.hash, textQuery) ||
+      isRegexMatch(commit.shortHash, textQuery) ||
+      isRegexMatch(commit.author, textQuery) ||
+      isRegexMatch(commit.email, textQuery) ||
+      isRegexMatch(commit.message, textQuery) ||
+      (commit.tags && commit.tags.some(t => isRegexMatch(t, textQuery)))
     );
   }
 
@@ -567,6 +575,77 @@ function handleWordWrapToggle() {
         wordWrapBtn.title = 'Toggle word wrap (Ctrl+Shift+W)';
       }
     }
+  }
+}
+
+/**
+ * Check if text matches the regex pattern
+ * @param {string} text - Text to test
+ * @param {string} pattern - Regex pattern
+ * @returns {boolean} True if matches or if regex is invalid (fallback to includes)
+ */
+function isRegexMatch(text, pattern) {
+  if (!pattern) return true;
+  if (!regexSearchEnabled) {
+    return text.toLowerCase().includes(pattern.toLowerCase());
+  }
+  try {
+    const regex = new RegExp(pattern, 'i');
+    return regex.test(text);
+  } catch (e) {
+    // Invalid regex - fallback to simple includes
+    return text.toLowerCase().includes(pattern.toLowerCase());
+  }
+}
+
+/**
+ * Check if the current regex pattern is valid
+ * @param {string} pattern - Regex pattern to validate
+ * @returns {boolean} True if valid or not in regex mode
+ */
+function isValidRegex(pattern) {
+  if (!regexSearchEnabled || !pattern) return true;
+  try {
+    new RegExp(pattern);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Toggle regex search mode
+ */
+function handleRegexToggle() {
+  regexSearchEnabled = !regexSearchEnabled;
+  if (regexToggleBtn) {
+    if (regexSearchEnabled) {
+      regexToggleBtn.classList.add('active');
+      regexToggleBtn.title = 'Regex mode enabled (Ctrl+Shift+X to toggle)';
+    } else {
+      regexToggleBtn.classList.remove('active');
+      regexToggleBtn.classList.remove('invalid');
+      regexToggleBtn.title = 'Toggle regex search mode (Ctrl+Shift+X)';
+    }
+  }
+  // Update search results with new mode
+  focusedIndex = -1;
+  renderCommits();
+  updateCommitCount();
+  // Validate current pattern
+  updateRegexValidation();
+}
+
+/**
+ * Update regex validation visual feedback
+ */
+function updateRegexValidation() {
+  if (!regexToggleBtn) return;
+  const { textQuery } = parseDateFilter(searchQuery);
+  if (regexSearchEnabled && textQuery && !isValidRegex(textQuery)) {
+    regexToggleBtn.classList.add('invalid');
+  } else {
+    regexToggleBtn.classList.remove('invalid');
   }
 }
 
@@ -648,6 +727,10 @@ function init() {
 
   if (mergeToggleBtn) {
     mergeToggleBtn.addEventListener('click', handleMergeToggle);
+  }
+
+  if (regexToggleBtn) {
+    regexToggleBtn.addEventListener('click', handleRegexToggle);
   }
 
   // Keyboard shortcuts
@@ -1529,6 +1612,7 @@ function handleSearch(e) {
   renderCommits();
   updateCommitCount();
   renderFilterBadges();
+  updateRegexValidation();
 }
 
 async function handleRefresh() {

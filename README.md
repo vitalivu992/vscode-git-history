@@ -16,7 +16,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Selection History**: Select lines of code and view only commits that affected those specific lines
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
 - **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions)
-- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter. Supports tag filter: `tag:name` or click any tag badge to filter by tag.
+- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter. Supports tag filter: `tag:name` or click any tag badge to filter by tag. Supports regex mode with the .* button for advanced pattern matching like `bug(fix|patch)|hotfix` or `^feat:.*`.
 - **Sort Toggle**: Switch between newest-first and oldest-first commit ordering with the sort button in the toolbar
 - **Compare Any Two Commits**: Shift+click (or Shift+Enter) two commits to see the diff between them
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
@@ -84,6 +84,11 @@ A powerful VS Code extension that provides git history visualization inspired by
   - `tag:v1.0.0` - show commits with a tag matching "v1.0.0" (case-insensitive, partial match)
   - `tag:release` - show commits with tags containing "release"
   - Combine with other filters: `tag:v2.0 author:Bob after:2024-01-01`
+- **Regex search mode**: Click the .* button (or press `Ctrl+Shift+X` / `Cmd+Shift+X`) to enable regex pattern matching:
+  - `^feat:` - match commits starting with "feat:"
+  - `bug(fix|patch)|hotfix` - match "bugfix", "bugpatch", or "hotfix"
+  - `\\bfix\\b` - match whole word "fix" (not "bugfix")
+  - Invalid regex patterns show red border on the button; filtering falls back to substring matching
 - **Toggle sort order** with the sort button to switch between newest-first and oldest-first
 - **Hide merge commits** with the "No Merge" button to focus on actual work commits; the count indicator shows "X of Y" when filters are active
 - **Toggle view mode** between Unified and Side-by-Side
@@ -184,6 +189,7 @@ This extension contributes the following settings:
 | Focus search | `/` or `Ctrl+F` / `Cmd+F` |
 | Copy commit message | `Ctrl+Shift+C` / `Cmd+Shift+C` |
 | Toggle word wrap | `Ctrl+Shift+W` / `Cmd+Shift+W` |
+| Toggle regex search mode | `Ctrl+Shift+X` / `Cmd+Shift+X` |
 | Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
 | Clear selection | `Escape` |
 
