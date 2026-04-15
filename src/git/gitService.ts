@@ -260,3 +260,15 @@ export async function getFileContentAtCommit(
   const output = await execGit(['show', `${commitHash}:${relativePath}`], cwd);
   return output;
 }
+
+/**
+ * Get commit as a patch (format-patch output)
+ * Returns a unified diff with git headers suitable for git apply or git am
+ */
+export async function getCommitPatch(
+  hash: string,
+  cwd: string
+): Promise<string> {
+  const output = await execGit(['format-patch', '-1', '--stdout', hash], cwd);
+  return output;
+}

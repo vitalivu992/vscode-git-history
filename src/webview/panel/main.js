@@ -308,6 +308,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+E: Copy commit as patch
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'e') {
+    e.preventDefault();
+    handleCopyPatch();
+    return;
+  }
+
   // / or Ctrl+F: Focus search
   if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
     e.preventDefault();
@@ -1199,6 +1206,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📄</span>
       <span class="context-menu-label">Copy commit diff</span>
     </div>
+    <div class="context-menu-item" data-action="copy-patch">
+      <span class="context-menu-icon">🩹</span>
+      <span class="context-menu-label">Copy as patch</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -1222,6 +1233,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitFiles', hash: commit.hash });
       } else if (action === 'copy-diff') {
         vscode.postMessage({ type: 'copyCommitDiff', hash: commit.hash });
+      } else if (action === 'copy-patch') {
+        vscode.postMessage({ type: 'copyCommitPatch', hash: commit.hash });
       }
       menu.remove();
     });
@@ -1442,6 +1455,17 @@ function handleCopyDiff() {
   } else if (selectedCommits.size === 1) {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitDiff', hash });
+  }
+}
+
+function handleCopyPatch() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyCommitPatch', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCommitPatch', hash });
   }
 }
 

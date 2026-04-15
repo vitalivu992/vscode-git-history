@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitFiles } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitFiles, getCommitPatch } from '../git/gitService';
 import { ExtToWebviewMessage } from '../types';
 
 /**
@@ -59,6 +59,14 @@ export async function handleMessage(
 
     case 'copyCommitFiles':
       handleCopyCommitFiles(message.hash, panel);
+      break;
+
+    case 'copyCommitDiff':
+      await handleCopyCommitDiff(message.hash, panel);
+      break;
+
+    case 'copyCommitPatch':
+      await handleCopyCommitPatch(message.hash, panel);
       break;
 
     case 'copyFilePath':
@@ -275,6 +283,30 @@ async function handleCopyCommitFiles(hash: string, panel: GitHistoryPanel): Prom
   }
 }
 
+async function handleCopyCommitDiff(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const diffResult = await getCommitDiff(hash, cwd);
+
+    if (diffResult.isBinary) {
+      void vscode.window.showInformationMessage('Cannot copy diff for binary file');
+      return;
+    }
+
+    if (diffResult.diff) {
+      await vscode.env.clipboard.writeText(diffResult.diff);
+      const shortHash = hash.substring(0, 7);
+      void vscode.window.showInformationMessage(`Commit diff ${shortHash} copied to clipboard`);
+    } else {
+      void vscode.window.showInformationMessage('No diff to copy');
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy diff: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
 function handleCopyFilePath(filePath: string, _panel: GitHistoryPanel): void {
   // Extract just the filename for the display message
   const fileName = path.basename(filePath);
@@ -306,6 +338,25 @@ async function handleOpenFileAtCommit(
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to open file at commit: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleCopyCommitPatch(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const patch = await getCommitPatch(hash, cwd);
+
+    if (patch) {
+      await vscode.env.clipboard.writeText(patch);
+      const shortHash = hash.substring(0, 7);
+      void vscode.window.showInformationMessage(`Commit patch ${shortHash} copied to clipboard`);
+    } else {
+      void vscode.window.showInformationMessage('No patch to copy');
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy patch: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
