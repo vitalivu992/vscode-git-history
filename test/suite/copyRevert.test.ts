@@ -206,12 +206,12 @@ suite('Revert Command Source Verification', () => {
       'CLAUDE.md should document Copy Revert Command feature');
   });
 
-  test('README.md should document revert keyboard shortcut', () => {
+  test('README.md should document revert keyboard shortcut in the shortcuts table', () => {
     const fs = require('fs');
     const readmePath = path.resolve(__dirname, '../../../README.md');
     const source = fs.readFileSync(readmePath, 'utf-8');
 
-    assert.ok(source.includes('Copy Revert Command') || source.includes('revert'),
-      'README.md should document revert feature');
+    assert.ok(source.includes('Ctrl+Shift+U') && source.includes('Copy revert command'),
+      'README.md should document Ctrl+Shift+U for Copy revert command in shortcuts table');
   });
 });

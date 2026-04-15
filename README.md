@@ -139,6 +139,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
+| `Ctrl+Shift+X` / `Cmd+Shift+X` | Toggle regex search mode |
 | `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
 | `Escape` | Clear selection and search focus |
 
