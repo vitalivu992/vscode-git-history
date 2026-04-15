@@ -79,6 +79,14 @@ export async function handleMessage(
       await handleCopyCommitPatch(message.hash, panel);
       break;
 
+    case 'copyFilePath':
+      handleCopyFilePath(message.filePath, panel);
+      break;
+
+    case 'openFileAtCommit':
+      await handleOpenFileAtCommit(message.hash, message.filePath, panel);
+      break;
+
     case 'quickCompare':
       await handleQuickCompare(message.hash, panel);
       break;
