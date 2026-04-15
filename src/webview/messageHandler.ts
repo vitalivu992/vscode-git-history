@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff } from '../git/gitService';
 import { ExtToWebviewMessage } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 
@@ -79,12 +79,8 @@ export async function handleMessage(
       await handleCopyCommitPatch(message.hash, panel);
       break;
 
-    case 'copyFilePath':
-      handleCopyFilePath(message.filePath, panel);
-      break;
-
-    case 'openFileAtCommit':
-      await handleOpenFileAtCommit(message.hash, message.filePath, panel);
+    case 'quickCompare':
+      await handleQuickCompare(message.hash, panel);
       break;
 
     case 'saveSettings':
@@ -418,6 +414,64 @@ async function handleCopyCommitPatch(hash: string, panel: GitHistoryPanel): Prom
     void vscode.window.showErrorMessage(
       `Failed to copy patch: ${error instanceof Error ? error.message : String(error)}`
     );
+  }
+}
+
+async function handleQuickCompare(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const commit = panel.getCommits().find(c => c.hash === hash);
+
+    if (!commit) {
+      panel.postMessage({
+        type: 'error',
+        message: 'Commit not found'
+      });
+      return;
+    }
+
+    if (!commit.parentHashes || commit.parentHashes.length === 0) {
+      panel.postMessage({
+        type: 'error',
+        message: 'Root commit has no parent to compare with'
+      });
+      return;
+    }
+
+    const diffResult = await getCommitParentDiff(hash, cwd);
+
+    if (diffResult.isBinary) {
+      panel.postMessage({
+        type: 'diff',
+        hash,
+        diff: 'Binary file - cannot display diff',
+        files: []
+      });
+      return;
+    }
+
+    const files = await getCommitFiles(hash, cwd);
+
+    const parentShort = commit.parentHashes[0].substring(0, 7);
+    const commitShort = hash.substring(0, 7);
+
+    panel.postMessage({
+      type: 'rangeDiff',
+      fromHash: commit.parentHashes[0],
+      toHash: hash,
+      diff: diffResult.diff
+    });
+
+    panel.postMessage({
+      type: 'commitFiles',
+      hash,
+      files
+    });
+  } catch (error) {
+    panel.postMessage({
+      type: 'error',
+      message: error instanceof Error ? error.message : String(error)
+    });
   }
 }
 
