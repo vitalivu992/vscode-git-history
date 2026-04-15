@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff } from '../git/gitService';
-import { ExtToWebviewMessage } from '../types';
+import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 
 /**
@@ -93,6 +94,10 @@ export async function handleMessage(
 
     case 'saveSettings':
       await handleSaveSettings(message.settings, settingsService);
+      break;
+
+    case 'exportCommits':
+      await handleExportCommits(message.format, message.commits, panel);
       break;
 
     default:
@@ -491,5 +496,93 @@ async function handleSaveSettings(
     await settingsService.saveSettings(settings);
   } catch (error) {
     console.error('Failed to save settings:', error);
+  }
+}
+
+/**
+ * Format commits as JSON
+ */
+function formatCommitsAsJson(commits: CommitInfo[]): string {
+  return JSON.stringify(commits, null, 2);
+}
+
+/**
+ * Escape a field for CSV output
+ */
+function escapeCsvField(field: string): string {
+  // If field contains comma, quote, or newline, wrap in quotes and escape internal quotes
+  if (/[",\n\r]/.test(field)) {
+    return `"${field.replace(/"/g, '""')}"`;
+  }
+  return field;
+}
+
+/**
+ * Format commits as CSV
+ */
+function formatCommitsAsCsv(commits: CommitInfo[]): string {
+  const headers = ['Hash', 'Short Hash', 'Author', 'Email', 'Date', 'Message', 'Tags', 'Files Changed', 'Insertions', 'Deletions'];
+  const lines = [headers.join(',')];
+
+  for (const commit of commits) {
+    const fields = [
+      commit.hash,
+      commit.shortHash,
+      escapeCsvField(commit.author),
+      commit.email,
+      commit.date,
+      escapeCsvField(commit.message),
+      commit.tags ? commit.tags.join(';') : '',
+      commit.stats?.filesChanged?.toString() || '0',
+      commit.stats?.insertions?.toString() || '0',
+      commit.stats?.deletions?.toString() || '0'
+    ];
+    lines.push(fields.join(','));
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Handle export commits to file
+ */
+async function handleExportCommits(
+  format: 'json' | 'csv',
+  commits: CommitInfo[],
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    if (commits.length === 0) {
+      void vscode.window.showInformationMessage('No commits to export');
+      return;
+    }
+
+    const fileExtension = format === 'json' ? 'json' : 'csv';
+    const defaultFileName = `git-history-export.${fileExtension}`;
+
+    const uri = await vscode.window.showSaveDialog({
+      defaultUri: vscode.Uri.file(path.join(panel.getCwd(), defaultFileName)),
+      filters: {
+        [format.toUpperCase()]: [fileExtension]
+      }
+    });
+
+    if (!uri) {
+      return; // User cancelled
+    }
+
+    const content = format === 'json'
+      ? formatCommitsAsJson(commits)
+      : formatCommitsAsCsv(commits);
+
+    await fs.promises.writeFile(uri.fsPath, content, 'utf-8');
+
+    void vscode.window.showInformationMessage(
+      `Exported ${commits.length} commit${commits.length !== 1 ? 's' : ''} to ${path.basename(uri.fsPath)}`
+    );
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to export commits: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }

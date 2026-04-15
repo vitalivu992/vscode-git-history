@@ -213,6 +213,7 @@ const compareParentBtn = document.getElementById('compare-parent-btn');
 const wordWrapBtn = document.getElementById('word-wrap-btn');
 const mergeToggleBtn = document.getElementById('merge-toggle-btn');
 const regexToggleBtn = document.getElementById('regex-toggle-btn');
+const exportBtn = document.getElementById('export-btn');
 const commitCountEl = document.getElementById('commit-count');
 
 let isRefreshing = false;
@@ -340,6 +341,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'e') {
     e.preventDefault();
     handleCopyPatch();
+    return;
+  }
+
+  // Ctrl+Shift+O: Export filtered commits
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'o') {
+    e.preventDefault();
+    handleExportCommits();
     return;
   }
 
@@ -755,6 +763,10 @@ function init() {
 
   if (regexToggleBtn) {
     regexToggleBtn.addEventListener('click', handleRegexToggle);
+  }
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', handleExportCommits);
   }
 
   // Keyboard shortcuts
@@ -1810,6 +1822,84 @@ function handleCopyPatch() {
     const hash = [...selectedCommits][0];
     vscode.postMessage({ type: 'copyCommitPatch', hash });
   }
+}
+
+// ─── Export Commits ───────────────────────────────────────────────────────────
+
+function handleExportCommits() {
+  const filteredCommits = getFilteredCommits();
+  if (filteredCommits.length === 0) {
+    showError('No commits to export');
+    return;
+  }
+
+  // Show format selection modal
+  showExportFormatDialog(filteredCommits);
+}
+
+function showExportFormatDialog(commitsToExport) {
+  const existingModal = document.getElementById('export-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'export-modal';
+  modal.innerHTML = `
+    <div class="modal-overlay"></div>
+    <div class="modal-content export-modal-content">
+      <div class="modal-header">
+        <span class="modal-title">Export ${commitsToExport.length} Commit${commitsToExport.length !== 1 ? 's' : ''}</span>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="export-description">Choose export format:</p>
+        <div class="export-options">
+          <button class="export-option-btn" data-format="json">
+            <span class="export-option-icon">{}</span>
+            <span class="export-option-label">JSON</span>
+            <span class="export-option-desc">Full commit data with stats and tags</span>
+          </button>
+          <button class="export-option-btn" data-format="csv">
+            <span class="export-option-icon">📊</span>
+            <span class="export-option-label">CSV</span>
+            <span class="export-option-desc">Spreadsheet format for analysis</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const overlay = modal.querySelector('.modal-overlay');
+  const closeBtn = modal.querySelector('.modal-close');
+
+  const closeModal = () => modal.remove();
+
+  overlay.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+
+  modal.querySelectorAll('.export-option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const format = btn.dataset.format;
+      vscode.postMessage({
+        type: 'exportCommits',
+        format,
+        commits: commitsToExport
+      });
+      closeModal();
+    });
+  });
+
+  // Close on Escape
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
 }
 
 function handleQuickCompare() {

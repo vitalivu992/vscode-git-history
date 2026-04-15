@@ -156,6 +156,8 @@ The extension detects and displays the current git branch in the history panel:
 
 - **File Context Menu**: Right-click on any file in the changed files list to open a context menu with three options: "Open file at this commit" (opens file using the `git-history` URI scheme), "View diff for this file" (shows file-scoped diff), and "Copy file path" (copies the file path to clipboard using `handleCopyFilePath`). The `openFileAtCommit` message is handled by `handleOpenFileAtCommit` in `messageHandler.ts` which constructs a `git-history` URI and calls `vscode.window.showTextDocument`. The `copyFilePath` message is handled by `handleCopyFilePath` which writes the file path to `vscode.env.clipboard`. Both message types are dispatched through the `handleMessage` switch statement in `messageHandler.ts`.
 
+- **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to a JSON or CSV file. The export dialog shows the number of commits to be exported and offers two format options: JSON (full commit data with stats and tags) or CSV (tabular format for spreadsheet analysis). The export respects all active filters (search, author, tag, date, hide merge commits). The `handleExportCommits` function in `messageHandler.ts` uses `vscode.window.showSaveDialog` for file selection and `fs.promises.writeFile` to write the formatted data. CSV fields are properly escaped for commas, quotes, and newlines. The formatter functions `formatCommitsAsJson` and `formatCommitsAsCsv` are pure functions that can be unit tested independently.
+
 ### Message Protocol
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):

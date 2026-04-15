@@ -216,6 +216,7 @@ export class GitHistoryPanel {
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
+      <button id="export-btn" class="export-btn" title="Export filtered commits (Ctrl+Shift+O)">Export</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>
 

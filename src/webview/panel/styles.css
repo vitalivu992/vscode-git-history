@@ -165,6 +165,23 @@ body {
   flex-shrink: 0;
 }
 
+/* Export button */
+.export-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s;
+}
+
+.export-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
 .regex-toggle-btn:hover {
   background-color: var(--vscode-list-hoverBackground);
 }
@@ -1213,5 +1230,120 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* ─── Export Modal ───────────────────────────────────────────────────────────── */
+
+#export-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+#export-modal .modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+#export-modal .modal-content {
+  position: relative;
+  width: 360px;
+  max-width: 90vw;
+  background-color: var(--vscode-widget-background);
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+#export-modal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--vscode-border-color);
+}
+
+#export-modal .modal-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#export-modal .modal-close {
+  background: transparent;
+  border: none;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+#export-modal .modal-close:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+#export-modal .modal-body {
+  padding: 16px;
+}
+
+.export-description {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  margin-bottom: 12px;
+}
+
+.export-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.export-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.1s, border-color 0.1s;
+  text-align: left;
+  width: 100%;
+}
+
+.export-option-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+  border-color: var(--vscode-button-background);
+}
+
+.export-option-icon {
+  font-size: 16px;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.export-option-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vscode-editor-foreground);
+}
+
+.export-option-desc {
+  font-size: 11px;
   color: var(--vscode-descriptionForeground);
 }

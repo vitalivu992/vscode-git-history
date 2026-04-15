@@ -41,6 +41,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
 - **Copy File Path**: Right-click on any file in the changed files list to copy its full path to clipboard
 - **Open File at Commit**: Right-click on any file in the changed files list to view the file content as it was at that specific commit
+- **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to a JSON or CSV file. The export respects all active filters (search, author, tag, date, hide merge commits). JSON format includes full commit data with stats and tags, while CSV provides a tabular format suitable for spreadsheet analysis.
 - **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
 - **Dark/Light Theme**: Automatically adapts to your VS Code theme using native CSS variables
 
@@ -141,6 +142,8 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
+| `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
+| `Ctrl+Shift+O` / `Cmd+Shift+O` | Export filtered commits to file |
 | `Ctrl+Shift+X` / `Cmd+Shift+X` | Toggle regex search mode |
 | `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
 | `Escape` | Clear selection and search focus |
