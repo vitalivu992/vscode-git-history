@@ -16,9 +16,8 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Selection History**: Select lines of code and view only commits that affected those specific lines
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
 - **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions)
-- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter
+- **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter. Supports tag filter: `tag:name` or click any tag badge to filter by tag.
 - **Sort Toggle**: Switch between newest-first and oldest-first commit ordering with the sort button in the toolbar
-- **Compare Any Two Commits**: Shift+click (or Shift+Enter) two commits to see the diff between them
 - **Compare Any Two Commits**: Shift+click (or Shift+Enter) two commits to see the diff between them
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views with optional word wrap for long lines
@@ -80,6 +79,10 @@ A powerful VS Code extension that provides git history visualization inspired by
   - `author:Alice` - show commits by author name (case-insensitive)
   - `author:alice@example.com` - show commits by email
   - Combine with other filters: `author:Bob fix after:2024-01-01`
+- **Filter by tag** using `tag:` prefix or click any tag badge in the commit list:
+  - `tag:v1.0.0` - show commits with a tag matching "v1.0.0" (case-insensitive, partial match)
+  - `tag:release` - show commits with tags containing "release"
+  - Combine with other filters: `tag:v2.0 author:Bob after:2024-01-01`
 - **Toggle sort order** with the sort button to switch between newest-first and oldest-first
 - **Hide merge commits** with the "No Merge" button to focus on actual work commits; the count indicator shows "X of Y" when filters are active
 - **Toggle view mode** between Unified and Side-by-Side
