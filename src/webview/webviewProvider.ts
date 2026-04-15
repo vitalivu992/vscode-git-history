@@ -149,8 +149,9 @@ export class GitHistoryPanel {
         this._commits = commits;
         const showGraph = vscode.workspace.getConfiguration('gitHistory').get<boolean>('showGraph', true);
         const hideMergeCommits = vscode.workspace.getConfiguration('gitHistory').get<boolean>('hideMergeCommits', false);
+        const defaultDiffView = vscode.workspace.getConfiguration('gitHistory').get<string>('defaultDiffView', 'unified');
         const branch = await getCurrentBranch(this._cwd);
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, hideMergeCommits });
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, hideMergeCommits, defaultDiffView });
       } catch (error) {
         this.postMessage({
           type: 'error',

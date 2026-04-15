@@ -785,6 +785,9 @@ function handleMessage(event) {
       hideMergeCommits = message.hideMergeCommits === true;
       trackedFilePath = message.filePath || null;
       currentBranch = message.branch || null;
+      if (message.defaultDiffView === 'side-by-side') {
+        setDiffType('side-by-side');
+      }
       const graphTh = document.querySelector('th.graph-col');
       if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
       // Update merge toggle button state

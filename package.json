@@ -101,6 +101,15 @@
           "type": "boolean",
           "default": false,
           "description": "Hide merge commits in the history view"
+        },
+        "gitHistory.defaultDiffView": {
+          "type": "string",
+          "default": "unified",
+          "enum": [
+            "unified",
+            "side-by-side"
+          ],
+          "description": "Default diff view mode when opening Git History"
         }
       }
     }
