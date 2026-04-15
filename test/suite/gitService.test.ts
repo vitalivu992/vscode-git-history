@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -336,5 +336,21 @@ suite('Git Service Integration Tests', () => {
     // Both should return valid results (though with opposite change directions)
     assert.ok(typeof forwardDiff.diff === 'string');
     assert.ok(typeof reverseDiff.diff === 'string');
+  });
+
+  test('getAllBranches should return all branch names', async () => {
+    const branches = await getAllBranches(tempDir);
+    assert.ok(branches.length > 0, 'Should have at least one branch');
+    assert.ok(branches.includes('main') || branches.includes('master'), 'Should include main or master branch');
+  });
+
+  test('getBranchCommitHashes should return hashes for specified branches', async () => {
+    const branches = await getAllBranches(tempDir);
+    const branchName = branches[0];
+    const hashes = await getBranchCommitHashes([branchName], tempDir, testFile);
+    assert.ok(typeof hashes === 'object', 'Should return an object');
+    assert.ok(hashes[branchName], `Should have ${branchName} branch entry`);
+    assert.ok(Array.isArray(hashes[branchName]), 'Branch hashes should be an array');
+    assert.ok(hashes[branchName].length > 0, 'Should have at least one hash for branch');
   });
 });

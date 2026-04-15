@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 
@@ -94,6 +94,10 @@ export async function handleMessage(
 
     case 'saveSettings':
       await handleSaveSettings(message.settings, settingsService);
+      break;
+
+    case 'requestBranchHashes':
+      await handleRequestBranchHashes(message.branches, panel);
       break;
 
     case 'exportCommits':
@@ -479,6 +483,26 @@ async function handleQuickCompare(hash: string, panel: GitHistoryPanel): Promise
       type: 'commitFiles',
       hash,
       files
+    });
+  } catch (error) {
+    panel.postMessage({
+      type: 'error',
+      message: error instanceof Error ? error.message : String(error)
+    });
+  }
+}
+
+async function handleRequestBranchHashes(
+  branches: string[],
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const hashes = await getBranchCommitHashes(branches, cwd, panel.getFilePath());
+
+    panel.postMessage({
+      type: 'branchHashes',
+      hashes
     });
   } catch (error) {
     panel.postMessage({

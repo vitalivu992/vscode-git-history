@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getFileHistory, getSelectionHistory, getCurrentBranch } from '../git/gitService';
+import { getFileHistory, getSelectionHistory, getCurrentBranch, getAllBranches } from '../git/gitService';
 import { CommitInfo } from '../types';
 import { handleMessage } from './messageHandler';
 import { SettingsService } from '../settings';
@@ -161,11 +161,12 @@ export class GitHistoryPanel {
         const hideMergeCommits = vscode.workspace.getConfiguration('gitHistory').get<boolean>('hideMergeCommits', false);
         const defaultDiffView = vscode.workspace.getConfiguration('gitHistory').get<string>('defaultDiffView', 'unified');
         const branch = await getCurrentBranch(this._cwd);
+        const branches = await getAllBranches(this._cwd);
 
         // Get user settings from persistent storage
         const userSettings = this._settingsService.getSettings();
 
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, hideMergeCommits, defaultDiffView, userSettings });
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings });
       } catch (error) {
         this.postMessage({
           type: 'error',

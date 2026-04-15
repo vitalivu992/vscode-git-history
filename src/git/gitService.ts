@@ -249,6 +249,54 @@ export async function getCurrentBranch(cwd: string): Promise<string> {
 }
 
 /**
+ * Get all branch names for a git repository (local and remote)
+ */
+export async function getAllBranches(cwd: string): Promise<string[]> {
+  try {
+    const output = await execGit(['branch', '-a', '--format=%(refname:short)'], cwd);
+    const branches = output
+      .trim()
+      .split('\n')
+      .map(b => b.trim())
+      .filter(Boolean)
+      .filter(b => !b.startsWith('HEAD -> '));
+    return [...new Set(branches)];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Get commit hashes reachable from each branch for a specific file
+ * Returns a map: branchName -> array of commit hashes
+ */
+export async function getBranchCommitHashes(
+  branches: string[],
+  cwd: string,
+  filePath?: string
+): Promise<Record<string, string[]>> {
+  const result: Record<string, string[]> = {};
+
+  for (const branch of branches) {
+    try {
+      const relativePath = filePath ? path.relative(cwd, filePath) : '';
+      const args = ['log', '--format=%H', '-n', '2000', branch];
+      if (relativePath) {
+        args.push('--', relativePath);
+      }
+
+      const output = await execGit(args, cwd);
+      const hashes = output.trim().split('\n').filter(Boolean);
+      result[branch] = hashes;
+    } catch {
+      result[branch] = [];
+    }
+  }
+
+  return result;
+}
+
+/**
  * Get file content at a specific commit
  */
 export async function getFileContentAtCommit(

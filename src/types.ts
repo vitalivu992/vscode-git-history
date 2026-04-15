@@ -70,13 +70,14 @@ export interface BlameResult {
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
-  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string; hideMergeCommits?: boolean; defaultDiffView?: string; userSettings?: UserSettings }
+  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; userSettings?: UserSettings }
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[]; selectedFile?: string }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'rangeDiff'; fromHash: string; toHash: string; diff: string }
   | { type: 'commitFiles'; hash: string; files: CommitFileChange[] }
   | { type: 'error'; message: string }
-  | { type: 'selectCommit'; hash: string };
+  | { type: 'selectCommit'; hash: string }
+  | { type: 'branchHashes'; hashes: Record<string, string[]> };
 
 /**
  * Messages from webview to extension
@@ -101,4 +102,5 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitPatch'; hash: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
-  | { type: 'exportCommits'; format: 'json' | 'csv'; commits: CommitInfo[] };
+  | { type: 'exportCommits'; format: 'json' | 'csv'; commits: CommitInfo[] }
+  | { type: 'requestBranchHashes'; branches: string[] };

@@ -87,6 +87,10 @@ A powerful VS Code extension that provides git history visualization inspired by
   - `tag:v1.0.0` - show commits with a tag matching "v1.0.0" (case-insensitive, partial match)
   - `tag:release` - show commits with tags containing "release"
   - Combine with other filters: `tag:v2.0 author:Bob after:2024-01-01`
+- **Filter by branch** using `branch:` prefix:
+  - `branch:main` - show commits on main branch
+  - `branch:feature/login` - show commits on feature branch (case-insensitive, partial match)
+  - Combine with other filters: `branch:main author:Bob after:2024-01-01`
 - **Regex search mode**: Click the .* button (or press `Ctrl+Shift+X` / `Cmd+Shift+X`) to enable regex pattern matching:
   - `^feat:` - match commits starting with "feat:"
   - `bug(fix|patch)|hotfix` - match "bugfix", "bugpatch", or "hotfix"

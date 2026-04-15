@@ -19,6 +19,8 @@ let hideMergeCommits = false; // Filter out merge commits (commits with multiple
 let wordWrapEnabled = false; // Word wrap toggle for diff view
 let rangeSelectionAnchor = null; // Anchor commit for Shift+click range selection
 let regexSearchEnabled = false; // Regex search mode toggle
+let branches = []; // All available branches from init message
+let branchCommitHashes = {}; // Map: branchName -> Set of commit hashes
 
 /**
  * Parse filters from search query
@@ -40,6 +42,12 @@ function parseDateFilter(query) {
   const tagFilter = tagMatch ? tagMatch[1].toLowerCase() : null;
   if (tagMatch) {
     textQuery = textQuery.replace(tagMatch[0], '').trim();
+  }
+
+  const branchMatch = query.match(/branch:([^\s]+)/i);
+  const branchFilter = branchMatch ? branchMatch[1].toLowerCase() : null;
+  if (branchMatch) {
+    textQuery = textQuery.replace(branchMatch[0], '').trim();
   }
 
   // Parse after:YYYY-MM-DD or after:YYYY/MM/DD
@@ -84,7 +92,7 @@ function parseDateFilter(query) {
     textQuery = textQuery.replace(lastMatch[0], '').trim();
   }
 
-  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter };
+  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter, branchFilter };
 }
 
 /**
@@ -92,8 +100,8 @@ function parseDateFilter(query) {
  * @returns {boolean}
  */
 function hasActiveFilters() {
-  const { dateFilters, authorFilter, tagFilter } = parseDateFilter(searchQuery);
-  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter);
+  const { dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
+  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter);
 }
 
 function hasActiveDateFilters() {
@@ -109,9 +117,9 @@ function renderFilterBadges() {
     existingBadges.remove();
   }
 
-  const { dateFilters, authorFilter, tagFilter } = parseDateFilter(searchQuery);
+  const { dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
   const hasDateFilters = !!(dateFilters.after || dateFilters.before);
-  const hasFilters = hasDateFilters || authorFilter || tagFilter;
+  const hasFilters = hasDateFilters || authorFilter || tagFilter || branchFilter;
 
   if (!hasFilters) {
     return;
@@ -147,6 +155,13 @@ function renderFilterBadges() {
     badgesContainer.appendChild(tagBadge);
   }
 
+  if (branchFilter) {
+    const branchBadge = document.createElement('span');
+    branchBadge.className = 'filter-badge';
+    branchBadge.innerHTML = `branch: ${escapeHtml(branchFilter)} <span class="filter-badge-clear" data-filter="branch">&times;</span>`;
+    badgesContainer.appendChild(branchBadge);
+  }
+
   if (dateFilters.after) {
     const afterBadge = document.createElement('span');
     afterBadge.className = 'filter-badge';
@@ -178,6 +193,8 @@ function renderFilterBadges() {
         newQuery = newQuery.replace(/author:[^\s]+/i, '').trim();
       } else if (filterToRemove === 'tag') {
         newQuery = newQuery.replace(/tag:[^\s]+/i, '').trim();
+      } else if (filterToRemove === 'branch') {
+        newQuery = newQuery.replace(/branch:[^\s]+/i, '').trim();
       }
 
       // Also remove any orphaned "last:" filter if it was the only thing
@@ -497,7 +514,7 @@ function getFilteredCommits() {
   }
 
   // Parse date filters and get remaining text query
-  const { textQuery, dateFilters, authorFilter, tagFilter } = parseDateFilter(searchQuery);
+  const { textQuery, dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
 
   // Apply author filter
   if (authorFilter) {
@@ -511,6 +528,14 @@ function getFilteredCommits() {
     filtered = filtered.filter(commit =>
       commit.tags && commit.tags.some(t => t.toLowerCase().includes(tagFilter))
     );
+  }
+
+  // Apply branch filter
+  if (branchFilter) {
+    filtered = filtered.filter(commit => {
+      const branchHashes = branchCommitHashes[branchFilter];
+      return branchHashes && branchHashes.has(commit.hash);
+    });
   }
 
   // Apply date filters
@@ -982,6 +1007,14 @@ function handleMessage(event) {
           mergeToggleBtn.title = 'Hide merge commits';
         }
       }
+
+      // Initialize branches and fetch their commit hashes
+      if (message.branches && message.branches.length > 0) {
+        branches = message.branches;
+        // Request branch commit hashes from extension
+        vscode.postMessage({ type: 'requestBranchHashes', branches: branches });
+      }
+
       renderBranchBadge();
       renderCommits();
       if (commits.length > 0) {
@@ -1014,6 +1047,16 @@ function handleMessage(event) {
 
     case 'error':
       showError(message.message);
+      break;
+
+    case 'branchHashes':
+      // Build a map of branch names to commit hash sets
+      if (message.hashes) {
+        branchCommitHashes = {};
+        for (const [branchName, hashList] of Object.entries(message.hashes)) {
+          branchCommitHashes[branchName.toLowerCase()] = new Set(hashList);
+        }
+      }
       break;
 
     case 'selectCommit':
