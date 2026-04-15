@@ -189,4 +189,69 @@ suite('Branch Filter E2E Tests', () => {
       );
     });
   });
+
+  suite('Search Placeholder E2E', () => {
+    const indexHtmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
+
+    test('index.html search placeholder should mention branch filter', () => {
+      const indexHtmlSource = fs.readFileSync(indexHtmlPath, 'utf-8');
+      assert.ok(
+        indexHtmlSource.includes('branch:name'),
+        'index.html placeholder should include branch:name for user discoverability'
+      );
+    });
+
+    test('index.html and webviewProvider.ts should have matching search input placeholders', () => {
+      const indexHtmlSource = fs.readFileSync(indexHtmlPath, 'utf-8');
+      const webviewProviderSource = fs.readFileSync(webviewProviderPath, 'utf-8');
+
+      const indexPlaceholder = indexHtmlSource.match(/id="search-input" placeholder="([^"]+)"/)?.[1];
+      const providerPlaceholder = webviewProviderSource.match(/id="search-input" placeholder="([^"]+)"/)?.[1];
+
+      assert.ok(indexPlaceholder, 'index.html should have search input placeholder');
+      assert.ok(providerPlaceholder, 'webviewProvider.ts should have search input placeholder');
+      assert.strictEqual(indexPlaceholder, providerPlaceholder,
+        'index.html and webviewProvider.ts placeholders must match exactly');
+    });
+
+    test('index.html should have export-btn matching webviewProvider.ts', () => {
+      const indexHtmlSource = fs.readFileSync(indexHtmlPath, 'utf-8');
+      const webviewProviderSource = fs.readFileSync(webviewProviderPath, 'utf-8');
+
+      assert.ok(
+        indexHtmlSource.includes('id="export-btn"'),
+        'index.html should have export-btn for dev-mode parity'
+      );
+      assert.ok(
+        webviewProviderSource.includes('id="export-btn"'),
+        'webviewProvider.ts should have export-btn'
+      );
+    });
+
+    test('CLAUDE.md should document branch filter in UI Features', () => {
+      const claudeMdPath = path.resolve(__dirname, '../../../CLAUDE.md');
+      const claudeSource = fs.readFileSync(claudeMdPath, 'utf-8');
+      assert.ok(
+        claudeSource.includes('**Branch Filter**'),
+        'CLAUDE.md should have Branch Filter section in UI Features'
+      );
+      assert.ok(
+        claudeSource.includes('branch:name'),
+        'CLAUDE.md should document branch:name syntax'
+      );
+    });
+
+    test('CLAUDE.md should document branchHashes and requestBranchHashes in Message Protocol', () => {
+      const claudeMdPath = path.resolve(__dirname, '../../../CLAUDE.md');
+      const claudeSource = fs.readFileSync(claudeMdPath, 'utf-8');
+      assert.ok(
+        claudeSource.includes('`branchHashes`'),
+        'CLAUDE.md Message Protocol should list branchHashes'
+      );
+      assert.ok(
+        claudeSource.includes('`requestBranchHashes`'),
+        'CLAUDE.md Message Protocol should list requestBranchHashes'
+      );
+    });
+  });
 });

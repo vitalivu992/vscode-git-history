@@ -46,6 +46,7 @@ suite('WebviewProvider HTML Tests', () => {
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
+      <button id="export-btn" class="export-btn" title="Export filtered commits (Ctrl+Shift+O)">Export</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>
 
@@ -56,7 +57,7 @@ suite('WebviewProvider HTML Tests', () => {
       <div id="bottom-panel">
         <div id="commit-table-container">
           <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | after:2024-01-01 | last:7days">
+            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | after:2024-01-01 | last:7days">
             <button id="regex-toggle-btn" class="regex-toggle-btn" title="Toggle regex search mode (Ctrl+Shift+X)">.*</button>
             <div id="commit-count" class="commit-count"></div>
           </div>
@@ -463,5 +464,60 @@ suite('Word Wrap Button in WebviewProvider HTML Tests', () => {
 
     assert.ok(providerSource.includes('id="word-wrap-btn"'), 'webviewProvider should have word-wrap-btn');
     assert.ok(htmlSource.includes('id="word-wrap-btn"'), 'index.html should have word-wrap-btn');
+  });
+});
+
+suite('Search Placeholder Parity Tests', () => {
+  test('webviewProvider and index.html should have identical search placeholders', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const providerSource = fs.readFileSync(providerPath, 'utf-8');
+
+    const htmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
+    const htmlSource = fs.readFileSync(htmlPath, 'utf-8');
+
+    const providerPlaceholder = providerSource.match(/id="search-input" placeholder="([^"]+)"/)?.[1];
+    const htmlPlaceholder = htmlSource.match(/id="search-input" placeholder="([^"]+)"/)?.[1];
+
+    assert.ok(providerPlaceholder, 'webviewProvider should have search placeholder');
+    assert.ok(htmlPlaceholder, 'index.html should have search placeholder');
+    assert.strictEqual(providerPlaceholder, htmlPlaceholder,
+      'Both files should have identical search placeholders');
+  });
+
+  test('search placeholder should include all filter hints', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+    const placeholder = source.match(/id="search-input" placeholder="([^"]+)"/)?.[1];
+
+    assert.ok(placeholder, 'Should have search placeholder');
+    assert.ok(placeholder.includes('author:name'), 'Should hint author filter');
+    assert.ok(placeholder.includes('tag:name'), 'Should hint tag filter');
+    assert.ok(placeholder.includes('branch:name'), 'Should hint branch filter');
+    assert.ok(placeholder.includes('after:'), 'Should hint date filter');
+    assert.ok(placeholder.includes('last:'), 'Should hint relative date filter');
+  });
+});
+
+suite('Export Button Parity Tests', () => {
+  test('webviewProvider and index.html should both have export-btn', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const providerSource = fs.readFileSync(providerPath, 'utf-8');
+
+    const htmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
+    const htmlSource = fs.readFileSync(htmlPath, 'utf-8');
+
+    assert.ok(providerSource.includes('id="export-btn"'), 'webviewProvider should have export-btn');
+    assert.ok(htmlSource.includes('id="export-btn"'), 'index.html should have export-btn');
+  });
+
+  test('export-btn should have correct title attribute', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('title="Export filtered commits'), 'export-btn should have title with keyboard shortcut');
   });
 });

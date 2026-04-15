@@ -1,4 +1,6 @@
 import * as assert from 'assert';
+import * as fs from 'fs';
+import * as path from 'path';
 
 function parseDateFilter(query: string): { textQuery: string; dateFilters: { after?: Date; before?: Date }; authorFilter: string | null; tagFilter: string | null; branchFilter: string | null } {
   const dateFilters: { after?: Date; before?: Date } = {};
@@ -118,5 +120,112 @@ suite('Branch Filter Tests', () => {
   test('parseDateFilter should return null for branch filter when not present', () => {
     const result = parseDateFilter('author:John tag:v1.0');
     assert.strictEqual(result.branchFilter, null);
+  });
+});
+
+suite('Branch Filter Placeholder Discoverability Tests', () => {
+  const indexHtmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
+  const webviewProviderPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+
+  test('index.html search placeholder should include branch:name hint', () => {
+    const source = fs.readFileSync(indexHtmlPath, 'utf-8');
+    assert.ok(
+      source.includes('branch:name'),
+      'index.html search placeholder should contain branch:name for discoverability'
+    );
+  });
+
+  test('webviewProvider.ts search placeholder should include branch:name hint', () => {
+    const source = fs.readFileSync(webviewProviderPath, 'utf-8');
+    assert.ok(
+      source.includes('branch:name'),
+      'webviewProvider.ts search placeholder should contain branch:name for discoverability'
+    );
+  });
+
+  test('index.html and webviewProvider.ts should have matching search placeholders', () => {
+    const indexSource = fs.readFileSync(indexHtmlPath, 'utf-8');
+    const providerSource = fs.readFileSync(webviewProviderPath, 'utf-8');
+
+    const indexPlaceholder = indexSource.match(/placeholder="([^"]+)"/)?.[1];
+    const providerPlaceholder = providerSource.match(/placeholder="([^"]+)"/)?.[1];
+
+    assert.ok(indexPlaceholder, 'index.html should have a placeholder attribute');
+    assert.ok(providerPlaceholder, 'webviewProvider.ts should have a placeholder attribute');
+    assert.strictEqual(indexPlaceholder, providerPlaceholder,
+      'index.html and webviewProvider.ts should have identical search placeholders');
+  });
+
+  test('placeholder should list all filter types in logical order', () => {
+    const source = fs.readFileSync(indexHtmlPath, 'utf-8');
+    const placeholder = source.match(/placeholder="([^"]+)"/)?.[1];
+    assert.ok(placeholder, 'Should have placeholder');
+
+    const authorIdx = placeholder.indexOf('author:name');
+    const tagIdx = placeholder.indexOf('tag:name');
+    const branchIdx = placeholder.indexOf('branch:name');
+    const afterIdx = placeholder.indexOf('after:');
+
+    assert.ok(authorIdx > 0, 'Placeholder should mention author:name');
+    assert.ok(tagIdx > 0, 'Placeholder should mention tag:name');
+    assert.ok(branchIdx > 0, 'Placeholder should mention branch:name');
+    assert.ok(afterIdx > 0, 'Placeholder should mention after:');
+    assert.ok(authorIdx < tagIdx, 'author:name should come before tag:name');
+    assert.ok(tagIdx < branchIdx, 'tag:name should come before branch:name');
+    assert.ok(branchIdx < afterIdx, 'branch:name should come before after:');
+  });
+});
+
+suite('HTML Parity Tests', () => {
+  const indexHtmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
+  const webviewProviderPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+
+  test('index.html should have export-btn matching webviewProvider.ts', () => {
+    const indexSource = fs.readFileSync(indexHtmlPath, 'utf-8');
+    const providerSource = fs.readFileSync(webviewProviderPath, 'utf-8');
+
+    assert.ok(
+      indexSource.includes('id="export-btn"'),
+      'index.html should have export-btn element'
+    );
+    assert.ok(
+      providerSource.includes('id="export-btn"'),
+      'webviewProvider.ts should have export-btn element'
+    );
+  });
+
+  test('export-btn should be between merge-toggle-btn and refresh-btn in index.html', () => {
+    const source = fs.readFileSync(indexHtmlPath, 'utf-8');
+
+    const mergeIdx = source.indexOf('id="merge-toggle-btn"');
+    const exportIdx = source.indexOf('id="export-btn"');
+    const refreshIdx = source.indexOf('id="refresh-btn"');
+
+    assert.ok(mergeIdx > 0, 'Should have merge-toggle-btn');
+    assert.ok(exportIdx > 0, 'Should have export-btn');
+    assert.ok(refreshIdx > 0, 'Should have refresh-btn');
+    assert.ok(mergeIdx < exportIdx, 'export-btn should come after merge-toggle-btn');
+    assert.ok(exportIdx < refreshIdx, 'export-btn should come before refresh-btn');
+  });
+
+  test('index.html toolbar buttons should match webviewProvider.ts toolbar buttons', () => {
+    const indexSource = fs.readFileSync(indexHtmlPath, 'utf-8');
+    const providerSource = fs.readFileSync(webviewProviderPath, 'utf-8');
+
+    const toolbarButtonIds = [
+      'unified-btn', 'side-by-side-btn', 'copy-btn', 'compare-parent-btn',
+      'word-wrap-btn', 'sort-btn', 'merge-toggle-btn', 'export-btn', 'refresh-btn'
+    ];
+
+    for (const id of toolbarButtonIds) {
+      assert.ok(
+        indexSource.includes(`id="${id}"`),
+        `index.html should have ${id}`
+      );
+      assert.ok(
+        providerSource.includes(`id="${id}"`),
+        `webviewProvider.ts should have ${id}`
+      );
+    }
   });
 });
