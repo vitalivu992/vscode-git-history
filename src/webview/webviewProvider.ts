@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getFileHistory, getSelectionHistory, getCurrentBranch, getAllBranches } from '../git/gitService';
+import { getFileHistory, getSelectionHistory, getCurrentBranch, getAllBranches, getCurrentGitUser } from '../git/gitService';
 import { CommitInfo } from '../types';
 import { handleMessage } from './messageHandler';
 import { SettingsService } from '../settings';
@@ -162,11 +162,12 @@ export class GitHistoryPanel {
         const defaultDiffView = vscode.workspace.getConfiguration('gitHistory').get<string>('defaultDiffView', 'unified');
         const branch = await getCurrentBranch(this._cwd);
         const branches = await getAllBranches(this._cwd);
+        const currentUser = await getCurrentGitUser(this._cwd);
 
         // Get user settings from persistent storage
         const userSettings = this._settingsService.getSettings();
 
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings });
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings, currentUser });
       } catch (error) {
         this.postMessage({
           type: 'error',
@@ -217,6 +218,7 @@ export class GitHistoryPanel {
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
+      <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>
       <button id="export-btn" class="export-btn" title="Export filtered commits (Ctrl+Shift+O)">Export</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
     </div>

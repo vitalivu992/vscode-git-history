@@ -12,6 +12,8 @@ export interface UserSettings {
   hideMergeCommits: boolean;
   /** Whether regex search mode is enabled */
   regexSearchEnabled: boolean;
+  /** Whether to show only commits by the current git user */
+  showMyCommitsOnly: boolean;
 }
 
 /**
@@ -22,7 +24,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   wordWrapEnabled: false,
   sortOldestFirst: false,
   hideMergeCommits: false,
-  regexSearchEnabled: false
+  regexSearchEnabled: false,
+  showMyCommitsOnly: false
 };
 
 /**

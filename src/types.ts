@@ -70,7 +70,7 @@ export interface BlameResult {
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
-  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; userSettings?: UserSettings }
+  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; userSettings?: UserSettings; currentUser?: { name: string; email: string } | null }
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[]; selectedFile?: string }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'rangeDiff'; fromHash: string; toHash: string; diff: string }

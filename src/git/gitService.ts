@@ -236,6 +236,26 @@ export async function getGitRoot(filePath: string): Promise<string> {
 }
 
 /**
+ * Get the current git user from git config
+ * Returns name and email from user.name and user.email config
+ */
+export async function getCurrentGitUser(cwd: string): Promise<{ name: string; email: string } | null> {
+  try {
+    const nameOutput = await execGit(['config', 'user.name'], cwd);
+    const emailOutput = await execGit(['config', 'user.email'], cwd);
+    const name = nameOutput.trim();
+    const email = emailOutput.trim();
+
+    if (name || email) {
+      return { name, email };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Get the current branch name for a git repository
  */
 export async function getCurrentBranch(cwd: string): Promise<string> {

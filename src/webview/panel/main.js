@@ -21,6 +21,8 @@ let rangeSelectionAnchor = null; // Anchor commit for Shift+click range selectio
 let regexSearchEnabled = false; // Regex search mode toggle
 let branches = []; // All available branches from init message
 let branchCommitHashes = {}; // Map: branchName -> Set of commit hashes
+let currentUser = null; // Current git user from git config
+let showMyCommitsOnly = false; // Filter to show only my commits
 
 /**
  * Parse filters from search query
@@ -101,11 +103,12 @@ function parseDateFilter(query) {
  */
 function hasActiveFilters() {
   const { dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
-  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter);
+  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter || showMyCommitsOnly);
 }
 
 function hasActiveDateFilters() {
-  return hasActiveFilters();
+  const { dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
+  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter);
 }
 
 /**
@@ -231,6 +234,7 @@ const wordWrapBtn = document.getElementById('word-wrap-btn');
 const mergeToggleBtn = document.getElementById('merge-toggle-btn');
 const regexToggleBtn = document.getElementById('regex-toggle-btn');
 const exportBtn = document.getElementById('export-btn');
+const myCommitsBtn = document.getElementById('my-commits-btn');
 const commitCountEl = document.getElementById('commit-count');
 
 let isRefreshing = false;
@@ -375,6 +379,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+M: Toggle my commits filter
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'm') {
+    e.preventDefault();
+    handleMyCommitsToggle();
+    return;
+  }
+
   // Ctrl+Shift+W: Toggle word wrap
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'w') {
     e.preventDefault();
@@ -511,6 +522,14 @@ function getFilteredCommits() {
   // Filter out merge commits if enabled
   if (hideMergeCommits) {
     filtered = filtered.filter(commit => !(commit.parentHashes && commit.parentHashes.length > 1));
+  }
+
+  // Filter to show only my commits if enabled
+  if (showMyCommitsOnly && currentUser) {
+    filtered = filtered.filter(commit =>
+      commit.email.toLowerCase() === currentUser.email.toLowerCase() ||
+      commit.author.toLowerCase() === currentUser.name.toLowerCase()
+    );
   }
 
   // Parse date filters and get remaining text query
@@ -697,6 +716,28 @@ function handleRegexToggle() {
 }
 
 /**
+ * Toggle my commits only filter
+ */
+function handleMyCommitsToggle() {
+  showMyCommitsOnly = !showMyCommitsOnly;
+  if (myCommitsBtn) {
+    if (showMyCommitsOnly) {
+      myCommitsBtn.classList.add('active');
+      myCommitsBtn.title = 'Showing only my commits (click to show all)';
+    } else {
+      myCommitsBtn.classList.remove('active');
+      myCommitsBtn.title = 'Show only my commits (Ctrl+Shift+M)';
+    }
+  }
+  focusedIndex = -1;
+  renderCommits();
+  updateCommitCount();
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { showMyCommitsOnly } });
+}
+
+/**
  * Update regex validation visual feedback
  */
 function updateRegexValidation() {
@@ -712,7 +753,7 @@ function updateRegexValidation() {
 function updateCommitCount() {
   if (!commitCountEl) return;
   const filtered = getFilteredCommits();
-  const hasActiveFilter = searchQuery || hideMergeCommits;
+  const hasActiveFilter = searchQuery || hideMergeCommits || showMyCommitsOnly;
   if (hasActiveFilter && filtered.length !== commits.length) {
     commitCountEl.textContent = `${filtered.length} of ${commits.length} commits`;
   } else {
@@ -799,6 +840,10 @@ function init() {
 
   if (exportBtn) {
     exportBtn.addEventListener('click', handleExportCommits);
+  }
+
+  if (myCommitsBtn) {
+    myCommitsBtn.addEventListener('click', handleMyCommitsToggle);
   }
 
   // Keyboard shortcuts
@@ -935,6 +980,7 @@ function handleMessage(event) {
       showGraph = message.showGraph !== false;
       trackedFilePath = message.filePath || null;
       currentBranch = message.branch || null;
+      currentUser = message.currentUser || null;
 
       // Apply user settings from persistent storage (overrides defaultDiffView)
       if (message.userSettings) {
@@ -990,6 +1036,9 @@ function handleMessage(event) {
             regexToggleBtn.title = 'Toggle regex search mode (Ctrl+Shift+X)';
           }
         }
+
+        // Apply my commits only filter
+        showMyCommitsOnly = settings.showMyCommitsOnly;
       } else if (message.defaultDiffView === 'side-by-side') {
         setDiffType('side-by-side');
       }
@@ -1005,6 +1054,22 @@ function handleMessage(event) {
         } else {
           mergeToggleBtn.classList.remove('active');
           mergeToggleBtn.title = 'Hide merge commits';
+        }
+      }
+
+      // Update my commits toggle button state
+      if (myCommitsBtn) {
+        if (showMyCommitsOnly) {
+          myCommitsBtn.classList.add('active');
+          myCommitsBtn.title = 'Showing only my commits (click to show all)';
+        } else {
+          myCommitsBtn.classList.remove('active');
+          myCommitsBtn.title = 'Show only my commits (Ctrl+Shift+M)';
+        }
+        // Disable my commits button if no current user is configured
+        myCommitsBtn.disabled = !currentUser;
+        if (!currentUser) {
+          myCommitsBtn.title = 'No git user configured (set user.name and user.email)';
         }
       }
 
@@ -2121,6 +2186,7 @@ function showKeyboardHelpDialog() {
       category: 'View Options',
       items: [
         { keys: [cmdKey, 'Shift', 'W'], description: 'Toggle word wrap' },
+        { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
         { keys: [cmdKey, 'Alt', 'P'], description: 'Quick compare with parent' }
       ]
     },

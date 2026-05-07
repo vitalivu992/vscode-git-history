@@ -151,6 +151,36 @@ body {
   border-color: var(--vscode-button-background);
 }
 
+/* My commits toggle button */
+.my-commits-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s, border-color 0.1s;
+}
+
+.my-commits-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.my-commits-btn.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--vscode-button-background);
+}
+
+.my-commits-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: transparent;
+  color: var(--vscode-descriptionForeground);
+}
+
 /* Regex toggle button */
 .regex-toggle-btn {
   padding: 4px 8px;
