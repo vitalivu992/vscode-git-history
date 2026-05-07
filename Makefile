@@ -9,7 +9,7 @@ help:
 clean: ### Clean build artifacts
 	rm -rf dist out *.vsix
 	rm -rf screenshots/
-	rm -rf .node_modules/
+	rm -rf node_modules/
 
 compile: ### Compile the extension
 	npm install
