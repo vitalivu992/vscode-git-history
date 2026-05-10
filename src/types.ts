@@ -124,6 +124,7 @@ export type WebviewToExtMessage =
   | { type: 'copyFilePath'; filePath: string }
   | { type: 'openFileAtCommit'; hash: string; filePath: string }
   | { type: 'copyCommitPatch'; hash: string }
+  | { type: 'copyCommitUrl'; hash: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
   | { type: 'exportCommits'; format: 'json' | 'csv'; commits: CommitInfo[] }

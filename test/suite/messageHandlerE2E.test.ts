@@ -235,3 +235,70 @@ suite('Compare with Parent Context Menu E2E Tests', () => {
     assert.ok(fnBody.includes('Root commit'), 'Should provide error message for root commits');
   });
 });
+
+suite('Copy Commit URL E2E Tests', () => {
+  test('copyCommitUrl message type exists in WebviewToExtMessage', () => {
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes("type: 'copyCommitUrl'"), 'types.ts should define copyCommitUrl message type');
+    assert.ok(source.includes('hash: string'), 'copyCommitUrl should have hash field');
+  });
+
+  test('handleCopyCommitUrl is implemented in messageHandler.ts', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    assert.ok(source.includes('async function handleCopyCommitUrl'), 'Should have handleCopyCommitUrl function');
+    assert.ok(source.includes("case 'copyCommitUrl':"), 'Should handle copyCommitUrl message type');
+  });
+
+  test('commit context menu includes copy-url action', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const menuStart = source.indexOf('function showCommitContextMenu');
+    const menuEnd = source.indexOf('// ───', menuStart + 1) || source.indexOf('function showFileContextMenu', menuStart + 1);
+    const menuSection = source.substring(menuStart, menuEnd > menuStart ? menuEnd : menuStart + 5000);
+
+    assert.ok(menuSection.includes('data-action="copy-url"'), 'Commit context menu should have copy-url action');
+    assert.ok(menuSection.includes('Copy commit URL'), 'Commit context menu should show "Copy commit URL" label');
+    assert.ok(menuSection.includes('🔗'), 'Copy commit URL should have link icon');
+  });
+
+  test('copy-url action should send copyCommitUrl message', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("action === 'copy-url'"), 'Should handle copy-url action');
+    assert.ok(source.includes("type: 'copyCommitUrl'"), 'copy-url should send copyCommitUrl message');
+  });
+
+  test('keyboard help includes Copy commit URL entry', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const helpStart = source.indexOf('function showKeyboardHelpDialog');
+    const helpEnd = source.lastIndexOf('}');
+    const helpSection = source.substring(helpStart, helpEnd);
+
+    assert.ok(helpSection.includes('Copy commit URL'), 'Keyboard help should include "Copy commit URL"');
+    assert.ok(source.includes("'L'"), 'Should include L key in keyboard shortcuts');
+  });
+
+  test('handleCopyUrl function exists and sends copyCommitUrl message', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('function handleCopyUrl()'), 'Should have handleCopyUrl function');
+    assert.ok(source.includes("type: 'copyCommitUrl'"), 'handleCopyUrl should send copyCommitUrl message');
+  });
+
+  test('Ctrl+Shift+L keyboard shortcut triggers handleCopyUrl', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("e.key === 'l'"), 'Should handle L key');
+    assert.ok(source.includes('handleCopyUrl()'), 'Should call handleCopyUrl function');
+    });
+});

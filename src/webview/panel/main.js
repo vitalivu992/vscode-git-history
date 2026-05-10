@@ -365,6 +365,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+L: Copy commit URL
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'l') {
+    e.preventDefault();
+    handleCopyUrl();
+    return;
+  }
+
   // Ctrl+Shift+O: Export filtered commits
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'o') {
     e.preventDefault();
@@ -1127,6 +1134,29 @@ function handleMessage(event) {
     case 'selectCommit':
       handleSelectCommit(message.hash);
       break;
+
+    case 'triggerAction':
+      switch (message.action) {
+        case 'refresh': handleRefresh(); break;
+        case 'copyCommitMessage': handleCopyMessage(); break;
+        case 'copyCommitHash': handleCopyHash(); break;
+        case 'copyCommitInfo': handleCopyInfo(); break;
+        case 'copyCherryPick': handleCopyCherryPick(); break;
+        case 'copyRevert': handleCopyRevert(); break;
+        case 'copyCommitFiles': handleCopyFiles(); break;
+        case 'copyCommitDiff': handleCopyDiff(); break;
+        case 'copyCommitPatch': handleCopyPatch(); break;
+        case 'copyCommitUrl': handleCopyUrl(); break;
+        case 'exportCommits': handleExportCommits(); break;
+        case 'quickCompare': handleQuickCompare(); break;
+        case 'toggleMyCommits': handleMyCommitsToggle(); break;
+        case 'toggleWordWrap': handleWordWrapToggle(); break;
+        case 'toggleRegex': handleRegexToggle(); break;
+        case 'jumpToHash': showJumpToHashDialog(); break;
+        case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
+        case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
+      }
+      break;
   }
 }
 
@@ -1659,6 +1689,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🩹</span>
       <span class="context-menu-label">Copy as patch</span>
     </div>
+    <div class="context-menu-item" data-action="copy-url">
+      <span class="context-menu-icon">🔗</span>
+      <span class="context-menu-label">Copy commit URL</span>
+    </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" data-action="compare-parent">
       <span class="context-menu-icon">⧁</span>
@@ -1691,6 +1725,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitDiff', hash: commit.hash });
       } else if (action === 'copy-patch') {
         vscode.postMessage({ type: 'copyCommitPatch', hash: commit.hash });
+      } else if (action === 'copy-url') {
+        vscode.postMessage({ type: 'copyCommitUrl', hash: commit.hash });
       } else if (action === 'compare-parent') {
         vscode.postMessage({ type: 'quickCompare', hash: commit.hash });
       }
@@ -1955,6 +1991,19 @@ function handleCopyPatch() {
   }
 }
 
+function handleCopyUrl() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyCommitUrl', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCommitUrl', hash });
+  } else {
+    showError('Select a commit to copy its URL');
+  }
+}
+
 // ─── Export Commits ───────────────────────────────────────────────────────────
 
 function handleExportCommits() {
@@ -2200,7 +2249,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
         { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
         { keys: [cmdKey, 'Shift', 'D'], description: 'Copy commit diff' },
-        { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' }
+        { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' },
+        { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' }
       ]
     },
     {

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 
@@ -78,6 +78,10 @@ export async function handleMessage(
 
     case 'copyCommitPatch':
       await handleCopyCommitPatch(message.hash, panel);
+      break;
+
+    case 'copyCommitUrl':
+      await handleCopyCommitUrl(message.hash, panel);
       break;
 
     case 'copyFilePath':
@@ -607,6 +611,48 @@ async function handleExportCommits(
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to export commits: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle copy commit URL to clipboard
+ * Generates platform-specific URLs based on git remote
+ */
+async function handleCopyCommitUrl(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const remoteUrl = await getRemoteUrl(cwd);
+
+    if (!remoteUrl) {
+      void vscode.window.showInformationMessage(
+        'No git remote configured. Unable to generate commit URL.'
+      );
+      return;
+    }
+
+    const remoteInfo = parseRemoteUrl(remoteUrl);
+    if (!remoteInfo || remoteInfo.platform === 'unknown') {
+      void vscode.window.showInformationMessage(
+        'Unable to detect git platform. Supported: GitHub, GitLab, Bitbucket.'
+      );
+      return;
+    }
+
+    const commitUrl = await getCommitUrl(hash, cwd);
+    if (!commitUrl) {
+      void vscode.window.showInformationMessage(
+        'Failed to generate commit URL.'
+      );
+      return;
+    }
+
+    await vscode.env.clipboard.writeText(commitUrl);
+    const shortHash = hash.substring(0, 7);
+    void vscode.window.showInformationMessage(`Commit URL copied: ${shortHash}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to generate commit URL: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
