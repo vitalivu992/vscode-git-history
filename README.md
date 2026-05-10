@@ -22,6 +22,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views with optional word wrap for long lines. Set your preferred default view via `gitHistory.defaultDiffView` setting
 - **Word Wrap Toggle**: Enable word wrap in the diff viewer to handle long lines in JSON, minified code, and other content
+- **Ignore Whitespace Toggle**: Toggle ignore whitespace in diffs to focus on actual code changes rather than formatting/indentation differences. Uses git's `-w` flag to render cleaner diffs when only whitespace has changed.
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
 - **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
 - **Blame Annotations**: Toggle inline blame annotations showing commit author and date per line, with a status bar showing commit details for the current line
@@ -210,6 +211,7 @@ Git History automatically saves and restores your view preferences across VS Cod
 - **Hide Merge Commits**: Whether merge commits are filtered out
 - **Show My Commits Only**: Whether to show only commits by the current git user
 - **Regex Search Mode**: Whether regex search is enabled
+- **Ignore Whitespace**: Whether to ignore whitespace in diffs
 
 These preferences are saved automatically when you change them in the UI, and restored the next time you open Git History. This allows you to maintain your preferred workflow without reconfiguring each time.
 
@@ -236,6 +238,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Focus search | `/` or `Ctrl+F` / `Cmd+F` |
 | Copy commit message | `Ctrl+Shift+C` / `Cmd+Shift+C` |
 | Toggle word wrap | `Ctrl+Shift+W` / `Cmd+Shift+W` |
+| Toggle ignore whitespace | `Ctrl+Shift+J` / `Cmd+Shift+J` |
 | Toggle my commits filter | `Ctrl+Shift+M` / `Cmd+Shift+M` |
 | Toggle regex search mode | `Ctrl+Shift+X` / `Cmd+Shift+X` |
 | Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
