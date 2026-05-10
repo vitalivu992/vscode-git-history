@@ -156,6 +156,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.toggleMyCommits', action: 'toggleMyCommits' },
     { command: 'gitHistory.toggleWordWrap', action: 'toggleWordWrap' },
     { command: 'gitHistory.toggleRegex', action: 'toggleRegex' },
+    { command: 'gitHistory.toggleIgnoreWhitespace', action: 'toggleIgnoreWhitespace' },
     { command: 'gitHistory.jumpToHash', action: 'jumpToHash' },
     { command: 'gitHistory.focusSearch', action: 'focusSearch' },
     { command: 'gitHistory.showKeyboardHelp', action: 'showKeyboardHelp' },

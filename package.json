@@ -152,6 +152,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.toggleIgnoreWhitespace",
+        "title": "Git History: Toggle Ignore Whitespace",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.jumpToHash",
         "title": "Git History: Jump to Hash",
         "category": "Git History"
@@ -328,6 +333,12 @@
         "command": "gitHistory.toggleRegex",
         "key": "ctrl+shift+x",
         "mac": "cmd+shift+x",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleIgnoreWhitespace",
+        "key": "ctrl+shift+j",
+        "mac": "cmd+shift+j",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
