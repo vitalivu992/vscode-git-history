@@ -24,6 +24,7 @@ export class GitHistoryPanel {
   private _webviewReady: boolean = false;
   private _pendingInit: (() => void) | null = null;
   private readonly _settingsService: SettingsService;
+  private _ignoreWhitespace: boolean = false;
 
   public static async showCommitDiff(
     extensionUri: vscode.Uri,
@@ -137,6 +138,19 @@ export class GitHistoryPanel {
     return this._settingsService;
   }
 
+  public getIgnoreWhitespace(): boolean {
+    return this._ignoreWhitespace;
+  }
+
+  public setIgnoreWhitespace(value: boolean): void {
+    this._ignoreWhitespace = value;
+  }
+
+  public toggleIgnoreWhitespace(): boolean {
+    this._ignoreWhitespace = !this._ignoreWhitespace;
+    return this._ignoreWhitespace;
+  }
+
   public onWebviewReady(): void {
     this._webviewReady = true;
     if (this._pendingInit) {
@@ -172,6 +186,11 @@ export class GitHistoryPanel {
 
         // Get user settings from persistent storage
         const userSettings = this._settingsService.getSettings();
+
+        // Apply saved settings to panel state
+        if (userSettings.ignoreWhitespace !== undefined) {
+          this._ignoreWhitespace = userSettings.ignoreWhitespace;
+        }
 
         this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings, currentUser });
       } catch (error) {
@@ -222,6 +241,7 @@ export class GitHistoryPanel {
       <button id="copy-btn" class="copy-btn" title="Copy commit message (Ctrl+Shift+C) / Copy hash (Ctrl+Shift+H) / Copy info (Ctrl+Shift+I)">Copy</button>
       <button id="compare-parent-btn" class="compare-parent-btn" title="Compare with parent (Ctrl+Alt+P)">Compare</button>
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
+      <button id="ignore-ws-btn" class="ignore-ws-btn" title="Toggle ignore whitespace (Ctrl+Shift+J)">W</button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
       <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>
