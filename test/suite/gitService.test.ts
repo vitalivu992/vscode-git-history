@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -462,6 +462,62 @@ suite('Git Service Integration Tests', () => {
     const diffResult = await getCommitDiff(commits[0].hash, tempDir, undefined, undefined, 10);
 
     assert.ok(diffResult.diff, 'Diff should work with 10 context lines');
+  });
+
+  suite('getCommitPatch', () => {
+    test('getCommitPatch should return valid patch format', async () => {
+      const commits = await getFileHistory(testFile, tempDir);
+      const latestHash = commits[0].hash;
+
+      const patch = await getCommitPatch(latestHash, tempDir);
+
+      assert.ok(typeof patch === 'string', 'Patch should be a string');
+      assert.ok(patch.length > 0, 'Patch should not be empty');
+    });
+
+    test('getCommitPatch should include proper git headers', async () => {
+      const commits = await getFileHistory(testFile, tempDir);
+      const latestHash = commits[0].hash;
+
+      const patch = await getCommitPatch(latestHash, tempDir);
+
+      // git format-patch includes From, Date, Subject headers
+      assert.ok(patch.includes('From '), 'Patch should include From header');
+      assert.ok(patch.includes('Date: '), 'Patch should include Date header');
+      assert.ok(patch.includes('Subject: '), 'Patch should include Subject header');
+    });
+
+    test('getCommitPatch should handle file modifications correctly', async () => {
+      const commits = await getFileHistory(testFile, tempDir);
+      const latestHash = commits[0].hash;
+
+      const patch = await getCommitPatch(latestHash, tempDir);
+
+      // Should show diff format with --- a/ and +++ b/
+      assert.ok(patch.includes('--- a/'), 'Patch should show old file path');
+      assert.ok(patch.includes('+++ b/'), 'Patch should show new file path');
+      assert.ok(patch.includes('diff --git'), 'Patch should include git diff header');
+    });
+
+    test('getCommitPatch should show diff with proper line additions', async () => {
+      const commits = await getFileHistory(testFile, tempDir);
+      const latestHash = commits[0].hash;
+
+      const patch = await getCommitPatch(latestHash, tempDir);
+
+      // Should show addition markers
+      assert.ok(patch.includes('+') || patch.includes('-'), 'Patch should show line changes');
+    });
+
+    test('getCommitPatch should include commit message in subject', async () => {
+      const commits = await getFileHistory(testFile, tempDir);
+      const latestCommit = commits[0];
+
+      const patch = await getCommitPatch(latestCommit.hash, tempDir);
+
+      // Subject should contain the commit message
+      assert.ok(patch.includes(latestCommit.message), 'Patch subject should include commit message');
+    });
   });
 });
 
