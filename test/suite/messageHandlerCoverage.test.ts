@@ -96,6 +96,28 @@ suite('Message Handler Switch Case Coverage', () => {
     assert.ok(caseBlock.includes('handleOpenFileAtCommit'), 'openFileAtCommit case should call handleOpenFileAtCommit');
   });
 
+  test('copyBranchName should be handled in switch statement', () => {
+    assert.ok(
+      handlerSource.includes("case 'copyBranchName':"),
+      'messageHandler should have case for copyBranchName'
+    );
+  });
+
+  test('handleCopyBranchName function should exist', () => {
+    assert.ok(
+      handlerSource.includes('function handleCopyBranchName'),
+      'messageHandler should have handleCopyBranchName function'
+    );
+  });
+
+  test('copyBranchName case should call handleCopyBranchName', () => {
+    const caseStart = handlerSource.indexOf("case 'copyBranchName':");
+    const nextCase = handlerSource.indexOf('case ', caseStart + 1);
+    const caseBlock = handlerSource.substring(caseStart, nextCase > caseStart ? nextCase : caseStart + 200);
+
+    assert.ok(caseBlock.includes('handleCopyBranchName'), 'copyBranchName case should call handleCopyBranchName');
+  });
+
   test('copyFilePath case should pass filePath from message', () => {
     const caseStart = handlerSource.indexOf("case 'copyFilePath':");
     const nextCase = handlerSource.indexOf('case ', caseStart + 1);
