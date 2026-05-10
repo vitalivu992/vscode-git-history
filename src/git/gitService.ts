@@ -9,6 +9,16 @@ import { parseMultipleCommitStats } from './gitStatsParser';
 
 const execFileAsync = util.promisify(execFile);
 
+/**
+ * Git remote information extracted from a remote URL
+ */
+interface GitRemoteInfo {
+  platform: 'github' | 'gitlab' | 'bitbucket' | 'unknown';
+  baseUrl: string;
+  owner: string;
+  repo: string;
+}
+
 const EMPTY_TREE_HASH = '4b825dc642cb6eb9a060e54bf899d69f82cf0163';
 
 /**
@@ -396,5 +406,122 @@ export async function getCommitParentDiff(
       filePath,
       isBinary: false
     };
+  }
+}
+
+/**
+ * Get the git remote URL for a repository
+ * @param cwd Working directory
+ * @param remote Remote name (default: 'origin')
+ * @returns Remote URL or null if not found
+ */
+export async function getRemoteUrl(cwd: string, remote = 'origin'): Promise<string | null> {
+  try {
+    const output = await execGit(['remote', 'get-url', remote], cwd);
+    return output.trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Parse a git remote URL to extract platform, base URL, owner, and repo
+ * Supports both SSH and HTTPS formats for GitHub, GitLab, and Bitbucket
+ * @param remoteUrl The remote URL to parse
+ * @returns Parsed remote info or null if unrecognized format
+ */
+export function parseRemoteUrl(remoteUrl: string): GitRemoteInfo | null {
+  // HTTPS format: https://github.com/owner/repo.git
+  // SSH format: git@github.com:owner/repo.git
+
+  let match: RegExpMatchArray | null;
+  let platform: 'github' | 'gitlab' | 'bitbucket' | 'unknown';
+  let baseUrl: string;
+  let owner: string;
+  let repo: string;
+
+  // Try SSH format first (git@host:owner/repo.git)
+  const sshPattern = /^git@([^:]+):([^/]+)\/(.+?)(?:\.git)?$/;
+  match = remoteUrl.match(sshPattern);
+  if (match) {
+    const [, host, sshOwner, sshRepo] = match;
+    platform = detectPlatform(host);
+    baseUrl = `https://${host}`;
+    owner = sshOwner;
+    repo = sshRepo;
+    return { platform, baseUrl, owner, repo };
+  }
+
+  // Try HTTPS format (https://host/owner/repo.git)
+  const httpsPattern = /^https?:\/\/([^/]+)\/([^/]+)\/(.+?)(?:\.git)?$/;
+  match = remoteUrl.match(httpsPattern);
+  if (match) {
+    const [, host, httpsOwner, httpsRepo] = match;
+    platform = detectPlatform(host);
+    baseUrl = `https://${host}`;
+    owner = httpsOwner;
+    repo = httpsRepo;
+    return { platform, baseUrl, owner, repo };
+  }
+
+  return null;
+}
+
+/**
+ * Detect the git platform based on hostname
+ * @param hostname The hostname to check
+ * @returns The detected platform
+ */
+function detectPlatform(hostname: string): 'github' | 'gitlab' | 'bitbucket' | 'unknown' {
+  const lowerHost = hostname.toLowerCase();
+
+  if (lowerHost === 'github.com' || lowerHost.endsWith('.github.com')) {
+    return 'github';
+  }
+  if (lowerHost === 'gitlab.com' || lowerHost.endsWith('.gitlab.com') || lowerHost.includes('gitlab')) {
+    return 'gitlab';
+  }
+  if (lowerHost === 'bitbucket.org' || lowerHost.includes('bitbucket')) {
+    return 'bitbucket';
+  }
+
+  return 'unknown';
+}
+
+/**
+ * Generate a web URL for a commit
+ * Auto-detects the git remote and generates platform-specific URLs
+ * @param hash The commit hash
+ * @param cwd Working directory
+ * @param remote Remote name (default: 'origin')
+ * @returns Commit URL or null if unable to generate
+ */
+export async function getCommitUrl(
+  hash: string,
+  cwd: string,
+  remote = 'origin'
+): Promise<string | null> {
+  const remoteUrl = await getRemoteUrl(cwd, remote);
+  if (!remoteUrl) {
+    return null;
+  }
+
+  const remoteInfo = parseRemoteUrl(remoteUrl);
+  if (!remoteInfo || remoteInfo.platform === 'unknown') {
+    return null;
+  }
+
+  // Use short hash for URLs (7 characters)
+  const shortHash = hash.substring(0, 7);
+
+  switch (remoteInfo.platform) {
+    case 'github':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/commit/${shortHash}`;
+    case 'gitlab':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/-/commit/${shortHash}`;
+    case 'bitbucket':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/commits/${shortHash}`;
+    default:
+      return null;
   }
 }

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -352,5 +352,108 @@ suite('Git Service Integration Tests', () => {
     assert.ok(hashes[branchName], `Should have ${branchName} branch entry`);
     assert.ok(Array.isArray(hashes[branchName]), 'Branch hashes should be an array');
     assert.ok(hashes[branchName].length > 0, 'Should have at least one hash for branch');
+  });
+});
+
+suite('Commit URL Generation Tests', () => {
+  suite('parseRemoteUrl', () => {
+    test('parses GitHub HTTPS URLs with .git suffix', () => {
+      const result = parseRemoteUrl('https://github.com/owner/repo.git');
+      assert.ok(result, 'Should parse GitHub HTTPS URL');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses GitHub HTTPS URLs without .git suffix', () => {
+      const result = parseRemoteUrl('https://github.com/owner/repo');
+      assert.ok(result, 'Should parse GitHub HTTPS URL without .git');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses GitHub SSH URLs', () => {
+      const result = parseRemoteUrl('git@github.com:owner/repo.git');
+      assert.ok(result, 'Should parse GitHub SSH URL');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses GitLab HTTPS URLs', () => {
+      const result = parseRemoteUrl('https://gitlab.com/owner/repo.git');
+      assert.ok(result, 'Should parse GitLab HTTPS URL');
+      assert.strictEqual(result?.platform, 'gitlab');
+      assert.strictEqual(result?.baseUrl, 'https://gitlab.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses GitLab SSH URLs', () => {
+      const result = parseRemoteUrl('git@gitlab.com:owner/repo.git');
+      assert.ok(result, 'Should parse GitLab SSH URL');
+      assert.strictEqual(result?.platform, 'gitlab');
+      assert.strictEqual(result?.baseUrl, 'https://gitlab.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses Bitbucket HTTPS URLs', () => {
+      const result = parseRemoteUrl('https://bitbucket.org/owner/repo.git');
+      assert.ok(result, 'Should parse Bitbucket HTTPS URL');
+      assert.strictEqual(result?.platform, 'bitbucket');
+      assert.strictEqual(result?.baseUrl, 'https://bitbucket.org');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses Bitbucket SSH URLs', () => {
+      const result = parseRemoteUrl('git@bitbucket.org:owner/repo.git');
+      assert.ok(result, 'Should parse Bitbucket SSH URL');
+      assert.strictEqual(result?.platform, 'bitbucket');
+      assert.strictEqual(result?.baseUrl, 'https://bitbucket.org');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses GitHub Enterprise URLs (github.company.com)', () => {
+      const result = parseRemoteUrl('https://github.company.com/owner/repo.git');
+      assert.ok(result, 'Should parse GitHub Enterprise URL');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.company.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses self-hosted GitLab URLs', () => {
+      const result = parseRemoteUrl('https://gitlab.company.com/owner/repo.git');
+      assert.ok(result, 'Should parse self-hosted GitLab URL');
+      assert.strictEqual(result?.platform, 'gitlab');
+      assert.strictEqual(result?.baseUrl, 'https://gitlab.company.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('returns null for unknown platforms', () => {
+      const result = parseRemoteUrl('https://unknown-platform.com/owner/repo.git');
+      assert.strictEqual(result, null);
+    });
+
+    test('handles URLs with custom ports', () => {
+      const result = parseRemoteUrl('https://github.com:8443/owner/repo.git');
+      assert.ok(result, 'Should parse URL with custom port');
+      assert.strictEqual(result?.baseUrl, 'https://github.com:8443');
+    });
+  });
+
+  suite('getRemoteUrl', () => {
+    test('returns null when no remote configured', async () => {
+      const result = await getRemoteUrl('/non/existent/path');
+      assert.strictEqual(result, null);
+    });
   });
 });
