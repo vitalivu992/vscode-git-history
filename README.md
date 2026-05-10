@@ -38,6 +38,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Revert Command**: Copy a pre-formatted `git revert <hash>` command to the clipboard with `Ctrl+Shift+U` / `Cmd+Shift+U` keyboard shortcut, or right-click on any commit
 - **Copy Commit as Patch**: Copy the commit as a unified diff patch (with git headers) suitable for `git apply` or `git am` with `Ctrl+Shift+E` / `Cmd+Shift+E` keyboard shortcut, or right-click on any commit
 - **Copy Commit URL**: Copy the web URL for a commit to share with others. Automatically detects GitHub, GitLab, and Bitbucket remotes (including self-hosted instances). Use `Ctrl+Shift+L` / `Cmd+Shift+L` or right-click on any commit
+- **Copy Commit Stats**: Copy commit statistics (files changed, insertions, deletions) to clipboard with `Ctrl+Shift+S` / `Cmd+Shift+S` keyboard shortcut, or right-click on any commit
 - **Quick Compare with Parent**: Instantly compare the selected commit with its parent to see what changed in that specific commit. Use the "Compare" button or press `Ctrl+Alt+P` / `Cmd+Alt+P`. For root commits (first commit), an error is shown since there's no parent.
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
@@ -124,6 +125,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy commit diff** | Copy the full diff output to clipboard |
 | **Copy as patch** | Copy the commit as a unified diff patch (for `git apply` or `git am`) |
 | **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket) for the commit |
+| **Copy stats** | Copy commit statistics (files changed, insertions, deletions) to clipboard |
 
 **Changed Files Context Menu:**
 
@@ -153,6 +155,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+U` / `Cmd+Shift+U` | Copy revert command to clipboard |
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
+| `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Shift+B` / `Cmd+Shift+B` | Copy branch name to clipboard |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
