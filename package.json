@@ -102,6 +102,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyTags",
+        "title": "Git History: Copy Tags",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyAuthorEmail",
         "title": "Git History: Copy Author Email",
         "category": "Git History"
@@ -273,6 +278,12 @@
         "command": "gitHistory.copyBranchName",
         "key": "ctrl+shift+b",
         "mac": "cmd+shift+b",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyTags",
+        "key": "ctrl+shift+g",
+        "mac": "cmd+shift+g",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

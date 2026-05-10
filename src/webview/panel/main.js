@@ -498,6 +498,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+G or Cmd+Shift+G: Copy tags
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'g') {
+    e.preventDefault();
+    handleCopyTags();
+    return;
+  }
+
   // Ctrl+G or Cmd+G: Jump to hash
   if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
     e.preventDefault();
@@ -1300,6 +1307,7 @@ function handleMessage(event) {
         case 'copyCommitPatch': handleCopyPatch(); break;
         case 'copyCommitUrl': handleCopyUrl(); break;
         case 'copyBranchName': handleCopyBranchName(); break;
+        case 'copyTags': handleCopyTags(); break;
         case 'copyAuthorEmail': handleCopyAuthorEmail(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
@@ -1876,6 +1884,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🌿</span>
       <span class="context-menu-label">Copy branch name</span>
     </div>
+    <div class="context-menu-item" data-action="copy-tags">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy tags</span>
+    </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" data-action="copy-selected-hashes" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
@@ -1926,6 +1938,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitDate', hash: commit.hash });
       } else if (action === 'copy-branch-name') {
         handleCopyBranchName();
+      } else if (action === 'copy-tags') {
+        handleCopyTags();
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
       } else if (action === 'compare-parent') {
@@ -2212,6 +2226,26 @@ function handleCopyBranchName() {
     return;
   }
   vscode.postMessage({ type: 'copyBranchName' });
+}
+
+function handleCopyTags() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy tags');
+    return;
+  }
+
+  vscode.postMessage({ type: 'copyTags', hash: targetCommit.hash });
 }
 
 function handleCopyAuthorEmail() {

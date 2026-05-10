@@ -92,6 +92,10 @@ export async function handleMessage(
       handleCopyBranchName(panel);
       break;
 
+    case 'copyTags':
+      handleCopyTags(message.hash, panel);
+      break;
+
     case 'copyAuthorEmail':
       handleCopyAuthorEmail(message.hash, panel);
       break;
@@ -724,6 +728,26 @@ function handleCopyBranchName(panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(branch).then(() => {
     void vscode.window.showInformationMessage(`Branch name copied: ${branch}`);
+  });
+}
+
+function handleCopyTags(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const tags = commit.tags || [];
+  const tagsText = tags.join(', ');
+
+  void vscode.env.clipboard.writeText(tagsText).then(() => {
+    const shortHash = hash.slice(0, 7);
+    if (tags.length > 0) {
+      void vscode.window.showInformationMessage(`Copied tags: ${tagsText}`);
+    } else {
+      void vscode.window.showInformationMessage(`No tags on commit ${shortHash}`);
+    }
   });
 }
 
