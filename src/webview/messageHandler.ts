@@ -147,7 +147,7 @@ function isValidMessage(message: unknown): message is { type: string; [key: stri
 
 async function handleRequestDiff(hash: string, panel: GitHistoryPanel): Promise<void> {
   try {
-    const diffResult = await getCommitDiff(hash, panel.getCwd());
+    const diffResult = await getCommitDiff(hash, panel.getCwd(), undefined, panel.getIgnoreWhitespace());
 
     if (diffResult.isBinary) {
       panel.postMessage({
@@ -180,7 +180,7 @@ async function handleRequestCombinedDiff(
   panel: GitHistoryPanel
 ): Promise<void> {
   try {
-    const diffResult = await getCombinedDiff(hashes, panel.getCwd());
+    const diffResult = await getCombinedDiff(hashes, panel.getCwd(), undefined, panel.getIgnoreWhitespace());
 
     if (diffResult.isBinary) {
       panel.postMessage({
@@ -210,7 +210,7 @@ async function handleRequestRangeDiff(
   panel: GitHistoryPanel
 ): Promise<void> {
   try {
-    const diffResult = await getCommitRangeDiff(fromHash, toHash, panel.getCwd());
+    const diffResult = await getCommitRangeDiff(fromHash, toHash, panel.getCwd(), undefined, panel.getIgnoreWhitespace());
 
     if (diffResult.isBinary) {
       panel.postMessage({
@@ -262,7 +262,7 @@ async function handleRequestFileDiff(
 ): Promise<void> {
   try {
     const cwd = panel.getCwd();
-    const diffResult = await getCommitDiff(hash, cwd, filePath);
+    const diffResult = await getCommitDiff(hash, cwd, filePath, panel.getIgnoreWhitespace());
 
     if (diffResult.isBinary) {
       const files = await getCommitFiles(hash, cwd);
@@ -487,7 +487,7 @@ async function handleQuickCompare(hash: string, panel: GitHistoryPanel): Promise
       return;
     }
 
-    const diffResult = await getCommitParentDiff(hash, cwd);
+    const diffResult = await getCommitParentDiff(hash, cwd, undefined, panel.getIgnoreWhitespace());
 
     if (diffResult.isBinary) {
       panel.postMessage({
