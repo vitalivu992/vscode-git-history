@@ -14,6 +14,8 @@ export interface UserSettings {
   regexSearchEnabled: boolean;
   /** Whether to show only commits by the current git user */
   showMyCommitsOnly: boolean;
+  /** Whether to ignore whitespace in diffs */
+  ignoreWhitespace: boolean;
 }
 
 /**
@@ -25,7 +27,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   sortOldestFirst: false,
   hideMergeCommits: false,
   regexSearchEnabled: false,
-  showMyCommitsOnly: false
+  showMyCommitsOnly: false,
+  ignoreWhitespace: false
 };
 
 /**
