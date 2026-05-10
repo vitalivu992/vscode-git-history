@@ -23,6 +23,7 @@ let branches = []; // All available branches from init message
 let branchCommitHashes = {}; // Map: branchName -> Set of commit hashes
 let currentUser = null; // Current git user from git config
 let showMyCommitsOnly = false; // Filter to show only my commits
+let commitFilesMap = new Map(); // hash -> CommitFileChange[]
 
 /**
  * Parse filters from search query
@@ -50,6 +51,12 @@ function parseDateFilter(query) {
   const branchFilter = branchMatch ? branchMatch[1].toLowerCase() : null;
   if (branchMatch) {
     textQuery = textQuery.replace(branchMatch[0], '').trim();
+  }
+
+  const pathMatch = query.match(/path:([^\s]+)/i);
+  const pathFilter = pathMatch ? pathMatch[1].toLowerCase() : null;
+  if (pathMatch) {
+    textQuery = textQuery.replace(pathMatch[0], '').trim();
   }
 
   // Parse after:YYYY-MM-DD or after:YYYY/MM/DD
@@ -94,7 +101,7 @@ function parseDateFilter(query) {
     textQuery = textQuery.replace(lastMatch[0], '').trim();
   }
 
-  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter, branchFilter };
+  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter, branchFilter, pathFilter };
 }
 
 /**
@@ -102,13 +109,13 @@ function parseDateFilter(query) {
  * @returns {boolean}
  */
 function hasActiveFilters() {
-  const { dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
-  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter || showMyCommitsOnly);
+  const { dateFilters, authorFilter, tagFilter, branchFilter, pathFilter } = parseDateFilter(searchQuery);
+  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter || pathFilter || showMyCommitsOnly);
 }
 
 function hasActiveDateFilters() {
-  const { dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
-  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter);
+  const { dateFilters, authorFilter, tagFilter, branchFilter, pathFilter } = parseDateFilter(searchQuery);
+  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter || pathFilter);
 }
 
 /**
@@ -120,9 +127,9 @@ function renderFilterBadges() {
     existingBadges.remove();
   }
 
-  const { dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
+  const { dateFilters, authorFilter, tagFilter, branchFilter, pathFilter } = parseDateFilter(searchQuery);
   const hasDateFilters = !!(dateFilters.after || dateFilters.before);
-  const hasFilters = hasDateFilters || authorFilter || tagFilter || branchFilter;
+  const hasFilters = hasDateFilters || authorFilter || tagFilter || branchFilter || pathFilter;
 
   if (!hasFilters) {
     return;
@@ -165,6 +172,13 @@ function renderFilterBadges() {
     badgesContainer.appendChild(branchBadge);
   }
 
+  if (pathFilter) {
+    const pathBadge = document.createElement('span');
+    pathBadge.className = 'filter-badge';
+    pathBadge.innerHTML = `path: ${escapeHtml(pathFilter)} <span class="filter-badge-clear" data-filter="path">&times;</span>`;
+    badgesContainer.appendChild(pathBadge);
+  }
+
   if (dateFilters.after) {
     const afterBadge = document.createElement('span');
     afterBadge.className = 'filter-badge';
@@ -198,6 +212,8 @@ function renderFilterBadges() {
         newQuery = newQuery.replace(/tag:[^\s]+/i, '').trim();
       } else if (filterToRemove === 'branch') {
         newQuery = newQuery.replace(/branch:[^\s]+/i, '').trim();
+      } else if (filterToRemove === 'path') {
+        newQuery = newQuery.replace(/path:[^\s]+/i, '').trim();
       }
 
       // Also remove any orphaned "last:" filter if it was the only thing
@@ -540,7 +556,7 @@ function getFilteredCommits() {
   }
 
   // Parse date filters and get remaining text query
-  const { textQuery, dateFilters, authorFilter, tagFilter, branchFilter } = parseDateFilter(searchQuery);
+  const { textQuery, dateFilters, authorFilter, tagFilter, branchFilter, pathFilter } = parseDateFilter(searchQuery);
 
   // Apply author filter
   if (authorFilter) {
@@ -561,6 +577,19 @@ function getFilteredCommits() {
     filtered = filtered.filter(commit => {
       const branchHashes = branchCommitHashes[branchFilter];
       return branchHashes && branchHashes.has(commit.hash);
+    });
+  }
+
+  // Apply path filter - requires fetching commit files
+  if (pathFilter) {
+    filtered = filtered.filter(commit => {
+      const files = commitFilesMap.get(commit.hash);
+      if (!files) {
+        // Request files for this commit if not cached
+        vscode.postMessage({ type: 'requestCommitFiles', hash: commit.hash });
+        return false;
+      }
+      return files.some(f => f.path.toLowerCase().includes(pathFilter));
     });
   }
 
@@ -1114,7 +1143,12 @@ function handleMessage(event) {
       break;
 
     case 'commitFiles':
+      // Cache the files for filtering
+      if (message.hash) {
+        commitFilesMap.set(message.hash, message.files);
+      }
       renderFiles(message.files);
+      renderCommits(); // Re-render commit list to re-evaluate path filter
       break;
 
     case 'error':
