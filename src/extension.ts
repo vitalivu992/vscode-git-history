@@ -148,6 +148,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyBranchName', action: 'copyBranchName' },
     { command: 'gitHistory.copyAuthorEmail', action: 'copyAuthorEmail' },
     { command: 'gitHistory.copyShortHash', action: 'copyShortHash' },
+    { command: 'gitHistory.copySubject', action: 'copySubject' },
     { command: 'gitHistory.copySelectedHashes', action: 'copySelectedHashes' },
     { command: 'gitHistory.exportCommits', action: 'exportCommits' },
     { command: 'gitHistory.quickCompare', action: 'quickCompare' },

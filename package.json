@@ -112,6 +112,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copySubject",
+        "title": "Git History: Copy Commit Subject",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copySelectedHashes",
         "title": "Git History: Copy Selected Hashes",
         "category": "Git History"
@@ -270,6 +275,12 @@
         "command": "gitHistory.copyShortHash",
         "key": "ctrl+shift+7",
         "mac": "cmd+shift+7",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySubject",
+        "key": "ctrl+shift+6",
+        "mac": "cmd+shift+6",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
