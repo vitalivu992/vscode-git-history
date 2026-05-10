@@ -96,6 +96,10 @@ export async function handleMessage(
       handleCopyAuthorEmail(message.hash, panel);
       break;
 
+    case 'copyShortHash':
+      handleCopyShortHash(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -724,6 +728,19 @@ function handleCopyAuthorEmail(hash: string, panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(commit.email).then(() => {
     void vscode.window.showInformationMessage(`Author email copied: ${commit.email}`);
+  });
+}
+
+function handleCopyShortHash(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const shortHash = hash.substring(0, 7);
+  void vscode.env.clipboard.writeText(shortHash).then(() => {
+    void vscode.window.showInformationMessage(`Copied short hash: ${shortHash}`);
   });
 }
 
