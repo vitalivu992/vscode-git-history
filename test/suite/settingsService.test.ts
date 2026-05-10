@@ -92,6 +92,14 @@ suite('Settings Service Tests', () => {
     assert.ok(source.includes('regexSearchEnabled:'), 'UserSettings should have regexSearchEnabled property');
   });
 
+  test('UserSettings should have searchQuery property', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/settings/settingsTypes.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes('searchQuery:'), 'UserSettings should have searchQuery property');
+  });
+
   test('DEFAULT_SETTINGS should be defined', () => {
     const fs = require('fs');
     const typesPath = path.resolve(__dirname, '../../../src/settings/settingsTypes.ts');
@@ -110,6 +118,7 @@ suite('Settings Service Tests', () => {
     assert.ok(source.includes('sortOldestFirst: false'), 'DEFAULT_SETTINGS should have false as default sortOldestFirst');
     assert.ok(source.includes('hideMergeCommits: false'), 'DEFAULT_SETTINGS should have false as default hideMergeCommits');
     assert.ok(source.includes('regexSearchEnabled: false'), 'DEFAULT_SETTINGS should have false as default regexSearchEnabled');
+    assert.ok(source.includes("searchQuery: ''"), "DEFAULT_SETTINGS should have empty string as default searchQuery");
   });
 
   test('SETTINGS_STORAGE_KEY should be defined', () => {
