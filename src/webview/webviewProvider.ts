@@ -20,6 +20,7 @@ export class GitHistoryPanel {
   private readonly _cwd: string;
   private readonly _selection?: SelectionRange;
   private _commits: CommitInfo[] = [];
+  private _branch: string | undefined;
   private _webviewReady: boolean = false;
   private _pendingInit: (() => void) | null = null;
   private readonly _settingsService: SettingsService;
@@ -128,6 +129,10 @@ export class GitHistoryPanel {
     return this._commits;
   }
 
+  public getBranch(): string | undefined {
+    return this._branch;
+  }
+
   public getSettingsService(): SettingsService {
     return this._settingsService;
   }
@@ -161,6 +166,7 @@ export class GitHistoryPanel {
         const hideMergeCommits = vscode.workspace.getConfiguration('gitHistory').get<boolean>('hideMergeCommits', false);
         const defaultDiffView = vscode.workspace.getConfiguration('gitHistory').get<string>('defaultDiffView', 'unified');
         const branch = await getCurrentBranch(this._cwd);
+        this._branch = branch;
         const branches = await getAllBranches(this._cwd);
         const currentUser = await getCurrentGitUser(this._cwd);
 

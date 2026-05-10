@@ -388,6 +388,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+B: Copy branch name
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'b') {
+    e.preventDefault();
+    handleCopyBranchName();
+    return;
+  }
+
   // Ctrl+Shift+O: Export filtered commits
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'o') {
     e.preventDefault();
@@ -811,9 +818,10 @@ function renderBranchBadge() {
 
   if (currentBranch) {
     const branchBadge = document.createElement('span');
-    branchBadge.className = 'branch-badge';
+    branchBadge.className = 'branch-badge branch-filter-link';
     branchBadge.textContent = currentBranch;
-    branchBadge.title = `Current branch: ${currentBranch}`;
+    branchBadge.title = `Current branch: ${currentBranch} (click to copy)`;
+    branchBadge.addEventListener('click', () => handleCopyBranchName());
     header.insertBefore(branchBadge, header.firstChild);
   }
 }
@@ -1181,6 +1189,7 @@ function handleMessage(event) {
         case 'copyCommitDiff': handleCopyDiff(); break;
         case 'copyCommitPatch': handleCopyPatch(); break;
         case 'copyCommitUrl': handleCopyUrl(); break;
+        case 'copyBranchName': handleCopyBranchName(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
@@ -2036,6 +2045,14 @@ function handleCopyUrl() {
   } else {
     showError('Select a commit to copy its URL');
   }
+}
+
+function handleCopyBranchName() {
+  if (!currentBranch) {
+    showError('No branch detected');
+    return;
+  }
+  vscode.postMessage({ type: 'copyBranchName' });
 }
 
 // ─── Export Commits ───────────────────────────────────────────────────────────

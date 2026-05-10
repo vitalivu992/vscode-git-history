@@ -84,6 +84,10 @@ export async function handleMessage(
       await handleCopyCommitUrl(message.hash, panel);
       break;
 
+    case 'copyBranchName':
+      handleCopyBranchName(panel);
+      break;
+
     case 'copyFilePath':
       handleCopyFilePath(message.filePath, panel);
       break;
@@ -655,4 +659,16 @@ async function handleCopyCommitUrl(hash: string, panel: GitHistoryPanel): Promis
       `Failed to generate commit URL: ${error instanceof Error ? error.message : String(error)}`
     );
   }
+}
+
+function handleCopyBranchName(panel: GitHistoryPanel): void {
+  const branch = panel.getBranch();
+  if (!branch) {
+    void vscode.window.showInformationMessage('No branch detected');
+    return;
+  }
+
+  void vscode.env.clipboard.writeText(branch).then(() => {
+    void vscode.window.showInformationMessage(`Branch name copied: ${branch}`);
+  });
 }
