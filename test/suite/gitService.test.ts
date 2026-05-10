@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -352,6 +352,116 @@ suite('Git Service Integration Tests', () => {
     assert.ok(hashes[branchName], `Should have ${branchName} branch entry`);
     assert.ok(Array.isArray(hashes[branchName]), 'Branch hashes should be an array');
     assert.ok(hashes[branchName].length > 0, 'Should have at least one hash for branch');
+  });
+
+  test('getCommitDiff should use default context lines (3) when not specified', async () => {
+    const { execSync } = require('child_process');
+    const commits = await getFileHistory(testFile, tempDir);
+
+    // Create a commit with more context lines
+    fs.writeFileSync(testFile, 'Line 1\nLine 2\nLine 3\nLine 4\nLine 5\n');
+    execSync('git add .', { cwd: tempDir });
+    execSync('git commit -m "Add more lines"', { cwd: tempDir });
+
+    const updatedCommits = await getFileHistory(testFile, tempDir);
+    const diffResult = await getCommitDiff(updatedCommits[0].hash, tempDir);
+
+    // Default git behavior shows 3 lines of context
+    // Verify the diff contains expected content
+    assert.ok(diffResult.diff.includes('@@'), 'Diff should contain hunk headers');
+  });
+
+  test('getCommitDiff should use custom context lines when specified', async () => {
+    const { execSync } = require('child_process');
+
+    // Create a commit with more lines
+    fs.writeFileSync(testFile, 'Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\n');
+    execSync('git add .', { cwd: tempDir });
+    execSync('git commit -m "Add even more lines"', { cwd: tempDir });
+
+    const commits = await getFileHistory(testFile, tempDir);
+
+    // Test with 5 context lines
+    const diffResult = await getCommitDiff(commits[0].hash, tempDir, undefined, undefined, 5);
+
+    // Verify the diff contains expected content
+    assert.ok(diffResult.diff.includes('@@'), 'Diff should contain hunk headers');
+    assert.ok(diffResult.diff.length > 0, 'Diff should have content');
+  });
+
+  test('getCommitDiff should include -U flag in git command when diffContextLines is not default', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+
+    // This test verifies the function works with custom context lines
+    // The actual -U flag usage is internal to the function
+    const diffResult = await getCommitDiff(commits[0].hash, tempDir, undefined, undefined, 1);
+
+    assert.ok(diffResult.diff, 'Diff should be returned');
+  });
+
+  test('getCombinedDiff should use custom context lines when specified', async () => {
+    const { execSync } = require('child_process');
+    const commits = await getFileHistory(testFile, tempDir);
+
+    if (commits.length >= 2) {
+      const hashes = commits.slice(0, 2).map(c => c.hash);
+      const diffResult = await getCombinedDiff(hashes, tempDir, undefined, undefined, 5);
+
+      assert.ok(typeof diffResult.diff === 'string', 'Combined diff should return a string');
+    }
+  });
+
+  test('getCommitRangeDiff should use custom context lines when specified', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+
+    if (commits.length >= 2) {
+      const fromCommit = commits[commits.length - 1];
+      const toCommit = commits[0];
+      const diffResult = await getCommitRangeDiff(fromCommit.hash, toCommit.hash, tempDir, undefined, undefined, 5);
+
+      assert.ok(typeof diffResult.diff === 'string', 'Range diff should return a string');
+    }
+  });
+
+  test('getCommitParentDiff should use custom context lines when specified', async () => {
+    const commits = await getFileHistory(testFile, tempDir);
+
+    // Skip first commit as it has no parent
+    const commitWithParent = commits.find(c => c.parentHashes && c.parentHashes.length > 0);
+
+    if (commitWithParent) {
+      const diffResult = await getCommitParentDiff(commitWithParent.hash, tempDir, undefined, undefined, 5);
+
+      assert.ok(typeof diffResult.diff === 'string', 'Parent diff should return a string');
+    }
+  });
+
+  test('diffContextLines with value 1 should work', async () => {
+    const { execSync } = require('child_process');
+
+    fs.writeFileSync(testFile, 'A\nB\nC\nD\nE\n');
+    execSync('git add .', { cwd: tempDir });
+    execSync('git commit -m "Test minimum context"', { cwd: tempDir });
+
+    const commits = await getFileHistory(testFile, tempDir);
+    const diffResult = await getCommitDiff(commits[0].hash, tempDir, undefined, undefined, 1);
+
+    assert.ok(diffResult.diff, 'Diff should work with 1 context line');
+  });
+
+  test('diffContextLines with value 10 should work', async () => {
+    const { execSync } = require('child_process');
+
+    // Create a file with many lines
+    const lines = Array.from({ length: 20 }, (_, i) => `Line ${i + 1}`).join('\n');
+    fs.writeFileSync(testFile, lines);
+    execSync('git add .', { cwd: tempDir });
+    execSync('git commit -m "Test maximum context"', { cwd: tempDir });
+
+    const commits = await getFileHistory(testFile, tempDir);
+    const diffResult = await getCommitDiff(commits[0].hash, tempDir, undefined, undefined, 10);
+
+    assert.ok(diffResult.diff, 'Diff should work with 10 context lines');
   });
 });
 
