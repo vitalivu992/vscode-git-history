@@ -25,6 +25,7 @@ export class GitHistoryPanel {
   private _pendingInit: (() => void) | null = null;
   private readonly _settingsService: SettingsService;
   private _ignoreWhitespace: boolean = false;
+  private _diffContextLines: number = 3;
 
   public static async showCommitDiff(
     extensionUri: vscode.Uri,
@@ -151,6 +152,10 @@ export class GitHistoryPanel {
     return this._ignoreWhitespace;
   }
 
+  public getDiffContextLines(): number {
+    return this._diffContextLines;
+  }
+
   public onWebviewReady(): void {
     this._webviewReady = true;
     if (this._pendingInit) {
@@ -179,6 +184,8 @@ export class GitHistoryPanel {
         const showGraph = vscode.workspace.getConfiguration('gitHistory').get<boolean>('showGraph', true);
         const hideMergeCommits = vscode.workspace.getConfiguration('gitHistory').get<boolean>('hideMergeCommits', false);
         const defaultDiffView = vscode.workspace.getConfiguration('gitHistory').get<string>('defaultDiffView', 'unified');
+        const diffContextLines = vscode.workspace.getConfiguration('gitHistory').get<number>('diffContextLines', 3);
+        this._diffContextLines = diffContextLines;
         const branch = await getCurrentBranch(this._cwd);
         this._branch = branch;
         const branches = await getAllBranches(this._cwd);
