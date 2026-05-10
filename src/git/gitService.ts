@@ -105,12 +105,17 @@ export async function getCommitDiff(
   hash: string,
   cwd: string,
   filePath?: string,
-  ignoreWhitespace?: boolean
+  ignoreWhitespace?: boolean,
+  diffContextLines?: number
 ): Promise<DiffResult> {
   const args = ['show', '--patch', '--no-color'];
 
   if (ignoreWhitespace) {
     args.push('-w');
+  }
+
+  if (diffContextLines !== undefined && diffContextLines !== 3) {
+    args.push(`-U${diffContextLines}`);
   }
 
   args.push(hash);
@@ -161,14 +166,15 @@ export async function getCombinedDiff(
   hashes: string[],
   cwd: string,
   filePath?: string,
-  ignoreWhitespace?: boolean
+  ignoreWhitespace?: boolean,
+  diffContextLines?: number
 ): Promise<DiffResult> {
   if (hashes.length === 0) {
     return { diff: '', filePath, isBinary: false };
   }
 
   if (hashes.length === 1) {
-    return getCommitDiff(hashes[0], cwd, filePath, ignoreWhitespace);
+    return getCommitDiff(hashes[0], cwd, filePath, ignoreWhitespace, diffContextLines);
   }
 
   const sortedHashes = await sortHashesByDate(hashes, cwd);
@@ -179,6 +185,10 @@ export async function getCombinedDiff(
 
   if (ignoreWhitespace) {
     args.push('-w');
+  }
+
+  if (diffContextLines !== undefined && diffContextLines !== 3) {
+    args.push(`-U${diffContextLines}`);
   }
 
   args.push(`${earliest}~1..${latest}`);
@@ -202,6 +212,10 @@ export async function getCombinedDiff(
 
     if (ignoreWhitespace) {
       args2.push('-w');
+    }
+
+    if (diffContextLines !== undefined && diffContextLines !== 3) {
+      args2.push(`-U${diffContextLines}`);
     }
 
     args2.push(`${EMPTY_TREE_HASH}..${latest}`);
@@ -378,12 +392,17 @@ export async function getCommitRangeDiff(
   toHash: string,
   cwd: string,
   filePath?: string,
-  ignoreWhitespace?: boolean
+  ignoreWhitespace?: boolean,
+  diffContextLines?: number
 ): Promise<DiffResult> {
   const args = ['diff', '--no-color'];
 
   if (ignoreWhitespace) {
     args.push('-w');
+  }
+
+  if (diffContextLines !== undefined && diffContextLines !== 3) {
+    args.push(`-U${diffContextLines}`);
   }
 
   args.push(`${fromHash}..${toHash}`);
@@ -410,12 +429,17 @@ export async function getCommitParentDiff(
   hash: string,
   cwd: string,
   filePath?: string,
-  ignoreWhitespace?: boolean
+  ignoreWhitespace?: boolean,
+  diffContextLines?: number
 ): Promise<DiffResult> {
   const args = ['diff', '--no-color'];
 
   if (ignoreWhitespace) {
     args.push('-w');
+  }
+
+  if (diffContextLines !== undefined && diffContextLines !== 3) {
+    args.push(`-U${diffContextLines}`);
   }
 
   args.push(`${hash}~1..${hash}`);
