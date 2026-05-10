@@ -35,6 +35,13 @@ module.exports = {
           }
         },
         {
+          from: 'src/webview/panel',
+          to: path.resolve(__dirname, 'out/src/webview/panel'),
+          globOptions: {
+            ignore: ['**/*.ts']
+          }
+        },
+        {
           from: 'node_modules/diff2html/bundles/js/diff2html-ui.min.js',
           to: path.resolve(__dirname, 'dist/webview/panel/diff2html-ui.min.js')
         },
