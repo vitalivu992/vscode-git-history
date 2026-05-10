@@ -163,6 +163,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Shift+B` / `Cmd+Shift+B` | Copy branch name to clipboard |
+| `Ctrl+Shift+G` / `Cmd+Shift+G` | Copy tags to clipboard |
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email to clipboard |
 | `Ctrl+Shift+7` / `Cmd+Shift+7` | Copy short hash (7 characters) to clipboard |
 | `Ctrl+Shift+6` / `Cmd+Shift+6` | Copy subject (commit title) to clipboard |
