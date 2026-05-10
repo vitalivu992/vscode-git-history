@@ -67,6 +67,29 @@ export interface BlameResult {
 }
 
 /**
+ * Actions that can be triggered from VS Code keybindings
+ */
+export type WebviewAction =
+  | 'refresh'
+  | 'copyCommitMessage'
+  | 'copyCommitHash'
+  | 'copyCommitInfo'
+  | 'copyCherryPick'
+  | 'copyRevert'
+  | 'copyCommitFiles'
+  | 'copyCommitDiff'
+  | 'copyCommitPatch'
+  | 'copyCommitUrl'
+  | 'exportCommits'
+  | 'quickCompare'
+  | 'toggleMyCommits'
+  | 'toggleWordWrap'
+  | 'toggleRegex'
+  | 'jumpToHash'
+  | 'focusSearch'
+  | 'showKeyboardHelp';
+
+/**
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
@@ -77,7 +100,8 @@ export type ExtToWebviewMessage =
   | { type: 'commitFiles'; hash: string; files: CommitFileChange[] }
   | { type: 'error'; message: string }
   | { type: 'selectCommit'; hash: string }
-  | { type: 'branchHashes'; hashes: Record<string, string[]> };
+  | { type: 'branchHashes'; hashes: Record<string, string[]> }
+  | { type: 'triggerAction'; action: WebviewAction };
 
 /**
  * Messages from webview to extension

@@ -131,6 +131,36 @@ export function activate(context: vscode.ExtensionContext) {
       new GitHistoryContentProvider()
     )
   );
+
+  // Register webview action commands for keybinding discoverability
+  const webviewActions = [
+    { command: 'gitHistory.refresh', action: 'refresh' },
+    { command: 'gitHistory.copyCommitMessage', action: 'copyCommitMessage' },
+    { command: 'gitHistory.copyCommitHash', action: 'copyCommitHash' },
+    { command: 'gitHistory.copyCommitInfo', action: 'copyCommitInfo' },
+    { command: 'gitHistory.copyCherryPick', action: 'copyCherryPick' },
+    { command: 'gitHistory.copyRevert', action: 'copyRevert' },
+    { command: 'gitHistory.copyCommitFiles', action: 'copyCommitFiles' },
+    { command: 'gitHistory.copyCommitDiff', action: 'copyCommitDiff' },
+    { command: 'gitHistory.copyCommitPatch', action: 'copyCommitPatch' },
+    { command: 'gitHistory.copyCommitUrl', action: 'copyCommitUrl' },
+    { command: 'gitHistory.exportCommits', action: 'exportCommits' },
+    { command: 'gitHistory.quickCompare', action: 'quickCompare' },
+    { command: 'gitHistory.toggleMyCommits', action: 'toggleMyCommits' },
+    { command: 'gitHistory.toggleWordWrap', action: 'toggleWordWrap' },
+    { command: 'gitHistory.toggleRegex', action: 'toggleRegex' },
+    { command: 'gitHistory.jumpToHash', action: 'jumpToHash' },
+    { command: 'gitHistory.focusSearch', action: 'focusSearch' },
+    { command: 'gitHistory.showKeyboardHelp', action: 'showKeyboardHelp' },
+  ] as const;
+
+  for (const { command, action } of webviewActions) {
+    context.subscriptions.push(
+      vscode.commands.registerCommand(command, () => {
+        GitHistoryPanel.currentPanel?.postMessage({ type: 'triggerAction', action });
+      })
+    );
+  }
 }
 
 export function deactivate() {

@@ -40,6 +40,96 @@
       {
         "command": "gitHistory.showBlameCommit",
         "title": "Git: Show Blame Commit"
+      },
+      {
+        "command": "gitHistory.refresh",
+        "title": "Git History: Refresh",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitMessage",
+        "title": "Git History: Copy Commit Message",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitHash",
+        "title": "Git History: Copy Commit Hash",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitInfo",
+        "title": "Git History: Copy Commit Info",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCherryPick",
+        "title": "Git History: Copy Cherry-Pick Command",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyRevert",
+        "title": "Git History: Copy Revert Command",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitFiles",
+        "title": "Git History: Copy Changed Files",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitDiff",
+        "title": "Git History: Copy Commit Diff",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitPatch",
+        "title": "Git History: Copy Commit as Patch",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitUrl",
+        "title": "Git History: Copy Commit URL",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.exportCommits",
+        "title": "Git History: Export Filtered Commits",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.quickCompare",
+        "title": "Git History: Quick Compare with Parent",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleMyCommits",
+        "title": "Git History: Toggle My Commits",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleWordWrap",
+        "title": "Git History: Toggle Word Wrap",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleRegex",
+        "title": "Git History: Toggle Regex Search",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToHash",
+        "title": "Git History: Jump to Hash",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.focusSearch",
+        "title": "Git History: Focus Search",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.showKeyboardHelp",
+        "title": "Git History: Show Keyboard Shortcuts",
+        "category": "Git History"
       }
     ],
     "menus": {
@@ -72,6 +162,114 @@
         "key": "ctrl+shift+b",
         "mac": "cmd+shift+b",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "gitHistory.refresh",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitMessage",
+        "key": "ctrl+shift+c",
+        "mac": "cmd+shift+c",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitHash",
+        "key": "ctrl+shift+h",
+        "mac": "cmd+shift+h",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitInfo",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCherryPick",
+        "key": "ctrl+shift+p",
+        "mac": "cmd+shift+p",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyRevert",
+        "key": "ctrl+shift+u",
+        "mac": "cmd+shift+u",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitFiles",
+        "key": "ctrl+shift+f",
+        "mac": "cmd+shift+f",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitDiff",
+        "key": "ctrl+shift+d",
+        "mac": "cmd+shift+d",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitPatch",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitUrl",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.exportCommits",
+        "key": "ctrl+shift+o",
+        "mac": "cmd+shift+o",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.quickCompare",
+        "key": "ctrl+alt+p",
+        "mac": "cmd+alt+p",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleMyCommits",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleWordWrap",
+        "key": "ctrl+shift+w",
+        "mac": "cmd+shift+w",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleRegex",
+        "key": "ctrl+shift+x",
+        "mac": "cmd+shift+x",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToHash",
+        "key": "ctrl+g",
+        "mac": "cmd+g",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.focusSearch",
+        "key": "ctrl+f",
+        "mac": "cmd+f",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.showKeyboardHelp",
+        "key": "shift+/",
+        "mac": "shift+/",
+        "when": "activeWebviewPanelId == gitHistory.webview"
       }
     ],
     "configuration": {
