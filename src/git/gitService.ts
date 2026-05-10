@@ -104,9 +104,14 @@ export async function getSelectionHistory(
 export async function getCommitDiff(
   hash: string,
   cwd: string,
-  filePath?: string
+  filePath?: string,
+  ignoreWhitespace?: boolean
 ): Promise<DiffResult> {
   const args = ['show', '--patch', '--no-color'];
+
+  if (ignoreWhitespace) {
+    args.push('-w');
+  }
 
   args.push(hash);
   if (filePath) {
@@ -155,21 +160,28 @@ async function sortHashesByDate(hashes: string[], cwd: string): Promise<string[]
 export async function getCombinedDiff(
   hashes: string[],
   cwd: string,
-  filePath?: string
+  filePath?: string,
+  ignoreWhitespace?: boolean
 ): Promise<DiffResult> {
   if (hashes.length === 0) {
     return { diff: '', filePath, isBinary: false };
   }
 
   if (hashes.length === 1) {
-    return getCommitDiff(hashes[0], cwd, filePath);
+    return getCommitDiff(hashes[0], cwd, filePath, ignoreWhitespace);
   }
 
   const sortedHashes = await sortHashesByDate(hashes, cwd);
   const earliest = sortedHashes[0];
   const latest = sortedHashes[sortedHashes.length - 1];
 
-  const args = ['diff', '--no-color', `${earliest}~1..${latest}`];
+  const args = ['diff', '--no-color'];
+
+  if (ignoreWhitespace) {
+    args.push('-w');
+  }
+
+  args.push(`${earliest}~1..${latest}`);
 
   if (filePath) {
     const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
@@ -186,7 +198,13 @@ export async function getCombinedDiff(
     };
   } catch (error) {
     // Fallback for initial commits: use empty tree
-    const args2 = ['diff', '--no-color', `${EMPTY_TREE_HASH}..${latest}`];
+    const args2 = ['diff', '--no-color'];
+
+    if (ignoreWhitespace) {
+      args2.push('-w');
+    }
+
+    args2.push(`${EMPTY_TREE_HASH}..${latest}`);
     if (filePath) {
       const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
       args2.push('--', relativePath);
@@ -359,9 +377,16 @@ export async function getCommitRangeDiff(
   fromHash: string,
   toHash: string,
   cwd: string,
-  filePath?: string
+  filePath?: string,
+  ignoreWhitespace?: boolean
 ): Promise<DiffResult> {
-  const args = ['diff', '--no-color', `${fromHash}..${toHash}`];
+  const args = ['diff', '--no-color'];
+
+  if (ignoreWhitespace) {
+    args.push('-w');
+  }
+
+  args.push(`${fromHash}..${toHash}`);
 
   if (filePath) {
     const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
@@ -384,9 +409,16 @@ export async function getCommitRangeDiff(
 export async function getCommitParentDiff(
   hash: string,
   cwd: string,
-  filePath?: string
+  filePath?: string,
+  ignoreWhitespace?: boolean
 ): Promise<DiffResult> {
-  const args = ['diff', '--no-color', `${hash}~1..${hash}`];
+  const args = ['diff', '--no-color'];
+
+  if (ignoreWhitespace) {
+    args.push('-w');
+  }
+
+  args.push(`${hash}~1..${hash}`);
 
   if (filePath) {
     const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
