@@ -92,6 +92,7 @@ export type WebviewAction =
   | 'toggleMyCommits'
   | 'toggleWordWrap'
   | 'toggleRegex'
+  | 'toggleIgnoreWhitespace'
   | 'jumpToHash'
   | 'focusSearch'
   | 'showKeyboardHelp';
