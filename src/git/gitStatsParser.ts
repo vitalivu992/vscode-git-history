@@ -28,22 +28,22 @@ export function parseCommitStats(statLine: string): ParsedStats {
     return result;
   }
 
-  // Match files changed: handles "file" or "files"
-  const filesMatch = statLine.match(/(\d+)\s+file[s]?\s+changed/);
+  // Match files changed: handles "file" or "files", numbers may include commas (e.g., "1,500")
+  const filesMatch = statLine.match(/([\d,]+)\s+file[s]?\s+changed/);
   if (filesMatch) {
-    result.filesChanged = parseInt(filesMatch[1], 10);
+    result.filesChanged = parseInt(filesMatch[1].replace(/,/g, ''), 10);
   }
 
   // Match insertions: handles "insertion" or "insertions"
-  const insertionsMatch = statLine.match(/(\d+)\s+insertion[s]?\s*\(\+\)/);
+  const insertionsMatch = statLine.match(/([\d,]+)\s+insertion[s]?\s*\(\+\)/);
   if (insertionsMatch) {
-    result.insertions = parseInt(insertionsMatch[1], 10);
+    result.insertions = parseInt(insertionsMatch[1].replace(/,/g, ''), 10);
   }
 
   // Match deletions: handles "deletion" or "deletions"
-  const deletionsMatch = statLine.match(/(\d+)\s+deletion[s]?\s*\(-\)/);
+  const deletionsMatch = statLine.match(/([\d,]+)\s+deletion[s]?\s*\(-\)/);
   if (deletionsMatch) {
-    result.deletions = parseInt(deletionsMatch[1], 10);
+    result.deletions = parseInt(deletionsMatch[1].replace(/,/g, ''), 10);
   }
 
   return result;
