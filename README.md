@@ -33,6 +33,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
 - **Copy Commit Message**: Copy the commit message, author, email, and date to clipboard with the copy button or `Ctrl+Shift+C` / `Cmd+Shift+C` keyboard shortcut
 - **Copy Commit Hash**: Copy the full commit hash to clipboard with `Ctrl+Shift+H` / `Cmd+Shift+H` keyboard shortcut, or click any hash chip
+- **Copy Selected Hashes**: Copy all selected commit hashes as a newline-separated list with `Ctrl+Shift+;` / `Cmd+Shift+;` keyboard shortcut (when 2+ commits are selected), or right-click context menu (shown when multiple commits are selected). Falls back to single hash copy when 0 or 1 commit is selected.
 - **Copy Commit Info**: Copy the full commit information (hash, author, date, message) to clipboard with `Ctrl+Shift+I` / `Cmd+Shift+I` keyboard shortcut
 - **Copy Cherry-Pick Command**: Copy a pre-formatted `git cherry-pick <hash>` command to the clipboard with `Ctrl+Shift+P` / `Cmd+Shift+P` keyboard shortcut, or right-click on any commit
 - **Copy Revert Command**: Copy a pre-formatted `git revert <hash>` command to the clipboard with `Ctrl+Shift+U` / `Cmd+Shift+U` keyboard shortcut, or right-click on any commit
@@ -157,6 +158,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Shift+B` / `Cmd+Shift+B` | Copy branch name to clipboard |
+| `Ctrl+Shift+;` / `Cmd+Shift+;` | Copy selected hashes to clipboard (2+ commits) |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
@@ -229,6 +231,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Toggle my commits filter | `Ctrl+Shift+M` / `Cmd+Shift+M` |
 | Toggle regex search mode | `Ctrl+Shift+X` / `Cmd+Shift+X` |
 | Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
+| Copy selected hashes | `Ctrl+Shift+;` / `Cmd+Shift+;` (when 2+ selected) |
 | Clear selection | `Escape` |
 
 ## License
