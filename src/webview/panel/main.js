@@ -1182,6 +1182,17 @@ function handleMessage(event) {
 
         // Apply my commits only filter
         showMyCommitsOnly = settings.showMyCommitsOnly;
+
+        // Apply saved search query
+        if (settings.searchQuery !== undefined && settings.searchQuery !== '') {
+          searchQuery = settings.searchQuery;
+          if (searchInput) {
+            searchInput.value = searchQuery;
+          }
+          renderCommits();
+          updateCommitCount();
+          renderFilterBadges();
+        }
       } else if (message.defaultDiffView === 'side-by-side') {
         setDiffType('side-by-side');
       }
@@ -2056,6 +2067,7 @@ function handleSearch(e) {
   updateCommitCount();
   renderFilterBadges();
   updateRegexValidation();
+  vscode.postMessage({ type: 'saveSettings', settings: { searchQuery } });
 }
 
 async function handleRefresh() {
