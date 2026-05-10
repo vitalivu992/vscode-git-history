@@ -283,6 +283,29 @@ body {
   border-color: var(--vscode-button-background);
 }
 
+/* Ignore whitespace toggle button */
+.ignore-ws-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s, border-color 0.1s;
+}
+
+.ignore-ws-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.ignore-ws-btn.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--vscode-button-background);
+}
+
 /* Word wrap state for diff viewer */
 #diff-viewer.word-wrap .d2h-code-line,
 #diff-viewer.word-wrap .d2h-code-side-line {

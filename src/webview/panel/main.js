@@ -23,6 +23,7 @@ let branches = []; // All available branches from init message
 let branchCommitHashes = {}; // Map: branchName -> Set of commit hashes
 let currentUser = null; // Current git user from git config
 let showMyCommitsOnly = false; // Filter to show only my commits
+let ignoreWhitespace = false; // Ignore whitespace in diffs
 let commitFilesMap = new Map(); // hash -> CommitFileChange[]
 
 /**
@@ -247,6 +248,7 @@ const sortBtn = document.getElementById('sort-btn');
 const copyBtn = document.getElementById('copy-btn');
 const compareParentBtn = document.getElementById('compare-parent-btn');
 const wordWrapBtn = document.getElementById('word-wrap-btn');
+const ignoreWsBtn = document.getElementById('ignore-ws-btn');
 const mergeToggleBtn = document.getElementById('merge-toggle-btn');
 const regexToggleBtn = document.getElementById('regex-toggle-btn');
 const exportBtn = document.getElementById('export-btn');
@@ -469,6 +471,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'x') {
     e.preventDefault();
     handleRegexToggle();
+    return;
+  }
+
+  // Ctrl+Shift+J: Toggle ignore whitespace
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'j') {
+    e.preventDefault();
+    handleIgnoreWhitespaceToggle();
     return;
   }
 
@@ -801,6 +810,38 @@ function handleRegexToggle() {
 }
 
 /**
+ * Toggle ignore whitespace in diffs
+ */
+function handleIgnoreWhitespaceToggle() {
+  ignoreWhitespace = !ignoreWhitespace;
+  if (ignoreWsBtn) {
+    if (ignoreWhitespace) {
+      ignoreWsBtn.classList.add('active');
+      ignoreWsBtn.title = 'Ignore whitespace enabled (Ctrl+Shift+J to toggle)';
+    } else {
+      ignoreWsBtn.classList.remove('active');
+      ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+J)';
+    }
+  }
+
+  // Re-fetch diff if a commit is selected
+  if (currentCommitHash) {
+    vscode.postMessage({ type: 'requestDiff', hash: currentCommitHash });
+  } else if (selectedCommits && selectedCommits.size > 0) {
+    // Handle combined diff for multiple selected commits
+    const hashes = Array.from(selectedCommits);
+    if (hashes.length === 1) {
+      vscode.postMessage({ type: 'requestDiff', hash: hashes[0] });
+    } else {
+      vscode.postMessage({ type: 'requestCombinedDiff', hashes });
+    }
+  }
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { ignoreWhitespace } });
+}
+
+/**
  * Toggle my commits only filter
  */
 function handleMyCommitsToggle() {
@@ -922,6 +963,10 @@ function init() {
 
   if (regexToggleBtn) {
     regexToggleBtn.addEventListener('click', handleRegexToggle);
+  }
+
+  if (ignoreWsBtn) {
+    ignoreWsBtn.addEventListener('click', handleIgnoreWhitespaceToggle);
   }
 
   if (exportBtn) {
@@ -1123,6 +1168,18 @@ function handleMessage(event) {
           }
         }
 
+        // Apply ignore whitespace setting
+        ignoreWhitespace = settings.ignoreWhitespace;
+        if (ignoreWsBtn) {
+          if (ignoreWhitespace) {
+            ignoreWsBtn.classList.add('active');
+            ignoreWsBtn.title = 'Ignore whitespace enabled (Ctrl+Shift+J to toggle)';
+          } else {
+            ignoreWsBtn.classList.remove('active');
+            ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+J)';
+          }
+        }
+
         // Apply my commits only filter
         showMyCommitsOnly = settings.showMyCommitsOnly;
       } else if (message.defaultDiffView === 'side-by-side') {
@@ -1242,6 +1299,7 @@ function handleMessage(event) {
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
         case 'toggleWordWrap': handleWordWrapToggle(); break;
         case 'toggleRegex': handleRegexToggle(); break;
+        case 'toggleIgnoreWhitespace': handleIgnoreWhitespaceToggle(); break;
         case 'jumpToHash': showJumpToHashDialog(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
