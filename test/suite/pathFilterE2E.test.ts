@@ -95,4 +95,18 @@ suite('pathFilterE2E Tests', () => {
     const handler = commitFilesMatch[0];
     assert.ok(handler.includes('renderCommits()'), 'commitFiles handler should call renderCommits() to re-render commit list after files are cached');
   });
+
+  test('index.html placeholder should show path:name syntax', () => {
+    const indexHtmlPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'index.html');
+    const content = fs.readFileSync(indexHtmlPath, 'utf-8');
+    assert.ok(content.includes('path:name'),
+      'index.html placeholder should show path:name syntax, not path:file');
+  });
+
+  test('webviewProvider placeholder should show path:name syntax', () => {
+    const providerPath = path.join(__dirname, '..', '..', 'src', 'webview', 'webviewProvider.ts');
+    const content = fs.readFileSync(providerPath, 'utf-8');
+    assert.ok(content.includes('path:name'),
+      'webviewProvider placeholder should show path:name syntax, not path:file');
+  });
 });
