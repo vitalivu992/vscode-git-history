@@ -92,6 +92,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCommitStats",
+        "title": "Git History: Copy Commit Stats",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyBranchName",
         "title": "Git History: Copy Branch Name",
         "category": "Git History"
@@ -226,6 +231,12 @@
         "command": "gitHistory.copyCommitUrl",
         "key": "ctrl+shift+l",
         "mac": "cmd+shift+l",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitStats",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
