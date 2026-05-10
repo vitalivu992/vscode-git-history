@@ -395,6 +395,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+;: Copy selected hashes
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === ';') {
+    e.preventDefault();
+    handleCopySelectedHashes();
+    return;
+  }
+
   // Ctrl+Shift+S: Copy commit stats
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
     e.preventDefault();
@@ -1197,6 +1204,7 @@ function handleMessage(event) {
         case 'copyCommitPatch': handleCopyPatch(); break;
         case 'copyCommitUrl': handleCopyUrl(); break;
         case 'copyBranchName': handleCopyBranchName(); break;
+        case 'copySelectedHashes': handleCopySelectedHashes(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
@@ -1748,6 +1756,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-label">Copy stats</span>
     </div>
     <div class="context-menu-divider"></div>
+    <div class="context-menu-item" data-action="copy-selected-hashes" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy selected hashes</span>
+    </div>
     <div class="context-menu-item" data-action="compare-parent">
       <span class="context-menu-icon">⧁</span>
       <span class="context-menu-label">Compare with parent</span>
@@ -1783,6 +1795,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitUrl', hash: commit.hash });
       } else if (action === 'copy-stats') {
         vscode.postMessage({ type: 'copyCommitStats', hash: commit.hash });
+      } else if (action === 'copy-selected-hashes') {
+        handleCopySelectedHashes();
       } else if (action === 'compare-parent') {
         vscode.postMessage({ type: 'quickCompare', hash: commit.hash });
       }
@@ -2068,6 +2082,35 @@ function handleCopyBranchName() {
   vscode.postMessage({ type: 'copyBranchName' });
 }
 
+function handleCopySelectedHashes() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+
+  // Get hashes from selected commits
+  const selectedHashes = [...selectedCommits];
+
+  if (selectedHashes.length === 0) {
+    // Fall back to focused commit
+    if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+      const commit = displayCommits[focusedIndex];
+      vscode.postMessage({ type: 'copyCommitHash', hash: commit.hash });
+    } else {
+      showError('Select a commit to copy its hash');
+    }
+  } else if (selectedHashes.length === 1) {
+    // Fall back to single hash copy
+    vscode.postMessage({ type: 'copyCommitHash', hash: selectedHashes[0] });
+  } else {
+    // Copy all selected hashes as newline-separated list
+    // Reorder to match display order (newest first)
+    const orderedHashes = selectedHashes
+      .map(hash => displayCommits.find(c => c.hash === hash))
+      .filter(Boolean)
+      .map(c => c.hash);
+
+    vscode.postMessage({ type: 'copySelectedHashes', hashes: orderedHashes });
+  }
+}
+
 function handleCopyStats() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -2344,7 +2387,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' },
         { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
         { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
-        { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' }
+        { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' },
+        { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' }
       ]
     },
     {

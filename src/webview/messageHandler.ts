@@ -92,6 +92,10 @@ export async function handleMessage(
       handleCopyBranchName(panel);
       break;
 
+    case 'copySelectedHashes':
+      handleCopySelectedHashes(message.hashes, panel);
+      break;
+
     case 'copyFilePath':
       handleCopyFilePath(message.filePath, panel);
       break;
@@ -704,5 +708,20 @@ function handleCopyBranchName(panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(branch).then(() => {
     void vscode.window.showInformationMessage(`Branch name copied: ${branch}`);
+  });
+}
+
+/**
+ * Handle copy selected hashes to clipboard
+ */
+function handleCopySelectedHashes(hashes: string[], panel: GitHistoryPanel): void {
+  if (hashes.length === 0) {
+    void vscode.window.showInformationMessage('No commits selected');
+    return;
+  }
+
+  const hashText = hashes.join('\n');
+  void vscode.env.clipboard.writeText(hashText).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${hashes.length} commit hash${hashes.length > 1 ? 'es' : ''}`);
   });
 }
