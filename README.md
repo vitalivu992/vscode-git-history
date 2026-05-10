@@ -153,6 +153,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+U` / `Cmd+Shift+U` | Copy revert command to clipboard |
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
+| `Ctrl+Shift+B` / `Cmd+Shift+B` | Copy branch name to clipboard |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
