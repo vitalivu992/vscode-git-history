@@ -56,6 +56,24 @@ suite('Git Stats Parser Tests', () => {
     assert.strictEqual(result.deletions, 800);
   });
 
+  test('parseCommitStats should handle numbers with commas', () => {
+    const statLine = '1,500 files changed, 25,000 insertions(+), 10,500 deletions(-)';
+    const result = parseCommitStats(statLine);
+
+    assert.strictEqual(result.filesChanged, 1500);
+    assert.strictEqual(result.insertions, 25000);
+    assert.strictEqual(result.deletions, 10500);
+  });
+
+  test('parseCommitStats should handle mixed comma and non-comma numbers', () => {
+    const statLine = '1,500 files changed, 500 insertions(+), 1,200 deletions(-)';
+    const result = parseCommitStats(statLine);
+
+    assert.strictEqual(result.filesChanged, 1500);
+    assert.strictEqual(result.insertions, 500);
+    assert.strictEqual(result.deletions, 1200);
+  });
+
   test('parseCommitStats should return zeros for empty input', () => {
     const result = parseCommitStats('');
 
