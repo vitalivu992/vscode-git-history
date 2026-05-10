@@ -302,3 +302,159 @@ suite('Copy Commit URL E2E Tests', () => {
     assert.ok(source.includes('handleCopyUrl()'), 'Should call handleCopyUrl function');
     });
 });
+
+suite('Keybinding Registration E2E Tests', () => {
+  const expectedWebviewActions = [
+    { command: 'gitHistory.refresh', action: 'refresh' },
+    { command: 'gitHistory.copyCommitMessage', action: 'copyCommitMessage' },
+    { command: 'gitHistory.copyCommitHash', action: 'copyCommitHash' },
+    { command: 'gitHistory.copyCommitInfo', action: 'copyCommitInfo' },
+    { command: 'gitHistory.copyCherryPick', action: 'copyCherryPick' },
+    { command: 'gitHistory.copyRevert', action: 'copyRevert' },
+    { command: 'gitHistory.copyCommitFiles', action: 'copyCommitFiles' },
+    { command: 'gitHistory.copyCommitDiff', action: 'copyCommitDiff' },
+    { command: 'gitHistory.copyCommitPatch', action: 'copyCommitPatch' },
+    { command: 'gitHistory.copyCommitUrl', action: 'copyCommitUrl' },
+    { command: 'gitHistory.exportCommits', action: 'exportCommits' },
+    { command: 'gitHistory.quickCompare', action: 'quickCompare' },
+    { command: 'gitHistory.toggleMyCommits', action: 'toggleMyCommits' },
+    { command: 'gitHistory.toggleWordWrap', action: 'toggleWordWrap' },
+    { command: 'gitHistory.toggleRegex', action: 'toggleRegex' },
+    { command: 'gitHistory.jumpToHash', action: 'jumpToHash' },
+    { command: 'gitHistory.focusSearch', action: 'focusSearch' },
+    { command: 'gitHistory.showKeyboardHelp', action: 'showKeyboardHelp' },
+  ] as const;
+
+  test('package.json declares all webview action commands', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    const commands = packageJson.contributes?.commands || [];
+    const commandNames = new Set(commands.map((c: any) => c.command));
+
+    for (const { command } of expectedWebviewActions) {
+      assert.ok(
+        commandNames.has(command),
+        `package.json should declare command "${command}"`
+      );
+    }
+  });
+
+  test('package.json declares keybindings with correct when clause', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    const keybindings = packageJson.contributes?.keybindings || [];
+    const webviewKeybindings = keybindings.filter((kb: any) =>
+      expectedWebviewActions.some((a) => a.command === kb.command)
+    );
+
+    assert.strictEqual(
+      webviewKeybindings.length,
+      expectedWebviewActions.length,
+      `Should have ${expectedWebviewActions.length} webview keybindings`
+    );
+
+    for (const kb of webviewKeybindings) {
+      assert.strictEqual(
+        kb.when,
+        'activeWebviewPanelId == gitHistory.webview',
+        `Keybinding for "${kb.command}" should have when clause "activeWebviewPanelId == gitHistory.webview"`
+      );
+    }
+  });
+
+  test('triggerAction message type is handled in webview', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(
+      source.includes("case 'triggerAction':"),
+      'main.js should handle triggerAction message type'
+    );
+  });
+
+  test('all 18 webview actions are handled in triggerAction switch', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const triggerActionStart = source.indexOf("case 'triggerAction':");
+    const triggerActionEnd = source.indexOf('}', triggerActionStart + 100);
+    const triggerActionSection = source.substring(triggerActionStart, triggerActionEnd + 2000);
+
+    for (const { action } of expectedWebviewActions) {
+      assert.ok(
+        triggerActionSection.includes(`case '${action}':`),
+        `triggerAction handler should handle "${action}" action`
+      );
+    }
+  });
+
+  test('extension.ts registers all webview action commands', () => {
+    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
+
+    assert.ok(
+      extensionSource.includes('const webviewActions = ['),
+      'extension.ts should define webviewActions array'
+    );
+
+    for (const { command, action } of expectedWebviewActions) {
+      assert.ok(
+        extensionSource.includes(`command: '${command}'`) ||
+        extensionSource.includes(`command: "${command}"`),
+        `webviewActions should include command "${command}"`
+      );
+      assert.ok(
+        extensionSource.includes(`action: '${action}'`) ||
+        extensionSource.includes(`action: "${action}"`),
+        `webviewActions should include action "${action}"`
+      );
+    }
+  });
+
+  test('commands post triggerAction message with correct action type', () => {
+    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
+
+    assert.ok(
+      extensionSource.includes("{ type: 'triggerAction', action }"),
+      'Commands should post triggerAction messages'
+    );
+
+    assert.ok(
+      extensionSource.includes('GitHistoryPanel.currentPanel?.postMessage'),
+      'Commands should post to current webview panel'
+    );
+  });
+
+  test('all keybindings reference valid commands', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    const commands = new Set(
+      (packageJson.contributes?.commands || []).map((c: any) => c.command)
+    );
+    const keybindings = packageJson.contributes?.keybindings || [];
+
+    for (const kb of keybindings) {
+      assert.ok(
+        commands.has(kb.command),
+        `Keybinding "${kb.command}" should reference a valid command`
+      );
+    }
+  });
+
+  test('webview action commands are registered with correct command names', () => {
+    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
+
+    for (const { command } of expectedWebviewActions) {
+      assert.ok(
+        extensionSource.includes(`vscode.commands.registerCommand('${command}'`) ||
+        extensionSource.includes(`vscode.commands.registerCommand("${command}"`),
+        `extension.ts should register command "${command}"`
+      );
+    }
+  });
+});
