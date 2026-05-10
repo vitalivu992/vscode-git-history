@@ -104,6 +104,10 @@ export async function handleMessage(
       handleCopySubject(message.hash, panel);
       break;
 
+    case 'copyCommitDate':
+      handleCopyCommitDate(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -759,6 +763,19 @@ function handleCopySubject(hash: string, panel: GitHistoryPanel): void {
   const truncatedSubject = subject.length > 50 ? subject.substring(0, 47) + '...' : subject;
   void vscode.env.clipboard.writeText(subject).then(() => {
     void vscode.window.showInformationMessage(`Copied subject: ${truncatedSubject}`);
+  });
+}
+
+function handleCopyCommitDate(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const dateStr = new Date(commit.date).toISOString();
+  void vscode.env.clipboard.writeText(dateStr).then(() => {
+    void vscode.window.showInformationMessage(`Copied date: ${dateStr}`);
   });
 }
 
