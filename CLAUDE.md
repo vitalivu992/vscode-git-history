@@ -52,6 +52,7 @@ User preferences are automatically persisted across VS Code sessions using VS Co
   - `gitHistory.showFileHistory` - history for entire file
   - `gitHistory.showSelectionHistory` - history for selected lines
   - Also registers `GitHistoryContentProvider` for the `git-history` URI scheme
+  - Registers 18 webview action commands (prefixed `gitHistory.`) that post `triggerAction` messages to the active webview panel for keybinding discoverability. Each command maps to a `WebviewAction` type defined in `src/types.ts`. These commands are declared in `package.json` under `contributes.keybindings` with `when: "activeWebviewPanelId == gitHistory.webview"` so they only fire when the Git History panel is focused. The webview handles `triggerAction` messages in its `handleMessage` switch, dispatching to the same handler functions used by `handleKeyDown`.
 
 - **Git Layer** (`src/git/`):
   - `gitService.ts` - executes git commands via `child_process.execFile`

@@ -37,6 +37,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Cherry-Pick Command**: Copy a pre-formatted `git cherry-pick <hash>` command to the clipboard with `Ctrl+Shift+P` / `Cmd+Shift+P` keyboard shortcut, or right-click on any commit
 - **Copy Revert Command**: Copy a pre-formatted `git revert <hash>` command to the clipboard with `Ctrl+Shift+U` / `Cmd+Shift+U` keyboard shortcut, or right-click on any commit
 - **Copy Commit as Patch**: Copy the commit as a unified diff patch (with git headers) suitable for `git apply` or `git am` with `Ctrl+Shift+E` / `Cmd+Shift+E` keyboard shortcut, or right-click on any commit
+- **Copy Commit URL**: Copy the web URL for a commit to share with others. Automatically detects GitHub, GitLab, and Bitbucket remotes (including self-hosted instances). Use `Ctrl+Shift+L` / `Cmd+Shift+L` or right-click on any commit
 - **Quick Compare with Parent**: Instantly compare the selected commit with its parent to see what changed in that specific commit. Use the "Compare" button or press `Ctrl+Alt+P` / `Cmd+Alt+P`. For root commits (first commit), an error is shown since there's no parent.
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
@@ -92,6 +93,10 @@ A powerful VS Code extension that provides git history visualization inspired by
   - `branch:main` - show commits on main branch
   - `branch:feature/login` - show commits on feature branch (case-insensitive, partial match)
   - Combine with other filters: `branch:main author:Bob after:2024-01-01`
+- **Filter by path** using `path:` prefix:
+  - `path:src/main.ts` - show commits that modified this specific file
+  - `path:src/` - show commits that modified any file in src/ directory
+  - Combine with other filters: `path:src/ author:Bob after:2024-01-01`
 - **Regex search mode**: Click the .* button (or press `Ctrl+Shift+X` / `Cmd+Shift+X`) to enable regex pattern matching:
   - `^feat:` - match commits starting with "feat:"
   - `bug(fix|patch)|hotfix` - match "bugfix", "bugpatch", or "hotfix"
@@ -118,6 +123,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy changed files** | Copy the list of changed files to clipboard |
 | **Copy commit diff** | Copy the full diff output to clipboard |
 | **Copy as patch** | Copy the commit as a unified diff patch (for `git apply` or `git am`) |
+| **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket) for the commit |
 
 **Changed Files Context Menu:**
 
@@ -146,6 +152,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+P` / `Cmd+Shift+P` | Copy cherry-pick command to clipboard |
 | `Ctrl+Shift+U` / `Cmd+Shift+U` | Copy revert command to clipboard |
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
+| `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
