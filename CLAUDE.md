@@ -37,6 +37,7 @@ User preferences are automatically persisted across VS Code sessions using VS Co
 - **Sort Order**: Newest-first or oldest-first commit ordering
 - **Hide Merge Commits**: Whether to filter out merge commits
 - **Regex Search Mode**: Whether regex search is enabled
+- **Search Query**: Search query text for filtering commits
 
 **Implementation**:
 - `src/settings/settingsService.ts` - Service for saving/loading settings via `globalState`
