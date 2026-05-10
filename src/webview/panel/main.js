@@ -1803,6 +1803,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🕐</span>
       <span class="context-menu-label">Copy commit date</span>
     </div>
+    <div class="context-menu-item" data-action="copy-branch-name">
+      <span class="context-menu-icon">🌿</span>
+      <span class="context-menu-label">Copy branch name</span>
+    </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" data-action="copy-selected-hashes" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
@@ -1851,6 +1855,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copySubject', hash: commit.hash });
       } else if (action === 'copy-commit-date') {
         vscode.postMessage({ type: 'copyCommitDate', hash: commit.hash });
+      } else if (action === 'copy-branch-name') {
+        handleCopyBranchName();
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
       } else if (action === 'compare-parent') {

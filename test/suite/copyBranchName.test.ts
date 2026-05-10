@@ -166,6 +166,22 @@ suite('Copy Branch Name Test Suite', () => {
       'extension.ts should register copyBranchName webview action');
   });
 
+  test('context menu should have copy-branch-name item', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('data-action="copy-branch-name"'),
+      'Context menu should include copy-branch-name');
+  });
+
+  test('context menu click handler should handle copy-branch-name action', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes("action === 'copy-branch-name'"),
+      'Context menu click handler should handle copy-branch-name action');
+    const handlerIdx = source.indexOf("action === 'copy-branch-name'");
+    const nearby = source.substring(handlerIdx, handlerIdx + 200);
+    assert.ok(nearby.includes('handleCopyBranchName'),
+      'copy-branch-name handler should call handleCopyBranchName');
+  });
+
   test('CLAUDE.md should document Copy Branch Name feature', () => {
     const source = fs.readFileSync(claudePath, 'utf-8');
     assert.ok(source.includes('Copy Branch Name'),
