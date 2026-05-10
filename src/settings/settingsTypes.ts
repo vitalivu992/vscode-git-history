@@ -16,6 +16,8 @@ export interface UserSettings {
   showMyCommitsOnly: boolean;
   /** Whether to ignore whitespace in diffs */
   ignoreWhitespace: boolean;
+  /** Saved search query for persistence across sessions */
+  searchQuery: string;
 }
 
 /**
@@ -28,7 +30,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   hideMergeCommits: false,
   regexSearchEnabled: false,
   showMyCommitsOnly: false,
-  ignoreWhitespace: false
+  ignoreWhitespace: false,
+  searchQuery: ''
 };
 
 /**
