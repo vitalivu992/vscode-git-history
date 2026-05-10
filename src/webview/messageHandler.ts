@@ -147,7 +147,7 @@ function isValidMessage(message: unknown): message is { type: string; [key: stri
 
 async function handleRequestDiff(hash: string, panel: GitHistoryPanel): Promise<void> {
   try {
-    const diffResult = await getCommitDiff(hash, panel.getCwd(), undefined, panel.getIgnoreWhitespace());
+    const diffResult = await getCommitDiff(hash, panel.getCwd(), undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
     if (diffResult.isBinary) {
       panel.postMessage({
@@ -180,7 +180,7 @@ async function handleRequestCombinedDiff(
   panel: GitHistoryPanel
 ): Promise<void> {
   try {
-    const diffResult = await getCombinedDiff(hashes, panel.getCwd(), undefined, panel.getIgnoreWhitespace());
+    const diffResult = await getCombinedDiff(hashes, panel.getCwd(), undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
     if (diffResult.isBinary) {
       panel.postMessage({
@@ -210,7 +210,7 @@ async function handleRequestRangeDiff(
   panel: GitHistoryPanel
 ): Promise<void> {
   try {
-    const diffResult = await getCommitRangeDiff(fromHash, toHash, panel.getCwd(), undefined, panel.getIgnoreWhitespace());
+    const diffResult = await getCommitRangeDiff(fromHash, toHash, panel.getCwd(), undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
     if (diffResult.isBinary) {
       panel.postMessage({
@@ -262,7 +262,7 @@ async function handleRequestFileDiff(
 ): Promise<void> {
   try {
     const cwd = panel.getCwd();
-    const diffResult = await getCommitDiff(hash, cwd, filePath, panel.getIgnoreWhitespace());
+    const diffResult = await getCommitDiff(hash, cwd, filePath, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
     if (diffResult.isBinary) {
       const files = await getCommitFiles(hash, cwd);
@@ -391,7 +391,7 @@ async function handleCopyCommitFiles(hash: string, panel: GitHistoryPanel): Prom
 async function handleCopyCommitDiff(hash: string, panel: GitHistoryPanel): Promise<void> {
   try {
     const cwd = panel.getCwd();
-    const diffResult = await getCommitDiff(hash, cwd);
+    const diffResult = await getCommitDiff(hash, cwd, undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
     if (diffResult.isBinary) {
       void vscode.window.showInformationMessage('Cannot copy diff for binary file');
@@ -487,7 +487,7 @@ async function handleQuickCompare(hash: string, panel: GitHistoryPanel): Promise
       return;
     }
 
-    const diffResult = await getCommitParentDiff(hash, cwd, undefined, panel.getIgnoreWhitespace());
+    const diffResult = await getCommitParentDiff(hash, cwd, undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
     if (diffResult.isBinary) {
       panel.postMessage({
