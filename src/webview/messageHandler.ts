@@ -84,6 +84,10 @@ export async function handleMessage(
       await handleCopyCommitUrl(message.hash, panel);
       break;
 
+    case 'copyCommitStats':
+      await handleCopyCommitStats(message.hash, panel);
+      break;
+
     case 'copyBranchName':
       handleCopyBranchName(panel);
       break;
@@ -659,6 +663,36 @@ async function handleCopyCommitUrl(hash: string, panel: GitHistoryPanel): Promis
       `Failed to generate commit URL: ${error instanceof Error ? error.message : String(error)}`
     );
   }
+}
+
+/**
+ * Handle copy commit stats to clipboard
+ */
+async function handleCopyCommitStats(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  if (!commit.stats) {
+    void vscode.window.showInformationMessage('No statistics available for this commit');
+    return;
+  }
+
+  const { stats, shortHash, message } = commit;
+  const netChange = stats.insertions - stats.deletions;
+  const netSign = netChange >= 0 ? '+' : '';
+  const filesWord = stats.filesChanged === 1 ? 'file' : 'files';
+
+  const copyText = `Commit ${shortHash}: ${message}
+${stats.filesChanged} ${filesWord} changed
+Insertions: +${stats.insertions}
+Deletions: -${stats.deletions}
+Net: ${netSign}${netChange}`;
+
+  await vscode.env.clipboard.writeText(copyText);
+  void vscode.window.showInformationMessage(`Commit stats copied: ${stats.filesChanged} ${filesWord}, +${stats.insertions}, -${stats.deletions}`);
 }
 
 function handleCopyBranchName(panel: GitHistoryPanel): void {

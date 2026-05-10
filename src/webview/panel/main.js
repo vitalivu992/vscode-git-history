@@ -395,6 +395,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+S: Copy commit stats
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
+    e.preventDefault();
+    handleCopyStats();
+    return;
+  }
+
   // Ctrl+Shift+O: Export filtered commits
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'o') {
     e.preventDefault();
@@ -1736,6 +1743,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🔗</span>
       <span class="context-menu-label">Copy commit URL</span>
     </div>
+    <div class="context-menu-item" data-action="copy-stats">
+      <span class="context-menu-icon">📊</span>
+      <span class="context-menu-label">Copy stats</span>
+    </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" data-action="compare-parent">
       <span class="context-menu-icon">⧁</span>
@@ -1770,6 +1781,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitPatch', hash: commit.hash });
       } else if (action === 'copy-url') {
         vscode.postMessage({ type: 'copyCommitUrl', hash: commit.hash });
+      } else if (action === 'copy-stats') {
+        vscode.postMessage({ type: 'copyCommitStats', hash: commit.hash });
       } else if (action === 'compare-parent') {
         vscode.postMessage({ type: 'quickCompare', hash: commit.hash });
       }
@@ -2055,6 +2068,34 @@ function handleCopyBranchName() {
   vscode.postMessage({ type: 'copyBranchName' });
 }
 
+function handleCopyStats() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy its stats');
+    return;
+  }
+
+  if (!targetCommit.stats) {
+    showError('No stats available for this commit');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitStats',
+    hash: targetCommit.hash
+  });
+}
+
 // ─── Export Commits ───────────────────────────────────────────────────────────
 
 function handleExportCommits() {
@@ -2301,7 +2342,9 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
         { keys: [cmdKey, 'Shift', 'D'], description: 'Copy commit diff' },
         { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' },
-        { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' }
+        { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
+        { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
+        { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' }
       ]
     },
     {

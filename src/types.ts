@@ -80,6 +80,7 @@ export type WebviewAction =
   | 'copyCommitDiff'
   | 'copyCommitPatch'
   | 'copyCommitUrl'
+  | 'copyCommitStats'
   | 'copyBranchName'
   | 'exportCommits'
   | 'quickCompare'
@@ -126,6 +127,7 @@ export type WebviewToExtMessage =
   | { type: 'openFileAtCommit'; hash: string; filePath: string }
   | { type: 'copyCommitPatch'; hash: string }
   | { type: 'copyCommitUrl'; hash: string }
+  | { type: 'copyCommitStats'; hash: string }
   | { type: 'copyBranchName' }
   | { type: 'quickCompare'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
