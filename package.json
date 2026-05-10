@@ -396,6 +396,13 @@
             "side-by-side"
           ],
           "description": "Default diff view mode when opening Git History"
+        },
+        "gitHistory.diffContextLines": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Number of context lines to show in diffs (1-10)"
         }
       }
     }
