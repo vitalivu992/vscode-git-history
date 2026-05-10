@@ -118,6 +118,36 @@ suite('Message Handler Switch Case Coverage', () => {
     assert.ok(caseBlock.includes('handleCopyBranchName'), 'copyBranchName case should call handleCopyBranchName');
   });
 
+  test('copyCommitStats should be handled in switch statement', () => {
+    assert.ok(
+      handlerSource.includes("case 'copyCommitStats':"),
+      'messageHandler should have case for copyCommitStats'
+    );
+  });
+
+  test('handleCopyCommitStats function should exist', () => {
+    assert.ok(
+      handlerSource.includes('function handleCopyCommitStats'),
+      'messageHandler should have handleCopyCommitStats function'
+    );
+  });
+
+  test('copyCommitStats case should call handleCopyCommitStats', () => {
+    const caseStart = handlerSource.indexOf("case 'copyCommitStats':");
+    const nextCase = handlerSource.indexOf('case ', caseStart + 1);
+    const caseBlock = handlerSource.substring(caseStart, nextCase > caseStart ? nextCase : caseStart + 200);
+
+    assert.ok(caseBlock.includes('handleCopyCommitStats'), 'copyCommitStats case should call handleCopyCommitStats');
+  });
+
+  test('copyCommitStats case should pass hash from message', () => {
+    const caseStart = handlerSource.indexOf("case 'copyCommitStats':");
+    const nextCase = handlerSource.indexOf('case ', caseStart + 1);
+    const caseBlock = handlerSource.substring(caseStart, nextCase > caseStart ? nextCase : caseStart + 200);
+
+    assert.ok(caseBlock.includes('message.hash'), 'copyCommitStats case should pass message.hash');
+  });
+
   test('copyFilePath case should pass filePath from message', () => {
     const caseStart = handlerSource.indexOf("case 'copyFilePath':");
     const nextCase = handlerSource.indexOf('case ', caseStart + 1);
@@ -211,5 +241,69 @@ suite('Message Handler Integration - openFileAtCommit', () => {
     assert.ok(fnBody.includes('try'), 'Should have try block');
     assert.ok(fnBody.includes('catch'), 'Should have catch block');
     assert.ok(fnBody.includes('showErrorMessage'), 'Should show error message on failure');
+  });
+});
+
+suite('Message Handler Integration - copyCommitStats', () => {
+  test('handleCopyCommitStats should write formatted stats to clipboard', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyCommitStats');
+    const fnEnd = source.indexOf('\n}', fnStart);
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('vscode.env.clipboard.writeText(copyText)'), 'Should write formatted stats to clipboard');
+    assert.ok(fnBody.includes('showInformationMessage'), 'Should show confirmation with stats summary');
+  });
+
+  test('handleCopyCommitStats should handle missing commit gracefully', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyCommitStats');
+    const fnEnd = source.indexOf('\n}', fnStart);
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('Commit not found'), 'Should show message when commit is not found');
+  });
+
+  test('handleCopyCommitStats should handle missing stats gracefully', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyCommitStats');
+    const fnEnd = source.indexOf('\n}', fnStart);
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('No statistics available'), 'Should show message when stats are not available');
+  });
+
+  test('handleCopyCommitStats should format stats with singular/plural files', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyCommitStats');
+    const fnEnd = source.indexOf('\n}', fnStart);
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(
+      fnBody.includes("filesChanged === 1") || (fnBody.includes("'file'") && fnBody.includes("'files'")),
+      'Should use singular "file" when count is 1 and plural "files" otherwise'
+    );
+  });
+
+  test('handleCopyCommitStats should include all stat fields in output', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyCommitStats');
+    const fnEnd = source.indexOf('\n}', fnStart);
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('filesChanged'), 'Should include files changed');
+    assert.ok(fnBody.includes('insertions'), 'Should include insertions');
+    assert.ok(fnBody.includes('deletions'), 'Should include deletions');
+    assert.ok(fnBody.includes('Net:'), 'Should include net change');
   });
 });

@@ -61,7 +61,10 @@ function getKeyboardShortcutsData(isMac: boolean): Array<{ category: string; ite
         { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
         { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
         { keys: [cmdKey, 'Shift', 'D'], description: 'Copy commit diff' },
-        { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' }
+        { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' },
+        { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
+        { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
+        { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' }
       ]
     },
     {
@@ -206,10 +209,10 @@ suite('Keyboard Help E2E Tests', () => {
     assert.strictEqual(navCategory!.items.length, 8);
   });
 
-  test('Copy Commands category should have 8 shortcuts', () => {
+  test('Copy Commands category should have 11 shortcuts', () => {
     const shortcuts = getKeyboardShortcutsData(true);
     const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
-    assert.strictEqual(copyCategory!.items.length, 8);
+    assert.strictEqual(copyCategory!.items.length, 11);
   });
 
   test('Search & Filter category should have 4 shortcuts', () => {
@@ -340,6 +343,8 @@ suite('Keyboard Help E2E Tests', () => {
     assert.ok(descriptions.includes('Copy changed files'));
     assert.ok(descriptions.includes('Copy commit diff'));
     assert.ok(descriptions.includes('Copy commit as patch'));
+    assert.ok(descriptions.includes('Copy commit URL'));
+    assert.ok(descriptions.includes('Copy branch name'));
   });
 });
 

@@ -61,7 +61,10 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
         { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
         { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
         { keys: [cmdKey, 'Shift', 'D'], description: 'Copy commit diff' },
-        { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' }
+        { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' },
+        { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
+        { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
+        { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' }
       ]
     },
     {
@@ -158,6 +161,9 @@ suite('Keyboard Help Logic Tests', () => {
     assert.ok(descriptions.includes('Copy changed files'), 'Should have copy files');
     assert.ok(descriptions.includes('Copy commit diff'), 'Should have copy diff');
     assert.ok(descriptions.includes('Copy commit as patch'), 'Should have copy patch');
+    assert.ok(descriptions.includes('Copy commit URL'), 'Should have copy commit URL');
+    assert.ok(descriptions.includes('Copy commit stats'), 'Should have copy commit stats');
+    assert.ok(descriptions.includes('Copy branch name'), 'Should have copy branch name');
   });
 
   test('Mac shortcuts should use Cmd modifier', () => {
