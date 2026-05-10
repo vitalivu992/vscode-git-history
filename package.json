@@ -102,6 +102,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copySelectedHashes",
+        "title": "Git History: Copy Selected Hashes",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.exportCommits",
         "title": "Git History: Export Filtered Commits",
         "category": "Git History"
@@ -243,6 +248,12 @@
         "command": "gitHistory.copyBranchName",
         "key": "ctrl+shift+b",
         "mac": "cmd+shift+b",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySelectedHashes",
+        "key": "ctrl+shift+;",
+        "mac": "cmd+shift+;",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
