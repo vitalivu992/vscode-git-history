@@ -409,6 +409,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+6: Copy subject
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '6') {
+    e.preventDefault();
+    handleCopySubject();
+    return;
+  }
+
   // Ctrl+Shift+;: Copy selected hashes
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === ';') {
     e.preventDefault();
@@ -1220,6 +1227,7 @@ function handleMessage(event) {
         case 'copyBranchName': handleCopyBranchName(); break;
         case 'copyAuthorEmail': handleCopyAuthorEmail(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
+        case 'copySubject': handleCopySubject(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
@@ -1779,6 +1787,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">#7</span>
       <span class="context-menu-label">Copy short hash</span>
     </div>
+    <div class="context-menu-item" data-action="copy-subject">
+      <span class="context-menu-icon">📌</span>
+      <span class="context-menu-label">Copy subject</span>
+    </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" data-action="copy-selected-hashes" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
@@ -1823,6 +1835,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyAuthorEmail', hash: commit.hash });
       } else if (action === 'copy-short-hash') {
         vscode.postMessage({ type: 'copyShortHash', hash: commit.hash });
+      } else if (action === 'copy-subject') {
+        vscode.postMessage({ type: 'copySubject', hash: commit.hash });
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
       } else if (action === 'compare-parent') {
@@ -2156,6 +2170,29 @@ function handleCopyShortHash() {
   });
 }
 
+function handleCopySubject() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy subject');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copySubject',
+    hash: targetCommit.hash
+  });
+}
+
 function handleCopySelectedHashes() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
 
@@ -2464,6 +2501,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' },
         { keys: [cmdKey, 'Shift', 'A'], description: 'Copy author email' },
         { keys: [cmdKey, 'Shift', '7'], description: 'Copy short hash' },
+        { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' }
       ]
     },

@@ -85,6 +85,7 @@ export type WebviewAction =
   | 'copySelectedHashes'
   | 'copyAuthorEmail'
   | 'copyShortHash'
+  | 'copySubject'
   | 'exportCommits'
   | 'quickCompare'
   | 'toggleMyCommits'
@@ -135,6 +136,7 @@ export type WebviewToExtMessage =
   | { type: 'copySelectedHashes'; hashes: string[] }
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyShortHash'; hash: string }
+  | { type: 'copySubject'; hash: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
   | { type: 'exportCommits'; format: 'json' | 'csv'; commits: CommitInfo[] }

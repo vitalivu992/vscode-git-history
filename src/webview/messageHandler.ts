@@ -100,6 +100,10 @@ export async function handleMessage(
       handleCopyShortHash(message.hash, panel);
       break;
 
+    case 'copySubject':
+      handleCopySubject(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -741,6 +745,20 @@ function handleCopyShortHash(hash: string, panel: GitHistoryPanel): void {
   const shortHash = hash.substring(0, 7);
   void vscode.env.clipboard.writeText(shortHash).then(() => {
     void vscode.window.showInformationMessage(`Copied short hash: ${shortHash}`);
+  });
+}
+
+function handleCopySubject(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const subject = commit.message;
+  const truncatedSubject = subject.length > 50 ? subject.substring(0, 47) + '...' : subject;
+  void vscode.env.clipboard.writeText(subject).then(() => {
+    void vscode.window.showInformationMessage(`Copied subject: ${truncatedSubject}`);
   });
 }
 
