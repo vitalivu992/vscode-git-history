@@ -182,6 +182,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.cycleDiffContextLines', action: 'cycleDiffContextLines' },
     { command: 'gitHistory.cycleSortMode', action: 'cycleSortMode' },
     { command: 'gitHistory.copyFilterQuery', action: 'copyFilterQuery' },
+    { command: 'gitHistory.pasteFilterQuery', action: 'pasteFilterQuery' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

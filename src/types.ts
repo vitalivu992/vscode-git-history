@@ -110,7 +110,8 @@ export type WebviewAction =
   | 'jumpToHash'
   | 'focusSearch'
   | 'showKeyboardHelp'
-  | 'copyFilterQuery';
+  | 'copyFilterQuery'
+  | 'pasteFilterQuery';
 
 /**
  * Filter state for copy filter query feature
@@ -135,7 +136,8 @@ export type ExtToWebviewMessage =
   | { type: 'selectCommit'; hash: string }
   | { type: 'branchHashes'; hashes: Record<string, string[]> }
   | { type: 'triggerAction'; action: WebviewAction }
-  | { type: 'showFirstRunTip' };
+  | { type: 'showFirstRunTip' }
+  | { type: 'applyFilterQuery'; filterState: FilterQueryState };
 
 /**
  * Messages from webview to extension
@@ -185,4 +187,5 @@ export type WebviewToExtMessage =
   | { type: 'checkoutBranch'; branch: string }
   | { type: 'changeDiffContextLines'; value: number }
   | { type: 'dismissFirstRunTip' }
-  | { type: 'copyFilterQuery'; filterState: FilterQueryState };
+  | { type: 'copyFilterQuery'; filterState: FilterQueryState }
+  | { type: 'pasteFilterQuery' };
