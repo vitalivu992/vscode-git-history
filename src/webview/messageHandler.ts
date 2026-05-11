@@ -130,6 +130,10 @@ export async function handleMessage(
       handleCopyCommitDate(message.hash, panel);
       break;
 
+    case 'copyRelativeDate':
+      handleCopyRelativeDate(message.hash, panel);
+      break;
+
     case 'copyOneline':
       handleCopyOneline(message.hash, panel);
       break;
@@ -1022,6 +1026,37 @@ function handleCopyCommitDate(hash: string, panel: GitHistoryPanel): void {
   const dateStr = new Date(commit.date).toISOString();
   void vscode.env.clipboard.writeText(dateStr).then(() => {
     void vscode.window.showInformationMessage(`Copied date: ${dateStr}`);
+  });
+}
+
+function handleCopyRelativeDate(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const date = new Date(commit.date);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  let relativeDate: string;
+  if (diffDays === 0) {
+    relativeDate = `Today ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  } else if (diffDays === 1) {
+    relativeDate = `Yesterday ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  } else if (diffDays < 7) {
+    relativeDate = `${diffDays} days ago`;
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    relativeDate = `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+  } else {
+    relativeDate = date.toLocaleDateString();
+  }
+
+  void vscode.env.clipboard.writeText(relativeDate).then(() => {
+    void vscode.window.showInformationMessage(`Copied relative date: ${relativeDate}`);
   });
 }
 

@@ -198,6 +198,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+Y` / `Cmd+Shift+Y` | Copy as oneline (`shortHash subject`) to clipboard |
 | `Ctrl+Shift+K` / `Cmd+Shift+K` | Copy co-authors to clipboard |
 | `Ctrl+Shift+T` / `Cmd+Shift+T` | Copy commit date (ISO 8601 format) to clipboard |
+| `Ctrl+Shift+8` / `Cmd+Shift+8` | Copy relative date (e.g., "Today 2:30 PM", "3 days ago") to clipboard |
 | `Ctrl+Shift+;` / `Cmd+Shift+;` | Copy selected hashes to clipboard (2+ commits) |
 | `Ctrl+Shift+,` / `Cmd+Shift+,` | Copy file name only to clipboard |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
@@ -283,6 +284,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy diff stat summary | `Ctrl+Shift+9` / `Cmd+Shift+9` |
 | Copy as oneline | `Ctrl+Shift+Y` / `Cmd+Shift+Y` |
 | Copy commit date | `Ctrl+Shift+T` / `Cmd+Shift+T` |
+| Copy relative date | `Ctrl+Shift+8` / `Cmd+Shift+8` |
 | Copy short hash | `Ctrl+Shift+7` / `Cmd+Shift+7` |
 | Copy selected hashes | `Ctrl+Shift+;` / `Cmd+Shift+;` (when 2+ selected) |
 | Clear selection | `Escape` |

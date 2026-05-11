@@ -157,6 +157,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyRelativeDate",
+        "title": "Git History: Copy Relative Date",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyFileContent",
         "title": "Git History: Copy File Content at Commit",
         "category": "Git History"
@@ -407,6 +412,12 @@
         "command": "gitHistory.copyCommitDate",
         "key": "ctrl+shift+t",
         "mac": "cmd+shift+t",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyRelativeDate",
+        "key": "ctrl+shift+8",
+        "mac": "cmd+shift+8",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

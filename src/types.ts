@@ -92,6 +92,7 @@ export type WebviewAction =
   | 'copyDiffStatSummary'
   | 'copyCoAuthors'
   | 'copyCommitDate'
+  | 'copyRelativeDate'
   | 'copyOneline'
   | 'copyCommitBody'
   | 'copyFileContent'
@@ -171,6 +172,7 @@ export type WebviewToExtMessage =
   | { type: 'copyDiffStatSummary'; hash: string }
   | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
+  | { type: 'copyRelativeDate'; hash: string }
   | { type: 'copyOneline'; hash: string }
   | { type: 'copyCommitBody'; hash: string }
   | { type: 'copyFileContent'; hash: string; filePath: string }

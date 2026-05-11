@@ -159,6 +159,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyDiffStatSummary', action: 'copyDiffStatSummary' },
     { command: 'gitHistory.copyCoAuthors', action: 'copyCoAuthors' },
     { command: 'gitHistory.copyCommitDate', action: 'copyCommitDate' },
+    { command: 'gitHistory.copyRelativeDate', action: 'copyRelativeDate' },
     { command: 'gitHistory.copyOneline', action: 'copyOneline' },
     { command: 'gitHistory.copyCommitBody', action: 'copyCommitBody' },
     { command: 'gitHistory.copyFileContent', action: 'copyFileContent' },
