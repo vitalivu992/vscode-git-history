@@ -167,6 +167,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.createTag",
+        "title": "Git History: Create Tag from Commit",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.toggleMyCommits",
         "title": "Git History: Toggle My Commits",
         "category": "Git History"
