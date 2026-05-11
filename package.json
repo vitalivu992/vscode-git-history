@@ -157,6 +157,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFileName",
+        "title": "Git History: Copy File Name Only",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copySelectedHashes",
         "title": "Git History: Copy Selected Hashes",
         "category": "Git History"
@@ -394,6 +399,12 @@
         "command": "gitHistory.copySelectedHashes",
         "key": "ctrl+shift+;",
         "mac": "cmd+shift+;",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFileName",
+        "key": "ctrl+shift+,",
+        "mac": "cmd+shift+,",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

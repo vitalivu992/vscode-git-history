@@ -109,4 +109,32 @@ suite('Copy File Name E2E Tests', () => {
     assert.ok(source.includes("type: 'copyFileName'"),
       'Should send copyFileName message');
   });
+
+  test('package.json command registration', async () => {
+    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const content = fs.readFileSync(packageJsonPath, 'utf-8');
+
+    assert.ok(content.includes('"gitHistory.copyFileName"'),
+      'package.json should register copyFileName command');
+    assert.ok(content.includes('"Git History: Copy File Name Only"'),
+      'package.json should have command title');
+  });
+
+  test('package.json keybinding registration', async () => {
+    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const content = fs.readFileSync(packageJsonPath, 'utf-8');
+
+    // Find keybinding for copyFileName
+    const keybindingsSection = content.substring(
+      content.indexOf('"keybindings"'),
+      content.indexOf('"configuration"')
+    );
+
+    assert.ok(keybindingsSection.includes('"gitHistory.copyFileName"'),
+      'package.json should have keybinding for copyFileName');
+    assert.ok(keybindingsSection.includes('"ctrl+shift+,"'),
+      'package.json should bind copyFileName to Ctrl+Shift+,');
+    assert.ok(keybindingsSection.includes('"cmd+shift+,"'),
+      'package.json should bind copyFileName to Cmd+Shift+, on Mac');
+  });
 });
