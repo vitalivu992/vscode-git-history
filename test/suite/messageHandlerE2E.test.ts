@@ -303,6 +303,116 @@ suite('Copy Commit URL E2E Tests', () => {
     });
 });
 
+suite('Copy Parent Hash E2E Tests', () => {
+  test('handleCopyParentHash with commit that has parent', async () => {
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(messageHandlerPath, 'utf-8');
+
+    assert.ok(source.includes('function handleCopyParentHash'),
+      'handleCopyParentHash should be defined');
+    assert.ok(source.includes('panel.getCommits()'),
+      'Should get commits from panel');
+    assert.ok(source.includes('parentHashes[0]'),
+      'Should read parentHashes[0]');
+  });
+
+  test('handleCopyParentHash writes parent hash to clipboard', async () => {
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(messageHandlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyParentHash');
+    assert.ok(fnStart >= 0, 'handleCopyParentHash should exist');
+    const fnEnd = source.indexOf('\n}', fnStart);
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('vscode.env.clipboard.writeText'),
+      'Should write to clipboard');
+    assert.ok(fnBody.includes('Parent hash copied'),
+      'Should show confirmation message');
+  });
+
+  test('handleCopyParentHash handles root commit', async () => {
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(messageHandlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyParentHash');
+    const fnEnd = source.indexOf('\n}', fnStart);
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('Root commit has no parent'),
+      'Should handle root commit');
+  });
+
+  test('main.js handleCopyParentHash target resolution prioritizes focused', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyParentHash');
+    assert.ok(fnStart >= 0, 'handleCopyParentHash should exist');
+    const fnEnd = source.indexOf('\nfunction', fnStart + 1);
+    const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
+
+    assert.ok(fnBody.includes('focusedIndex'),
+      'Should check focusedIndex');
+    assert.ok(fnBody.includes('selectedCommits'),
+      'Should check selectedCommits');
+    assert.ok(fnBody.includes('focusedIndex >= 0'),
+      'Should prioritize focused over selected');
+  });
+
+  test('main.js handleCopyParentHash sends correct message type', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyParentHash');
+    const fnEnd = source.indexOf('\nfunction', fnStart + 1);
+    const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
+
+    assert.ok(fnBody.includes("type: 'copyParentHash'"),
+      'Should send copyParentHash message type');
+  });
+
+  test('main.js handleCopyParentHash handles no target', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyParentHash');
+    const fnEnd = source.indexOf('\nfunction', fnStart + 1);
+    const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
+
+    assert.ok(fnBody.includes('Select a commit to copy parent hash'),
+      'Should show error when no commit selected');
+  });
+
+  test('context menu has copy-parent-hash item', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('data-action="copy-parent-hash"'),
+      'Context menu should include copy-parent-hash');
+    assert.ok(source.includes('Copy parent hash'),
+      'Context menu should have label Copy parent hash');
+  });
+
+  test('Ctrl+Shift+V keyboard shortcut integration', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("e.key === 'v'") && source.includes('handleCopyParentHash'),
+      'Ctrl+Shift+V shortcut should be handled');
+  });
+
+  test('package.json command registration', async () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const content = fs.readFileSync(packageJsonPath, 'utf-8');
+
+    assert.ok(content.includes('"gitHistory.copyParentHash"'),
+      'package.json should register copyParentHash command');
+    assert.ok(content.includes('"ctrl+shift+v"'),
+      'package.json should define Ctrl+Shift+V keybinding');
+  });
+});
+
 suite('Keybinding Registration E2E Tests', () => {
   const expectedWebviewActions = [
     { command: 'gitHistory.refresh', action: 'refresh' },
