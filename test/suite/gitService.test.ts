@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, checkoutBranch, getCommitUrl } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, checkoutBranch, getCommitUrl, getBranchUrl } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -802,6 +802,109 @@ suite('Commit URL Generation Tests', () => {
       await withRemote('https://github.com/owner/repo.git', 'upstream', async () => {
         const url = await getCommitUrl(commitHash, urlTestDir, 'upstream');
         assert.strictEqual(url, `https://github.com/owner/repo/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+  });
+
+  suite('getBranchUrl', () => {
+    const { execSync } = require('child_process');
+    let branchUrlTestDir: string;
+
+    suiteSetup(() => {
+      branchUrlTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-branch-url-test-'));
+      execSync('git init', { cwd: branchUrlTestDir });
+      execSync('git config user.name "Test User"', { cwd: branchUrlTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: branchUrlTestDir });
+      execSync('git commit --allow-empty -m "Initial"', { cwd: branchUrlTestDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(branchUrlTestDir)) {
+        fs.rmSync(branchUrlTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withBranchRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: branchUrlTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: branchUrlTestDir });
+      }
+    }
+
+    test('should generate GitHub branch URL', async () => {
+      await withBranchRemote('https://github.com/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, 'https://github.com/owner/repo/tree/main');
+      });
+    });
+
+    test('should generate GitHub SSH branch URL', async () => {
+      await withBranchRemote('git@github.com:owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('feature/test', branchUrlTestDir);
+        assert.strictEqual(url, 'https://github.com/owner/repo/tree/feature/test');
+      });
+    });
+
+    test('should generate GitLab branch URL', async () => {
+      await withBranchRemote('https://gitlab.com/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('develop', branchUrlTestDir);
+        assert.strictEqual(url, 'https://gitlab.com/owner/repo/-/tree/develop');
+      });
+    });
+
+    test('should generate GitLab SSH branch URL', async () => {
+      await withBranchRemote('git@gitlab.com:owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, 'https://gitlab.com/owner/repo/-/tree/main');
+      });
+    });
+
+    test('should generate Bitbucket branch URL', async () => {
+      await withBranchRemote('https://bitbucket.org/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, 'https://bitbucket.org/owner/repo/src/main');
+      });
+    });
+
+    test('should generate Bitbucket SSH branch URL', async () => {
+      await withBranchRemote('git@bitbucket.org:owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('release/v2', branchUrlTestDir);
+        assert.strictEqual(url, 'https://bitbucket.org/owner/repo/src/release/v2');
+      });
+    });
+
+    test('should generate GitHub Enterprise branch URL', async () => {
+      await withBranchRemote('https://github.company.com/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, 'https://github.company.com/owner/repo/tree/main');
+      });
+    });
+
+    test('should generate self-hosted GitLab branch URL', async () => {
+      await withBranchRemote('https://gitlab.company.com/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, 'https://gitlab.company.com/owner/repo/-/tree/main');
+      });
+    });
+
+    test('should return null for unknown platform', async () => {
+      await withBranchRemote('https://unknown-platform.com/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, null);
+      });
+    });
+
+    test('should return null when no remote configured', async () => {
+      const url = await getBranchUrl('main', branchUrlTestDir);
+      assert.strictEqual(url, null);
+    });
+
+    test('should work with custom remote name', async () => {
+      await withBranchRemote('https://github.com/owner/repo.git', 'upstream', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir, 'upstream');
+        assert.strictEqual(url, 'https://github.com/owner/repo/tree/main');
       });
     });
   });
