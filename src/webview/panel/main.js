@@ -258,6 +258,7 @@ const exportBtn = document.getElementById('export-btn');
 const myCommitsBtn = document.getElementById('my-commits-btn');
 const commitCountEl = document.getElementById('commit-count');
 const copyFilterQueryBtn = document.getElementById('copy-filter-query-btn');
+const pasteFilterQueryBtn = document.getElementById('paste-filter-query-btn');
 
 let isRefreshing = false;
 
@@ -1265,6 +1266,10 @@ function init() {
     copyFilterQueryBtn.addEventListener('click', handleCopyFilterQuery);
   }
 
+  if (pasteFilterQueryBtn) {
+    pasteFilterQueryBtn.addEventListener('click', handlePasteFilterQuery);
+  }
+
   if (ignoreWsBtn) {
     ignoreWsBtn.addEventListener('click', handleIgnoreWhitespaceToggle);
   }
@@ -1598,6 +1603,10 @@ function handleMessage(event) {
       handleSelectCommit(message.hash);
       break;
 
+    case 'applyFilterQuery':
+      applyFilterQuery(message.filterState);
+      break;
+
     case 'showFirstRunTip':
       if (message.showFirstRunTip) {
         showFirstRunTipBanner();
@@ -1648,6 +1657,7 @@ function handleMessage(event) {
         case 'cycleDiffContextLines': handleDiffContextLinesCycle(); break;
         case 'cycleSortMode': handleSortToggle(); break;
         case 'copyFilterQuery': handleCopyFilterQuery(); break;
+        case 'pasteFilterQuery': handlePasteFilterQuery(); break;
       }
       break;
   }
@@ -2809,6 +2819,54 @@ function handleCopyFilterQuery() {
   vscode.postMessage({ type: 'copyFilterQuery', filterState });
 }
 
+function handlePasteFilterQuery() {
+  vscode.postMessage({ type: 'pasteFilterQuery' });
+}
+
+function applyFilterQuery(filterState) {
+  if (!filterState || typeof filterState !== 'object') {
+    return;
+  }
+
+  if (typeof filterState.query === 'string') {
+    searchInput.value = filterState.query;
+    searchQuery = filterState.query;
+  }
+  if (typeof filterState.hideMergeCommits === 'boolean') {
+    hideMergeCommits = filterState.hideMergeCommits;
+    if (mergeToggleBtn) {
+      if (hideMergeCommits) {
+        mergeToggleBtn.classList.add('active');
+        mergeToggleBtn.title = 'Merge commits hidden (click to show)';
+      } else {
+        mergeToggleBtn.classList.remove('active');
+        mergeToggleBtn.title = 'Hide merge commits';
+      }
+    }
+  }
+  if (typeof filterState.sortMode === 'number' && filterState.sortMode >= 0 && filterState.sortMode <= 3) {
+    sortMode = filterState.sortMode;
+    updateSortButton();
+  }
+  if (typeof filterState.showMyCommitsOnly === 'boolean') {
+    showMyCommitsOnly = filterState.showMyCommitsOnly;
+    if (myCommitsBtn) {
+      if (showMyCommitsOnly) {
+        myCommitsBtn.classList.add('active');
+        myCommitsBtn.title = 'Showing only my commits (click to show all)';
+      } else {
+        myCommitsBtn.classList.remove('active');
+        myCommitsBtn.title = 'Show only my commits (Ctrl+Shift+M)';
+      }
+    }
+  }
+
+  focusedIndex = -1;
+  renderCommits();
+  updateCommitCount();
+  renderFilterBadges();
+}
+
 function handleCopyOneline() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -3301,6 +3359,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
         { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
         { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
+        { keys: [cmdKey, 'Shift', '4'], description: 'Paste filter query from clipboard' },
         { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
         { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' }
       ]
