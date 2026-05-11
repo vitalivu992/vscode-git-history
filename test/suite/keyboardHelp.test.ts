@@ -31,6 +31,7 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
         { keys: ['Enter'], description: 'Select focused commit' },
         { keys: ['Shift', 'Enter'], description: 'Select range from anchor to focused' },
         { keys: [cmdKey, 'Enter'], description: 'Add/remove from multi-selection' },
+        { keys: [cmdKey, 'A'], description: 'Select all visible commits' },
         { keys: ['?'], description: 'Show this help dialog' },
         { keys: ['Esc'], description: 'Clear selection and close dialogs' }
       ]
@@ -41,14 +42,18 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
         { keys: ['/'], description: 'Focus search input' },
         { keys: [cmdKey, 'F'], description: 'Focus search input' },
         { keys: [cmdKey, 'Shift', 'X'], description: 'Toggle regex search mode' },
-        { keys: [cmdKey, 'G'], description: 'Jump to commit by hash' }
+        { keys: [cmdKey, 'G'], description: 'Jump to commit by hash' },
+        { keys: [cmdKey, 'Shift', 'Q'], description: 'Toggle hide merge commits' },
+        { keys: [cmdKey, altKey, 'B'], description: 'Show branch picker' }
       ]
     },
     {
       category: 'View Options',
       items: [
         { keys: [cmdKey, 'Shift', 'W'], description: 'Toggle word wrap' },
-        { keys: [cmdKey, altKey, 'P'], description: 'Quick compare with parent' }
+        { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
+        { keys: [cmdKey, altKey, 'P'], description: 'Quick compare with parent' },
+        { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' }
       ]
     },
     {
@@ -64,7 +69,17 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
         { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' },
         { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
         { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
-        { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' }
+        { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' },
+        { keys: [cmdKey, 'Shift', 'A'], description: 'Copy author email' },
+        { keys: [cmdKey, 'Shift', 'N'], description: 'Copy author name' },
+        { keys: [cmdKey, 'Shift', 'V'], description: 'Copy parent hash' },
+        { keys: [cmdKey, 'Shift', '7'], description: 'Copy short hash' },
+        { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' },
+        { keys: [cmdKey, 'Shift', 'T'], description: 'Copy commit date' },
+        { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
+        { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
+        { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
+        { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' }
       ]
     },
     {
@@ -219,6 +234,56 @@ suite('Keyboard Help Logic Tests', () => {
 
     assert.ok(escShortcut, 'Escape shortcut should exist');
     assert.deepStrictEqual(escShortcut!.keys, ['Esc']);
+  });
+
+  test('Search & Filter should include Toggle hide merge commits', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const searchCategory = shortcuts.find(s => s.category === 'Search & Filter');
+    assert.ok(searchCategory, 'Search & Filter category should exist');
+
+    const toggleMerge = searchCategory!.items.find(item => item.description === 'Toggle hide merge commits');
+    assert.ok(toggleMerge, 'Toggle hide merge commits shortcut should exist');
+    assert.deepStrictEqual(toggleMerge!.keys, ['Cmd', 'Shift', 'Q'], 'Should use Cmd+Shift+Q on Mac');
+  });
+
+  test('Search & Filter should include Show branch picker', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const searchCategory = shortcuts.find(s => s.category === 'Search & Filter');
+    assert.ok(searchCategory, 'Search & Filter category should exist');
+
+    const branchPicker = searchCategory!.items.find(item => item.description === 'Show branch picker');
+    assert.ok(branchPicker, 'Show branch picker shortcut should exist');
+    assert.deepStrictEqual(branchPicker!.keys, ['Cmd', 'Option', 'B'], 'Should use Cmd+Option+B on Mac');
+  });
+
+  test('View Options should include Toggle ignore whitespace', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const viewCategory = shortcuts.find(s => s.category === 'View Options');
+    assert.ok(viewCategory, 'View Options category should exist');
+
+    const toggleIgnoreWs = viewCategory!.items.find(item => item.description === 'Toggle ignore whitespace');
+    assert.ok(toggleIgnoreWs, 'Toggle ignore whitespace shortcut should exist');
+    assert.deepStrictEqual(toggleIgnoreWs!.keys, ['Cmd', 'Shift', 'J'], 'Should use Cmd+Shift+J on Mac');
+  });
+
+  test('Copy Commands should include Copy tags', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyTags = copyCategory!.items.find(item => item.description === 'Copy tags');
+    assert.ok(copyTags, 'Copy tags shortcut should exist');
+    assert.deepStrictEqual(copyTags!.keys, ['Cmd', 'Shift', 'G'], 'Should use Cmd+Shift+G on Mac');
+  });
+
+  test('Copy Commands should include Copy as oneline', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyOneline = copyCategory!.items.find(item => item.description === 'Copy as oneline');
+    assert.ok(copyOneline, 'Copy as oneline shortcut should exist');
+    assert.deepStrictEqual(copyOneline!.keys, ['Cmd', 'Shift', 'Y'], 'Should use Cmd+Shift+Y on Mac');
   });
 });
 
