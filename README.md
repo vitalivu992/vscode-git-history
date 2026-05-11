@@ -25,7 +25,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Ignore Whitespace Toggle**: Toggle ignore whitespace in diffs to focus on actual code changes rather than formatting/indentation differences. Uses git's `-w` flag to render cleaner diffs when only whitespace has changed.
 - **Changed Files**: See all files modified in a commit with status indicators (Added/Modified/Deleted/Renamed)
 - **Git Tags**: Tag badges displayed in commit list for annotated and lightweight tags
-- **Blame Annotations**: Toggle inline blame annotations showing commit author and date per line, with a status bar showing commit details for the current line
+- **Blame Annotations**: Toggle inline blame annotations showing commit author and date per line, with a status bar showing commit details for the current line. Click on any blame decoration to view the full commit in the history panel. (Note: Requires an active text editor)
 - **Date Display**: Commit dates show relative time (e.g., "Today 2:30 PM", "Yesterday 3:45 PM") with time for recent commits; hover to see absolute timestamps
 - **Expandable Commit Messages**: Click the arrow button on commits with multi-line messages to view the full commit body
 - **Hide Merge Commits**: Toggle the "No Merge" button to filter out merge commits and focus on actual work commits; the count indicator shows how many commits are hidden
@@ -206,6 +206,8 @@ Navigate the commit list using keyboard shortcuts:
 3. Inline decorations appear showing the author and date for each line's last commit
 4. The status bar shows commit details for the current line
 5. Click the status bar or use "Git: Show Blame Commit" to view the full commit diff
+
+**Note**: The "Show Blame Commit" command requires an active text editor. If triggered without an active editor, a warning message "No active editor found" will be displayed.
 
 ## Requirements
 
