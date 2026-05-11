@@ -235,8 +235,15 @@ suite('Copy File Content Integration Tests', () => {
       filePath: testFile
     };
 
+    // Mock FirstRunTipService
+    const mockFirstRunTipService: any = {
+      shouldShowTip: () => false,
+      markAsShown: async () => {},
+      reset: async () => {}
+    };
+
     try {
-      await handleMessage(message, mockPanel, mockSettingsService);
+      await handleMessage(message, mockPanel, mockSettingsService, mockFirstRunTipService);
       assert.ok(true, 'Message handler processed copyFileContent without error');
     } catch (error) {
       // Expected to fail in test environment due to vscode.env.clipboard not being available

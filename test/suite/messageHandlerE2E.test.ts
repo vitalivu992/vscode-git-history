@@ -95,11 +95,18 @@ suite('Open File at Commit E2E Tests', () => {
       setSetting: async () => {}
     };
 
+    const mockFirstRunTipService: any = {
+      shouldShowTip: () => false,
+      markAsShown: async () => {},
+      reset: async () => {}
+    };
+
     try {
       await handleMessage(
         { type: 'openFileAtCommit', hash: commitHashes[0], filePath: testFile },
         mockPanel,
-        mockSettingsService
+        mockSettingsService,
+        mockFirstRunTipService
       );
     } catch (error) {
       // Expected in test environment - VS Code APIs not available
@@ -128,11 +135,18 @@ suite('Open File at Commit E2E Tests', () => {
       setSetting: async () => {}
     };
 
+    const mockFirstRunTipService: any = {
+      shouldShowTip: () => false,
+      markAsShown: async () => {},
+      reset: async () => {}
+    };
+
     try {
       await handleMessage(
         { type: 'copyFilePath', filePath: 'src/webview/panel/main.js' },
         mockPanel,
-        mockSettingsService
+        mockSettingsService,
+        mockFirstRunTipService
       );
     } catch (error) {
       // Expected in test environment
@@ -159,10 +173,17 @@ suite('Open File at Commit E2E Tests', () => {
       setSetting: async () => {}
     };
 
+    const mockFirstRunTipService: any = {
+      shouldShowTip: () => false,
+      markAsShown: async () => {},
+      reset: async () => {}
+    };
+
     await handleMessage(
       { type: 'nonExistentMessageType' },
       mockPanel,
-      mockSettingsService
+      mockSettingsService,
+      mockFirstRunTipService
     );
 
     assert.ok(true, 'Unknown message type should not crash');

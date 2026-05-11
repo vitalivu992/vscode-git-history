@@ -119,8 +119,14 @@ suite('Open File at Commit Feature', () => {
       setSetting: async () => {}
     };
 
+    const mockFirstRunTipService: any = {
+      shouldShowTip: () => false,
+      markAsShown: async () => {},
+      reset: async () => {}
+    };
+
     try {
-      await handleMessage(message, mockPanel, mockSettingsService as any);
+      await handleMessage(message, mockPanel, mockSettingsService as any, mockFirstRunTipService);
       assert.ok(true, 'Message handler processed openFileAtCommit without error');
     } catch (error) {
       assert.ok(true, 'Handler attempted to process (may fail due to missing VS Code APIs in test)');
