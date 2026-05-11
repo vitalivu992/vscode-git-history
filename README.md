@@ -54,7 +54,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Quick Compare with Parent**: Instantly compare the selected commit with its parent to see what changed in that specific commit. Use the "Compare" button or press `Ctrl+Alt+P` / `Cmd+Alt+P`. For root commits (first commit), an error is shown since there's no parent.
 - **Create Branch from Commit**: Right-click on any commit to create a new branch at that point in history. You'll be prompted for a branch name, and the branch will be created at the selected commit using `git branch <name> <hash>`.
 - **Create Tag from Commit**: Right-click on any commit to create a new git tag at that point in history. Supports both lightweight tags (enter tag name only) and annotated tags (enter a message when prompted). The tag will be created using `git tag <name> <hash>` or `git tag -a <name> -m <message> <hash>`.
-- **Branch Switching**: Right-click on the branch badge or press `Ctrl+Alt+B` / `Cmd+Alt+B` to switch between branches. A searchable picker dialog shows all local and remote branches. The panel automatically refreshes after successful checkout.
+- **Branch Switching**: Right-click on the branch badge or press `Ctrl+Alt+S` / `Cmd+Alt+S` to switch between branches. A searchable picker dialog shows all local and remote branches. The panel automatically refreshes after successful checkout.
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
 - **Copy File Path**: Right-click on any file in the changed files list to copy its full path to clipboard
@@ -187,7 +187,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
 | `Ctrl+Shift+M` / `Cmd+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
-| `Ctrl+Shift+B` / `Cmd+Shift+B` | Copy branch name to clipboard |
+| `Ctrl+Alt+B` / `Cmd+Alt+B` | Copy branch name to clipboard |
 | `Ctrl+Shift+G` / `Cmd+Shift+G` | Copy tags to clipboard |
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email to clipboard |
 | `Ctrl+Shift+N` / `Cmd+Shift+N` | Copy author name to clipboard |
@@ -205,7 +205,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+O` / `Cmd+Shift+O` | Export filtered commits to file |
 | `Ctrl+Shift+5` / `Cmd+Shift+5` | Copy filter query state to clipboard (includes search query and all toggle states as JSON) |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
-| `Ctrl+Alt+B` / `Cmd+Alt+B` | Show branch switcher |
+| `Ctrl+Alt+S` / `Cmd+Alt+S` | Show branch switcher |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
 | `Ctrl+Shift+X` / `Cmd+Shift+X` | Toggle regex search mode |

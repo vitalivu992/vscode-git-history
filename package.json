@@ -361,8 +361,8 @@
       },
       {
         "command": "gitHistory.copyBranchName",
-        "key": "ctrl+shift+b",
-        "mac": "cmd+shift+b",
+        "key": "ctrl+alt+b",
+        "mac": "cmd+alt+b",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -475,8 +475,8 @@
       },
       {
         "command": "gitHistory.checkoutBranch",
-        "key": "ctrl+alt+b",
-        "mac": "cmd+alt+b",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

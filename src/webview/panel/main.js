@@ -394,8 +394,8 @@ function handleKeyDown(e) {
     return;
   }
 
-  // Ctrl+Shift+B: Copy branch name
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'b') {
+  // Ctrl+Alt+B: Copy branch name
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'b') {
     e.preventDefault();
     handleCopyBranchName();
     return;
@@ -513,8 +513,8 @@ function handleKeyDown(e) {
     return;
   }
 
-  // Ctrl+Alt+B: Show branch picker
-  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'b') {
+  // Ctrl+Alt+S: Show branch picker
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 's') {
     e.preventDefault();
     if (_allBranches.length > 0) {
       showBranchPickerDialog();
@@ -3257,7 +3257,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'X'], description: 'Toggle regex search mode' },
         { keys: [cmdKey, 'G'], description: 'Jump to commit by hash' },
         { keys: [cmdKey, 'Shift', 'Q'], description: 'Toggle hide merge commits' },
-        { keys: [cmdKey, 'Alt', 'B'], description: 'Show branch picker' }
+        { keys: [cmdKey, 'Alt', 'S'], description: 'Show branch picker' }
       ]
     },
     {
@@ -3284,7 +3284,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' },
         { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
         { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
-        { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' },
+        { keys: [cmdKey, 'Alt', 'B'], description: 'Copy branch name' },
         { keys: [cmdKey, 'Shift', 'A'], description: 'Copy author email' },
         { keys: [cmdKey, 'Shift', 'N'], description: 'Copy author name' },
         { keys: [cmdKey, 'Shift', 'V'], description: 'Copy parent hash' },
