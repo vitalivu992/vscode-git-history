@@ -18,6 +18,7 @@ let currentBranch = null; // Current git branch name
 let hideMergeCommits = false; // Filter out merge commits (commits with multiple parents)
 let wordWrapEnabled = false; // Word wrap toggle for diff view
 let rangeSelectionAnchor = null; // Anchor commit for Shift+click range selection
+let rangeSelectionTarget = null; // Target commit for Shift+click range selection
 let regexSearchEnabled = false; // Regex search mode toggle
 let branches = []; // All available branches from init message
 let branchCommitHashes = {}; // Map: branchName -> Set of commit hashes
@@ -419,6 +420,20 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Alt+D: Copy combined diff (multi-select)
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'd') {
+    e.preventDefault();
+    handleCopyCombinedDiff();
+    return;
+  }
+
+  // Ctrl+Alt+R: Copy range diff
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'r') {
+    e.preventDefault();
+    handleCopyRangeDiff();
+    return;
+  }
+
   // Ctrl+Shift+E: Copy commit as patch
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'e') {
     e.preventDefault();
@@ -718,6 +733,7 @@ function handleKeyDown(e) {
             selectedCommits.delete(commit.hash);
             if (selectedCommits.size === 0) {
               rangeSelectionAnchor = null;
+              rangeSelectionTarget = null;
             }
           } else {
             selectedCommits.add(commit.hash);
@@ -1675,6 +1691,8 @@ function handleMessage(event) {
         case 'copyRevert': handleCopyRevert(); break;
         case 'copyCommitFiles': handleCopyFiles(); break;
         case 'copyCommitDiff': handleCopyDiff(); break;
+        case 'copyCombinedDiff': handleCopyCombinedDiff(); break;
+        case 'copyRangeDiff': handleCopyRangeDiff(); break;
         case 'copyCommitPatch': handleCopyPatch(); break;
         case 'copyCommitUrl': handleCopyUrl(); break;
         case 'copyBranchName': handleCopyBranchName(); break;
@@ -1856,6 +1874,7 @@ function renderCommits() {
           selectedCommits.delete(commit.hash);
           if (selectedCommits.size === 0) {
             rangeSelectionAnchor = null;
+            rangeSelectionTarget = null;
           }
         } else {
           selectedCommits.add(commit.hash);
@@ -1902,6 +1921,7 @@ function selectCommit(hash) {
 function clearSelection() {
   selectedCommits.clear();
   rangeSelectionAnchor = null;
+  rangeSelectionTarget = null;
   updateSelectedRows();
 }
 
@@ -1927,6 +1947,10 @@ function handleRangeSelection(anchorHash, targetHash) {
   if (anchorIndex === -1 || targetIndex === -1) {
     return;
   }
+
+  // Store anchor and target for copy range diff
+  rangeSelectionAnchor = anchorHash;
+  rangeSelectionTarget = targetHash;
 
   // Select all commits between anchor and target (inclusive)
   const startIndex = Math.min(anchorIndex, targetIndex);
@@ -2356,6 +2380,14 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy selected hashes</span>
     </div>
+    <div class="context-menu-item" data-action="copy-combined-diff" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy combined diff</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-range-diff" style="display: ${rangeSelectionAnchor !== null ? 'block' : 'none'}">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy range diff</span>
+    </div>
     <div class="context-menu-item" data-action="compare-parent">
       <span class="context-menu-icon">⧁</span>
       <span class="context-menu-label">Compare with parent</span>
@@ -2425,6 +2457,10 @@ function showCommitContextMenu(event, commit) {
         handleCreateTag();
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
+      } else if (action === 'copy-combined-diff') {
+        handleCopyCombinedDiff();
+      } else if (action === 'copy-range-diff') {
+        handleCopyRangeDiff();
       } else if (action === 'compare-parent') {
         vscode.postMessage({ type: 'quickCompare', hash: commit.hash });
       }
@@ -2674,6 +2710,23 @@ function handleCopyDiff() {
     vscode.postMessage({ type: 'copyCommitDiff', hash });
   } else {
     showError('Select a commit to copy its diff');
+  }
+}
+
+function handleCopyCombinedDiff() {
+  const hashes = [...selectedCommits];
+  if (hashes.length < 2) {
+    showError('Select at least 2 commits (Ctrl+click) to copy combined diff');
+    return;
+  }
+  vscode.postMessage({ type: 'copyCombinedDiff', hashes });
+}
+
+function handleCopyRangeDiff() {
+  if (rangeSelectionAnchor && rangeSelectionTarget) {
+    vscode.postMessage({ type: 'copyRangeDiff', fromHash: rangeSelectionAnchor, toHash: rangeSelectionTarget });
+  } else {
+    showError('Select a range of commits (Shift+click) to copy range diff');
   }
 }
 
@@ -3424,6 +3477,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
         { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
         { keys: [cmdKey, 'Shift', 'D'], description: 'Copy commit diff' },
+        { keys: [cmdKey, 'Alt', 'D'], description: 'Copy combined diff (multi-select)' },
+        { keys: [cmdKey, 'Alt', 'R'], description: 'Copy range diff (range select)' },
         { keys: [cmdKey, 'Shift', 'E'], description: 'Copy commit as patch' },
         { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
         { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
