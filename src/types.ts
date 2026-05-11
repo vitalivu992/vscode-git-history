@@ -83,6 +83,7 @@ export type WebviewAction =
   | 'copyCommitStats'
   | 'copyBranchName'
   | 'copyBranchUrl'
+  | 'copyRemoteUrl'
   | 'copyTags'
   | 'copySelectedHashes'
   | 'copyAuthorEmail'
@@ -173,6 +174,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitStats'; hash: string }
   | { type: 'copyBranchName' }
   | { type: 'copyBranchUrl' }
+  | { type: 'copyRemoteUrl' }
   | { type: 'copyTags'; hash: string }
   | { type: 'copySelectedHashes'; hashes: string[] }
   | { type: 'copyAuthorEmail'; hash: string }

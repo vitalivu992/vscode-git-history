@@ -117,6 +117,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyRemoteUrl",
+        "title": "Git History: Copy Remote URL",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyTags",
         "title": "Git History: Copy Tags",
         "category": "Git History"
@@ -421,6 +426,12 @@
         "command": "gitHistory.copyBranchUrl",
         "key": "ctrl+alt+u",
         "mac": "cmd+alt+u",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyRemoteUrl",
+        "key": "ctrl+alt+o",
+        "mac": "cmd+alt+o",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

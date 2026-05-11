@@ -97,6 +97,10 @@ export async function handleMessage(
       handleCopyBranchUrl(panel);
       break;
 
+    case 'copyRemoteUrl':
+      handleCopyRemoteUrl(panel);
+      break;
+
     case 'copyTags':
       handleCopyTags(message.hash, panel);
       break;
@@ -939,6 +943,19 @@ function handleCopyBranchUrl(panel: GitHistoryPanel): void {
 
     void vscode.env.clipboard.writeText(url).then(() => {
       void vscode.window.showInformationMessage(`Branch URL copied: ${url}`);
+    });
+  });
+}
+
+function handleCopyRemoteUrl(panel: GitHistoryPanel): void {
+  const cwd = panel.getCwd();
+  getRemoteUrl(cwd).then(url => {
+    if (!url) {
+      void vscode.window.showInformationMessage('No git remote configured');
+      return;
+    }
+    void vscode.env.clipboard.writeText(url).then(() => {
+      void vscode.window.showInformationMessage(`Remote URL copied: ${url}`);
     });
   });
 }
