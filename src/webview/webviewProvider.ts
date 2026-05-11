@@ -162,6 +162,10 @@ export class GitHistoryPanel {
     return this._diffContextLines;
   }
 
+  public setDiffContextLines(value: number): void {
+    this._diffContextLines = Math.max(1, Math.min(10, value));
+  }
+
   public onWebviewReady(): void {
     this._webviewReady = true;
     if (this._pendingInit) {
@@ -257,6 +261,9 @@ export class GitHistoryPanel {
       <button id="compare-parent-btn" class="compare-parent-btn" title="Compare with parent (Ctrl+Alt+P)">Compare</button>
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
       <button id="ignore-ws-btn" class="ignore-ws-btn" title="Toggle ignore whitespace (Ctrl+Shift+J)">W</button>
+      <button id="context-lines-btn" class="context-lines-btn" title="Diff context lines (Ctrl+Shift+/)">
+        <span id="context-lines-value">3</span>
+      </button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
       <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>

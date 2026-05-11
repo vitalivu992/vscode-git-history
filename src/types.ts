@@ -168,4 +168,5 @@ export type WebviewToExtMessage =
   | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown'; commits: CommitInfo[] }
   | { type: 'requestBranchHashes'; branches: string[] }
   | { type: 'checkoutBranch'; branch: string }
+  | { type: 'changeDiffContextLines'; value: number }
   | { type: 'dismissFirstRunTip' };

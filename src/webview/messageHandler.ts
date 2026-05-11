@@ -186,6 +186,10 @@ export async function handleMessage(
       await handleDismissFirstRunTip(firstRunTipService);
       break;
 
+    case 'changeDiffContextLines':
+      panel.setDiffContextLines(message.value);
+      break;
+
     default:
       console.error('Unknown message type:', message);
   }

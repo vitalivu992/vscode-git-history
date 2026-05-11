@@ -16,6 +16,8 @@ export interface UserSettings {
   showMyCommitsOnly: boolean;
   /** Whether to ignore whitespace in diffs */
   ignoreWhitespace: boolean;
+  /** Number of context lines in diffs (1-10) */
+  diffContextLines: number;
   /** Saved search query for persistence across sessions */
   searchQuery: string;
 }
@@ -31,6 +33,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   regexSearchEnabled: false,
   showMyCommitsOnly: false,
   ignoreWhitespace: false,
+  diffContextLines: 3,
   searchQuery: ''
 };
 
