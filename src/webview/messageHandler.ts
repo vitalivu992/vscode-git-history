@@ -124,6 +124,10 @@ export async function handleMessage(
       handleCopyCommitDate(message.hash, panel);
       break;
 
+    case 'copyOneline':
+      handleCopyOneline(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -884,6 +888,22 @@ function handleCopyCommitDate(hash: string, panel: GitHistoryPanel): void {
   const dateStr = new Date(commit.date).toISOString();
   void vscode.env.clipboard.writeText(dateStr).then(() => {
     void vscode.window.showInformationMessage(`Copied date: ${dateStr}`);
+  });
+}
+
+function handleCopyOneline(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const oneline = `${commit.shortHash} ${commit.message}`;
+  void vscode.env.clipboard.writeText(oneline).then(() => {
+    const shortMsg = commit.message.length > 50
+      ? commit.message.substring(0, 47) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied: ${commit.shortHash} ${shortMsg}`);
   });
 }
 

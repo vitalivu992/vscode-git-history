@@ -446,6 +446,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+Y: Copy as oneline
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'y') {
+    e.preventDefault();
+    handleCopyOneline();
+    return;
+  }
+
   // Ctrl+Shift+;: Copy selected hashes
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === ';') {
     e.preventDefault();
@@ -1341,6 +1348,7 @@ function handleMessage(event) {
         case 'copyParentHash': handleCopyParentHash(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
+        case 'copyOneline': handleCopyOneline(); break;
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
         case 'copyCommitDate': handleCopyCommitDate(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
@@ -1929,6 +1937,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📌</span>
       <span class="context-menu-label">Copy subject</span>
     </div>
+    <div class="context-menu-item" data-action="copy-oneline">
+      <span class="context-menu-icon">≡</span>
+      <span class="context-menu-label">Copy as oneline</span>
+    </div>
     <div class="context-menu-item" data-action="copy-co-authors">
       <span class="context-menu-icon">👥</span>
       <span class="context-menu-label">Copy co-authors</span>
@@ -1995,6 +2007,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyShortHash', hash: commit.hash });
       } else if (action === 'copy-subject') {
         vscode.postMessage({ type: 'copySubject', hash: commit.hash });
+      } else if (action === 'copy-oneline') {
+        vscode.postMessage({ type: 'copyOneline', hash: commit.hash });
       } else if (action === 'copy-co-authors') {
         vscode.postMessage({ type: 'copyCoAuthors', hash: commit.hash });
       } else if (action === 'copy-commit-date') {
@@ -2422,6 +2436,29 @@ function handleCopySubject() {
 
   vscode.postMessage({
     type: 'copySubject',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyOneline() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy as oneline');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyOneline',
     hash: targetCommit.hash
   });
 }

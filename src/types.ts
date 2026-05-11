@@ -91,6 +91,7 @@ export type WebviewAction =
   | 'copySubject'
   | 'copyCoAuthors'
   | 'copyCommitDate'
+  | 'copyOneline'
   | 'exportCommits'
   | 'quickCompare'
   | 'toggleMyCommits'
@@ -148,6 +149,7 @@ export type WebviewToExtMessage =
   | { type: 'copySubject'; hash: string }
   | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
+  | { type: 'copyOneline'; hash: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
   | { type: 'exportCommits'; format: 'json' | 'csv'; commits: CommitInfo[] }
