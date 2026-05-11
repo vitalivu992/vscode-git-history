@@ -132,6 +132,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyDiffStatSummary",
+        "title": "Git History: Copy Diff Stat Summary",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyOneline",
         "title": "Git History: Copy Commit as Oneline",
         "category": "Git History"
@@ -159,6 +164,11 @@
       {
         "command": "gitHistory.copyFileName",
         "title": "Git History: Copy File Name Only",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyFilePath",
+        "title": "Git History: Copy File Path",
         "category": "Git History"
       },
       {
@@ -377,6 +387,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyDiffStatSummary",
+        "key": "ctrl+shift+9",
+        "mac": "cmd+shift+9",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyCoAuthors",
         "key": "ctrl+shift+k",
         "mac": "cmd+shift+k",
@@ -410,6 +426,12 @@
         "command": "gitHistory.copyFileName",
         "key": "ctrl+shift+,",
         "mac": "cmd+shift+,",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFilePath",
+        "key": "ctrl+shift+\\.",
+        "mac": "cmd+shift+.",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

@@ -435,6 +435,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+9: Copy diff stat summary
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '9') {
+    e.preventDefault();
+    handleCopyDiffStatSummary();
+    return;
+  }
+
   // Ctrl+Shift+K: Copy co-authors
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'k') {
     e.preventDefault();
@@ -1587,6 +1594,7 @@ function handleMessage(event) {
         case 'copyParentHash': handleCopyParentHash(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
+        case 'copyDiffStatSummary': handleCopyDiffStatSummary(); break;
         case 'copyOneline': handleCopyOneline(); break;
         case 'copyCommitBody': handleCopyCommitBody(); break;
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
@@ -2201,6 +2209,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📌</span>
       <span class="context-menu-label">Copy subject</span>
     </div>
+    <div class="context-menu-item" data-action="copy-diff-stat-summary">
+      <span class="context-menu-icon">📊</span>
+      <span class="context-menu-label">Copy diff stat summary</span>
+    </div>
     <div class="context-menu-item" data-action="copy-oneline">
       <span class="context-menu-icon">≡</span>
       <span class="context-menu-label">Copy as oneline</span>
@@ -2283,6 +2295,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyShortHash', hash: commit.hash });
       } else if (action === 'copy-subject') {
         vscode.postMessage({ type: 'copySubject', hash: commit.hash });
+      } else if (action === 'copy-diff-stat-summary') {
+        vscode.postMessage({ type: 'copyDiffStatSummary', hash: commit.hash });
       } else if (action === 'copy-oneline') {
         vscode.postMessage({ type: 'copyOneline', hash: commit.hash });
       } else if (action === 'copy-commit-body') {
@@ -2718,6 +2732,29 @@ function handleCopySubject() {
 
   vscode.postMessage({
     type: 'copySubject',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyDiffStatSummary() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy diff stat summary');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyDiffStatSummary',
     hash: targetCommit.hash
   });
 }

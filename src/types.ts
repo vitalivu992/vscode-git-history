@@ -89,6 +89,7 @@ export type WebviewAction =
   | 'copyParentHash'
   | 'copyShortHash'
   | 'copySubject'
+  | 'copyDiffStatSummary'
   | 'copyCoAuthors'
   | 'copyCommitDate'
   | 'copyOneline'
@@ -156,6 +157,7 @@ export type WebviewToExtMessage =
   | { type: 'copyParentHash'; hash: string }
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }
+  | { type: 'copyDiffStatSummary'; hash: string }
   | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
   | { type: 'copyOneline'; hash: string }

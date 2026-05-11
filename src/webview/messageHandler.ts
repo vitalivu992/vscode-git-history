@@ -118,6 +118,10 @@ export async function handleMessage(
       handleCopySubject(message.hash, panel);
       break;
 
+    case 'copyDiffStatSummary':
+      handleCopyDiffStatSummary(message.hash, panel);
+      break;
+
     case 'copyCoAuthors':
       handleCopyCoAuthors(message.hash, panel);
       break;
@@ -835,6 +839,30 @@ Net: ${netSign}${netChange}`;
 
   await vscode.env.clipboard.writeText(copyText);
   void vscode.window.showInformationMessage(`Commit stats copied: ${stats.filesChanged} ${filesWord}, +${stats.insertions}, -${stats.deletions}`);
+}
+
+function handleCopyDiffStatSummary(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  if (!commit.stats) {
+    void vscode.window.showInformationMessage('No statistics available for this commit');
+    return;
+  }
+
+  const { stats } = commit;
+  const filesWord = stats.filesChanged === 1 ? 'file' : 'files';
+  const insertionsWord = stats.insertions === 1 ? 'insertion' : 'insertions';
+  const deletionsWord = stats.deletions === 1 ? 'deletion' : 'deletions';
+
+  const copyText = `${stats.filesChanged} ${filesWord} changed, ${stats.insertions} ${insertionsWord}(+), ${stats.deletions} ${deletionsWord}(-)`;
+
+  void vscode.env.clipboard.writeText(copyText).then(() => {
+    void vscode.window.showInformationMessage(`Diff stat summary copied: ${stats.filesChanged} ${filesWord}, +${stats.insertions}, -${stats.deletions}`);
+  });
 }
 
 function handleCopyBranchName(panel: GitHistoryPanel): void {
