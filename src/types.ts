@@ -113,7 +113,9 @@ export type WebviewAction =
   | 'showKeyboardHelp'
   | 'copyFilterQuery'
   | 'pasteFilterQuery'
-  | 'clearAllFilters';
+  | 'clearAllFilters'
+  | 'copyCombinedDiff'
+  | 'copyRangeDiff';
 
 /**
  * Filter state for copy filter query feature
@@ -192,4 +194,6 @@ export type WebviewToExtMessage =
   | { type: 'dismissFirstRunTip' }
   | { type: 'copyFilterQuery'; filterState: FilterQueryState }
   | { type: 'pasteFilterQuery' }
-  | { type: 'clearAllFilters' };
+  | { type: 'clearAllFilters' }
+  | { type: 'copyCombinedDiff'; hashes: string[] }
+  | { type: 'copyRangeDiff'; fromHash: string; toHash: string };

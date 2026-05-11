@@ -82,6 +82,16 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCombinedDiff",
+        "title": "Git History: Copy Combined Diff",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyRangeDiff",
+        "title": "Git History: Copy Range Diff",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitPatch",
         "title": "Git History: Copy Commit as Patch",
         "category": "Git History"
@@ -354,6 +364,18 @@
         "command": "gitHistory.copyCommitDiff",
         "key": "ctrl+shift+d",
         "mac": "cmd+shift+d",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCombinedDiff",
+        "key": "ctrl+alt+d",
+        "mac": "cmd+alt+d",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyRangeDiff",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
