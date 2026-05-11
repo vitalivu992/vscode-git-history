@@ -501,6 +501,29 @@ body {
   opacity: 1;
 }
 
+/* Clear All Filters button */
+.clear-all-filters-btn {
+  display: none;
+  font-size: 11px;
+  padding: 2px 8px;
+  background-color: transparent;
+  color: var(--vscode-editor-foreground);
+  border: 1px solid var(--vscode-focusBorder);
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.1s, color 0.1s;
+}
+
+.clear-all-filters-btn:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.clear-all-filters-btn.visible {
+  display: inline-flex;
+  align-items: center;
+}
+
 #search-input::placeholder {
   color: var(--vscode-descriptionForeground);
 }
