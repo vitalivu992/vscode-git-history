@@ -118,7 +118,7 @@ export type WebviewAction =
 export interface FilterQueryState {
   query: string;
   hideMergeCommits: boolean;
-  sortOldestFirst: boolean;
+  sortMode: number;
   showMyCommitsOnly: boolean;
 }
 

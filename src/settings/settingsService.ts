@@ -36,10 +36,17 @@ export class SettingsService {
     }
 
     // Merge with defaults to handle any missing fields (backward compatibility)
-    return {
+    const settings: UserSettings = {
       ...DEFAULT_SETTINGS,
       ...saved
     };
+
+    // Migrate legacy sortOldestFirst to sortMode
+    if ('sortOldestFirst' in saved && !('sortMode' in saved)) {
+      settings.sortMode = (saved as any).sortOldestFirst ? 1 : 0;
+    }
+
+    return settings;
   }
 
   /**

@@ -6,8 +6,8 @@ export interface UserSettings {
   diffType: 'unified' | 'side-by-side';
   /** Whether word wrap is enabled in diff view */
   wordWrapEnabled: boolean;
-  /** Sort order: true = oldest first, false = newest first */
-  sortOldestFirst: boolean;
+  /** Sort mode: 0=newest first, 1=oldest first, 2=author A-Z, 3=author Z-A */
+  sortMode: number;
   /** Whether to hide merge commits */
   hideMergeCommits: boolean;
   /** Whether regex search mode is enabled */
@@ -28,7 +28,7 @@ export interface UserSettings {
 export const DEFAULT_SETTINGS: UserSettings = {
   diffType: 'unified',
   wordWrapEnabled: false,
-  sortOldestFirst: false,
+  sortMode: 0,
   hideMergeCommits: false,
   regexSearchEnabled: false,
   showMyCommitsOnly: false,
