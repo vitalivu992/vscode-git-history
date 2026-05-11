@@ -1354,6 +1354,7 @@ function handleMessage(event) {
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
+        case 'createBranch': handleCreateBranch(); break;
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
         case 'toggleWordWrap': handleWordWrapToggle(); break;
         case 'toggleRegex': handleRegexToggle(); break;
@@ -1958,6 +1959,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-label">Copy tags</span>
     </div>
     <div class="context-menu-divider"></div>
+    <div class="context-menu-item" data-action="create-branch">
+      <span class="context-menu-icon">🌿</span>
+      <span class="context-menu-label">Create branch from commit</span>
+    </div>
     <div class="context-menu-item" data-action="copy-selected-hashes" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy selected hashes</span>
@@ -2017,6 +2022,8 @@ function showCommitContextMenu(event, commit) {
         handleCopyBranchName();
       } else if (action === 'copy-tags') {
         handleCopyTags();
+      } else if (action === 'create-branch') {
+        handleCreateBranch();
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
       } else if (action === 'compare-parent') {
@@ -2505,6 +2512,29 @@ function handleCopyCommitDate() {
 
   vscode.postMessage({
     type: 'copyCommitDate',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCreateBranch() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to create a branch from');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'createBranch',
     hash: targetCommit.hash
   });
 }
