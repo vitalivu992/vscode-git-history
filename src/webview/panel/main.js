@@ -538,6 +538,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+A or Cmd+A: Select all visible commits
+  if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !e.shiftKey) {
+    e.preventDefault();
+    handleSelectAll();
+    return;
+  }
+
   // Only handle arrow keys and Enter if not in an input
   if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
     return;
@@ -1529,6 +1536,20 @@ function clearSelection() {
   selectedCommits.clear();
   rangeSelectionAnchor = null;
   updateSelectedRows();
+}
+
+function handleSelectAll() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (displayCommits.length === 0) {
+    return; // No-op if no commits visible
+  }
+
+  // Add all visible commits to selection
+  displayCommits.forEach(commit => selectedCommits.add(commit.hash));
+  updateSelectedRows();
+
+  // Request combined diff for all selected commits
+  requestCombinedDiff();
 }
 
 function handleRangeSelection(anchorHash, targetHash) {
@@ -2685,6 +2706,7 @@ function showKeyboardHelpDialog() {
         { keys: ['Enter'], description: 'Select focused commit' },
         { keys: ['Shift', 'Enter'], description: 'Select range from anchor to focused' },
         { keys: [cmdKey, 'Enter'], description: 'Add/remove from multi-selection' },
+        { keys: [cmdKey, 'A'], description: 'Select all visible commits' },
         { keys: ['?'], description: 'Show this help dialog' },
         { keys: ['Esc'], description: 'Clear selection and close dialogs' }
       ]
