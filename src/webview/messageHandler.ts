@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit } from '../git/gitService';
-import { ExtToWebviewMessage, CommitInfo } from '../types';
+import { ExtToWebviewMessage, CommitInfo, FilterQueryState } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
 
@@ -140,6 +140,10 @@ export async function handleMessage(
 
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
+      break;
+
+    case 'copyFilterQuery':
+      handleCopyFilterQuery(message.filterState, panel);
       break;
 
     case 'copyFilePath':
@@ -1077,6 +1081,16 @@ function handleCopySelectedHashes(hashes: string[], panel: GitHistoryPanel): voi
   const hashText = hashes.join('\n');
   void vscode.env.clipboard.writeText(hashText).then(() => {
     void vscode.window.showInformationMessage(`Copied ${hashes.length} commit hash${hashes.length > 1 ? 'es' : ''}`);
+  });
+}
+
+/**
+ * Handle copy filter query to clipboard
+ */
+function handleCopyFilterQuery(filterState: FilterQueryState, panel: GitHistoryPanel): void {
+  const formatted = JSON.stringify(filterState);
+  void vscode.env.clipboard.writeText(formatted).then(() => {
+    void vscode.window.showInformationMessage('Filter query copied to clipboard');
   });
 }
 

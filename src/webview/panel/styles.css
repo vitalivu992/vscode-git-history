@@ -195,6 +195,24 @@ body {
   flex-shrink: 0;
 }
 
+/* Copy filter query button */
+.copy-filter-query-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s, border-color 0.1s;
+  flex-shrink: 0;
+}
+
+.copy-filter-query-btn:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
 /* Export button */
 .export-btn {
   padding: 4px 10px;

@@ -257,6 +257,7 @@ const regexToggleBtn = document.getElementById('regex-toggle-btn');
 const exportBtn = document.getElementById('export-btn');
 const myCommitsBtn = document.getElementById('my-commits-btn');
 const commitCountEl = document.getElementById('commit-count');
+const copyFilterQueryBtn = document.getElementById('copy-filter-query-btn');
 
 let isRefreshing = false;
 
@@ -488,6 +489,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'o') {
     e.preventDefault();
     handleExportCommits();
+    return;
+  }
+
+  // Ctrl+Shift+5: Copy filter query
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '5') {
+    e.preventDefault();
+    handleCopyFilterQuery();
     return;
   }
 
@@ -1226,6 +1234,10 @@ function init() {
     regexToggleBtn.addEventListener('click', handleRegexToggle);
   }
 
+  if (copyFilterQueryBtn) {
+    copyFilterQueryBtn.addEventListener('click', handleCopyFilterQuery);
+  }
+
   if (ignoreWsBtn) {
     ignoreWsBtn.addEventListener('click', handleIgnoreWhitespaceToggle);
   }
@@ -1614,6 +1626,7 @@ function handleMessage(event) {
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
         case 'cycleDiffContextLines': handleDiffContextLinesCycle(); break;
+        case 'copyFilterQuery': handleCopyFilterQuery(); break;
       }
       break;
   }
@@ -2757,6 +2770,16 @@ function handleCopyDiffStatSummary() {
     type: 'copyDiffStatSummary',
     hash: targetCommit.hash
   });
+}
+
+function handleCopyFilterQuery() {
+  const filterState = {
+    query: searchInput.value,
+    hideMergeCommits: hideMergeCommits,
+    sortOldestFirst: sortOldestFirst,
+    showMyCommitsOnly: showMyCommitsOnly
+  };
+  vscode.postMessage({ type: 'copyFilterQuery', filterState });
 }
 
 function handleCopyOneline() {

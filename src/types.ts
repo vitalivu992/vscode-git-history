@@ -108,7 +108,18 @@ export type WebviewAction =
   | 'toggleHideMergeCommits'
   | 'jumpToHash'
   | 'focusSearch'
-  | 'showKeyboardHelp';
+  | 'showKeyboardHelp'
+  | 'copyFilterQuery';
+
+/**
+ * Filter state for copy filter query feature
+ */
+export interface FilterQueryState {
+  query: string;
+  hideMergeCommits: boolean;
+  sortOldestFirst: boolean;
+  showMyCommitsOnly: boolean;
+}
 
 /**
  * Messages from extension to webview
@@ -171,4 +182,5 @@ export type WebviewToExtMessage =
   | { type: 'requestBranchHashes'; branches: string[] }
   | { type: 'checkoutBranch'; branch: string }
   | { type: 'changeDiffContextLines'; value: number }
-  | { type: 'dismissFirstRunTip' };
+  | { type: 'dismissFirstRunTip' }
+  | { type: 'copyFilterQuery'; filterState: FilterQueryState };
