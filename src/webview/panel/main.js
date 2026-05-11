@@ -1355,6 +1355,7 @@ function handleMessage(event) {
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
         case 'createBranch': handleCreateBranch(); break;
+        case 'createTag': handleCreateTag(); break;
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
         case 'toggleWordWrap': handleWordWrapToggle(); break;
         case 'toggleRegex': handleRegexToggle(); break;
@@ -1963,6 +1964,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🌿</span>
       <span class="context-menu-label">Create branch from commit</span>
     </div>
+    <div class="context-menu-item" data-action="create-tag">
+      <span class="context-menu-icon">🏷️</span>
+      <span class="context-menu-label">Create tag from commit</span>
+    </div>
     <div class="context-menu-item" data-action="copy-selected-hashes" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy selected hashes</span>
@@ -2024,6 +2029,8 @@ function showCommitContextMenu(event, commit) {
         handleCopyTags();
       } else if (action === 'create-branch') {
         handleCreateBranch();
+      } else if (action === 'create-tag') {
+        handleCreateTag();
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
       } else if (action === 'compare-parent') {
@@ -2535,6 +2542,29 @@ function handleCreateBranch() {
 
   vscode.postMessage({
     type: 'createBranch',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCreateTag() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to create a tag from');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'createTag',
     hash: targetCommit.hash
   });
 }
