@@ -197,6 +197,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFileDiff",
+        "title": "Git History: Copy File Diff",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyFileName",
         "title": "Git History: Copy File Name Only",
         "category": "Git History"
@@ -552,6 +557,12 @@
         "command": "gitHistory.clearAllFilters",
         "key": "ctrl+alt+q",
         "mac": "cmd+alt+q",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFileDiff",
+        "key": "ctrl+alt+f",
+        "mac": "cmd+alt+f",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
