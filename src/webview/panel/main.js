@@ -108,17 +108,54 @@ function parseDateFilter(query) {
 }
 
 /**
- * Check if date or author filters are active
+ * Check if any filters are active (includes search query, date filters, author/tag/branch/path filters, merge commits toggle, my commits toggle)
  * @returns {boolean}
  */
 function hasActiveFilters() {
   const { dateFilters, authorFilter, tagFilter, branchFilter, pathFilter } = parseDateFilter(searchQuery);
-  return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter || pathFilter || showMyCommitsOnly);
+  return !!(searchQuery || dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter || pathFilter || showMyCommitsOnly || hideMergeCommits || regexSearchEnabled);
 }
 
 function hasActiveDateFilters() {
   const { dateFilters, authorFilter, tagFilter, branchFilter, pathFilter } = parseDateFilter(searchQuery);
   return !!(dateFilters.after || dateFilters.before || authorFilter || tagFilter || branchFilter || pathFilter);
+}
+
+/**
+ * Update Clear All button visibility and reset all filters
+ */
+function updateClearAllButton() {
+  const hasFilters = hasActiveFilters();
+  if (clearAllFiltersBtn) {
+    if (hasFilters) {
+      clearAllFiltersBtn.classList.add('visible');
+    } else {
+      clearAllFiltersBtn.classList.remove('visible');
+    }
+  }
+}
+
+function clearAllFilters() {
+  searchQuery = '';
+  hideMergeCommits = false;
+  regexSearchEnabled = false;
+  showMyCommitsOnly = false;
+
+  // Update UI elements
+  searchInput.value = '';
+  mergeToggleBtn.classList.remove('active');
+  regexToggleBtn.classList.remove('active');
+  myCommitsBtn.classList.remove('active');
+
+  // Render commits with no filters
+  renderCommits();
+
+  // Update badges and clear all button
+  renderFilterBadges();
+  updateClearAllButton();
+
+  // Save settings
+  saveSettings();
 }
 
 /**
@@ -259,6 +296,7 @@ const myCommitsBtn = document.getElementById('my-commits-btn');
 const commitCountEl = document.getElementById('commit-count');
 const copyFilterQueryBtn = document.getElementById('copy-filter-query-btn');
 const pasteFilterQueryBtn = document.getElementById('paste-filter-query-btn');
+const clearAllFiltersBtn = document.getElementById('clear-all-filters-btn');
 
 let isRefreshing = false;
 
@@ -388,10 +426,10 @@ function handleKeyDown(e) {
     return;
   }
 
-  // Ctrl+Shift+L: Copy commit URL
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'l') {
+  // Ctrl+Alt+Q: Clear all filters
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'q') {
     e.preventDefault();
-    handleCopyUrl();
+    clearAllFilters();
     return;
   }
 
@@ -845,6 +883,7 @@ function handleMergeToggle() {
   focusedIndex = -1;
   renderCommits();
   updateCommitCount();
+  updateClearAllButton();
 
   // Persist the setting
   vscode.postMessage({ type: 'saveSettings', settings: { hideMergeCommits } });
@@ -1016,6 +1055,7 @@ function handleMyCommitsToggle() {
   focusedIndex = -1;
   renderCommits();
   updateCommitCount();
+  updateClearAllButton();
 
   // Persist the setting
   vscode.postMessage({ type: 'saveSettings', settings: { showMyCommitsOnly } });
@@ -1275,6 +1315,10 @@ function init() {
 
   if (pasteFilterQueryBtn) {
     pasteFilterQueryBtn.addEventListener('click', handlePasteFilterQuery);
+  }
+
+  if (clearAllFiltersBtn) {
+    clearAllFiltersBtn.addEventListener('click', clearAllFilters);
   }
 
   if (ignoreWsBtn) {
@@ -1559,6 +1603,7 @@ function handleMessage(event) {
 
       renderBranchBadge();
       renderCommits();
+      updateClearAllButton();
       if (commits.length > 0) {
         selectCommit(commits[0].hash);
       }
@@ -1666,6 +1711,7 @@ function handleMessage(event) {
         case 'cycleSortMode': handleSortToggle(); break;
         case 'copyFilterQuery': handleCopyFilterQuery(); break;
         case 'pasteFilterQuery': handlePasteFilterQuery(); break;
+        case 'clearAllFilters': clearAllFilters(); break;
       }
       break;
   }
@@ -3406,6 +3452,7 @@ function showKeyboardHelpDialog() {
       category: 'Actions',
       items: [
         { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history' },
+        { keys: [cmdKey, 'Alt', 'Q'], description: 'Clear all filters' },
         { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' }
       ]
     }
