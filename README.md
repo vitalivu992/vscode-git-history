@@ -60,6 +60,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy File Path**: Right-click on any file in the changed files list to copy its full path to clipboard
 - **Open File at Commit**: Right-click on any file in the changed files list to view the file content as it was at that specific commit
 - **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to JSON, CSV, or Markdown format. The Markdown format generates a changelog-style output with commit hashes, authors, dates, messages, tags, and statistics—perfect for release notes and documentation.
+- **Import Filter Query**: Press `Ctrl+Shift+4` / `Cmd+Shift+4` or click the "Paste Filter" button to restore a previously copied filter query from clipboard. This allows you to share reproducible commit views with team members.
 - **Select All Commits**: Press `Ctrl+A` / `Cmd+A` to quickly select all visible commits for bulk operations like export or copy
 - **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
 - **First-Run Welcome Tip**: On first use, a helpful tip appears directing you to keyboard shortcuts (press `?` for help), ensuring you discover the extension's full capabilities
@@ -204,6 +205,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+.` / `Cmd+Shift+.` | Copy file path to clipboard (for focused file in changed files list) |
 | `Ctrl+Shift+O` / `Cmd+Shift+O` | Export filtered commits to file |
 | `Ctrl+Shift+5` / `Cmd+Shift+5` | Copy filter query state to clipboard (includes search query and all toggle states as JSON) |
+| `Ctrl+Shift+4` / `Cmd+Shift+4` | Paste/import filter query from clipboard |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Alt+S` / `Cmd+Alt+S` | Show branch switcher |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
