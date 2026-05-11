@@ -92,6 +92,7 @@ export type WebviewAction =
   | 'copyCoAuthors'
   | 'copyCommitDate'
   | 'copyOneline'
+  | 'copyFileContent'
   | 'exportCommits'
   | 'quickCompare'
   | 'createBranch'
@@ -154,6 +155,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
   | { type: 'copyOneline'; hash: string }
+  | { type: 'copyFileContent'; hash: string; filePath: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'createBranch'; hash: string }
   | { type: 'createTag'; hash: string }
