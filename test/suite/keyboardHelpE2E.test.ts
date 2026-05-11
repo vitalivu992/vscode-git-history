@@ -80,7 +80,12 @@ function getKeyboardShortcutsData(isMac: boolean): Array<{ category: string; ite
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
-        { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' }
+        { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
+        { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
+        { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
+        { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
+        { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
+        { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' }
       ]
     },
     {
@@ -225,10 +230,10 @@ suite('Keyboard Help E2E Tests', () => {
     assert.strictEqual(navCategory!.items.length, 9);
   });
 
-  test('Copy Commands category should have 21 shortcuts', () => {
+  test('Copy Commands category should have 25 shortcuts', () => {
     const shortcuts = getKeyboardShortcutsData(true);
     const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
-    assert.strictEqual(copyCategory!.items.length, 21);
+    assert.strictEqual(copyCategory!.items.length, 25);
   });
 
   test('Search & Filter category should have 6 shortcuts', () => {
@@ -372,6 +377,11 @@ suite('Keyboard Help E2E Tests', () => {
     assert.ok(descriptions.includes('Copy selected hashes'));
     assert.ok(descriptions.includes('Copy tags'));
     assert.ok(descriptions.includes('Copy as oneline'));
+    assert.ok(descriptions.includes('Copy commit body'));
+    assert.ok(descriptions.includes('Copy diff stat summary'));
+    assert.ok(descriptions.includes('Copy filter query'));
+    assert.ok(descriptions.includes('Copy file path'));
+    assert.ok(descriptions.includes('Copy file name'));
   });
 
   test('Search & Filter should include Toggle hide merge commits', () => {
@@ -414,6 +424,34 @@ suite('Keyboard Help E2E Tests', () => {
     const viewCategory = shortcuts.find(s => s.category === 'View Options');
     const cycleContext = viewCategory!.items.find(item => item.description === 'Cycle diff context lines');
     assert.ok(cycleContext, 'Cycle diff context lines shortcut should exist');
+  });
+
+  test('Copy Commands should include Copy diff stat summary', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copyStatSummary = copyCategory!.items.find(item => item.description === 'Copy diff stat summary');
+    assert.ok(copyStatSummary, 'Copy diff stat summary shortcut should exist');
+  });
+
+  test('Copy Commands should include Copy filter query', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copyFilterQuery = copyCategory!.items.find(item => item.description === 'Copy filter query');
+    assert.ok(copyFilterQuery, 'Copy filter query shortcut should exist');
+  });
+
+  test('Copy Commands should include Copy file path', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copyFilePath = copyCategory!.items.find(item => item.description === 'Copy file path');
+    assert.ok(copyFilePath, 'Copy file path shortcut should exist');
+  });
+
+  test('Copy Commands should include Copy file name', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copyFileName = copyCategory!.items.find(item => item.description === 'Copy file name');
+    assert.ok(copyFileName, 'Copy file name shortcut should exist');
   });
 });
 

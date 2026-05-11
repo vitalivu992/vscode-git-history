@@ -3246,7 +3246,11 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
         { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
-        { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' }
+        { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
+        { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
+        { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
+        { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
+        { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' }
       ]
     },
     {

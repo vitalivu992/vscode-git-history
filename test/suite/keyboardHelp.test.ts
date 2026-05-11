@@ -80,7 +80,12 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
-        { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' }
+        { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
+        { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
+        { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
+        { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
+        { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
+        { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' }
       ]
     },
     {
@@ -180,6 +185,10 @@ suite('Keyboard Help Logic Tests', () => {
     assert.ok(descriptions.includes('Copy commit URL'), 'Should have copy commit URL');
     assert.ok(descriptions.includes('Copy commit stats'), 'Should have copy commit stats');
     assert.ok(descriptions.includes('Copy branch name'), 'Should have copy branch name');
+    assert.ok(descriptions.includes('Copy diff stat summary'), 'Should have copy diff stat summary');
+    assert.ok(descriptions.includes('Copy filter query'), 'Should have copy filter query');
+    assert.ok(descriptions.includes('Copy file path'), 'Should have copy file path');
+    assert.ok(descriptions.includes('Copy file name'), 'Should have copy file name');
   });
 
   test('Mac shortcuts should use Cmd modifier', () => {
@@ -295,6 +304,46 @@ suite('Keyboard Help Logic Tests', () => {
     const cycleContext = viewCategory!.items.find(item => item.description === 'Cycle diff context lines');
     assert.ok(cycleContext, 'Cycle diff context lines shortcut should exist');
     assert.deepStrictEqual(cycleContext!.keys, ['Cmd', 'Shift', '/'], 'Should use Cmd+Shift+/ on Mac');
+  });
+
+  test('Copy Commands should include Copy diff stat summary', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyStatSummary = copyCategory!.items.find(item => item.description === 'Copy diff stat summary');
+    assert.ok(copyStatSummary, 'Copy diff stat summary shortcut should exist');
+    assert.deepStrictEqual(copyStatSummary!.keys, ['Cmd', 'Shift', '9'], 'Should use Cmd+Shift+9 on Mac');
+  });
+
+  test('Copy Commands should include Copy filter query', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyFilterQuery = copyCategory!.items.find(item => item.description === 'Copy filter query');
+    assert.ok(copyFilterQuery, 'Copy filter query shortcut should exist');
+    assert.deepStrictEqual(copyFilterQuery!.keys, ['Cmd', 'Shift', '5'], 'Should use Cmd+Shift+5 on Mac');
+  });
+
+  test('Copy Commands should include Copy file path', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyFilePath = copyCategory!.items.find(item => item.description === 'Copy file path');
+    assert.ok(copyFilePath, 'Copy file path shortcut should exist');
+    assert.deepStrictEqual(copyFilePath!.keys, ['Cmd', 'Shift', '.'], 'Should use Cmd+Shift+. on Mac');
+  });
+
+  test('Copy Commands should include Copy file name', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyFileName = copyCategory!.items.find(item => item.description === 'Copy file name');
+    assert.ok(copyFileName, 'Copy file name shortcut should exist');
+    assert.deepStrictEqual(copyFileName!.keys, ['Cmd', 'Shift', ','], 'Should use Cmd+Shift+, on Mac');
   });
 });
 
