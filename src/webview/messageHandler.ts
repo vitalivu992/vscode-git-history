@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 
@@ -158,6 +158,10 @@ export async function handleMessage(
 
     case 'createTag':
       await handleCreateTag(message.hash, panel);
+      break;
+
+    case 'checkoutBranch':
+      await handleCheckoutBranch(message.branch, panel);
       break;
 
     case 'exportCommits':
@@ -1032,6 +1036,18 @@ async function handleCreateTag(hash: string, panel: GitHistoryPanel): Promise<vo
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to create tag: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleCheckoutBranch(branch: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    await checkoutBranch(branch, panel.getCwd());
+    void vscode.window.showInformationMessage(`Switched to branch "${branch}"`);
+    await panel.loadData();
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to checkout branch: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, checkoutBranch } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -620,6 +620,75 @@ suite('Commit URL Generation Tests', () => {
     test('returns null when no remote configured', async () => {
       const result = await getRemoteUrl('/non/existent/path');
       assert.strictEqual(result, null);
+    });
+  });
+
+  suite('checkoutBranch', () => {
+    const { execSync } = require('child_process');
+    let checkoutTestDir: string;
+    let checkoutTestFile: string;
+
+    suiteSetup(() => {
+      // Create a separate test directory for checkout tests
+      checkoutTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-checkout-test-'));
+      checkoutTestFile = path.join(checkoutTestDir, 'checkout-test.txt');
+
+      // Initialize git repo
+      execSync('git init', { cwd: checkoutTestDir });
+      execSync('git config user.name "Test User"', { cwd: checkoutTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: checkoutTestDir });
+
+      // Create initial commit on main branch
+      fs.writeFileSync(checkoutTestFile, 'Initial content\n');
+      execSync('git add .', { cwd: checkoutTestDir });
+      execSync('git commit -m "Initial commit"', { cwd: checkoutTestDir });
+
+      // Create a new branch
+      execSync('git branch feature-branch', { cwd: checkoutTestDir });
+    });
+
+    suiteTeardown(() => {
+      // Clean up checkout test directory
+      if (fs.existsSync(checkoutTestDir)) {
+        fs.rmSync(checkoutTestDir, { recursive: true, force: true });
+      }
+    });
+
+    test('should checkout a valid branch', async () => {
+      // Start on main (default)
+      const branchBefore = await getCurrentBranch(checkoutTestDir);
+      assert.ok(branchBefore, 'Should have a current branch');
+
+      // Checkout the feature branch
+      await checkoutBranch('feature-branch', checkoutTestDir);
+
+      // Verify we're on the feature branch
+      const branchAfter = await getCurrentBranch(checkoutTestDir);
+      assert.strictEqual(branchAfter, 'feature-branch', 'Should be on feature-branch');
+    });
+
+    test('should throw error for invalid branch', async () => {
+      await assert.rejects(
+        async () => {
+          await checkoutBranch('non-existent-branch', checkoutTestDir);
+        },
+        /pathspec 'non-existent-branch' did not match any file/
+      );
+    });
+
+    test('should throw error with uncommitted changes', async () => {
+      // Create uncommitted changes
+      fs.writeFileSync(checkoutTestFile, 'Uncommitted changes\n');
+
+      await assert.rejects(
+        async () => {
+          await checkoutBranch('feature-branch', checkoutTestDir);
+        },
+        /changes/
+      );
+
+      // Clean up the uncommitted changes for other tests
+      execSync('git checkout -- .', { cwd: checkoutTestDir });
     });
   });
 });

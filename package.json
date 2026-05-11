@@ -172,6 +172,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.checkoutBranch",
+        "title": "Git History: Checkout Branch",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.toggleMyCommits",
         "title": "Git History: Toggle My Commits",
         "category": "Git History"
@@ -189,6 +194,11 @@
       {
         "command": "gitHistory.toggleIgnoreWhitespace",
         "title": "Git History: Toggle Ignore Whitespace",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleHideMergeCommits",
+        "title": "Git History: Toggle Hide Merge Commits",
         "category": "Git History"
       },
       {
@@ -383,6 +393,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.checkoutBranch",
+        "key": "ctrl+alt+b",
+        "mac": "cmd+alt+b",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.toggleMyCommits",
         "key": "ctrl+shift+m",
         "mac": "cmd+shift+m",
@@ -404,6 +420,12 @@
         "command": "gitHistory.toggleIgnoreWhitespace",
         "key": "ctrl+shift+j",
         "mac": "cmd+shift+j",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleHideMergeCommits",
+        "key": "ctrl+shift+q",
+        "mac": "cmd+shift+q",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

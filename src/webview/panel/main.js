@@ -481,6 +481,15 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Alt+B: Show branch picker
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'b') {
+    e.preventDefault();
+    if (_allBranches.length > 0) {
+      showBranchPickerDialog();
+    }
+    return;
+  }
+
   // Ctrl+Shift+M: Toggle my commits filter
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'm') {
     e.preventDefault();
@@ -943,15 +952,161 @@ function renderBranchBadge() {
 
   if (currentBranch) {
     const branchBadge = document.createElement('span');
-    branchBadge.className = 'branch-badge branch-filter-link';
+    branchBadge.className = 'branch-badge branch-filter-link clickable';
     branchBadge.textContent = currentBranch;
-    branchBadge.title = `Current branch: ${currentBranch} (click to copy)`;
+    branchBadge.title = `Current branch: ${currentBranch} (right-click to switch)`;
     branchBadge.addEventListener('click', () => handleCopyBranchName());
+    branchBadge.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showBranchContextMenu(e);
+    });
     header.insertBefore(branchBadge, header.firstChild);
   }
 }
 
-function updateFocusedRow() {
+	let _allBranches = [];
+	let _currentBranch;
+
+	function setAllBranches(branches) {
+	  _allBranches = branches;
+	}
+
+	function showBranchContextMenu(event) {
+	  // Remove existing menu if any
+	  const existingMenu = document.querySelector('.branch-context-menu');
+	  if (existingMenu) existingMenu.remove();
+
+	  const menu = document.createElement('div');
+	  menu.className = 'branch-context-menu';
+
+	  // Group branches into local and remote
+	  const localBranches = _allBranches.filter(b => !b.startsWith('remotes/'));
+	  const remoteBranches = _allBranches.filter(b => b.startsWith('remotes/'));
+
+	  if (localBranches.length > 0) {
+	    const localTitle = document.createElement('div');
+	    localTitle.className = 'context-menu-section-title';
+	    localTitle.textContent = 'Local Branches';
+	    menu.appendChild(localTitle);
+
+	    localBranches.forEach(branch => {
+	      const item = document.createElement('div');
+	      item.className = 'context-menu-item';
+	      if (branch === currentBranch) {
+	        item.classList.add('current-branch');
+	        item.textContent = '✓ ' + branch;
+	        item.title = 'Current branch';
+	      } else {
+	        item.textContent = branch;
+	        item.addEventListener('click', () => {
+	          closeContextMenu();
+	          vscode.postMessage({ type: 'checkoutBranch', branch: branch });
+	        });
+	      }
+	      menu.appendChild(item);
+	    });
+	  }
+
+	  if (remoteBranches.length > 0) {
+	    const remoteTitle = document.createElement('div');
+	    remoteTitle.className = 'context-menu-section-title';
+	    remoteTitle.textContent = 'Remote Branches';
+	    menu.appendChild(remoteTitle);
+
+	    // Show remote branches without 'remotes/' prefix
+	    remoteBranches.forEach(fullPath => {
+	      const branch = fullPath.replace(/^remotes\//, '');
+	      const item = document.createElement('div');
+	      item.className = 'context-menu-item';
+	      item.textContent = branch;
+	      item.addEventListener('click', () => {
+	        closeContextMenu();
+	        vscode.postMessage({ type: 'checkoutBranch', branch: branch });
+	      });
+	      menu.appendChild(item);
+	    });
+	  }
+
+	  // Position menu near cursor
+	  const rect = event.target.getBoundingClientRect();
+	  menu.style.position = 'fixed';
+	  menu.style.left = rect.left + 'px';
+	  menu.style.top = (rect.bottom + 4) + 'px';
+	  document.body.appendChild(menu);
+
+	  // Close on click outside
+	  document.addEventListener('click', closeContextMenu, { once: true });
+	}
+
+	function closeContextMenu() {
+	  const menu = document.querySelector('.branch-context-menu');
+	  if (menu) menu.remove();
+	}
+
+	function showBranchPickerDialog() {
+	  const existingDialog = document.querySelector('.branch-picker-modal');
+	  if (existingDialog) existingDialog.remove();
+
+	  const modal = document.createElement('div');
+	  modal.className = 'branch-picker-modal';
+	  modal.innerHTML = `
+	    <div class="branch-picker-content">
+	      <div class="branch-picker-header">
+	        <h3>Switch Branch</h3>
+	        <button class="branch-picker-close">&times;</button>
+	      </div>
+	      <input type="text" class="branch-picker-input" placeholder="Search branches..." autofocus>
+	      <div class="branch-picker-results"></div>
+	    </div>
+	  `;
+	  document.body.appendChild(modal);
+
+	  const input = modal.querySelector('.branch-picker-input');
+	  const results = modal.querySelector('.branch-picker-results');
+	  const closeBtn = modal.querySelector('.branch-picker-close');
+
+	  function updateResults(filter) {
+	    results.innerHTML = '';
+	    const filtered = _allBranches.filter(b =>
+	      b.toLowerCase().includes(filter.toLowerCase())
+	    );
+	    filtered.slice(0, 20).forEach((branch, i) => {
+	      const item = document.createElement('div');
+	      item.className = 'branch-result-item' + (branch === currentBranch ? ' current-branch' : '');
+	      item.textContent = branch + (branch === currentBranch ? ' ✓' : '');
+	      item.addEventListener('click', () => {
+	        if (branch !== currentBranch) {
+	          vscode.postMessage({ type: 'checkoutBranch', branch: branch });
+	        }
+	        closePicker();
+	      });
+	      results.appendChild(item);
+	    });
+	  }
+
+	  function closePicker() {
+	    modal.remove();
+	  }
+
+	  input.addEventListener('input', () => updateResults(input.value));
+	  closeBtn.addEventListener('click', closePicker);
+	  modal.addEventListener('click', (e) => {
+	    if (e.target === modal) closePicker();
+	  });
+
+	  input.addEventListener('keydown', (e) => {
+	    if (e.key === 'Escape') closePicker();
+	    if (e.key === 'Enter') {
+	      const first = results.querySelector('.branch-result-item');
+	      if (first) first.click();
+	    }
+	  });
+
+	  updateResults('');
+	  input.focus();
+	}
+
+	function updateFocusedRow() {
   document.querySelectorAll('#commit-table tbody tr').forEach((tr, index) => {
     if (index === focusedIndex) {
       tr.classList.add('focused');
@@ -1224,6 +1379,8 @@ function handleMessage(event) {
 
         // Apply my commits only filter
         showMyCommitsOnly = settings.showMyCommitsOnly;
+        renderCommits();
+        updateCommitCount();
 
         // Apply saved search query
         if (settings.searchQuery !== undefined && settings.searchQuery !== '') {
@@ -1272,6 +1429,7 @@ function handleMessage(event) {
       // Initialize branches and fetch their commit hashes
       if (message.branches && message.branches.length > 0) {
         branches = message.branches;
+        setAllBranches(branches);
         // Request branch commit hashes from extension
         vscode.postMessage({ type: 'requestBranchHashes', branches: branches });
       }
@@ -1356,10 +1514,12 @@ function handleMessage(event) {
         case 'quickCompare': handleQuickCompare(); break;
         case 'createBranch': handleCreateBranch(); break;
         case 'createTag': handleCreateTag(); break;
+        case 'checkoutBranch': showBranchPickerDialog(); break;
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
         case 'toggleWordWrap': handleWordWrapToggle(); break;
         case 'toggleRegex': handleRegexToggle(); break;
         case 'toggleIgnoreWhitespace': handleIgnoreWhitespaceToggle(); break;
+        case 'toggleHideMergeCommits': handleMergeToggle(); break;
         case 'jumpToHash': showJumpToHashDialog(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;

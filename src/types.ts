@@ -96,10 +96,12 @@ export type WebviewAction =
   | 'quickCompare'
   | 'createBranch'
   | 'createTag'
+  | 'checkoutBranch'
   | 'toggleMyCommits'
   | 'toggleWordWrap'
   | 'toggleRegex'
   | 'toggleIgnoreWhitespace'
+  | 'toggleHideMergeCommits'
   | 'jumpToHash'
   | 'focusSearch'
   | 'showKeyboardHelp';
@@ -157,4 +159,5 @@ export type WebviewToExtMessage =
   | { type: 'createTag'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
   | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown'; commits: CommitInfo[] }
-  | { type: 'requestBranchHashes'; branches: string[] };
+  | { type: 'requestBranchHashes'; branches: string[] }
+  | { type: 'checkoutBranch'; branch: string };

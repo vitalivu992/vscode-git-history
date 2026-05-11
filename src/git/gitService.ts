@@ -615,3 +615,12 @@ export async function createTagFromCommit(
     await execGit(['tag', tagName, commitHash], cwd);
   }
 }
+
+/**
+ * Checkout an existing branch
+ * @param branchName The name of the branch to checkout
+ * @param cwd Working directory
+ */
+export async function checkoutBranch(branchName: string, cwd: string): Promise<void> {
+  await execGit(['checkout', branchName], cwd);
+}
