@@ -55,7 +55,7 @@ suite('Word Wrap Settings Restoration', () => {
     assert.ok(toggleFn.includes("wordWrapBtn.classList.remove('active')"), 'handleWordWrapToggle should remove active class from button');
   });
 
-  test('sort order restore correctly compares against sortOldestFirst variable', () => {
+  test('sort order restore correctly compares against sortMode variable', () => {
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
@@ -64,8 +64,8 @@ suite('Word Wrap Settings Restoration', () => {
     const sortBlock = source.substring(sortBlockStart, nextComment > sortBlockStart ? nextComment : sortBlockStart + 500);
 
     assert.ok(
-      sortBlock.includes('settings.sortOldestFirst !== sortOldestFirst'),
-      'Sort order restore should compare against sortOldestFirst variable (pattern consistency check)'
+      sortBlock.includes('settings.sortMode !== undefined && settings.sortMode !== sortMode'),
+      'Sort order restore should compare against sortMode variable (pattern consistency check)'
     );
   });
 });

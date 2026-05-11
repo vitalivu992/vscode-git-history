@@ -38,7 +38,7 @@ suite('Preference Persistence E2E Tests', () => {
     assert.ok(initCase.includes('settings.wordWrapEnabled'), 'init should apply wordWrapEnabled from settings');
   });
 
-  test('main.js should apply sortOldestFirst from userSettings', () => {
+  test('main.js should apply sortMode from userSettings', () => {
     const fs = require('fs');
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
@@ -47,7 +47,7 @@ suite('Preference Persistence E2E Tests', () => {
     const initEnd = source.indexOf('break;', initStart) + 6;
     const initCase = source.substring(initStart, initEnd);
 
-    assert.ok(initCase.includes('settings.sortOldestFirst'), 'init should apply sortOldestFirst from settings');
+    assert.ok(initCase.includes('settings.sortMode'), 'init should apply sortMode from settings');
   });
 
   test('main.js should apply hideMergeCommits from userSettings', () => {
@@ -84,7 +84,7 @@ suite('Preference Persistence E2E Tests', () => {
     const toggleFn = source.substring(toggleStart, toggleEnd > toggleStart ? toggleEnd : undefined);
 
     assert.ok(toggleFn.includes("type: 'saveSettings'"), 'handleSortToggle should send saveSettings message');
-    assert.ok(toggleFn.includes('sortOldestFirst'), 'handleSortToggle should save sortOldestFirst setting');
+    assert.ok(toggleFn.includes('sortMode'), 'handleSortToggle should save sortMode setting');
   });
 
   test('main.js handleMergeToggle should save settings', () => {

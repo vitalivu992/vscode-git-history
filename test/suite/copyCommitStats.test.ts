@@ -36,9 +36,12 @@ function filterCommits(commits: TestCommit[], query: string, hideMergeCommits: b
   );
 }
 
-function getOrderedCommits(filteredCommits: TestCommit[], sortOldestFirst: boolean): TestCommit[] {
-  if (sortOldestFirst) {
-    return filteredCommits.slice().reverse();
+function getOrderedCommits(filteredCommits: TestCommit[], sortMode: number): TestCommit[] {
+  switch (sortMode) {
+    case 0: return filteredCommits.slice();
+    case 1: return filteredCommits.slice().reverse();
+    case 2: return filteredCommits.slice().sort((a, b) => a.author.localeCompare(b.author));
+    case 3: return filteredCommits.slice().sort((a, b) => b.author.localeCompare(a.author));
   }
   return filteredCommits;
 }
@@ -48,12 +51,12 @@ function getCopyStatsTarget(
   focusedIndex: number,
   selectedCommits: Set<string>,
   searchQuery: string,
-  sortOldestFirst: boolean,
+  sortMode: number,
   hideMergeCommits: boolean
 ): TestCommit | null {
   const displayCommits = getOrderedCommits(
     filterCommits(commits, searchQuery, hideMergeCommits),
-    sortOldestFirst
+    sortMode
   );
   if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
     return displayCommits[focusedIndex];
@@ -140,51 +143,51 @@ suite('Copy Commit Stats Logic Tests', () => {
   ];
 
   test('copy stats with focusedIndex 0 returns first commit', () => {
-    const result = getCopyStatsTarget(commits, 0, new Set(), '', false, false);
+    const result = getCopyStatsTarget(commits, 0, new Set(), '', 0, false);
     assert.strictEqual(result?.hash, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     assert.ok(result?.stats, 'Commit should have stats');
   });
 
   test('copy stats with focusedIndex on last commit', () => {
-    const result = getCopyStatsTarget(commits, 4, new Set(), '', false, false);
+    const result = getCopyStatsTarget(commits, 4, new Set(), '', 0, false);
     assert.strictEqual(result?.hash, 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
     assert.strictEqual(result?.stats, undefined, 'Commit should not have stats');
   });
 
   test('copy stats falls back to selected commit when focusedIndex is -1', () => {
     const selected = new Set(['cccccccccccccccccccccccccccccccccccccccc']);
-    const result = getCopyStatsTarget(commits, -1, selected, '', false, false);
+    const result = getCopyStatsTarget(commits, -1, selected, '', 0, false);
     assert.strictEqual(result?.hash, 'cccccccccccccccccccccccccccccccccccccccc');
   });
 
   test('copy stats returns null when no focus and no selection', () => {
-    const result = getCopyStatsTarget(commits, -1, new Set(), '', false, false);
+    const result = getCopyStatsTarget(commits, -1, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
   test('copy stats with search filter uses displayed commit list', () => {
-    const result = getCopyStatsTarget(commits, 0, new Set(), 'Diana', false, false);
+    const result = getCopyStatsTarget(commits, 0, new Set(), 'Diana', 0, false);
     assert.strictEqual(result?.hash, 'dddddddddddddddddddddddddddddddddddddddd');
   });
 
   test('copy stats with sort oldest first uses reversed list', () => {
-    const result = getCopyStatsTarget(commits, 0, new Set(), '', true, false);
+    const result = getCopyStatsTarget(commits, 0, new Set(), '', 1, false);
     assert.strictEqual(result?.hash, 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
   });
 
   test('copy stats with focusedIndex out of filtered bounds falls back to selection', () => {
     const selected = new Set(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
-    const result = getCopyStatsTarget(commits, 5, selected, 'Bob', false, false);
+    const result = getCopyStatsTarget(commits, 5, selected, 'Bob', 0, false);
     assert.strictEqual(result?.hash, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   });
 
   test('copy stats with focusedIndex beyond results returns null without selection', () => {
-    const result = getCopyStatsTarget(commits, 10, new Set(), '', false, false);
+    const result = getCopyStatsTarget(commits, 10, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
   test('copy stats with empty commits list returns null', () => {
-    const result = getCopyStatsTarget([], 0, new Set(), '', false, false);
+    const result = getCopyStatsTarget([], 0, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
@@ -247,17 +250,17 @@ suite('Copy Commit Stats Logic Tests', () => {
   });
 
   test('copy stats with hideMergeCommits skips merge commit', () => {
-    const result = getCopyStatsTarget(commits, 1, new Set(), '', false, true);
+    const result = getCopyStatsTarget(commits, 1, new Set(), '', 0, true);
     assert.strictEqual(result?.hash, 'cccccccccccccccccccccccccccccccccccccccc');
   });
 
   test('copy stats with hideMergeCommits and focusedIndex 0 returns first non-merge', () => {
-    const result = getCopyStatsTarget(commits, 0, new Set(), '', false, true);
+    const result = getCopyStatsTarget(commits, 0, new Set(), '', 0, true);
     assert.strictEqual(result?.hash, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   });
 
   test('copy stats with combined search and hideMergeCommits', () => {
-    const result = getCopyStatsTarget(commits, 0, new Set(), 'company.org', false, true);
+    const result = getCopyStatsTarget(commits, 0, new Set(), 'company.org', 0, true);
     assert.strictEqual(result?.hash, 'dddddddddddddddddddddddddddddddddddddddd');
   });
 
@@ -266,7 +269,7 @@ suite('Copy Commit Stats Logic Tests', () => {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'cccccccccccccccccccccccccccccccccccccccc'
     ]);
-    const result = getCopyStatsTarget(commits, -1, selected, '', false, false);
+    const result = getCopyStatsTarget(commits, -1, selected, '', 0, false);
     assert.strictEqual(result, null);
   });
 
@@ -275,7 +278,7 @@ suite('Copy Commit Stats Logic Tests', () => {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'cccccccccccccccccccccccccccccccccccccccc'
     ]);
-    const result = getCopyStatsTarget(commits, 2, selected, '', false, false);
+    const result = getCopyStatsTarget(commits, 2, selected, '', 0, false);
     assert.strictEqual(result?.hash, 'cccccccccccccccccccccccccccccccccccccccc');
   });
 });

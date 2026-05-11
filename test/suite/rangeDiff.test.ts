@@ -35,9 +35,12 @@ function handleRangeSelection(
 }
 
 // Simulates finding commits in order
-function getOrderedCommits(commits: TestCommit[], sortOldestFirst: boolean): TestCommit[] {
-  if (sortOldestFirst) {
-    return [...commits].reverse();
+function getOrderedCommits(commits: TestCommit[], sortMode: number): TestCommit[] {
+  switch (sortMode) {
+    case 0: return [...commits];
+    case 1: return [...commits].reverse();
+    case 2: return [...commits].sort((a, b) => a.author.localeCompare(b.author));
+    case 3: return [...commits].sort((a, b) => b.author.localeCompare(a.author));
   }
   return [...commits];
 }
@@ -127,7 +130,7 @@ suite('Range Selection (Compare Any Two Commits) Tests', () => {
   });
 
   test('getOrderedCommits should return commits in original order when newest first', () => {
-    const ordered = getOrderedCommits(commits, false);
+    const ordered = getOrderedCommits(commits, 0);
 
     assert.strictEqual(ordered[0].hash, commits[0].hash);
     assert.strictEqual(ordered[1].hash, commits[1].hash);
@@ -136,7 +139,7 @@ suite('Range Selection (Compare Any Two Commits) Tests', () => {
   });
 
   test('getOrderedCommits should reverse commits when oldest first', () => {
-    const ordered = getOrderedCommits(commits, true);
+    const ordered = getOrderedCommits(commits, 1);
 
     assert.strictEqual(ordered[0].hash, commits[3].hash);
     assert.strictEqual(ordered[1].hash, commits[2].hash);
@@ -145,7 +148,7 @@ suite('Range Selection (Compare Any Two Commits) Tests', () => {
   });
 
   test('range selection should work with oldest-first ordering', () => {
-    const ordered = getOrderedCommits(commits, true);
+    const ordered = getOrderedCommits(commits, 1);
     const anchorHash = ordered[0].hash; // Oldest
     const targetHash = ordered[2].hash; // Third oldest
 

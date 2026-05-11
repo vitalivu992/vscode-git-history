@@ -23,9 +23,12 @@ function getFilteredCommits(commits: TestCommit[], searchQuery: string): TestCom
   );
 }
 
-function getOrderedCommits(commits: TestCommit[], sortOldestFirst: boolean): TestCommit[] {
-  if (sortOldestFirst) {
-    return commits.slice().reverse();
+function getOrderedCommits(commits: TestCommit[], sortMode: number): TestCommit[] {
+  switch (sortMode) {
+    case 0: return commits.slice();
+    case 1: return commits.slice().reverse();
+    case 2: return commits.slice().sort((a, b) => a.author.localeCompare(b.author));
+    case 3: return commits.slice().sort((a, b) => b.author.localeCompare(a.author));
   }
   return commits;
 }
@@ -127,7 +130,7 @@ suite('Jump to Hash Logic Tests', () => {
   });
 
   test('jumpToCommit should work on sorted commits', () => {
-    const sorted = getOrderedCommits(commits, true);
+    const sorted = getOrderedCommits(commits, 1);
     const navigator = new JumpToHashNavigator();
     const result = navigator.jumpToCommit(sorted, 'aaaaaaa');
     assert.strictEqual(result.index, 3);

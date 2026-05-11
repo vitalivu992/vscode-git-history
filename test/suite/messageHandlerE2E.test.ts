@@ -89,7 +89,7 @@ suite('Open File at Commit E2E Tests', () => {
 
     const mockSettingsService: any = {
       saveSettings: async () => {},
-      getSettings: () => ({ diffType: 'unified', wordWrapEnabled: false, sortOldestFirst: false, hideMergeCommits: false, regexSearchEnabled: false }),
+      getSettings: () => ({ diffType: 'unified', wordWrapEnabled: false, sortMode: 0, hideMergeCommits: false, regexSearchEnabled: false }),
       resetSettings: async () => {},
       getSetting: () => undefined,
       setSetting: async () => {}
@@ -129,7 +129,7 @@ suite('Open File at Commit E2E Tests', () => {
 
     const mockSettingsService: any = {
       saveSettings: async () => {},
-      getSettings: () => ({ diffType: 'unified', wordWrapEnabled: false, sortOldestFirst: false, hideMergeCommits: false, regexSearchEnabled: false }),
+      getSettings: () => ({ diffType: 'unified', wordWrapEnabled: false, sortMode: 0, hideMergeCommits: false, regexSearchEnabled: false }),
       resetSettings: async () => {},
       getSetting: () => undefined,
       setSetting: async () => {}
@@ -167,7 +167,7 @@ suite('Open File at Commit E2E Tests', () => {
 
     const mockSettingsService: any = {
       saveSettings: async () => {},
-      getSettings: () => ({ diffType: 'unified', wordWrapEnabled: false, sortOldestFirst: false, hideMergeCommits: false, regexSearchEnabled: false }),
+      getSettings: () => ({ diffType: 'unified', wordWrapEnabled: false, sortMode: 0, hideMergeCommits: false, regexSearchEnabled: false }),
       resetSettings: async () => {},
       getSetting: () => undefined,
       setSetting: async () => {}

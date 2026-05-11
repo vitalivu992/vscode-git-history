@@ -110,7 +110,7 @@ suite('Open File at Commit Feature', () => {
       getSettings: () => ({
         diffType: 'unified' as const,
         wordWrapEnabled: false,
-        sortOldestFirst: false,
+        sortMode: 0,
         hideMergeCommits: false,
         regexSearchEnabled: false
       }),

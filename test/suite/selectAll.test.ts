@@ -30,9 +30,12 @@ function filterCommits(commits: TestCommit[], query: string, hideMergeCommits: b
   );
 }
 
-function getOrderedCommits(filteredCommits: TestCommit[], sortOldestFirst: boolean): TestCommit[] {
-  if (sortOldestFirst) {
-    return filteredCommits.slice().reverse();
+function getOrderedCommits(filteredCommits: TestCommit[], sortMode: number): TestCommit[] {
+  switch (sortMode) {
+    case 0: return filteredCommits.slice();
+    case 1: return filteredCommits.slice().reverse();
+    case 2: return filteredCommits.slice().sort((a, b) => a.author.localeCompare(b.author));
+    case 3: return filteredCommits.slice().sort((a, b) => b.author.localeCompare(a.author));
   }
   return filteredCommits;
 }
@@ -45,12 +48,12 @@ function handleSelectAll(
   commits: TestCommit[],
   selectedCommits: Set<string>,
   searchQuery: string,
-  sortOldestFirst: boolean,
+  sortMode: number,
   hideMergeCommits: boolean
 ): string[] {
   const displayCommits = getOrderedCommits(
     filterCommits(commits, searchQuery, hideMergeCommits),
-    sortOldestFirst
+    sortMode
   );
 
   if (displayCommits.length === 0) {
@@ -106,14 +109,14 @@ suite('Select All Logic Tests', () => {
 
   test('select all with no visible commits should be no-op', () => {
     const selected = new Set<string>();
-    const result = handleSelectAll([], selected, '', false, false);
+    const result = handleSelectAll([], selected, '', 0, false);
     assert.deepStrictEqual(result, []);
     assert.strictEqual(selected.size, 0);
   });
 
   test('select all with multiple visible commits should select all', () => {
     const selected = new Set<string>();
-    const result = handleSelectAll(commits, selected, '', false, false);
+    const result = handleSelectAll(commits, selected, '', 0, false);
     assert.strictEqual(result.length, 4);
     assert.ok(result.includes('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'));
     assert.ok(result.includes('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'));
@@ -124,7 +127,7 @@ suite('Select All Logic Tests', () => {
 
   test('select all preserves existing selection', () => {
     const selected = new Set(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
-    const result = handleSelectAll(commits, selected, '', false, false);
+    const result = handleSelectAll(commits, selected, '', 0, false);
     assert.strictEqual(result.length, 4);
     assert.ok(selected.has('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'));
   });
@@ -132,28 +135,28 @@ suite('Select All Logic Tests', () => {
   test('select all with single visible commit selects that commit', () => {
     const singleCommit = [commits[0]];
     const selected = new Set<string>();
-    const result = handleSelectAll(singleCommit, selected, '', false, false);
+    const result = handleSelectAll(singleCommit, selected, '', 0, false);
     assert.deepStrictEqual(result, ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
     assert.strictEqual(selected.size, 1);
   });
 
   test('select all with filtered view selects only filtered commits', () => {
     const selected = new Set<string>();
-    const result = handleSelectAll(commits, selected, 'Diana', false, false);
+    const result = handleSelectAll(commits, selected, 'Diana', 0, false);
     assert.strictEqual(result.length, 1);
     assert.ok(result.includes('dddddddddddddddddddddddddddddddddddddddd'));
   });
 
   test('select all with hide merge commits excludes merge commits', () => {
     const selected = new Set<string>();
-    const result = handleSelectAll(commits, selected, '', false, true);
+    const result = handleSelectAll(commits, selected, '', 0, true);
     assert.strictEqual(result.length, 3);
     assert.ok(!result.includes('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'));
   });
 
   test('select all with search and hide merge commits', () => {
     const selected = new Set<string>();
-    const result = handleSelectAll(commits, selected, 'commit', false, true);
+    const result = handleSelectAll(commits, selected, 'commit', 0, true);
     assert.strictEqual(result.length, 2);
     assert.ok(result.includes('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'));
     assert.ok(result.includes('dddddddddddddddddddddddddddddddddddddddd'));
@@ -161,7 +164,7 @@ suite('Select All Logic Tests', () => {
 
   test('select all with sort oldest first maintains selection', () => {
     const selected = new Set<string>();
-    const result = handleSelectAll(commits, selected, '', true, false);
+    const result = handleSelectAll(commits, selected, '', 1, false);
     assert.strictEqual(result.length, 4);
     assert.strictEqual(selected.size, 4);
   });

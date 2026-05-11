@@ -31,9 +31,12 @@ function filterCommits(commits: TestCommit[], query: string, hideMergeCommits: b
   );
 }
 
-function getOrderedCommits(filteredCommits: TestCommit[], sortOldestFirst: boolean): TestCommit[] {
-  if (sortOldestFirst) {
-    return filteredCommits.slice().reverse();
+function getOrderedCommits(filteredCommits: TestCommit[], sortMode: number): TestCommit[] {
+  switch (sortMode) {
+    case 0: return filteredCommits.slice();
+    case 1: return filteredCommits.slice().reverse();
+    case 2: return filteredCommits.slice().sort((a, b) => a.author.localeCompare(b.author));
+    case 3: return filteredCommits.slice().sort((a, b) => b.author.localeCompare(a.author));
   }
   return filteredCommits;
 }
@@ -43,12 +46,12 @@ function getCopyInfoTarget(
   focusedIndex: number,
   selectedCommits: Set<string>,
   searchQuery: string,
-  sortOldestFirst: boolean,
+  sortMode: number,
   hideMergeCommits: boolean
 ): string | null {
   const displayCommits = getOrderedCommits(
     filterCommits(commits, searchQuery, hideMergeCommits),
-    sortOldestFirst
+    sortMode
   );
   if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
     return displayCommits[focusedIndex].hash;
@@ -104,43 +107,43 @@ suite('Copy Commit Info Logic Tests', () => {
   ];
 
   test('copy info with focusedIndex 0 returns first commit hash', () => {
-    const result = getCopyInfoTarget(commits, 0, new Set(), '', false, false);
+    const result = getCopyInfoTarget(commits, 0, new Set(), '', 0, false);
     assert.strictEqual(result, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   });
 
   test('copy info with focusedIndex on last commit', () => {
-    const result = getCopyInfoTarget(commits, 3, new Set(), '', false, false);
+    const result = getCopyInfoTarget(commits, 3, new Set(), '', 0, false);
     assert.strictEqual(result, 'dddddddddddddddddddddddddddddddddddddddd');
   });
 
   test('copy info falls back to selected commit when focusedIndex is -1', () => {
     const selected = new Set(['cccccccccccccccccccccccccccccccccccccccc']);
-    const result = getCopyInfoTarget(commits, -1, selected, '', false, false);
+    const result = getCopyInfoTarget(commits, -1, selected, '', 0, false);
     assert.strictEqual(result, 'cccccccccccccccccccccccccccccccccccccccc');
   });
 
   test('copy info returns null when no focus and no selection', () => {
-    const result = getCopyInfoTarget(commits, -1, new Set(), '', false, false);
+    const result = getCopyInfoTarget(commits, -1, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
   test('copy info with search filter uses displayed commit list', () => {
-    const result = getCopyInfoTarget(commits, 0, new Set(), 'Diana', false, false);
+    const result = getCopyInfoTarget(commits, 0, new Set(), 'Diana', 0, false);
     assert.strictEqual(result, 'dddddddddddddddddddddddddddddddddddddddd');
   });
 
   test('copy info with search filter focusedIndex 1 returns second filtered result', () => {
-    const result = getCopyInfoTarget(commits, 1, new Set(), 'example.com', false, false);
+    const result = getCopyInfoTarget(commits, 1, new Set(), 'example.com', 0, false);
     assert.strictEqual(result, 'cccccccccccccccccccccccccccccccccccccccc');
   });
 
   test('copy info with sort oldest first uses reversed list', () => {
-    const result = getCopyInfoTarget(commits, 0, new Set(), '', true, false);
+    const result = getCopyInfoTarget(commits, 0, new Set(), '', 1, false);
     assert.strictEqual(result, 'dddddddddddddddddddddddddddddddddddddddd');
   });
 
   test('copy info with sort oldest first and search filter', () => {
-    const result = getCopyInfoTarget(commits, 0, new Set(), 'company.org', true, false);
+    const result = getCopyInfoTarget(commits, 0, new Set(), 'company.org', 1, false);
     const filtered = filterCommits(commits, 'company.org', false);
     const reversed = filtered.slice().reverse();
     assert.strictEqual(result, reversed[0].hash);
@@ -148,22 +151,22 @@ suite('Copy Commit Info Logic Tests', () => {
 
   test('copy info with focusedIndex out of filtered bounds falls back to selection', () => {
     const selected = new Set(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
-    const result = getCopyInfoTarget(commits, 5, selected, 'Bob', false, false);
+    const result = getCopyInfoTarget(commits, 5, selected, 'Bob', 0, false);
     assert.strictEqual(result, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   });
 
   test('copy info with focusedIndex beyond results returns null without selection', () => {
-    const result = getCopyInfoTarget(commits, 10, new Set(), '', false, false);
+    const result = getCopyInfoTarget(commits, 10, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
   test('copy info with empty commits list returns null', () => {
-    const result = getCopyInfoTarget([], 0, new Set(), '', false, false);
+    const result = getCopyInfoTarget([], 0, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
   test('copy info with search that returns no results returns null', () => {
-    const result = getCopyInfoTarget(commits, 0, new Set(), 'zzzzz', false, false);
+    const result = getCopyInfoTarget(commits, 0, new Set(), 'zzzzz', 0, false);
     assert.strictEqual(result, null);
   });
 
@@ -172,7 +175,7 @@ suite('Copy Commit Info Logic Tests', () => {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'cccccccccccccccccccccccccccccccccccccccc'
     ]);
-    const result = getCopyInfoTarget(commits, -1, selected, '', false, false);
+    const result = getCopyInfoTarget(commits, -1, selected, '', 0, false);
     assert.strictEqual(result, null);
   });
 
@@ -181,34 +184,34 @@ suite('Copy Commit Info Logic Tests', () => {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'cccccccccccccccccccccccccccccccccccccccc'
     ]);
-    const result = getCopyInfoTarget(commits, 2, selected, '', false, false);
+    const result = getCopyInfoTarget(commits, 2, selected, '', 0, false);
     assert.strictEqual(result, 'cccccccccccccccccccccccccccccccccccccccc');
   });
 
   test('copy info with hideMergeCommits skips merge commit', () => {
-    const result = getCopyInfoTarget(commits, 1, new Set(), '', false, true);
+    const result = getCopyInfoTarget(commits, 1, new Set(), '', 0, true);
     assert.strictEqual(result, 'cccccccccccccccccccccccccccccccccccccccc');
   });
 
   test('copy info with hideMergeCommits and focusedIndex 0 returns first non-merge', () => {
-    const result = getCopyInfoTarget(commits, 0, new Set(), '', false, true);
+    const result = getCopyInfoTarget(commits, 0, new Set(), '', 0, true);
     assert.strictEqual(result, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   });
 
   test('copy info with combined search and hideMergeCommits', () => {
-    const result = getCopyInfoTarget(commits, 0, new Set(), 'company.org', false, true);
+    const result = getCopyInfoTarget(commits, 0, new Set(), 'company.org', 0, true);
     assert.strictEqual(result, 'dddddddddddddddddddddddddddddddddddddddd');
   });
 
   test('copy info with search filter does NOT use raw commits index', () => {
-    const displayedResult = getCopyInfoTarget(commits, 0, new Set(), 'Diana', false, false);
+    const displayedResult = getCopyInfoTarget(commits, 0, new Set(), 'Diana', 0, false);
     const rawResult = commits[0].hash;
     assert.notStrictEqual(displayedResult, rawResult,
       'Copy info should use displayed list, not raw commits array');
   });
 
   test('copy info with sort does NOT use unsorted index', () => {
-    const displayedResult = getCopyInfoTarget(commits, 3, new Set(), '', true, false);
+    const displayedResult = getCopyInfoTarget(commits, 3, new Set(), '', 1, false);
     const rawResult = commits[3].hash;
     assert.notStrictEqual(displayedResult, rawResult,
       'Copy info should use sorted display list, not raw commits array');

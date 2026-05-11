@@ -213,7 +213,7 @@ suite('Copy File Content Integration Tests', () => {
       getSettings: () => ({
         diffType: 'unified',
         wordWrapEnabled: false,
-        sortOldestFirst: false,
+        sortMode: 0,
         hideMergeCommits: false,
         regexSearchEnabled: false
       })

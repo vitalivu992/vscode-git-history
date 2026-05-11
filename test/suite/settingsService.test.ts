@@ -68,12 +68,12 @@ suite('Settings Service Tests', () => {
     assert.ok(source.includes('wordWrapEnabled:'), 'UserSettings should have wordWrapEnabled property');
   });
 
-  test('UserSettings should have sortOldestFirst property', () => {
+  test('UserSettings should have sortMode property', () => {
     const fs = require('fs');
     const typesPath = path.resolve(__dirname, '../../../src/settings/settingsTypes.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
-    assert.ok(source.includes('sortOldestFirst:'), 'UserSettings should have sortOldestFirst property');
+    assert.ok(source.includes('sortMode:'), 'UserSettings should have sortMode property');
   });
 
   test('UserSettings should have hideMergeCommits property', () => {
@@ -115,7 +115,7 @@ suite('Settings Service Tests', () => {
 
     assert.ok(source.includes("diffType: 'unified'"), 'DEFAULT_SETTINGS should have unified as default diffType');
     assert.ok(source.includes('wordWrapEnabled: false'), 'DEFAULT_SETTINGS should have false as default wordWrapEnabled');
-    assert.ok(source.includes('sortOldestFirst: false'), 'DEFAULT_SETTINGS should have false as default sortOldestFirst');
+    assert.ok(source.includes('sortMode: 0'), 'DEFAULT_SETTINGS should have 0 as default sortMode');
     assert.ok(source.includes('hideMergeCommits: false'), 'DEFAULT_SETTINGS should have false as default hideMergeCommits');
     assert.ok(source.includes('regexSearchEnabled: false'), 'DEFAULT_SETTINGS should have false as default regexSearchEnabled');
     assert.ok(source.includes("searchQuery: ''"), "DEFAULT_SETTINGS should have empty string as default searchQuery");

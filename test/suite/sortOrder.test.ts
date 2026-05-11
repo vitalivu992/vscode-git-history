@@ -10,9 +10,12 @@ interface TestCommit {
   tags?: string[];
 }
 
-function getOrderedCommits(filteredCommits: TestCommit[], sortOldestFirst: boolean): TestCommit[] {
-  if (sortOldestFirst) {
-    return filteredCommits.slice().reverse();
+function getOrderedCommits(filteredCommits: TestCommit[], sortMode: number): TestCommit[] {
+  switch (sortMode) {
+    case 0: return filteredCommits.slice();
+    case 1: return filteredCommits.slice().reverse();
+    case 2: return filteredCommits.slice().sort((a, b) => a.author.localeCompare(b.author));
+    case 3: return filteredCommits.slice().sort((a, b) => b.author.localeCompare(a.author));
   }
   return filteredCommits;
 }
@@ -46,7 +49,7 @@ suite('Sort Order Logic Tests', () => {
   ];
 
   test('default order (newest first) preserves original order', () => {
-    const result = getOrderedCommits(commits, false);
+    const result = getOrderedCommits(commits, 0);
     assert.strictEqual(result.length, 3);
     assert.strictEqual(result[0].message, 'Third commit');
     assert.strictEqual(result[1].message, 'Second commit');
@@ -54,7 +57,7 @@ suite('Sort Order Logic Tests', () => {
   });
 
   test('oldest first reverses the order', () => {
-    const result = getOrderedCommits(commits, true);
+    const result = getOrderedCommits(commits, 1);
     assert.strictEqual(result.length, 3);
     assert.strictEqual(result[0].message, 'First commit');
     assert.strictEqual(result[1].message, 'Second commit');
@@ -63,34 +66,34 @@ suite('Sort Order Logic Tests', () => {
 
   test('reversing does not mutate original array', () => {
     const original = [...commits];
-    getOrderedCommits(commits, true);
+    getOrderedCommits(commits, 1);
     assert.strictEqual(commits[0].message, original[0].message);
     assert.strictEqual(commits[1].message, original[1].message);
     assert.strictEqual(commits[2].message, original[2].message);
   });
 
   test('reversing twice restores original order', () => {
-    const once = getOrderedCommits(commits, true);
-    const twice = getOrderedCommits(once, true);
+    const once = getOrderedCommits(commits, 1);
+    const twice = getOrderedCommits(once, 1);
     assert.strictEqual(twice[0].message, commits[0].message);
     assert.strictEqual(twice[1].message, commits[1].message);
     assert.strictEqual(twice[2].message, commits[2].message);
   });
 
   test('sort with empty commits list', () => {
-    const result = getOrderedCommits([], true);
+    const result = getOrderedCommits([], 1);
     assert.strictEqual(result.length, 0);
   });
 
   test('sort with single commit', () => {
     const single = [commits[0]];
-    const result = getOrderedCommits(single, true);
+    const result = getOrderedCommits(single, 1);
     assert.strictEqual(result.length, 1);
     assert.strictEqual(result[0].message, 'Third commit');
   });
 
   test('sort preserves all commit fields', () => {
-    const result = getOrderedCommits(commits, true);
+    const result = getOrderedCommits(commits, 1);
     for (let i = 0; i < result.length; i++) {
       assert.ok(result[i].hash);
       assert.ok(result[i].shortHash);
@@ -105,11 +108,11 @@ suite('Sort Order Logic Tests', () => {
     const filtered = commits.filter(c => c.author !== 'Bob');
     assert.strictEqual(filtered.length, 2);
 
-    const newestFirst = getOrderedCommits(filtered, false);
+    const newestFirst = getOrderedCommits(filtered, 0);
     assert.strictEqual(newestFirst[0].message, 'Third commit');
     assert.strictEqual(newestFirst[1].message, 'First commit');
 
-    const oldestFirst = getOrderedCommits(filtered, true);
+    const oldestFirst = getOrderedCommits(filtered, 1);
     assert.strictEqual(oldestFirst[0].message, 'First commit');
     assert.strictEqual(oldestFirst[1].message, 'Third commit');
   });
@@ -120,20 +123,36 @@ suite('Sort Order Logic Tests', () => {
       { hash: 'bbb', shortHash: 'bbb', author: 'B', email: 'b@b.com', date: '2024-01-01', message: 'Untagged' }
     ];
 
-    const result = getOrderedCommits(tagged, true);
+    const result = getOrderedCommits(tagged, 1);
     assert.strictEqual(result[0].message, 'Untagged');
     assert.strictEqual(result[1].message, 'Tagged');
     assert.deepStrictEqual(result[1].tags, ['v1.0.0']);
   });
+
+  test('sort mode 2 sorts by author A-Z', () => {
+    const result = getOrderedCommits(commits, 2);
+    assert.strictEqual(result.length, 3);
+    assert.strictEqual(result[0].author, 'Alice');
+    assert.strictEqual(result[1].author, 'Bob');
+    assert.strictEqual(result[2].author, 'Charlie');
+  });
+
+  test('sort mode 3 sorts by author Z-A', () => {
+    const result = getOrderedCommits(commits, 3);
+    assert.strictEqual(result.length, 3);
+    assert.strictEqual(result[0].author, 'Charlie');
+    assert.strictEqual(result[1].author, 'Bob');
+    assert.strictEqual(result[2].author, 'Alice');
+  });
 });
 
 suite('Sort Order Source Verification', () => {
-  test('main.js should have sortOldestFirst state variable', () => {
+  test('main.js should have sortMode state variable', () => {
     const fs = require('fs');
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
-    assert.ok(source.includes('let sortOldestFirst'), 'main.js should have sortOldestFirst state');
+    assert.ok(source.includes('let sortMode'), 'main.js should have sortMode state');
   });
 
   test('main.js should have handleSortToggle function', () => {
@@ -160,13 +179,13 @@ suite('Sort Order Source Verification', () => {
     assert.ok(source.includes('const displayCommits = getOrderedCommits('), 'renderCommits should use getOrderedCommits');
   });
 
-  test('main.js should hide graph when sortOldestFirst is true', () => {
+  test('main.js should hide graph when sortMode is not newest-first', () => {
     const fs = require('fs');
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
-    assert.ok(source.includes('effectiveShowGraph') && source.includes('!sortOldestFirst'),
-      'Graph visibility should consider sortOldestFirst');
+    assert.ok(source.includes('effectiveShowGraph') && source.includes('sortMode < 2'),
+      'Graph visibility should consider sortMode');
   });
 
   test('sort toggle should reset focusedIndex', () => {

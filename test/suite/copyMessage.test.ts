@@ -25,9 +25,12 @@ function filterCommits(commits: TestCommit[], query: string): TestCommit[] {
   );
 }
 
-function getOrderedCommits(filteredCommits: TestCommit[], sortOldestFirst: boolean): TestCommit[] {
-  if (sortOldestFirst) {
-    return filteredCommits.slice().reverse();
+function getOrderedCommits(filteredCommits: TestCommit[], sortMode: number): TestCommit[] {
+  switch (sortMode) {
+    case 0: return filteredCommits.slice();
+    case 1: return filteredCommits.slice().reverse();
+    case 2: return filteredCommits.slice().sort((a, b) => a.author.localeCompare(b.author));
+    case 3: return filteredCommits.slice().sort((a, b) => b.author.localeCompare(a.author));
   }
   return filteredCommits;
 }
@@ -37,9 +40,9 @@ function getCopyTargetHash(
   focusedIndex: number,
   selectedCommits: Set<string>,
   searchQuery: string,
-  sortOldestFirst: boolean
+  sortMode: number
 ): string | null {
-  const displayCommits = getOrderedCommits(filterCommits(commits, searchQuery), sortOldestFirst);
+  const displayCommits = getOrderedCommits(filterCommits(commits, searchQuery), sortMode);
   if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
     return displayCommits[focusedIndex].hash;
   } else if (selectedCommits.size === 1) {
@@ -89,43 +92,43 @@ suite('Copy Commit Message Logic Tests', () => {
   ];
 
   test('copy with focusedIndex 0 returns first commit hash', () => {
-    const result = getCopyTargetHash(commits, 0, new Set(), '', false);
+    const result = getCopyTargetHash(commits, 0, new Set(), '', 0);
     assert.strictEqual(result, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   });
 
   test('copy with focusedIndex on last commit', () => {
-    const result = getCopyTargetHash(commits, 3, new Set(), '', false);
+    const result = getCopyTargetHash(commits, 3, new Set(), '', 0);
     assert.strictEqual(result, 'dddddddddddddddddddddddddddddddddddddddd');
   });
 
   test('copy falls back to selected commit when focusedIndex is -1', () => {
     const selected = new Set(['bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb']);
-    const result = getCopyTargetHash(commits, -1, selected, '', false);
+    const result = getCopyTargetHash(commits, -1, selected, '', 0);
     assert.strictEqual(result, 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
   });
 
   test('copy returns null when no focus and no selection', () => {
-    const result = getCopyTargetHash(commits, -1, new Set(), '', false);
+    const result = getCopyTargetHash(commits, -1, new Set(), '', 0);
     assert.strictEqual(result, null);
   });
 
   test('copy with search filter uses displayed commit list', () => {
-    const result = getCopyTargetHash(commits, 0, new Set(), 'Bob', false);
+    const result = getCopyTargetHash(commits, 0, new Set(), 'Bob', 0);
     assert.strictEqual(result, 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
   });
 
   test('copy with search filter focusedIndex 1 returns second filtered result', () => {
-    const result = getCopyTargetHash(commits, 1, new Set(), 'example.com', false);
+    const result = getCopyTargetHash(commits, 1, new Set(), 'example.com', 0);
     assert.strictEqual(result, 'cccccccccccccccccccccccccccccccccccccccc');
   });
 
   test('copy with sort oldest first uses reversed list', () => {
-    const result = getCopyTargetHash(commits, 0, new Set(), '', true);
+    const result = getCopyTargetHash(commits, 0, new Set(), '', 1);
     assert.strictEqual(result, 'dddddddddddddddddddddddddddddddddddddddd');
   });
 
   test('copy with sort oldest first and search filter', () => {
-    const result = getCopyTargetHash(commits, 0, new Set(), 'example.com', true);
+    const result = getCopyTargetHash(commits, 0, new Set(), 'example.com', 1);
     const filtered = filterCommits(commits, 'example.com');
     const reversed = filtered.slice().reverse();
     assert.strictEqual(result, reversed[0].hash);
@@ -133,22 +136,22 @@ suite('Copy Commit Message Logic Tests', () => {
 
   test('copy with focusedIndex out of filtered bounds falls back to selection', () => {
     const selected = new Set(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
-    const result = getCopyTargetHash(commits, 5, selected, 'Bob', false);
+    const result = getCopyTargetHash(commits, 5, selected, 'Bob', 0);
     assert.strictEqual(result, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   });
 
   test('copy with focusedIndex beyond filtered results returns null without selection', () => {
-    const result = getCopyTargetHash(commits, 10, new Set(), '', false);
+    const result = getCopyTargetHash(commits, 10, new Set(), '', 0);
     assert.strictEqual(result, null);
   });
 
   test('copy with empty commits list returns null', () => {
-    const result = getCopyTargetHash([], 0, new Set(), '', false);
+    const result = getCopyTargetHash([], 0, new Set(), '', 0);
     assert.strictEqual(result, null);
   });
 
   test('copy with search that returns no results returns null', () => {
-    const result = getCopyTargetHash(commits, 0, new Set(), 'zzzzz', false);
+    const result = getCopyTargetHash(commits, 0, new Set(), 'zzzzz', 0);
     assert.strictEqual(result, null);
   });
 
@@ -157,13 +160,13 @@ suite('Copy Commit Message Logic Tests', () => {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
     ]);
-    const result = getCopyTargetHash(commits, -1, selected, '', false);
+    const result = getCopyTargetHash(commits, -1, selected, '', 0);
     assert.strictEqual(result, null);
   });
 
   test('copy with search filter does NOT use raw commits index', () => {
     const rawIndex = 0;
-    const displayedResult = getCopyTargetHash(commits, 0, new Set(), 'Bob', false);
+    const displayedResult = getCopyTargetHash(commits, 0, new Set(), 'Bob', 0);
     const rawResult = commits[rawIndex].hash;
     assert.notStrictEqual(displayedResult, rawResult,
       'Copy should use displayed list, not raw commits array');
@@ -171,7 +174,7 @@ suite('Copy Commit Message Logic Tests', () => {
 
   test('copy with sort does NOT use unsorted index', () => {
     const index = 3;
-    const displayedResult = getCopyTargetHash(commits, index, new Set(), '', true);
+    const displayedResult = getCopyTargetHash(commits, index, new Set(), '', 1);
     const rawResult = commits[index].hash;
     assert.notStrictEqual(displayedResult, rawResult,
       'Copy should use sorted display list, not raw commits array');

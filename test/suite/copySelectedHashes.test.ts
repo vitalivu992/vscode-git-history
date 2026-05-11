@@ -30,9 +30,12 @@ function filterCommits(commits: TestCommit[], query: string, hideMergeCommits: b
   );
 }
 
-function getOrderedCommits(filteredCommits: TestCommit[], sortOldestFirst: boolean): TestCommit[] {
-  if (sortOldestFirst) {
-    return filteredCommits.slice().reverse();
+function getOrderedCommits(filteredCommits: TestCommit[], sortMode: number): TestCommit[] {
+  switch (sortMode) {
+    case 0: return filteredCommits.slice();
+    case 1: return filteredCommits.slice().reverse();
+    case 2: return filteredCommits.slice().sort((a, b) => a.author.localeCompare(b.author));
+    case 3: return filteredCommits.slice().sort((a, b) => b.author.localeCompare(a.author));
   }
   return filteredCommits;
 }
@@ -46,12 +49,12 @@ function getCopySelectedHashesTarget(
   focusedIndex: number,
   selectedCommits: Set<string>,
   searchQuery: string,
-  sortOldestFirst: boolean,
+  sortMode: number,
   hideMergeCommits: boolean
 ): string[] | null {
   const displayCommits = getOrderedCommits(
     filterCommits(commits, searchQuery, hideMergeCommits),
-    sortOldestFirst
+    sortMode
   );
 
   const selectedHashes = [...selectedCommits];
@@ -123,18 +126,18 @@ suite('Copy Selected Hashes Logic Tests', () => {
   ];
 
   test('0 selected with focused returns single hash', () => {
-    const result = getCopySelectedHashesTarget(commits, 0, new Set(), '', false, false);
+    const result = getCopySelectedHashesTarget(commits, 0, new Set(), '', 0, false);
     assert.deepStrictEqual(result, ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
   });
 
   test('0 selected without focus returns null', () => {
-    const result = getCopySelectedHashesTarget(commits, -1, new Set(), '', false, false);
+    const result = getCopySelectedHashesTarget(commits, -1, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
   test('1 selected returns single hash', () => {
     const selected = new Set(['cccccccccccccccccccccccccccccccccccccccc']);
-    const result = getCopySelectedHashesTarget(commits, -1, selected, '', false, false);
+    const result = getCopySelectedHashesTarget(commits, -1, selected, '', 0, false);
     assert.deepStrictEqual(result, ['cccccccccccccccccccccccccccccccccccccccc']);
   });
 
@@ -143,7 +146,7 @@ suite('Copy Selected Hashes Logic Tests', () => {
       'cccccccccccccccccccccccccccccccccccccccc',
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     ]);
-    const result = getCopySelectedHashesTarget(commits, -1, selected, '', false, false);
+    const result = getCopySelectedHashesTarget(commits, -1, selected, '', 0, false);
     // Should be in display order (newest first)
     assert.strictEqual(result?.length, 2);
     assert.strictEqual(result?.[0], 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
@@ -156,7 +159,7 @@ suite('Copy Selected Hashes Logic Tests', () => {
       'cccccccccccccccccccccccccccccccccccccccc',
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     ]);
-    const result = getCopySelectedHashesTarget(commits, -1, selected, '', false, false);
+    const result = getCopySelectedHashesTarget(commits, -1, selected, '', 0, false);
     assert.strictEqual(result?.length, 3);
     // Display order (newest first): a, c, d
     assert.strictEqual(result?.[0], 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
@@ -165,12 +168,12 @@ suite('Copy Selected Hashes Logic Tests', () => {
   });
 
   test('0 selected at end of list returns last hash', () => {
-    const result = getCopySelectedHashesTarget(commits, 3, new Set(), '', false, false);
+    const result = getCopySelectedHashesTarget(commits, 3, new Set(), '', 0, false);
     assert.deepStrictEqual(result, ['dddddddddddddddddddddddddddddddddddddddd']);
   });
 
   test('0 selected with search filters to displayed commits', () => {
-    const result = getCopySelectedHashesTarget(commits, 0, new Set(), 'Diana', false, false);
+    const result = getCopySelectedHashesTarget(commits, 0, new Set(), 'Diana', 0, false);
     assert.deepStrictEqual(result, ['dddddddddddddddddddddddddddddddddddddddd']);
   });
 
@@ -180,7 +183,7 @@ suite('Copy Selected Hashes Logic Tests', () => {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     ]);
     // Search for "Diana" should show only her commit at index 0
-    const result = getCopySelectedHashesTarget(commits, 0, selected, 'Diana', false, false);
+    const result = getCopySelectedHashesTarget(commits, 0, selected, 'Diana', 0, false);
     assert.strictEqual(result?.length, 1);
     assert.strictEqual(result?.[0], 'dddddddddddddddddddddddddddddddddddddddd');
   });
@@ -190,7 +193,7 @@ suite('Copy Selected Hashes Logic Tests', () => {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'dddddddddddddddddddddddddddddddddddddddd'
     ]);
-    const result = getCopySelectedHashesTarget(commits, -1, selected, '', true, false);
+    const result = getCopySelectedHashesTarget(commits, -1, selected, '', 1, false);
     // Oldest first: a (index 0), d (index 3) -> d, a
     assert.strictEqual(result?.length, 2);
     assert.strictEqual(result?.[0], 'dddddddddddddddddddddddddddddddddddddddd');
@@ -198,12 +201,12 @@ suite('Copy Selected Hashes Logic Tests', () => {
   });
 
   test('empty commits returns null', () => {
-    const result = getCopySelectedHashesTarget([], 0, new Set(), '', false, false);
+    const result = getCopySelectedHashesTarget([], 0, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
   test('focused beyond displayed commits returns null', () => {
-    const result = getCopySelectedHashesTarget(commits, 10, new Set(), '', false, false);
+    const result = getCopySelectedHashesTarget(commits, 10, new Set(), '', 0, false);
     assert.strictEqual(result, null);
   });
 
@@ -212,7 +215,7 @@ suite('Copy Selected Hashes Logic Tests', () => {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz' // Not in commits
     ]);
-    const result = getCopySelectedHashesTarget(commits, -1, selected, '', false, false);
+    const result = getCopySelectedHashesTarget(commits, -1, selected, '', 0, false);
     // Should only include valid commits
     assert.strictEqual(result?.length, 1);
     assert.strictEqual(result?.[0], 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
