@@ -122,6 +122,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCoAuthors",
+        "title": "Git History: Copy Co-Authors",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitDate",
         "title": "Git History: Copy Commit Date",
         "category": "Git History"
@@ -302,6 +307,12 @@
         "command": "gitHistory.copySubject",
         "key": "ctrl+shift+6",
         "mac": "cmd+shift+6",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCoAuthors",
+        "key": "ctrl+shift+k",
+        "mac": "cmd+shift+k",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
