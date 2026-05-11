@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, checkoutBranch } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, checkoutBranch, getCommitUrl } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -689,6 +689,120 @@ suite('Commit URL Generation Tests', () => {
 
       // Clean up the uncommitted changes for other tests
       execSync('git checkout -- .', { cwd: checkoutTestDir });
+    });
+  });
+
+  suite('getCommitUrl', () => {
+    const { execSync } = require('child_process');
+    let urlTestDir: string;
+    let commitHash: string;
+
+    suiteSetup(() => {
+      urlTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-commit-url-test-'));
+      execSync('git init', { cwd: urlTestDir });
+      execSync('git config user.name "Test User"', { cwd: urlTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: urlTestDir });
+      execSync('git commit --allow-empty -m "Initial"', { cwd: urlTestDir });
+      commitHash = execSync('git rev-parse HEAD', { cwd: urlTestDir }).toString().trim();
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(urlTestDir)) {
+        fs.rmSync(urlTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: urlTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: urlTestDir });
+      }
+    }
+
+    test('should generate GitHub HTTPS URL', async () => {
+      await withRemote('https://github.com/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate GitHub SSH URL', async () => {
+      await withRemote('git@github.com:owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate GitLab HTTPS URL', async () => {
+      await withRemote('https://gitlab.com/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://gitlab.com/owner/repo/-/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate GitLab SSH URL', async () => {
+      await withRemote('git@gitlab.com:owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://gitlab.com/owner/repo/-/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate Bitbucket HTTPS URL', async () => {
+      await withRemote('https://bitbucket.org/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://bitbucket.org/owner/repo/commits/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate Bitbucket SSH URL', async () => {
+      await withRemote('git@bitbucket.org:owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://bitbucket.org/owner/repo/commits/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate GitHub Enterprise URL', async () => {
+      await withRemote('https://github.company.com/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://github.company.com/owner/repo/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate self-hosted GitLab URL', async () => {
+      await withRemote('https://gitlab.company.com/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://gitlab.company.com/owner/repo/-/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should use 7-character short hash', async () => {
+      await withRemote('https://github.com/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.ok(url, 'Should return a URL');
+        const hashInUrl = url!.split('/').pop()!;
+        assert.strictEqual(hashInUrl.length, 7, 'Hash in URL should be 7 characters');
+      });
+    });
+
+    test('should return null for unknown platform', async () => {
+      await withRemote('https://unknown-platform.com/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, null);
+      });
+    });
+
+    test('should return null when no remote configured', async () => {
+      const url = await getCommitUrl(commitHash, urlTestDir);
+      assert.strictEqual(url, null);
+    });
+
+    test('should work with custom remote name', async () => {
+      await withRemote('https://github.com/owner/repo.git', 'upstream', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir, 'upstream');
+        assert.strictEqual(url, `https://github.com/owner/repo/commit/${commitHash.substring(0, 7)}`);
+      });
     });
   });
 });
