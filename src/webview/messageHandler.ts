@@ -620,10 +620,43 @@ function formatCommitsAsCsv(commits: CommitInfo[]): string {
 }
 
 /**
+ * Format commits as Markdown (changelog format)
+ */
+function formatCommitsAsMarkdown(commits: CommitInfo[]): string {
+  const lines: string[] = [];
+
+  for (const commit of commits) {
+    const tags = commit.tags && commit.tags.length > 0
+      ? ` ${commit.tags.map(t => `\`${t}\``).join(' ')}`
+      : '';
+    const stats = commit.stats
+      ? ` (${commit.stats.filesChanged} file${commit.stats.filesChanged === 1 ? '' : 's'}, +${commit.stats.insertions}, -${commit.stats.deletions})`
+      : '';
+
+    lines.push(`### ${commit.shortHash}${stats}${tags}`);
+    lines.push('');
+    lines.push(`**Author:** ${commit.author} <${commit.email}>`);
+    lines.push(`**Date:** ${commit.date}`);
+    lines.push('');
+    lines.push(commit.message);
+    lines.push('');
+
+    if (commit.fullMessage && commit.fullMessage !== commit.message) {
+      lines.push('---');
+      lines.push('');
+      lines.push(commit.fullMessage.replace(commit.message, '').trim());
+      lines.push('');
+    }
+  }
+
+  return lines.join('\n');
+}
+
+/**
  * Handle export commits to file
  */
 async function handleExportCommits(
-  format: 'json' | 'csv',
+  format: 'json' | 'csv' | 'markdown',
   commits: CommitInfo[],
   panel: GitHistoryPanel
 ): Promise<void> {
@@ -633,14 +666,16 @@ async function handleExportCommits(
       return;
     }
 
-    const fileExtension = format === 'json' ? 'json' : 'csv';
+    const fileExtension = format === 'json' ? 'json' : format === 'csv' ? 'csv' : 'md';
     const defaultFileName = `git-history-export.${fileExtension}`;
+
+    const filters = format === 'markdown'
+      ? { 'Markdown': ['md'] }
+      : { [format.toUpperCase()]: [fileExtension] };
 
     const uri = await vscode.window.showSaveDialog({
       defaultUri: vscode.Uri.file(path.join(panel.getCwd(), defaultFileName)),
-      filters: {
-        [format.toUpperCase()]: [fileExtension]
-      }
+      filters
     });
 
     if (!uri) {
@@ -649,7 +684,9 @@ async function handleExportCommits(
 
     const content = format === 'json'
       ? formatCommitsAsJson(commits)
-      : formatCommitsAsCsv(commits);
+      : format === 'csv'
+      ? formatCommitsAsCsv(commits)
+      : formatCommitsAsMarkdown(commits);
 
     await fs.promises.writeFile(uri.fsPath, content, 'utf-8');
 
