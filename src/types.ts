@@ -96,6 +96,7 @@ export type WebviewAction =
   | 'copyOneline'
   | 'copyCommitBody'
   | 'copyCommitMarkdown'
+  | 'copyCommitJson'
   | 'copyFileContent'
   | 'copyFileName'
   | 'exportCommits'
@@ -182,6 +183,7 @@ export type WebviewToExtMessage =
   | { type: 'copyOneline'; hash: string }
   | { type: 'copyCommitBody'; hash: string }
   | { type: 'copyCommitMarkdown'; hash: string }
+  | { type: 'copyCommitJson'; hash: string }
   | { type: 'copyFileContent'; hash: string; filePath: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'createBranch'; hash: string }
