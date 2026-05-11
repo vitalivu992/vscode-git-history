@@ -162,6 +162,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.createBranch",
+        "title": "Git History: Create Branch from Commit",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.toggleMyCommits",
         "title": "Git History: Toggle My Commits",
         "category": "Git History"
