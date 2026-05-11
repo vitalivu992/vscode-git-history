@@ -2607,6 +2607,11 @@ function showExportFormatDialog(commitsToExport) {
             <span class="export-option-label">CSV</span>
             <span class="export-option-desc">Spreadsheet format for analysis</span>
           </button>
+          <button class="export-option-btn" data-format="markdown">
+            <span class="export-option-icon">📝</span>
+            <span class="export-option-label">Markdown</span>
+            <span class="export-option-desc">Changelog format for documentation</span>
+          </button>
         </div>
       </div>
     </div>
