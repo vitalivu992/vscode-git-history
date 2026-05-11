@@ -104,6 +104,10 @@ export async function handleMessage(
       handleCopyAuthorName(message.hash, panel);
       break;
 
+    case 'copyParentHash':
+      handleCopyParentHash(message.hash, panel);
+      break;
+
     case 'copyShortHash':
       handleCopyShortHash(message.hash, panel);
       break;
@@ -780,6 +784,25 @@ function handleCopyAuthorName(hash: string, panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(commit.author).then(() => {
     void vscode.window.showInformationMessage(`Author name copied: ${commit.author}`);
+  });
+}
+
+function handleCopyParentHash(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  if (!commit.parentHashes || commit.parentHashes.length === 0) {
+    void vscode.window.showInformationMessage('Root commit has no parent');
+    return;
+  }
+
+  const parentHash = commit.parentHashes[0];
+  const parentShort = parentHash.substring(0, 7);
+  void vscode.env.clipboard.writeText(parentHash).then(() => {
+    void vscode.window.showInformationMessage(`Parent hash copied: ${parentShort}`);
   });
 }
 

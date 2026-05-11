@@ -149,6 +149,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyTags', action: 'copyTags' },
     { command: 'gitHistory.copyAuthorEmail', action: 'copyAuthorEmail' },
     { command: 'gitHistory.copyAuthorName', action: 'copyAuthorName' },
+    { command: 'gitHistory.copyParentHash', action: 'copyParentHash' },
     { command: 'gitHistory.copyShortHash', action: 'copyShortHash' },
     { command: 'gitHistory.copySubject', action: 'copySubject' },
     { command: 'gitHistory.copyCoAuthors', action: 'copyCoAuthors' },
