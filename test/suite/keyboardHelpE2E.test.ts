@@ -53,7 +53,8 @@ function getKeyboardShortcutsData(isMac: boolean): Array<{ category: string; ite
         { keys: [cmdKey, 'Shift', 'W'], description: 'Toggle word wrap' },
         { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
         { keys: [cmdKey, altKey, 'P'], description: 'Quick compare with parent' },
-        { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' }
+        { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' },
+        { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' }
       ]
     },
     {
@@ -236,10 +237,10 @@ suite('Keyboard Help E2E Tests', () => {
     assert.strictEqual(searchCategory!.items.length, 6);
   });
 
-  test('View Options category should have 4 shortcuts', () => {
+  test('View Options category should have 5 shortcuts', () => {
     const shortcuts = getKeyboardShortcutsData(true);
     const viewCategory = shortcuts.find(s => s.category === 'View Options');
-    assert.strictEqual(viewCategory!.items.length, 4);
+    assert.strictEqual(viewCategory!.items.length, 5);
   });
 
   test('Actions category should have 2 shortcuts', () => {
@@ -406,6 +407,13 @@ suite('Keyboard Help E2E Tests', () => {
     const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
     const copyOneline = copyCategory!.items.find(item => item.description === 'Copy as oneline');
     assert.ok(copyOneline, 'Copy as oneline shortcut should exist');
+  });
+
+  test('View Options should include Cycle diff context lines', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const viewCategory = shortcuts.find(s => s.category === 'View Options');
+    const cycleContext = viewCategory!.items.find(item => item.description === 'Cycle diff context lines');
+    assert.ok(cycleContext, 'Cycle diff context lines shortcut should exist');
   });
 });
 

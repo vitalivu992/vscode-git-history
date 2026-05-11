@@ -53,7 +53,8 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
         { keys: [cmdKey, 'Shift', 'W'], description: 'Toggle word wrap' },
         { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
         { keys: [cmdKey, altKey, 'P'], description: 'Quick compare with parent' },
-        { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' }
+        { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' },
+        { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' }
       ]
     },
     {
@@ -284,6 +285,16 @@ suite('Keyboard Help Logic Tests', () => {
     const copyOneline = copyCategory!.items.find(item => item.description === 'Copy as oneline');
     assert.ok(copyOneline, 'Copy as oneline shortcut should exist');
     assert.deepStrictEqual(copyOneline!.keys, ['Cmd', 'Shift', 'Y'], 'Should use Cmd+Shift+Y on Mac');
+  });
+
+  test('View Options should include Cycle diff context lines', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const viewCategory = shortcuts.find(s => s.category === 'View Options');
+    assert.ok(viewCategory, 'View Options category should exist');
+
+    const cycleContext = viewCategory!.items.find(item => item.description === 'Cycle diff context lines');
+    assert.ok(cycleContext, 'Cycle diff context lines shortcut should exist');
+    assert.deepStrictEqual(cycleContext!.keys, ['Cmd', 'Shift', '/'], 'Should use Cmd+Shift+/ on Mac');
   });
 });
 

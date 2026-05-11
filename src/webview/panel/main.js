@@ -3218,7 +3218,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'W'], description: 'Toggle word wrap' },
         { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
         { keys: [cmdKey, 'Alt', 'P'], description: 'Quick compare with parent' },
-        { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' }
+        { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' },
+        { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' }
       ]
     },
     {
