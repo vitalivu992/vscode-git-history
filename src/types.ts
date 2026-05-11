@@ -152,5 +152,5 @@ export type WebviewToExtMessage =
   | { type: 'copyOneline'; hash: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
-  | { type: 'exportCommits'; format: 'json' | 'csv'; commits: CommitInfo[] }
+  | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown'; commits: CommitInfo[] }
   | { type: 'requestBranchHashes'; branches: string[] };
