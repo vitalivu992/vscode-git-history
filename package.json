@@ -147,6 +147,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFileContent",
+        "title": "Git History: Copy File Content at Commit",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copySelectedHashes",
         "title": "Git History: Copy Selected Hashes",
         "category": "Git History"
