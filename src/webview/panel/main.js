@@ -518,6 +518,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+Q: Toggle hide merge commits
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'q') {
+    e.preventDefault();
+    handleMergeToggle();
+    return;
+  }
+
   // / or Ctrl+F: Focus search
   if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
     e.preventDefault();
