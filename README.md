@@ -197,6 +197,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+K` / `Cmd+Shift+K` | Copy co-authors to clipboard |
 | `Ctrl+Shift+T` / `Cmd+Shift+T` | Copy commit date (ISO 8601 format) to clipboard |
 | `Ctrl+Shift+;` / `Cmd+Shift+;` | Copy selected hashes to clipboard (2+ commits) |
+| `Ctrl+Shift+,` / `Cmd+Shift+,` | Copy file name only to clipboard |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Show branch switcher |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
