@@ -99,6 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
     async () => {
       const activeEditor = vscode.window.activeTextEditor;
       if (!activeEditor) {
+        vscode.window.showWarningMessage('No active editor found');
         return;
       }
       const bl = blameService.getBlameForLine(
