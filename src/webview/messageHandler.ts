@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 
@@ -154,6 +154,10 @@ export async function handleMessage(
 
     case 'createBranch':
       await handleCreateBranch(message.hash, panel);
+      break;
+
+    case 'createTag':
+      await handleCreateTag(message.hash, panel);
       break;
 
     case 'exportCommits':
@@ -989,6 +993,45 @@ async function handleCreateBranch(hash: string, panel: GitHistoryPanel): Promise
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to create branch: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleCreateTag(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const message = await vscode.window.showInputBox({
+    prompt: 'Enter tag name (optional: add message for annotated tag)',
+    placeHolder: 'v1.0.0',
+    title: `Create tag at ${commit.shortHash}`
+  });
+
+  if (!message || message.trim() === '') {
+    return; // User cancelled
+  }
+
+  const tagName = message.trim();
+
+  // Check if user wants an annotated tag by asking for message in second prompt
+  const annotate = await vscode.window.showInputBox({
+    prompt: 'Enter tag message (leave empty for lightweight tag)',
+    placeHolder: 'Release version 1.0.0',
+    title: 'Tag message (optional)'
+  });
+
+  const tagMessage = annotate && annotate.trim() !== '' ? annotate.trim() : undefined;
+
+  try {
+    await createTagFromCommit(tagName, hash, panel.getCwd(), tagMessage);
+    const tagType = tagMessage ? 'annotated' : 'lightweight';
+    void vscode.window.showInformationMessage(`${tagType} tag "${tagName}" created at commit ${commit.shortHash}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to create tag: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
