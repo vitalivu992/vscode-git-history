@@ -200,6 +200,7 @@ export async function handleMessage(
 
     case 'changeDiffContextLines':
       panel.setDiffContextLines(message.value);
+      await settingsService.saveSettings({ diffContextLines: message.value });
       break;
 
     default:
