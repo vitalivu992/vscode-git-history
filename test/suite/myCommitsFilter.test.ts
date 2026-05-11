@@ -240,6 +240,25 @@ suite('My Commits Filter Source Verification', () => {
     assert.ok(initCase.includes('showMyCommitsOnly'), 'init case should apply showMyCommitsOnly setting');
   });
 
+  test('main.js should call renderCommits and updateCommitCount after restoring showMyCommitsOnly', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const initCaseStart = source.indexOf("case 'init':");
+    const initCaseEnd = source.indexOf('break;', initCaseStart) + 6;
+    const initCase = source.substring(initCaseStart, initCaseEnd);
+
+    // Find the block where showMyCommitsOnly is restored from settings
+    const myCommitsAssignment = initCase.indexOf('showMyCommitsOnly = settings.showMyCommitsOnly');
+    assert.ok(myCommitsAssignment !== -1, 'init case should restore showMyCommitsOnly from settings');
+
+    // Check that renderCommits() and updateCommitCount() are called after
+    const afterMyCommits = initCase.substring(myCommitsAssignment);
+    assert.ok(afterMyCommits.includes('renderCommits()'), 'init case should call renderCommits() after restoring showMyCommitsOnly');
+    assert.ok(afterMyCommits.includes('updateCommitCount()'), 'init case should call updateCommitCount() after restoring showMyCommitsOnly');
+  });
+
   test('main.js should store currentUser from init message', () => {
     const fs = require('fs');
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
