@@ -17,7 +17,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
 - **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions)
 - **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter. Supports tag filter: `tag:name` or click any tag badge to filter by tag. Supports regex mode with the .* button for advanced pattern matching like `bug(fix|patch)|hotfix` or `^feat:.*`.
-- **Sort Toggle**: Switch between newest-first and oldest-first commit ordering with the sort button in the toolbar
+- **Sort Toggle**: Cycle through four sort modes with the sort button in the toolbar: Newest first, Oldest first, Author A-Z, and Author Z-A. Also accessible via `Ctrl+Shift+3` / `Cmd+Shift+3`
 - **Compare Any Two Commits**: Shift+click (or Shift+Enter) two commits to see the diff between them
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
 - **Diff Viewer**: Toggle between unified and side-by-side diff views with optional word wrap for long lines. Set your preferred default view via `gitHistory.defaultDiffView` setting
@@ -120,7 +120,7 @@ A powerful VS Code extension that provides git history visualization inspired by
   - `bug(fix|patch)|hotfix` - match "bugfix", "bugpatch", or "hotfix"
   - `\\bfix\\b` - match whole word "fix" (not "bugfix")
   - Invalid regex patterns show red border on the button; filtering falls back to substring matching
-- **Toggle sort order** with the sort button to switch between newest-first and oldest-first
+- **Toggle sort order** with the sort button to cycle through newest-first, oldest-first, author A-Z, and author Z-A ordering
 - **Hide merge commits** with the "No Merge" button to focus on actual work commits; the count indicator shows "X of Y" when filters are active
 - **Show my commits only** with the "My Commits" button to quickly filter commits authored by you (based on `git config user.name` and `user.email`). The button is disabled if git user is not configured.
 - **Toggle view mode** between Unified and Side-by-Side
@@ -282,6 +282,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Toggle ignore whitespace | `Ctrl+Shift+J` / `Cmd+Shift+J` |
 | Toggle my commits filter | `Ctrl+Shift+M` / `Cmd+Shift+M` |
 | Toggle regex search mode | `Ctrl+Shift+X` / `Cmd+Shift+X` |
+| Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A) | `Ctrl+Shift+3` / `Cmd+Shift+3` |
 | Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
 | Copy commit subject | `Ctrl+Shift+6` / `Cmd+Shift+6` |
 | Copy diff stat summary | `Ctrl+Shift+9` / `Cmd+Shift+9` |
