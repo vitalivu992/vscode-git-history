@@ -4,6 +4,7 @@ import { getFileHistory, getSelectionHistory, getCurrentBranch, getAllBranches, 
 import { CommitInfo } from '../types';
 import { handleMessage } from './messageHandler';
 import { SettingsService } from '../settings';
+import { FirstRunTipService } from '../firstRunTip';
 
 interface SelectionRange {
   startLine: number;
@@ -24,6 +25,7 @@ export class GitHistoryPanel {
   private _webviewReady: boolean = false;
   private _pendingInit: (() => void) | null = null;
   private readonly _settingsService: SettingsService;
+  private readonly _firstRunTipService: FirstRunTipService;
   private _ignoreWhitespace: boolean = false;
   private _diffContextLines: number = 3;
 
@@ -32,9 +34,10 @@ export class GitHistoryPanel {
     filePath: string,
     cwd: string,
     settingsService: SettingsService,
+    firstRunTipService: FirstRunTipService,
     commitHash: string
   ): Promise<void> {
-    await GitHistoryPanel.createOrShow(extensionUri, filePath, cwd, settingsService);
+    await GitHistoryPanel.createOrShow(extensionUri, filePath, cwd, settingsService, firstRunTipService);
     // After panel is ready, select the commit
     GitHistoryPanel.currentPanel?.postMessage({ type: 'selectCommit', hash: commitHash });
   }
@@ -44,6 +47,7 @@ export class GitHistoryPanel {
     filePath: string,
     cwd: string,
     settingsService: SettingsService,
+    firstRunTipService: FirstRunTipService,
     selection?: SelectionRange
   ): Promise<void> {
     const column = vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One;
@@ -80,7 +84,7 @@ export class GitHistoryPanel {
       }
     );
 
-    GitHistoryPanel.currentPanel = new GitHistoryPanel(panel, extensionUri, filePath, cwd, settingsService, selection);
+    GitHistoryPanel.currentPanel = new GitHistoryPanel(panel, extensionUri, filePath, cwd, settingsService, firstRunTipService, selection);
     await GitHistoryPanel.currentPanel.loadData();
   }
 
@@ -90,19 +94,21 @@ export class GitHistoryPanel {
     filePath: string,
     cwd: string,
     settingsService: SettingsService,
+    firstRunTipService: FirstRunTipService,
     selection?: SelectionRange
   ) {
     this._panel = panel;
     this._filePath = filePath;
     this._cwd = cwd;
     this._settingsService = settingsService;
+    this._firstRunTipService = firstRunTipService;
     this._selection = selection;
 
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
     this._panel.webview.onDidReceiveMessage(
       async (message) => {
-        await handleMessage(message, this, this._settingsService);
+        await handleMessage(message, this, this._settingsService, this._firstRunTipService);
       },
       null,
       this._disposables
@@ -199,7 +205,9 @@ export class GitHistoryPanel {
           this._ignoreWhitespace = userSettings.ignoreWhitespace;
         }
 
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings, currentUser });
+        const showFirstRunTip = this._firstRunTipService.shouldShowTip();
+
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings, currentUser, showFirstRunTip });
       } catch (error) {
         this.postMessage({
           type: 'error',

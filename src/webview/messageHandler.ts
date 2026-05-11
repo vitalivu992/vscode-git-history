@@ -5,6 +5,7 @@ import { GitHistoryPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
+import { FirstRunTipService } from '../firstRunTip';
 
 /**
  * Handle messages from webview
@@ -12,7 +13,8 @@ import { SettingsService, UserSettings } from '../settings';
 export async function handleMessage(
   message: unknown,
   panel: GitHistoryPanel,
-  settingsService: SettingsService
+  settingsService: SettingsService,
+  firstRunTipService: FirstRunTipService
 ): Promise<void> {
   if (!isValidMessage(message)) {
     console.error('Invalid message from webview:', message);
@@ -128,6 +130,10 @@ export async function handleMessage(
       handleCopyOneline(message.hash, panel);
       break;
 
+    case 'copyCommitBody':
+      handleCopyCommitBody(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -170,6 +176,10 @@ export async function handleMessage(
 
     case 'exportCommits':
       await handleExportCommits(message.format, message.commits, panel);
+      break;
+
+    case 'dismissFirstRunTip':
+      await handleDismissFirstRunTip(firstRunTipService);
       break;
 
     default:
@@ -983,6 +993,34 @@ function handleCopyOneline(hash: string, panel: GitHistoryPanel): void {
   });
 }
 
+function handleCopyCommitBody(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const fullMessage = commit.fullMessage || commit.message;
+  const newlineIndex = fullMessage.indexOf('\n');
+
+  if (newlineIndex === -1) {
+    void vscode.window.showInformationMessage('Commit has no body');
+    return;
+  }
+
+  const body = fullMessage.substring(newlineIndex + 1).trim();
+
+  if (body === '') {
+    void vscode.window.showInformationMessage('Commit has no body');
+    return;
+  }
+
+  const truncatedBody = body.length > 50 ? body.substring(0, 47) + '...' : body;
+  void vscode.env.clipboard.writeText(body).then(() => {
+    void vscode.window.showInformationMessage(`Copied body: ${truncatedBody}`);
+  });
+}
+
 /**
  * Handle copy selected hashes to clipboard
  */
@@ -1076,5 +1114,16 @@ async function handleCheckoutBranch(branch: string, panel: GitHistoryPanel): Pro
     void vscode.window.showErrorMessage(
       `Failed to checkout branch: ${error instanceof Error ? error.message : String(error)}`
     );
+  }
+}
+
+/**
+ * Handle dismiss first-run tip
+ */
+async function handleDismissFirstRunTip(firstRunTipService: FirstRunTipService): Promise<void> {
+  try {
+    await firstRunTipService.markAsShown();
+  } catch (error) {
+    console.error('Failed to mark first-run tip as shown:', error);
   }
 }
