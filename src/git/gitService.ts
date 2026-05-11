@@ -583,6 +583,41 @@ export async function getCommitUrl(
 }
 
 /**
+ * Generate a web URL for browsing a branch
+ * Auto-detects the git remote and generates platform-specific branch URLs
+ * @param branch The branch name
+ * @param cwd Working directory
+ * @param remote Remote name (default: 'origin')
+ * @returns Branch URL or null if unable to generate
+ */
+export async function getBranchUrl(
+  branch: string,
+  cwd: string,
+  remote = 'origin'
+): Promise<string | null> {
+  const remoteUrl = await getRemoteUrl(cwd, remote);
+  if (!remoteUrl) {
+    return null;
+  }
+
+  const remoteInfo = parseRemoteUrl(remoteUrl);
+  if (!remoteInfo || remoteInfo.platform === 'unknown') {
+    return null;
+  }
+
+  switch (remoteInfo.platform) {
+    case 'github':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/tree/${branch}`;
+    case 'gitlab':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/-/tree/${branch}`;
+    case 'bitbucket':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/src/${branch}`;
+    default:
+      return null;
+  }
+}
+
+/**
  * Create a new branch at a specific commit
  * @param branchName The name for the new branch
  * @param commitHash The commit hash to create the branch at
