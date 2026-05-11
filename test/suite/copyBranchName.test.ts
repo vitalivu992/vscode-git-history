@@ -111,10 +111,10 @@ suite('Copy Branch Name Test Suite', () => {
       'main.js should send copyBranchName message');
   });
 
-  test('main.js should handle Ctrl+Shift+B keyboard shortcut', () => {
+  test('main.js should handle Ctrl+Alt+B keyboard shortcut', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
-    assert.ok(source.includes("e.key === 'b'") && source.includes('handleCopyBranchName'),
-      'main.js should handle Ctrl+Shift+B and call handleCopyBranchName');
+    assert.ok(source.includes('e.altKey') && source.includes("e.key === 'b'") && source.includes('handleCopyBranchName'),
+      'main.js should handle Ctrl+Alt+B and call handleCopyBranchName');
   });
 
   test('main.js triggerAction should dispatch copyBranchName', () => {
@@ -148,15 +148,15 @@ suite('Copy Branch Name Test Suite', () => {
       'package.json should have Copy Branch Name command title');
   });
 
-  test('package.json should register Ctrl+Shift+B keybinding', () => {
+  test('package.json should register Ctrl+Alt+B keybinding', () => {
     const source = fs.readFileSync(packagePath, 'utf-8');
     const json = JSON.parse(source);
     const binding = json.contributes.keybindings.find(
       (k: any) => k.command === 'gitHistory.copyBranchName'
     );
     assert.ok(binding, 'Should have keybinding for gitHistory.copyBranchName');
-    assert.strictEqual(binding.key, 'ctrl+shift+b');
-    assert.strictEqual(binding.mac, 'cmd+shift+b');
+    assert.strictEqual(binding.key, 'ctrl+alt+b');
+    assert.strictEqual(binding.mac, 'cmd+alt+b');
     assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview');
   });
 

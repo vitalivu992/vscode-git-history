@@ -55,12 +55,12 @@ suite('Checkout Branch E2E', () => {
     );
   });
 
-  test('main.js includes keyboard handler for Ctrl+Alt+B', async () => {
+  test('main.js includes keyboard handler for Ctrl+Alt+S', async () => {
     const mainJsPath = path.join(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
     assert.ok(
-      source.includes("e.key === 'b'"),
-      'main.js should check for b key in keyboard handler'
+      source.includes("e.key === 's'"),
+      'main.js should check for s key in keyboard handler'
     );
   });
 
@@ -102,8 +102,8 @@ suite('Checkout Branch E2E', () => {
     const keybindings = packageJson.contributes.keybindings;
     const keybinding = keybindings.find((k: any) => k.command === 'gitHistory.checkoutBranch');
     assert.ok(keybinding, 'package.json should define keybinding for checkoutBranch');
-    assert.strictEqual(keybinding.key, 'ctrl+alt+b');
-    assert.strictEqual(keybinding.mac, 'cmd+alt+b');
+    assert.strictEqual(keybinding.key, 'ctrl+alt+s');
+    assert.strictEqual(keybinding.mac, 'cmd+alt+s');
   });
 
   test('checkoutBranch is registered in extension.ts', async () => {

@@ -106,12 +106,12 @@ suite('Copy Branch Name E2E Tests', () => {
       'Should handle copy-branch-name action');
   });
 
-  test('Ctrl+Shift+B keyboard shortcut integration', async () => {
+  test('Ctrl+Alt+B keyboard shortcut integration', async () => {
     const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
-    assert.ok(source.includes("e.key === 'b'") && source.includes('handleCopyBranchName'),
-      'Ctrl+Shift+B shortcut should be handled');
+    assert.ok(source.includes('e.altKey') && source.includes("e.key === 'b'") && source.includes('handleCopyBranchName'),
+      'Ctrl+Alt+B shortcut should be handled');
   });
 
   test('package.json command registration', async () => {
@@ -120,8 +120,8 @@ suite('Copy Branch Name E2E Tests', () => {
 
     assert.ok(content.includes('"gitHistory.copyBranchName"'),
       'package.json should register copyBranchName command');
-    assert.ok(content.includes('"ctrl+shift+b"'),
-      'package.json should define Ctrl+Shift+B keybinding');
+    assert.ok(content.includes('"ctrl+alt+b"'),
+      'package.json should define Ctrl+Alt+B keybinding');
   });
 
   test('keyboard help includes Copy branch name', async () => {
