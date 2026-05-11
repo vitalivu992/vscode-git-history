@@ -404,6 +404,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+N: Copy author name
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'n') {
+    e.preventDefault();
+    handleCopyAuthorName();
+    return;
+  }
+
   // Ctrl+Shift+7: Copy short hash
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '7') {
     e.preventDefault();
@@ -1316,6 +1323,7 @@ function handleMessage(event) {
         case 'copyBranchName': handleCopyBranchName(); break;
         case 'copyTags': handleCopyTags(); break;
         case 'copyAuthorEmail': handleCopyAuthorEmail(); break;
+        case 'copyAuthorName': handleCopyAuthorName(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
@@ -1876,6 +1884,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">@</span>
       <span class="context-menu-label">Copy author email</span>
     </div>
+    <div class="context-menu-item" data-action="copy-author-name">
+      <span class="context-menu-icon">👤</span>
+      <span class="context-menu-label">Copy author name</span>
+    </div>
     <div class="context-menu-item" data-action="copy-short-hash">
       <span class="context-menu-icon">#7</span>
       <span class="context-menu-label">Copy short hash</span>
@@ -1942,6 +1954,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitStats', hash: commit.hash });
       } else if (action === 'copy-author-email') {
         vscode.postMessage({ type: 'copyAuthorEmail', hash: commit.hash });
+      } else if (action === 'copy-author-name') {
+        vscode.postMessage({ type: 'copyAuthorName', hash: commit.hash });
       } else if (action === 'copy-short-hash') {
         vscode.postMessage({ type: 'copyShortHash', hash: commit.hash });
       } else if (action === 'copy-subject') {
@@ -2281,6 +2295,29 @@ function handleCopyAuthorEmail() {
 
   vscode.postMessage({
     type: 'copyAuthorEmail',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyAuthorName() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy author name');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyAuthorName',
     hash: targetCommit.hash
   });
 }
@@ -2684,6 +2721,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
         { keys: [cmdKey, 'Shift', 'B'], description: 'Copy branch name' },
         { keys: [cmdKey, 'Shift', 'A'], description: 'Copy author email' },
+        { keys: [cmdKey, 'Shift', 'N'], description: 'Copy author name' },
         { keys: [cmdKey, 'Shift', '7'], description: 'Copy short hash' },
         { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' },
         { keys: [cmdKey, 'Shift', 'T'], description: 'Copy commit date' },
