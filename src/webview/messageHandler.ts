@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo, FilterQueryState } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -92,6 +92,9 @@ export async function handleMessage(
 
     case 'copyBranchName':
       handleCopyBranchName(panel);
+      break;
+    case 'copyBranchUrl':
+      handleCopyBranchUrl(panel);
       break;
 
     case 'copyTags':
@@ -903,6 +906,26 @@ function handleCopyBranchName(panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(branch).then(() => {
     void vscode.window.showInformationMessage(`Branch name copied: ${branch}`);
+  });
+}
+
+function handleCopyBranchUrl(panel: GitHistoryPanel): void {
+  const branch = panel.getBranch();
+  if (!branch) {
+    void vscode.window.showInformationMessage('No branch detected');
+    return;
+  }
+
+  const cwd = panel.getCwd();
+  getBranchUrl(branch, cwd).then(url => {
+    if (!url) {
+      void vscode.window.showInformationMessage('Unable to generate branch URL. No remote configured?');
+      return;
+    }
+
+    void vscode.env.clipboard.writeText(url).then(() => {
+      void vscode.window.showInformationMessage(`Branch URL copied: ${url}`);
+    });
   });
 }
 
