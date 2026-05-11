@@ -158,6 +158,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copySelectedHashes', action: 'copySelectedHashes' },
     { command: 'gitHistory.exportCommits', action: 'exportCommits' },
     { command: 'gitHistory.quickCompare', action: 'quickCompare' },
+    { command: 'gitHistory.createBranch', action: 'createBranch' },
     { command: 'gitHistory.toggleMyCommits', action: 'toggleMyCommits' },
     { command: 'gitHistory.toggleWordWrap', action: 'toggleWordWrap' },
     { command: 'gitHistory.toggleRegex', action: 'toggleRegex' },

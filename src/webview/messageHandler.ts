@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 
@@ -150,6 +150,10 @@ export async function handleMessage(
 
     case 'requestBranchHashes':
       await handleRequestBranchHashes(message.branches, panel);
+      break;
+
+    case 'createBranch':
+      await handleCreateBranch(message.hash, panel);
       break;
 
     case 'exportCommits':
@@ -957,4 +961,34 @@ function handleCopySelectedHashes(hashes: string[], panel: GitHistoryPanel): voi
   void vscode.env.clipboard.writeText(hashText).then(() => {
     void vscode.window.showInformationMessage(`Copied ${hashes.length} commit hash${hashes.length > 1 ? 'es' : ''}`);
   });
+}
+
+/**
+ * Handle create branch from commit
+ */
+async function handleCreateBranch(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const branchName = await vscode.window.showInputBox({
+    prompt: 'Enter branch name',
+    placeHolder: 'feature/my-new-branch',
+    title: `Create branch at ${commit.shortHash}`
+  });
+
+  if (!branchName || branchName.trim() === '') {
+    return; // User cancelled
+  }
+
+  try {
+    await createBranchFromCommit(branchName.trim(), hash, panel.getCwd());
+    void vscode.window.showInformationMessage(`Branch "${branchName.trim()}" created at commit ${commit.shortHash}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to create branch: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 }
