@@ -95,6 +95,7 @@ export type WebviewAction =
   | 'exportCommits'
   | 'quickCompare'
   | 'createBranch'
+  | 'createTag'
   | 'toggleMyCommits'
   | 'toggleWordWrap'
   | 'toggleRegex'
@@ -153,6 +154,7 @@ export type WebviewToExtMessage =
   | { type: 'copyOneline'; hash: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'createBranch'; hash: string }
+  | { type: 'createTag'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
   | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown'; commits: CommitInfo[] }
   | { type: 'requestBranchHashes'; branches: string[] };
