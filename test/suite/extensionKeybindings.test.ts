@@ -180,4 +180,25 @@ suite('Extension Keybindings Tests', () => {
       );
     }
   });
+
+  test('no duplicate keybindings with same when clause', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const keybindings = packageJson.contributes.keybindings;
+
+    // Group by key+when combo
+    const keyMap = new Map<string, string[]>();
+    for (const kb of keybindings) {
+      const key = `${kb.key}|${kb.when || ''}`;
+      if (!keyMap.has(key)) {
+        keyMap.set(key, []);
+      }
+      keyMap.get(key)!.push(kb.command);
+    }
+
+    // Check for duplicates
+    const duplicates = [...keyMap.entries()].filter(([_, cmds]) => cmds.length > 1);
+    assert.strictEqual(duplicates.length, 0,
+      `Found duplicate keybindings: ${JSON.stringify(duplicates)}`);
+  });
 });
