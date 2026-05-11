@@ -176,6 +176,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.jumpToHash', action: 'jumpToHash' },
     { command: 'gitHistory.focusSearch', action: 'focusSearch' },
     { command: 'gitHistory.showKeyboardHelp', action: 'showKeyboardHelp' },
+    { command: 'gitHistory.cycleDiffContextLines', action: 'cycleDiffContextLines' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

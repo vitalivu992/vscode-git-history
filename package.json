@@ -230,6 +230,11 @@
         "command": "gitHistory.showKeyboardHelp",
         "title": "Git History: Show Keyboard Shortcuts",
         "category": "Git History"
+      },
+      {
+        "command": "gitHistory.cycleDiffContextLines",
+        "title": "Git History: Cycle Diff Context Lines",
+        "category": "Git History"
       }
     ],
     "menus": {
@@ -471,6 +476,12 @@
         "command": "gitHistory.showKeyboardHelp",
         "key": "shift+/",
         "mac": "shift+/",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.cycleDiffContextLines",
+        "key": "ctrl+shift+/",
+        "mac": "cmd+shift+/",
         "when": "activeWebviewPanelId == gitHistory.webview"
       }
     ],

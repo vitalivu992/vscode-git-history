@@ -1605,6 +1605,7 @@ function handleMessage(event) {
         case 'jumpToHash': showJumpToHashDialog(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
+        case 'cycleDiffContextLines': handleDiffContextLinesCycle(); break;
       }
       break;
   }
