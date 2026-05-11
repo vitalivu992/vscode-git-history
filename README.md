@@ -39,6 +39,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Parent Hash**: Copy the first parent hash to clipboard with `Ctrl+Shift+V` / `Cmd+Shift+V` keyboard shortcut, or right-click context menu. For root commits (no parent), an error message is shown.
 - **Copy Short Hash**: Copy the 7-character short hash to clipboard with `Ctrl+Shift+7` / `Cmd+Shift+7` keyboard shortcut, or right-click context menu
 - **📌 Copy Subject**: Copy only the commit subject (first line of the commit message) to clipboard with `Ctrl+Shift+6` / `Cmd+Shift+6` keyboard shortcut, or right-click context menu
+- **📊 Copy Diff Stat Summary**: Copy just the diff stat summary (e.g., "3 files changed, 45 insertions(+), 12 deletions(-)") to clipboard with `Ctrl+Shift+9` / `Cmd+Shift+9` keyboard shortcut, or right-click context menu. Uses singular forms when counts are 1 (e.g., "1 file changed, 1 insertion(+), 1 deletion(-)").
 - **≡ Copy as Oneline**: Copy the commit in `git log --oneline` format (`{shortHash} {subject}`) to clipboard with `Ctrl+Shift+Y` / `Cmd+Shift+Y` keyboard shortcut, or right-click context menu. Example: `a1b2c3d Fix authentication bug`
 - **📄 Copy Commit Body**: Copy just the commit body (the multi-line description after the subject line) to clipboard with `Ctrl+Shift+Z` / `Cmd+Shift+Z` keyboard shortcut, or right-click context menu. Shows "Commit has no body" for single-line commits.
 - **👥 Copy Co-Authors**: Copy co-authors from commit message to clipboard with `Ctrl+Shift+K` / `Cmd+Shift+K` keyboard shortcut, or right-click context menu. Extracts "Co-authored-by:" trailers in the format "Name <email>" separated by newlines.
@@ -193,6 +194,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+V` / `Cmd+Shift+V` | Copy parent hash to clipboard |
 | `Ctrl+Shift+7` / `Cmd+Shift+7` | Copy short hash (7 characters) to clipboard |
 | `Ctrl+Shift+6` / `Cmd+Shift+6` | Copy subject (commit title) to clipboard |
+| `Ctrl+Shift+9` / `Cmd+Shift+9` | Copy diff stat summary to clipboard |
 | `Ctrl+Shift+Y` / `Cmd+Shift+Y` | Copy as oneline (`shortHash subject`) to clipboard |
 | `Ctrl+Shift+K` / `Cmd+Shift+K` | Copy co-authors to clipboard |
 | `Ctrl+Shift+T` / `Cmd+Shift+T` | Copy commit date (ISO 8601 format) to clipboard |
@@ -278,6 +280,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Toggle regex search mode | `Ctrl+Shift+X` / `Cmd+Shift+X` |
 | Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
 | Copy commit subject | `Ctrl+Shift+6` / `Cmd+Shift+6` |
+| Copy diff stat summary | `Ctrl+Shift+9` / `Cmd+Shift+9` |
 | Copy as oneline | `Ctrl+Shift+Y` / `Cmd+Shift+Y` |
 | Copy commit date | `Ctrl+Shift+T` / `Cmd+Shift+T` |
 | Copy short hash | `Ctrl+Shift+7` / `Cmd+Shift+7` |
