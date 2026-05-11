@@ -162,6 +162,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyRelativeDate', action: 'copyRelativeDate' },
     { command: 'gitHistory.copyOneline', action: 'copyOneline' },
     { command: 'gitHistory.copyCommitBody', action: 'copyCommitBody' },
+    { command: 'gitHistory.copyCommitMarkdown', action: 'copyCommitMarkdown' },
     { command: 'gitHistory.copyFileContent', action: 'copyFileContent' },
     { command: 'gitHistory.copyFileName', action: 'copyFileName' },
     { command: 'gitHistory.copyFilePath', action: 'copyFilePath' },

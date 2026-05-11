@@ -523,6 +523,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Alt+M: Copy as Markdown
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'm') {
+    e.preventDefault();
+    handleCopyMarkdown();
+    return;
+  }
+
   // Ctrl+Shift+M: Toggle my commits filter
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'm') {
     e.preventDefault();
@@ -1635,6 +1642,7 @@ function handleMessage(event) {
         case 'copyDiffStatSummary': handleCopyDiffStatSummary(); break;
         case 'copyOneline': handleCopyOneline(); break;
         case 'copyCommitBody': handleCopyCommitBody(); break;
+        case 'copyCommitMarkdown': handleCopyMarkdown(); break;
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
         case 'copyCommitDate': handleCopyCommitDate(); break;
         case 'copyRelativeDate': handleCopyRelativeDate(); break;
@@ -2265,6 +2273,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📄</span>
       <span class="context-menu-label">Copy commit body</span>
     </div>
+    <div class="context-menu-item" data-action="copy-markdown">
+      <span class="context-menu-icon">📜</span>
+      <span class="context-menu-label">Copy as Markdown</span>
+    </div>
     <div class="context-menu-item" data-action="copy-co-authors">
       <span class="context-menu-icon">👥</span>
       <span class="context-menu-label">Copy co-authors</span>
@@ -2349,6 +2361,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyOneline', hash: commit.hash });
       } else if (action === 'copy-commit-body') {
         vscode.postMessage({ type: 'copyCommitBody', hash: commit.hash });
+      } else if (action === 'copy-markdown') {
+        vscode.postMessage({ type: 'copyCommitMarkdown', hash: commit.hash });
       } else if (action === 'copy-co-authors') {
         vscode.postMessage({ type: 'copyCoAuthors', hash: commit.hash });
       } else if (action === 'copy-commit-date') {
@@ -2913,6 +2927,29 @@ function handleCopyCommitBody() {
   });
 }
 
+function handleCopyMarkdown() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy as Markdown');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitMarkdown',
+    hash: targetCommit.hash
+  });
+}
+
 function handleCopyCoAuthors() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -3357,6 +3394,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
         { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
         { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
+        { keys: [cmdKey, 'Alt', 'M'], description: 'Copy as Markdown' },
         { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
         { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
         { keys: [cmdKey, 'Shift', '4'], description: 'Paste filter query from clipboard' },

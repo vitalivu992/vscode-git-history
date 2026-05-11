@@ -142,6 +142,10 @@ export async function handleMessage(
       handleCopyCommitBody(message.hash, panel);
       break;
 
+    case 'copyCommitMarkdown':
+      handleCopyCommitMarkdown(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -1106,6 +1110,92 @@ function handleCopyCommitBody(hash: string, panel: GitHistoryPanel): void {
   const truncatedBody = body.length > 50 ? body.substring(0, 47) + '...' : body;
   void vscode.env.clipboard.writeText(body).then(() => {
     void vscode.window.showInformationMessage(`Copied body: ${truncatedBody}`);
+  });
+}
+
+/**
+ * Format a single commit as Markdown
+ */
+function formatCommitAsMarkdown(commit: CommitInfo): string {
+  const lines: string[] = [];
+
+  // Header with commit message and short hash
+  lines.push(`## ${commit.message} (${commit.shortHash})`);
+  lines.push('');
+
+  // Author information
+  lines.push(`**Author:** ${commit.author} <${commit.email}>`);
+  lines.push('');
+
+  // Date information (relative + absolute)
+  const date = new Date(commit.date);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  let relativeDate: string;
+  if (diffDays === 0) {
+    relativeDate = `Today ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  } else if (diffDays === 1) {
+    relativeDate = `Yesterday ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  } else if (diffDays < 7) {
+    relativeDate = `${diffDays} days ago`;
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    relativeDate = `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+  } else {
+    relativeDate = date.toLocaleDateString();
+  }
+
+  lines.push(`**Date:** ${relativeDate} (${date.toISOString()})`);
+  lines.push('');
+
+  // Statistics
+  if (commit.stats) {
+    const filesChanged = commit.stats.filesChanged;
+    const insertions = commit.stats.insertions;
+    const deletions = commit.stats.deletions;
+    const filesText = filesChanged === 1 ? 'file' : 'files';
+    const insertionsText = insertions === 1 ? 'insertion' : 'insertions';
+    const deletionsText = deletions === 1 ? 'deletion' : 'deletions';
+    lines.push(`**Files:** ${filesChanged} ${filesText} changed, +${insertions}, -${deletions}`);
+    lines.push('');
+  }
+
+  // Tags
+  if (commit.tags && commit.tags.length > 0) {
+    lines.push(`**Tags:** ${commit.tags.join(', ')}`);
+    lines.push('');
+  }
+
+  // Commit body (if exists and different from subject)
+  if (commit.fullMessage && commit.fullMessage !== commit.message) {
+    const body = commit.fullMessage.replace(commit.message, '').trim();
+    if (body) {
+      lines.push(body);
+      lines.push('');
+    }
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Handle copy commit as Markdown to clipboard
+ */
+function handleCopyCommitMarkdown(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const markdown = formatCommitAsMarkdown(commit);
+  void vscode.env.clipboard.writeText(markdown).then(() => {
+    const shortMsg = commit.message.length > 30
+      ? commit.message.substring(0, 27) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied as Markdown: ${commit.shortHash} ${shortMsg}`);
   });
 }
 
