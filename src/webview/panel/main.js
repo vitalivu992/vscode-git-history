@@ -1721,6 +1721,7 @@ function handleMessage(event) {
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFilePath': handleCopyFilePath(); break;
+        case 'copyRelativePath': handleCopyRelativePath(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
         case 'createBranch': handleCreateBranch(); break;
@@ -2209,6 +2210,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy file name only</span>
     </div>
+    <div class="context-menu-item" data-action="copy-relative-path">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy relative path</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -2247,6 +2252,11 @@ function showFileContextMenu(event, filePath, commitHash) {
       } else if (action === 'copy-file-name') {
         vscode.postMessage({
           type: 'copyFileName',
+          filePath: filePath
+        });
+      } else if (action === 'copy-relative-path') {
+        vscode.postMessage({
+          type: 'copyRelativePath',
           filePath: filePath
         });
       }
@@ -3554,7 +3564,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
         { keys: [cmdKey, 'Shift', '4'], description: 'Paste filter query from clipboard' },
         { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
-        { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' }
+        { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' },
+        { keys: [cmdKey, 'Alt', 'L'], description: 'Copy relative path' }
       ]
     },
     {
@@ -3706,6 +3717,14 @@ function handleCopyFilePath() {
     return;
   }
   vscode.postMessage({ type: 'copyFilePath', filePath: selectedFile });
+}
+
+function handleCopyRelativePath() {
+  if (!selectedFile) {
+    showError('Select a file to copy its relative path');
+    return;
+  }
+  vscode.postMessage({ type: 'copyRelativePath', filePath: selectedFile });
 }
 
 // Initialize on load

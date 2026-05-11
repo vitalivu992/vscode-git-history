@@ -173,6 +173,10 @@ export async function handleMessage(
       handleCopyFileName(message.filePath, panel);
       break;
 
+    case 'copyRelativePath':
+      handleCopyRelativePath(message.filePath, panel);
+      break;
+
     case 'openFileAtCommit':
       await handleOpenFileAtCommit(message.hash, message.filePath, panel);
       break;
@@ -516,6 +520,16 @@ function handleCopyFileName(filePath: string, _panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(fileName).then(() => {
     void vscode.window.showInformationMessage(`Copied filename: ${fileName}`);
+  });
+}
+
+function handleCopyRelativePath(filePath: string, panel: GitHistoryPanel): void {
+  const cwd = panel.getCwd();
+  const relativePath = path.relative(cwd, filePath);
+  const fileName = path.basename(filePath);
+
+  void vscode.env.clipboard.writeText(relativePath).then(() => {
+    void vscode.window.showInformationMessage(`Copied relative path: ${fileName}`);
   });
 }
 
