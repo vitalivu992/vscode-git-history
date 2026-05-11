@@ -92,6 +92,7 @@ export type WebviewAction =
   | 'copyCoAuthors'
   | 'copyCommitDate'
   | 'copyOneline'
+  | 'copyCommitBody'
   | 'copyFileContent'
   | 'exportCommits'
   | 'quickCompare'
@@ -111,7 +112,7 @@ export type WebviewAction =
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
-  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; userSettings?: UserSettings; currentUser?: { name: string; email: string } | null }
+  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; userSettings?: UserSettings; currentUser?: { name: string; email: string } | null; showFirstRunTip?: boolean }
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[]; selectedFile?: string }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'rangeDiff'; fromHash: string; toHash: string; diff: string }
@@ -119,7 +120,8 @@ export type ExtToWebviewMessage =
   | { type: 'error'; message: string }
   | { type: 'selectCommit'; hash: string }
   | { type: 'branchHashes'; hashes: Record<string, string[]> }
-  | { type: 'triggerAction'; action: WebviewAction };
+  | { type: 'triggerAction'; action: WebviewAction }
+  | { type: 'showFirstRunTip' };
 
 /**
  * Messages from webview to extension
@@ -155,6 +157,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
   | { type: 'copyOneline'; hash: string }
+  | { type: 'copyCommitBody'; hash: string }
   | { type: 'copyFileContent'; hash: string; filePath: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'createBranch'; hash: string }
@@ -162,4 +165,5 @@ export type WebviewToExtMessage =
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
   | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown'; commits: CommitInfo[] }
   | { type: 'requestBranchHashes'; branches: string[] }
-  | { type: 'checkoutBranch'; branch: string };
+  | { type: 'checkoutBranch'; branch: string }
+  | { type: 'dismissFirstRunTip' };

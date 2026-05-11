@@ -137,6 +137,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCommitBody",
+        "title": "Git History: Copy Commit Body",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCoAuthors",
         "title": "Git History: Copy Co-Authors",
         "category": "Git History"
@@ -377,6 +382,12 @@
         "command": "gitHistory.copyOneline",
         "key": "ctrl+shift+y",
         "mac": "cmd+shift+y",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitBody",
+        "key": "ctrl+shift+z",
+        "mac": "cmd+shift+z",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

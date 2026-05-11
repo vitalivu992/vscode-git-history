@@ -4,10 +4,12 @@ import { getGitRoot } from './git/gitService';
 import { BlameService } from './blame/blameService';
 import { GitHistoryContentProvider } from './gitHistoryContentProvider';
 import { SettingsService } from './settings';
+import { FirstRunTipService } from './firstRunTip';
 
 export function activate(context: vscode.ExtensionContext) {
   // Initialize settings service
   const settingsService = new SettingsService(context.globalState);
+  const firstRunTipService = new FirstRunTipService(context.globalState);
 
   const blameService = new BlameService();
   context.subscriptions.push(blameService);
@@ -29,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       try {
         const cwd = await getGitRoot(filePath);
-        await GitHistoryPanel.createOrShow(context.extensionUri, filePath, cwd, settingsService);
+        await GitHistoryPanel.createOrShow(context.extensionUri, filePath, cwd, settingsService, firstRunTipService);
       } catch (error) {
         vscode.window.showErrorMessage(
           `Failed to open git history: ${error instanceof Error ? error.message : String(error)}`
@@ -66,6 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
           filePath,
           cwd,
           settingsService,
+          firstRunTipService,
           { startLine, endLine }
         );
       } catch (error) {
@@ -113,7 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         const filePath = activeEditor.document.uri.fsPath;
         const cwd = await getGitRoot(filePath);
-        await GitHistoryPanel.showCommitDiff(context.extensionUri, filePath, cwd, settingsService, bl.hash);
+        await GitHistoryPanel.showCommitDiff(context.extensionUri, filePath, cwd, settingsService, firstRunTipService, bl.hash);
       } catch (error) {
         vscode.window.showErrorMessage(
           `Failed to show commit: ${error instanceof Error ? error.message : String(error)}`
@@ -156,6 +159,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyCoAuthors', action: 'copyCoAuthors' },
     { command: 'gitHistory.copyCommitDate', action: 'copyCommitDate' },
     { command: 'gitHistory.copyOneline', action: 'copyOneline' },
+    { command: 'gitHistory.copyCommitBody', action: 'copyCommitBody' },
     { command: 'gitHistory.copyFileContent', action: 'copyFileContent' },
     { command: 'gitHistory.copySelectedHashes', action: 'copySelectedHashes' },
     { command: 'gitHistory.exportCommits', action: 'exportCommits' },
