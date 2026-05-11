@@ -306,6 +306,23 @@ body {
   border-color: var(--vscode-button-background);
 }
 
+.context-lines-btn {
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border);
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--vscode-font-family);
+  min-width: 36px;
+  text-align: center;
+}
+
+.context-lines-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
 /* Word wrap state for diff viewer */
 #diff-viewer.word-wrap .d2h-code-line,
 #diff-viewer.word-wrap .d2h-code-side-line {

@@ -24,6 +24,7 @@ let branchCommitHashes = {}; // Map: branchName -> Set of commit hashes
 let currentUser = null; // Current git user from git config
 let showMyCommitsOnly = false; // Filter to show only my commits
 let ignoreWhitespace = false; // Ignore whitespace in diffs
+let diffContextLines = 3; // Number of context lines in diffs (1-10)
 let commitFilesMap = new Map(); // hash -> CommitFileChange[]
 let firstRunTipVisible = false; // First-run tip banner visibility state
 
@@ -250,6 +251,7 @@ const copyBtn = document.getElementById('copy-btn');
 const compareParentBtn = document.getElementById('compare-parent-btn');
 const wordWrapBtn = document.getElementById('word-wrap-btn');
 const ignoreWsBtn = document.getElementById('ignore-ws-btn');
+const contextLinesBtn = document.getElementById('context-lines-btn');
 const mergeToggleBtn = document.getElementById('merge-toggle-btn');
 const regexToggleBtn = document.getElementById('regex-toggle-btn');
 const exportBtn = document.getElementById('export-btn');
@@ -523,6 +525,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'j') {
     e.preventDefault();
     handleIgnoreWhitespaceToggle();
+    return;
+  }
+
+  // Ctrl+Shift+/: Cycle diff context lines
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === '/' || e.key === '?')) {
+    e.preventDefault();
+    handleDiffContextLinesCycle();
     return;
   }
 
@@ -908,6 +917,39 @@ function handleIgnoreWhitespaceToggle() {
 }
 
 /**
+ * Cycle diff context lines (1-10)
+ */
+function handleDiffContextLinesCycle() {
+  diffContextLines = diffContextLines >= 10 ? 1 : diffContextLines + 1;
+
+  // Update button display
+  if (contextLinesBtn) {
+    const valueSpan = contextLinesBtn.querySelector('#context-lines-value');
+    if (valueSpan) {
+      valueSpan.textContent = diffContextLines;
+    } else {
+      contextLinesBtn.innerHTML = `<span id="context-lines-value">${diffContextLines}</span>`;
+    }
+    contextLinesBtn.title = `Diff context lines: ${diffContextLines} (Ctrl+Shift+/ to change)`;
+  }
+
+  // Re-fetch diff if a commit is selected
+  if (currentCommitHash) {
+    vscode.postMessage({ type: 'requestDiff', hash: currentCommitHash });
+  } else if (selectedCommits && selectedCommits.size > 0) {
+    const hashes = Array.from(selectedCommits);
+    if (hashes.length === 1) {
+      vscode.postMessage({ type: 'requestDiff', hash: hashes[0] });
+    } else {
+      vscode.postMessage({ type: 'requestCombinedDiff', hashes });
+    }
+  }
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { diffContextLines } });
+}
+
+/**
  * Toggle my commits only filter
  */
 function handleMyCommitsToggle() {
@@ -1181,6 +1223,10 @@ function init() {
     ignoreWsBtn.addEventListener('click', handleIgnoreWhitespaceToggle);
   }
 
+  if (contextLinesBtn) {
+    contextLinesBtn.addEventListener('click', handleDiffContextLinesCycle);
+  }
+
   if (exportBtn) {
     exportBtn.addEventListener('click', handleExportCommits);
   }
@@ -1389,6 +1435,20 @@ function handleMessage(event) {
           } else {
             ignoreWsBtn.classList.remove('active');
             ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+J)';
+          }
+        }
+
+        // Apply diff context lines setting
+        if (settings.diffContextLines !== undefined) {
+          diffContextLines = settings.diffContextLines;
+          if (contextLinesBtn) {
+            const valueSpan = contextLinesBtn.querySelector('#context-lines-value');
+            if (valueSpan) {
+              valueSpan.textContent = diffContextLines;
+            } else {
+              contextLinesBtn.innerHTML = `<span id="context-lines-value">${diffContextLines}</span>`;
+            }
+            contextLinesBtn.title = `Diff context lines: ${diffContextLines} (Ctrl+Shift+/ to change)`;
           }
         }
 
