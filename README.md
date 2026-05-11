@@ -62,6 +62,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Open File at Commit**: Right-click on any file in the changed files list to view the file content as it was at that specific commit
 - **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to JSON, CSV, or Markdown format. The Markdown format generates a changelog-style output with commit hashes, authors, dates, messages, tags, and statistics—perfect for release notes and documentation.
 - **Import Filter Query**: Press `Ctrl+Shift+4` / `Cmd+Shift+4` or click the "Paste Filter" button to restore a previously copied filter query from clipboard. This allows you to share reproducible commit views with team members.
+- **Clear All Filters**: Press `Ctrl+Alt+Q` / `Cmd+Alt+Q` or click the "Clear All" button to remove all active filters at once. Useful when you have multiple filters applied and want to quickly reset to the full commit list.
 - **Select All Commits**: Press `Ctrl+A` / `Cmd+A` to quickly select all visible commits for bulk operations like export or copy
 - **Branch Indicator**: Current branch name is displayed as a badge in the commit details panel for quick context
 - **First-Run Welcome Tip**: On first use, a helpful tip appears directing you to keyboard shortcuts (press `?` for help), ensuring you discover the extension's full capabilities
@@ -190,6 +191,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+M` / `Cmd+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Copy branch name to clipboard |
+| `Ctrl+Alt+Q` / `Cmd+Alt+Q` | Clear all filters |
 | `Ctrl+Shift+G` / `Cmd+Shift+G` | Copy tags to clipboard |
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email to clipboard |
 | `Ctrl+Shift+N` / `Cmd+Shift+N` | Copy author name to clipboard |
