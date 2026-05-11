@@ -146,6 +146,10 @@ export async function handleMessage(
       handleCopyCommitMarkdown(message.hash, panel);
       break;
 
+    case 'copyCommitJson':
+      handleCopyCommitJson(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -1204,6 +1208,45 @@ function handleCopyCommitMarkdown(hash: string, panel: GitHistoryPanel): void {
       ? commit.message.substring(0, 27) + '...'
       : commit.message;
     void vscode.window.showInformationMessage(`Copied as Markdown: ${commit.shortHash} ${shortMsg}`);
+  });
+}
+
+/**
+ * Handle copy commit as JSON to clipboard
+ */
+function handleCopyCommitJson(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  // Extract body from fullMessage (split on first newline)
+  const fullMessage = commit.fullMessage || commit.message;
+  const newlineIndex = fullMessage.indexOf('\n');
+  const body = newlineIndex === -1 ? null : fullMessage.substring(newlineIndex + 1).trim() || null;
+
+  const commitJson = {
+    hash: commit.hash,
+    shortHash: commit.shortHash,
+    author: {
+      name: commit.author,
+      email: commit.email
+    },
+    date: new Date(commit.date).toISOString(),
+    message: commit.message,
+    body: body,
+    parentHashes: commit.parentHashes || [],
+    tags: commit.tags || [],
+    stats: commit.stats || null
+  };
+
+  const json = JSON.stringify(commitJson, null, 2);
+  void vscode.env.clipboard.writeText(json).then(() => {
+    const shortMsg = commit.message.length > 30
+      ? commit.message.substring(0, 27) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied as JSON: ${commit.shortHash} ${shortMsg}`);
   });
 }
 
