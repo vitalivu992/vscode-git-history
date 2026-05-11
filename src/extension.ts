@@ -154,6 +154,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copySubject', action: 'copySubject' },
     { command: 'gitHistory.copyCoAuthors', action: 'copyCoAuthors' },
     { command: 'gitHistory.copyCommitDate', action: 'copyCommitDate' },
+    { command: 'gitHistory.copyOneline', action: 'copyOneline' },
     { command: 'gitHistory.copySelectedHashes', action: 'copySelectedHashes' },
     { command: 'gitHistory.exportCommits', action: 'exportCommits' },
     { command: 'gitHistory.quickCompare', action: 'quickCompare' },

@@ -132,6 +132,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyOneline",
+        "title": "Git History: Copy Commit as Oneline",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCoAuthors",
         "title": "Git History: Copy Co-Authors",
         "category": "Git History"
@@ -341,6 +346,12 @@
         "command": "gitHistory.copyCommitDate",
         "key": "ctrl+shift+t",
         "mac": "cmd+shift+t",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyOneline",
+        "key": "ctrl+shift+y",
+        "mac": "cmd+shift+y",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
