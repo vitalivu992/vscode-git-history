@@ -22,10 +22,12 @@ suite('Extension Keybindings Tests', () => {
     { command: 'gitHistory.jumpToHash', action: 'jumpToHash' },
     { command: 'gitHistory.focusSearch', action: 'focusSearch' },
     { command: 'gitHistory.showKeyboardHelp', action: 'showKeyboardHelp' },
+    { command: 'gitHistory.copyFileName', action: 'copyFileName' },
+    { command: 'gitHistory.copyFilePath', action: 'copyFilePath' },
   ] as const;
 
-  test('webview actions array has exactly 18 entries', () => {
-    assert.strictEqual(expectedWebviewActions.length, 18, 'Should have 18 webview action commands');
+  test('webview actions array has exactly 20 entries', () => {
+    assert.strictEqual(expectedWebviewActions.length, 20, 'Should have 20 webview action commands');
   });
 
   test('all webview action commands follow gitHistory.* naming pattern', () => {
@@ -37,7 +39,7 @@ suite('Extension Keybindings Tests', () => {
     }
   });
 
-  test('extension.ts registers all 18 webview action commands', () => {
+  test('extension.ts registers all 20 webview action commands', () => {
     const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
     const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
 
@@ -128,7 +130,7 @@ suite('Extension Keybindings Tests', () => {
     assert.strictEqual(
       webviewKeybindings.length,
       expectedWebviewActions.length,
-      'Should have keybindings for all 18 webview actions'
+      'Should have keybindings for all 20 webview actions'
     );
 
     for (const kb of webviewKeybindings) {

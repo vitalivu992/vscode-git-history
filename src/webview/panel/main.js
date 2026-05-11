@@ -1630,6 +1630,8 @@ function handleMessage(event) {
         case 'copyCommitDate': handleCopyCommitDate(); break;
         case 'copyRelativeDate': handleCopyRelativeDate(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
+        case 'copyFileName': handleCopyFileName(); break;
+        case 'copyFilePath': handleCopyFilePath(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
         case 'createBranch': handleCreateBranch(); break;
@@ -3435,6 +3437,22 @@ function dismissFirstRunTip() {
 
   // Notify extension to mark tip as shown
   vscode.postMessage({ type: 'dismissFirstRunTip' });
+}
+
+function handleCopyFileName() {
+  if (!selectedFile) {
+    showError('Select a file to copy its name');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFileName', filePath: selectedFile });
+}
+
+function handleCopyFilePath() {
+  if (!selectedFile) {
+    showError('Select a file to copy its path');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFilePath', filePath: selectedFile });
 }
 
 // Initialize on load
