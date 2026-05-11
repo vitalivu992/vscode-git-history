@@ -2212,6 +2212,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">🔍</span>
       <span class="context-menu-label">View diff for this file</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-diff">
+      <span class="context-menu-icon">🩹</span>
+      <span class="context-menu-label">Copy diff for this file</span>
+    </div>
     <div class="context-menu-item" data-action="copy-file-content">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy file content</span>
@@ -2250,6 +2254,12 @@ function showFileContextMenu(event, filePath, commitHash) {
         selectedFile = filePath;
         vscode.postMessage({
           type: 'requestFileDiff',
+          hash: commitHash,
+          filePath: filePath
+        });
+      } else if (action === 'copy-file-diff') {
+        vscode.postMessage({
+          type: 'copyFileDiff',
           hash: commitHash,
           filePath: filePath
         });

@@ -189,6 +189,10 @@ export async function handleMessage(
       await handleCopyFileContent(message.hash, message.filePath, panel);
       break;
 
+    case 'copyFileDiff':
+      await handleCopyFileDiff(message.hash, message.filePath, panel);
+      break;
+
     case 'quickCompare':
       await handleQuickCompare(message.hash, panel);
       break;
@@ -582,6 +586,34 @@ async function handleCopyFileContent(
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to copy file content: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleCopyFileDiff(
+  hash: string,
+  filePath: string,
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const diffResult = await getCommitDiff(hash, cwd, filePath, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
+
+    if (diffResult.isBinary) {
+      void vscode.window.showInformationMessage('Cannot copy diff for binary file');
+      return;
+    }
+
+    if (diffResult.diff) {
+      await vscode.env.clipboard.writeText(diffResult.diff);
+      const fileName = path.basename(filePath);
+      void vscode.window.showInformationMessage(`Copied diff for ${fileName}`);
+    } else {
+      void vscode.window.showInformationMessage('No diff to copy');
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy diff: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }

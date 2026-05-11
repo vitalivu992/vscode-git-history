@@ -102,6 +102,7 @@ export type WebviewAction =
   | 'copyFileContent'
   | 'copyFileName'
   | 'copyRelativePath'
+  | 'copyFileDiff'
   | 'exportCommits'
   | 'quickCompare'
   | 'createBranch'
@@ -191,6 +192,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitMarkdown'; hash: string }
   | { type: 'copyCommitJson'; hash: string }
   | { type: 'copyFileContent'; hash: string; filePath: string }
+  | { type: 'copyFileDiff'; hash: string; filePath: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'createBranch'; hash: string }
   | { type: 'createTag'; hash: string }
