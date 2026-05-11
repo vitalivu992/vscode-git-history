@@ -334,4 +334,74 @@ suite('Hide Merge Commits Source Verification', () => {
       'updateCommitCount should display "X of Y" format'
     );
   });
+
+  test('toggleHideMergeCommits keyboard shortcut is registered in package.json', () => {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const keybindings = packageJson.contributes.keybindings;
+    const keybinding = keybindings.find((k: any) => k.command === 'gitHistory.toggleHideMergeCommits');
+    assert.ok(keybinding, 'package.json should define keybinding for toggleHideMergeCommits');
+    assert.strictEqual(keybinding.key, 'ctrl+shift+q');
+    assert.strictEqual(keybinding.mac, 'cmd+shift+q');
+  });
+
+  test('toggleHideMergeCommits command is registered in package.json', () => {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const commands = packageJson.contributes.commands;
+    const command = commands.find((c: any) => c.command === 'gitHistory.toggleHideMergeCommits');
+    assert.ok(command, 'package.json should define gitHistory.toggleHideMergeCommits command');
+    assert.strictEqual(command.title, 'Git History: Toggle Hide Merge Commits');
+  });
+
+  test('toggleHideMergeCommits action is defined in types.ts', () => {
+    const source = fs.readFileSync(typesPath, 'utf-8');
+    assert.ok(
+      source.includes("'toggleHideMergeCommits'"),
+      'types.ts should include toggleHideMergeCommits in WebviewAction type'
+    );
+  });
+
+  test('toggleHideMergeCommits is registered in extension.ts', () => {
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
+    const source = fs.readFileSync(extensionPath, 'utf-8');
+    assert.ok(
+      source.includes("'toggleHideMergeCommits'"),
+      'extension.ts should register toggleHideMergeCommits action'
+    );
+  });
+
+  test('main.js triggerAction handler handles toggleHideMergeCommits', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    const triggerActionStart = source.indexOf("case 'triggerAction':");
+    assert.ok(triggerActionStart >= 0, 'Should have triggerAction message handler');
+
+    const triggerActionEnd = source.indexOf('}', triggerActionStart + 500);
+    const triggerActionBody = source.substring(triggerActionStart, triggerActionEnd);
+
+    assert.ok(
+      triggerActionBody.includes('toggleHideMergeCommits'),
+      'triggerAction handler should handle toggleHideMergeCommits'
+    );
+    assert.ok(
+      triggerActionBody.includes('handleMergeToggle()'),
+      'toggleHideMergeCommits should call handleMergeToggle()'
+    );
+  });
+
+  test('handleMergeToggle persists setting via saveSettings message', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    const fnStart = source.indexOf('function handleMergeToggle');
+    assert.ok(fnStart >= 0, 'handleMergeToggle function should exist');
+
+    const fnEnd = source.indexOf('\n}', fnStart + 1);
+    const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
+
+    assert.ok(
+      fnBody.includes('saveSettings'),
+      'handleMergeToggle should send saveSettings message'
+    );
+    assert.ok(
+      fnBody.includes('hideMergeCommits'),
+      'handleMergeToggle should include hideMergeCommits in saveSettings'
+    );
+  });
 });
