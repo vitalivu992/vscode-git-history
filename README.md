@@ -43,6 +43,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **≡ Copy as Oneline**: Copy the commit in `git log --oneline` format (`{shortHash} {subject}`) to clipboard with `Ctrl+Shift+Y` / `Cmd+Shift+Y` keyboard shortcut, or right-click context menu. Example: `a1b2c3d Fix authentication bug`
 - **📄 Copy Commit Body**: Copy just the commit body (the multi-line description after the subject line) to clipboard with `Ctrl+Shift+Z` / `Cmd+Shift+Z` keyboard shortcut, or right-click context menu. Shows "Commit has no body" for single-line commits.
 - **📜 Copy as Markdown**: Copy commit information formatted as Markdown for use in changelogs, release notes, and documentation. Press `Ctrl+Alt+M` / `Cmd+Alt+M` or use the right-click context menu. The format includes commit message with heading, author, date (relative + absolute), stats, tags, and body.
+- **{} Copy as JSON**: Copy the focused or selected commit as formatted JSON with all available commit data. Press `Ctrl+Alt+J` / `Cmd+Alt+J` or use the right-click context menu. The JSON includes hash, shortHash, author (name, email), date (ISO 8601), message, body (or null), parentHashes (empty array for root commits), tags (empty array if none), and stats (or null). Useful for programmatic access, API integrations, and automation workflows.
 - **👥 Copy Co-Authors**: Copy co-authors from commit message to clipboard with `Ctrl+Shift+K` / `Cmd+Shift+K` keyboard shortcut, or right-click context menu. Extracts "Co-authored-by:" trailers in the format "Name <email>" separated by newlines.
 - **🕐 Copy Commit Date**: Copy the commit date in ISO 8601 format to clipboard with `Ctrl+Shift+T` / `Cmd+Shift+T` keyboard shortcut, or right-click context menu
 - **Copy Selected Hashes**: Copy all selected commit hashes as a newline-separated list with `Ctrl+Shift+;` / `Cmd+Shift+;` keyboard shortcut (when 2+ commits are selected), or right-click context menu (shown when multiple commits are selected). Falls back to single hash copy when 0 or 1 commit is selected.
@@ -297,6 +298,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy short hash | `Ctrl+Shift+7` / `Cmd+Shift+7` |
 | Copy commit body | `Ctrl+Shift+Z` / `Cmd+Shift+Z` |
 | Copy as Markdown | `Ctrl+Alt+M` / `Cmd+Alt+M` |
+| Copy as JSON | `Ctrl+Alt+J` / `Cmd+Alt+J` |
 | Copy co-authors | `Ctrl+Shift+K` / `Cmd+Shift+K` |
 | Copy file path | `Ctrl+Shift+.` / `Cmd+Shift+.` |
 | Copy file name | `Ctrl+Shift+,` / `Cmd+Shift+,` |
