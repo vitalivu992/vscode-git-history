@@ -289,6 +289,10 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy commit date | `Ctrl+Shift+T` / `Cmd+Shift+T` |
 | Copy relative date | `Ctrl+Shift+8` / `Cmd+Shift+8` |
 | Copy short hash | `Ctrl+Shift+7` / `Cmd+Shift+7` |
+| Copy commit body | `Ctrl+Shift+Z` / `Cmd+Shift+Z` |
+| Copy co-authors | `Ctrl+Shift+K` / `Cmd+Shift+K` |
+| Copy file path | `Ctrl+Shift+.` / `Cmd+Shift+.` |
+| Copy file name | `Ctrl+Shift+,` / `Cmd+Shift+,` |
 | Copy selected hashes | `Ctrl+Shift+;` / `Cmd+Shift+;` (when 2+ selected) |
 | Clear selection | `Escape` |
 
