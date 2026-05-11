@@ -112,6 +112,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyBranchUrl",
+        "title": "Git History: Copy Branch URL",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyTags",
         "title": "Git History: Copy Tags",
         "category": "Git History"
@@ -405,6 +410,12 @@
         "command": "gitHistory.copyBranchName",
         "key": "ctrl+alt+b",
         "mac": "cmd+alt+b",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyBranchUrl",
+        "key": "ctrl+alt+u",
+        "mac": "cmd+alt+u",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
