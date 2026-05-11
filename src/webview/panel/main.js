@@ -3033,7 +3033,9 @@ function showKeyboardHelpDialog() {
         { keys: ['/'], description: 'Focus search input' },
         { keys: [cmdKey, 'F'], description: 'Focus search input' },
         { keys: [cmdKey, 'Shift', 'X'], description: 'Toggle regex search mode' },
-        { keys: [cmdKey, 'G'], description: 'Jump to commit by hash' }
+        { keys: [cmdKey, 'G'], description: 'Jump to commit by hash' },
+        { keys: [cmdKey, 'Shift', 'Q'], description: 'Toggle hide merge commits' },
+        { keys: [cmdKey, 'Alt', 'B'], description: 'Show branch picker' }
       ]
     },
     {
@@ -3041,7 +3043,8 @@ function showKeyboardHelpDialog() {
       items: [
         { keys: [cmdKey, 'Shift', 'W'], description: 'Toggle word wrap' },
         { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
-        { keys: [cmdKey, 'Alt', 'P'], description: 'Quick compare with parent' }
+        { keys: [cmdKey, 'Alt', 'P'], description: 'Quick compare with parent' },
+        { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' }
       ]
     },
     {
@@ -3065,7 +3068,9 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' },
         { keys: [cmdKey, 'Shift', 'T'], description: 'Copy commit date' },
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
-        { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' }
+        { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
+        { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
+        { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' }
       ]
     },
     {
