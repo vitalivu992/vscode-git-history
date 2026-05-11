@@ -222,3 +222,11 @@ The `saveSettings` message is sent by the webview when UI preferences change (di
 ## Testing
 
 Tests use VS Code's test framework with Mocha. Run with `npm test` or `make test`. On Linux CI, tests require `xvfb-run` because VS Code needs a display. The test job also captures screenshots for PR review.
+
+### Unit Tests
+
+Unit tests for pure parsing functions are located in:
+- `test/suite/gitParser.test.ts` - Tests for `parseGitLog`, `parseNameStatus`, `parseLineHistoryLog`, `isBinaryFile`
+- `test/suite/gitStatsParser.test.ts` - Tests for `parseCommitStats`, `extractStatsFromCommitBlock`, `parseMultipleCommitStats`
+
+These tests validate edge cases in git output parsing without requiring actual git operations.
