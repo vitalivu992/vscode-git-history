@@ -2005,6 +2005,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy file path</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-name">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy file name only</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -2038,6 +2042,11 @@ function showFileContextMenu(event, filePath, commitHash) {
       } else if (action === 'copy-file-path') {
         vscode.postMessage({
           type: 'copyFilePath',
+          filePath: filePath
+        });
+      } else if (action === 'copy-file-name') {
+        vscode.postMessage({
+          type: 'copyFileName',
           filePath: filePath
         });
       }

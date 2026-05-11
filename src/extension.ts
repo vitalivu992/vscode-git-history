@@ -161,6 +161,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyOneline', action: 'copyOneline' },
     { command: 'gitHistory.copyCommitBody', action: 'copyCommitBody' },
     { command: 'gitHistory.copyFileContent', action: 'copyFileContent' },
+    { command: 'gitHistory.copyFileName', action: 'copyFileName' },
     { command: 'gitHistory.copySelectedHashes', action: 'copySelectedHashes' },
     { command: 'gitHistory.exportCommits', action: 'exportCommits' },
     { command: 'gitHistory.quickCompare', action: 'quickCompare' },
