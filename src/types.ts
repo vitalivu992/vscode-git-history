@@ -85,6 +85,7 @@ export type WebviewAction =
   | 'copyTags'
   | 'copySelectedHashes'
   | 'copyAuthorEmail'
+  | 'copyAuthorName'
   | 'copyShortHash'
   | 'copySubject'
   | 'copyCoAuthors'
@@ -140,6 +141,7 @@ export type WebviewToExtMessage =
   | { type: 'copyTags'; hash: string }
   | { type: 'copySelectedHashes'; hashes: string[] }
   | { type: 'copyAuthorEmail'; hash: string }
+  | { type: 'copyAuthorName'; hash: string }
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }
   | { type: 'copyCoAuthors'; hash: string }
