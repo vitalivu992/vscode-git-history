@@ -48,6 +48,36 @@ function formatCommitsAsJson(commits: TestCommitInfo[]): string {
   return JSON.stringify(commits, null, 2);
 }
 
+function formatCommitsAsMarkdown(commits: TestCommitInfo[]): string {
+  const lines: string[] = [];
+
+  for (const commit of commits) {
+    const tags = commit.tags && commit.tags.length > 0
+      ? ` ${commit.tags.map(t => `\`${t}\``).join(' ')}`
+      : '';
+    const stats = commit.stats
+      ? ` (${commit.stats.filesChanged} file${commit.stats.filesChanged === 1 ? '' : 's'}, +${commit.stats.insertions}, -${commit.stats.deletions})`
+      : '';
+
+    lines.push(`### ${commit.shortHash}${stats}${tags}`);
+    lines.push('');
+    lines.push(`**Author:** ${commit.author} <${commit.email}>`);
+    lines.push(`**Date:** ${commit.date}`);
+    lines.push('');
+    lines.push(commit.message);
+    lines.push('');
+
+    if (commit.fullMessage && commit.fullMessage !== commit.message) {
+      lines.push('---');
+      lines.push('');
+      lines.push(commit.fullMessage.replace(commit.message, '').trim());
+      lines.push('');
+    }
+  }
+
+  return lines.join('\n');
+}
+
 function escapeCsvField(field: string): string {
   if (/[",\n\r]/.test(field)) {
     return `"${field.replace(/"/g, '""')}"`;
@@ -196,6 +226,57 @@ suite('Export Commits E2E Tests', () => {
     assert.ok(lines[1].includes('Alice Cooper'));
   });
 
+  // ─── Markdown E2E Tests ───────────────────────────────────────────────────
+
+  test('export all commits as Markdown includes heading', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const md = formatCommitsAsMarkdown(filtered);
+    assert.ok(md.includes('### abc123d'));
+  });
+
+  test('export all commits as Markdown includes stats', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const md = formatCommitsAsMarkdown(filtered);
+    assert.ok(md.includes('(3 files, +150, -0)'));
+  });
+
+  test('export all commits as Markdown includes tags', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const md = formatCommitsAsMarkdown(filtered);
+    assert.ok(md.includes('`v1.0.0`'));
+  });
+
+  test('export filtered commits as Markdown respects search filter', () => {
+    const filtered = getFilteredCommits(testCommits, 'Bob', false);
+    const md = formatCommitsAsMarkdown(filtered);
+    assert.ok(md.includes('### def456a'));
+    assert.ok(!md.includes('### abc123d'));
+  });
+
+  test('export filtered commits as Markdown respects hideMergeCommits', () => {
+    const filtered = getFilteredCommits(testCommits, '', true);
+    const md = formatCommitsAsMarkdown(filtered);
+    // Should not include the merge commit
+    assert.ok(!md.includes('Merge pull request'));
+  });
+
+  test('formatCommitsAsMarkdown includes body for multi-line commits', () => {
+    const md = formatCommitsAsMarkdown([testCommits[0]]);
+    assert.ok(md.includes('This is the first commit'));
+  });
+
+  test('formatCommitsAsMarkdown handles multiple tags', () => {
+    const md = formatCommitsAsMarkdown([testCommits[1]]);
+    assert.ok(md.includes('`v1.1.0`'));
+    assert.ok(md.includes('`release`'));
+  });
+
+  test('formatCommitsAsMarkdown handles commit without stats', () => {
+    const noStatsCommits = [{ ...testCommits[2], stats: undefined }];
+    const md = formatCommitsAsMarkdown(noStatsCommits);
+    assert.ok(!md.includes('(')); // No stats parentheses
+  });
+
   test('exported JSON can be re-parsed and contains same data', () => {
     const filtered = getFilteredCommits(testCommits, '', false);
     const json = formatCommitsAsJson(filtered);
@@ -311,8 +392,14 @@ suite('Export Commits Source Verification', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
     assert.ok(source.includes("type: 'exportCommits'"),
       'types.ts should define exportCommits message type');
-    assert.ok(source.includes("format: 'json' | 'csv'"),
-      'exportCommits should accept json or csv format');
+    assert.ok(source.includes("format: 'json' | 'csv' | 'markdown'"),
+      'exportCommits should accept json, csv, or markdown format');
+  });
+
+  test('messageHandler.ts should define formatCommitsAsMarkdown function', () => {
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+    assert.ok(source.includes('function formatCommitsAsMarkdown'),
+      'messageHandler.ts should define formatCommitsAsMarkdown function');
   });
 
   test('webviewProvider.ts should include export button', () => {
