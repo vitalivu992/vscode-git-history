@@ -197,6 +197,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyRelativePath",
+        "title": "Git History: Copy Relative File Path",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyFilterQuery",
         "title": "Git History: Copy Filter Query",
         "category": "Git History"
@@ -512,6 +517,12 @@
         "command": "gitHistory.copyFileName",
         "key": "ctrl+shift+,",
         "mac": "cmd+shift+,",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyRelativePath",
+        "key": "ctrl+alt+l",
+        "mac": "cmd+alt+l",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
