@@ -149,6 +149,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 |--------|-------------|
 | **Open file at this commit** | View the file content as it was at the selected commit |
 | **View diff for this file** | Show the diff for this specific file only |
+| **Copy file content** | Copy the full content of a file at the selected commit to clipboard. Useful for sharing code snippets from historical versions. |
 | **Copy file path** | Copy the full file path to clipboard |
 
 #### Keyboard Navigation
