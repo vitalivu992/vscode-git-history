@@ -147,6 +147,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCommitMarkdown",
+        "title": "Git History: Copy as Markdown",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCoAuthors",
         "title": "Git History: Copy Co-Authors",
         "category": "Git History"
@@ -440,6 +445,12 @@
         "command": "gitHistory.copyCommitBody",
         "key": "ctrl+shift+z",
         "mac": "cmd+shift+z",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitMarkdown",
+        "key": "ctrl+alt+m",
+        "mac": "cmd+alt+m",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
