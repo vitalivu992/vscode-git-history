@@ -25,6 +25,7 @@ let currentUser = null; // Current git user from git config
 let showMyCommitsOnly = false; // Filter to show only my commits
 let ignoreWhitespace = false; // Ignore whitespace in diffs
 let commitFilesMap = new Map(); // hash -> CommitFileChange[]
+let firstRunTipVisible = false; // First-run tip banner visibility state
 
 /**
  * Parse filters from search query
@@ -450,6 +451,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'y') {
     e.preventDefault();
     handleCopyOneline();
+    return;
+  }
+
+  // Ctrl+Shift+Z: Copy commit body
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+    e.preventDefault();
+    handleCopyCommitBody();
     return;
   }
 
@@ -1494,6 +1502,12 @@ function handleMessage(event) {
       handleSelectCommit(message.hash);
       break;
 
+    case 'showFirstRunTip':
+      if (message.showFirstRunTip) {
+        showFirstRunTipBanner();
+      }
+      break;
+
     case 'triggerAction':
       switch (message.action) {
         case 'refresh': handleRefresh(); break;
@@ -1514,6 +1528,7 @@ function handleMessage(event) {
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
         case 'copyOneline': handleCopyOneline(); break;
+        case 'copyCommitBody': handleCopyCommitBody(); break;
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
         case 'copyCommitDate': handleCopyCommitDate(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
@@ -2120,6 +2135,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">≡</span>
       <span class="context-menu-label">Copy as oneline</span>
     </div>
+    <div class="context-menu-item" data-action="copy-commit-body">
+      <span class="context-menu-icon">📄</span>
+      <span class="context-menu-label">Copy commit body</span>
+    </div>
     <div class="context-menu-item" data-action="copy-co-authors">
       <span class="context-menu-icon">👥</span>
       <span class="context-menu-label">Copy co-authors</span>
@@ -2196,6 +2215,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copySubject', hash: commit.hash });
       } else if (action === 'copy-oneline') {
         vscode.postMessage({ type: 'copyOneline', hash: commit.hash });
+      } else if (action === 'copy-commit-body') {
+        vscode.postMessage({ type: 'copyCommitBody', hash: commit.hash });
       } else if (action === 'copy-co-authors') {
         vscode.postMessage({ type: 'copyCoAuthors', hash: commit.hash });
       } else if (action === 'copy-commit-date') {
@@ -2654,6 +2675,29 @@ function handleCopyOneline() {
   });
 }
 
+function handleCopyCommitBody() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy body');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitBody',
+    hash: targetCommit.hash
+  });
+}
+
 function handleCopyCoAuthors() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -3070,7 +3114,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
-        { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' }
+        { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
+        { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' }
       ]
     },
     {
@@ -3146,6 +3191,65 @@ function showKeyboardHelpDialog() {
     }
   };
   document.addEventListener('keydown', handleEscape);
+}
+
+// ─── First-Run Tip Banner ────────────────────────────────────────────────────────
+
+/**
+ * Show the first-run welcome tip banner
+ */
+function showFirstRunTipBanner() {
+  // Don't show if already visible
+  if (firstRunTipVisible) {
+    return;
+  }
+
+  // Remove any existing banner
+  const existingBanner = document.getElementById('first-run-tip-banner');
+  if (existingBanner) {
+    existingBanner.remove();
+  }
+
+  const banner = document.createElement('div');
+  banner.id = 'first-run-tip-banner';
+  banner.className = 'first-run-tip-banner';
+  banner.innerHTML = `
+    <div class="first-run-tip-content">
+      <div class="first-run-tip-icon">💡</div>
+      <div class="first-run-tip-text">
+        <div class="first-run-tip-title">Welcome to Git History!</div>
+        <div class="first-run-tip-message">Press <kbd>?</kbd> anytime to see keyboard shortcuts</div>
+      </div>
+      <button class="first-run-tip-dismiss" title="Dismiss this tip">Got it</button>
+    </div>
+  `;
+
+  // Insert at the top of #app
+  const app = document.getElementById('app');
+  if (app) {
+    app.insertBefore(banner, app.firstChild);
+    firstRunTipVisible = true;
+  }
+
+  // Add click handler for dismiss button
+  const dismissBtn = banner.querySelector('.first-run-tip-dismiss');
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', dismissFirstRunTip);
+  }
+}
+
+/**
+ * Dismiss the first-run welcome tip banner
+ */
+function dismissFirstRunTip() {
+  const banner = document.getElementById('first-run-tip-banner');
+  if (banner) {
+    banner.remove();
+  }
+  firstRunTipVisible = false;
+
+  // Notify extension to mark tip as shown
+  vscode.postMessage({ type: 'dismissFirstRunTip' });
 }
 
 // Initialize on load
