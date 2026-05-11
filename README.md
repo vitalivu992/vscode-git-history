@@ -39,6 +39,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Parent Hash**: Copy the first parent hash to clipboard with `Ctrl+Shift+V` / `Cmd+Shift+V` keyboard shortcut, or right-click context menu. For root commits (no parent), an error message is shown.
 - **Copy Short Hash**: Copy the 7-character short hash to clipboard with `Ctrl+Shift+7` / `Cmd+Shift+7` keyboard shortcut, or right-click context menu
 - **📌 Copy Subject**: Copy only the commit subject (first line of the commit message) to clipboard with `Ctrl+Shift+6` / `Cmd+Shift+6` keyboard shortcut, or right-click context menu
+- **≡ Copy as Oneline**: Copy the commit in `git log --oneline` format (`{shortHash} {subject}`) to clipboard with `Ctrl+Shift+Y` / `Cmd+Shift+Y` keyboard shortcut, or right-click context menu. Example: `a1b2c3d Fix authentication bug`
 - **👥 Copy Co-Authors**: Copy co-authors from commit message to clipboard with `Ctrl+Shift+K` / `Cmd+Shift+K` keyboard shortcut, or right-click context menu. Extracts "Co-authored-by:" trailers in the format "Name <email>" separated by newlines.
 - **🕐 Copy Commit Date**: Copy the commit date in ISO 8601 format to clipboard with `Ctrl+Shift+T` / `Cmd+Shift+T` keyboard shortcut, or right-click context menu
 - **Copy Selected Hashes**: Copy all selected commit hashes as a newline-separated list with `Ctrl+Shift+;` / `Cmd+Shift+;` keyboard shortcut (when 2+ commits are selected), or right-click context menu (shown when multiple commits are selected). Falls back to single hash copy when 0 or 1 commit is selected.
@@ -175,6 +176,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+V` / `Cmd+Shift+V` | Copy parent hash to clipboard |
 | `Ctrl+Shift+7` / `Cmd+Shift+7` | Copy short hash (7 characters) to clipboard |
 | `Ctrl+Shift+6` / `Cmd+Shift+6` | Copy subject (commit title) to clipboard |
+| `Ctrl+Shift+Y` / `Cmd+Shift+Y` | Copy as oneline (`shortHash subject`) to clipboard |
 | `Ctrl+Shift+K` / `Cmd+Shift+K` | Copy co-authors to clipboard |
 | `Ctrl+Shift+T` / `Cmd+Shift+T` | Copy commit date (ISO 8601 format) to clipboard |
 | `Ctrl+Shift+;` / `Cmd+Shift+;` | Copy selected hashes to clipboard (2+ commits) |
@@ -254,6 +256,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Toggle regex search mode | `Ctrl+Shift+X` / `Cmd+Shift+X` |
 | Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
 | Copy commit subject | `Ctrl+Shift+6` / `Cmd+Shift+6` |
+| Copy as oneline | `Ctrl+Shift+Y` / `Cmd+Shift+Y` |
 | Copy commit date | `Ctrl+Shift+T` / `Cmd+Shift+T` |
 | Copy short hash | `Ctrl+Shift+7` / `Cmd+Shift+7` |
 | Copy selected hashes | `Ctrl+Shift+;` / `Cmd+Shift+;` (when 2+ selected) |
