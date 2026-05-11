@@ -38,6 +38,34 @@ suite('Git Parser Tests', () => {
     assert.deepStrictEqual(result.get('path/to/new.ts'), { status: 'R', previousPath: 'old.ts' });
   });
 
+  test('parseNameStatus should parse copied file', () => {
+    const input = 'C100\toriginal.ts\tcopied.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.deepStrictEqual(result.get('copied.ts'), { status: 'C', previousPath: 'original.ts' });
+  });
+
+  test('parseNameStatus should handle empty input', () => {
+    const result = parseNameStatus('');
+
+    assert.strictEqual(result.size, 0);
+  });
+
+  test('parseNameStatus should handle mixed statuses', () => {
+    const input = 'M\tfile1.ts\nA\tfile2.ts\nD\tfile3.ts\nR100\told.ts\tnew.ts\nC100\torig.ts\tcopy.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 5);
+    assert.deepStrictEqual(result.get('file1.ts'), { status: 'M' });
+    assert.deepStrictEqual(result.get('file2.ts'), { status: 'A' });
+    assert.deepStrictEqual(result.get('file3.ts'), { status: 'D' });
+    assert.deepStrictEqual(result.get('new.ts'), { status: 'R', previousPath: 'old.ts' });
+    assert.deepStrictEqual(result.get('copy.ts'), { status: 'C', previousPath: 'orig.ts' });
+  });
+
   test('parseLineHistoryLog should parse -L output', () => {
     // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d (one header line per commit, diff lines have no nulls)
     const hash1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
@@ -60,6 +88,31 @@ suite('Git Parser Tests', () => {
     assert.strictEqual(commits[1].hash, hash2);
     assert.strictEqual(commits[1].message, 'Modified line');
     assert.deepStrictEqual(commits[1].parentHashes, []);
+  });
+
+  test('parseLineHistoryLog should handle empty input', () => {
+    const commits = parseLineHistoryLog('');
+
+    assert.strictEqual(commits.length, 0);
+  });
+
+  test('parseLineHistoryLog should de-duplicate commits', () => {
+    const hash1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
+    const hash2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0';
+    // hash1 appears twice, should only be included once
+    const input = [
+      `${hash1}\x00\x00John Doe\x00john@example.com\x001234567890\x00First commit\x00`,
+      'diff line',
+      `${hash2}\x00\x00Jane Smith\x00jane@example.com\x001234567900\x00Second commit\x00`,
+      'another diff line',
+      `${hash1}\x00\x00John Doe\x00john@example.com\x001234567890\x00First commit\x00`, // duplicate
+    ].join('\n');
+
+    const commits = parseLineHistoryLog(input);
+
+    assert.strictEqual(commits.length, 2);
+    assert.strictEqual(commits[0].hash, hash1);
+    assert.strictEqual(commits[1].hash, hash2);
   });
 
   test('isBinaryFile should detect binary files', () => {
@@ -148,5 +201,27 @@ suite('Git Parser Tests', () => {
 
     assert.strictEqual(commits.length, 1);
     assert.ok(!commits[0].tags || commits[0].tags.length === 0);
+  });
+
+  test('parseGitLog should return null for invalid date', () => {
+    // Invalid timestamp (not a number)
+    const commitInvalidDate = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00invalid\x00Commit\x00\x00\x00---COMMIT-END---';
+    // Followed by valid commit
+    const validCommit = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00\x00John Doe\x00john@example.com\x001234567890\x00Valid\x00\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitInvalidDate + '\n' + validCommit);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].hash, 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0');
+  });
+
+  test('parseGitLog should handle merge commits with multiple parents', () => {
+    // Merge commit with two parents
+    const mergeCommit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00parent1 parent2\x00Jane Doe\x00jane@example.com\x001234567890\x00Merge branch\x00\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(mergeCommit);
+
+    assert.strictEqual(commits.length, 1);
+    assert.deepStrictEqual(commits[0].parentHashes, ['parent1', 'parent2']);
   });
 });
