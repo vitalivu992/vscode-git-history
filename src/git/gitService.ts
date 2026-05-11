@@ -595,3 +595,23 @@ export async function createBranchFromCommit(
 ): Promise<void> {
   await execGit(['branch', branchName, commitHash], cwd);
 }
+
+/**
+ * Create a new tag at a specific commit
+ * @param tagName The name for the new tag
+ * @param commitHash The commit hash to create the tag at
+ * @param cwd Working directory
+ * @param message Optional message for annotated tags
+ */
+export async function createTagFromCommit(
+  tagName: string,
+  commitHash: string,
+  cwd: string,
+  message?: string
+): Promise<void> {
+  if (message) {
+    await execGit(['tag', '-a', tagName, '-m', message, commitHash], cwd);
+  } else {
+    await execGit(['tag', tagName, commitHash], cwd);
+  }
+}
