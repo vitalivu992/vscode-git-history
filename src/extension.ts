@@ -179,6 +179,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.focusSearch', action: 'focusSearch' },
     { command: 'gitHistory.showKeyboardHelp', action: 'showKeyboardHelp' },
     { command: 'gitHistory.cycleDiffContextLines', action: 'cycleDiffContextLines' },
+    { command: 'gitHistory.cycleSortMode', action: 'cycleSortMode' },
     { command: 'gitHistory.copyFilterQuery', action: 'copyFilterQuery' },
   ] as const;
 

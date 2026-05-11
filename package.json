@@ -255,6 +255,11 @@
         "command": "gitHistory.cycleDiffContextLines",
         "title": "Git History: Cycle Diff Context Lines",
         "category": "Git History"
+      },
+      {
+        "command": "gitHistory.cycleSortMode",
+        "title": "Git History: Cycle Sort Mode",
+        "category": "Git History"
       }
     ],
     "menus": {
@@ -526,6 +531,12 @@
         "command": "gitHistory.cycleDiffContextLines",
         "key": "ctrl+shift+/",
         "mac": "cmd+shift+/",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.cycleSortMode",
+        "key": "ctrl+shift+3",
+        "mac": "cmd+shift+3",
         "when": "activeWebviewPanelId == gitHistory.webview"
       }
     ],
