@@ -1703,6 +1703,7 @@ function handleMessage(event) {
         case 'copyCommitPatch': handleCopyPatch(); break;
         case 'copyCommitUrl': handleCopyUrl(); break;
         case 'copyBranchName': handleCopyBranchName(); break;
+        case 'copyBranchUrl': handleCopyBranchUrl(); break;
         case 'copyTags': handleCopyTags(); break;
         case 'copyAuthorEmail': handleCopyAuthorEmail(); break;
         case 'copyAuthorName': handleCopyAuthorName(); break;
@@ -2375,6 +2376,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🌿</span>
       <span class="context-menu-label">Copy branch name</span>
     </div>
+    <div class="context-menu-item" data-action="copy-branch-url">
+      <span class="context-menu-icon">🔗</span>
+      <span class="context-menu-label">Copy branch URL</span>
+    </div>
     <div class="context-menu-item" data-action="copy-tags">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy tags</span>
@@ -2463,6 +2468,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyRelativeDate', hash: commit.hash });
       } else if (action === 'copy-branch-name') {
         handleCopyBranchName();
+      } else if (action === 'copy-branch-url') {
+        handleCopyBranchUrl();
       } else if (action === 'copy-tags') {
         handleCopyTags();
       } else if (action === 'create-branch') {
@@ -2776,6 +2783,14 @@ function handleCopyBranchName() {
     return;
   }
   vscode.postMessage({ type: 'copyBranchName' });
+}
+
+function handleCopyBranchUrl() {
+  if (!currentBranch) {
+    showError('No branch detected');
+    return;
+  }
+  vscode.postMessage({ type: 'copyBranchUrl' });
 }
 
 function handleCopyTags() {
@@ -3520,6 +3535,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
         { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
         { keys: [cmdKey, 'Alt', 'B'], description: 'Copy branch name' },
+        { keys: [cmdKey, 'Alt', 'U'], description: 'Copy branch URL' },
         { keys: [cmdKey, 'Shift', 'A'], description: 'Copy author email' },
         { keys: [cmdKey, 'Shift', 'N'], description: 'Copy author name' },
         { keys: [cmdKey, 'Shift', 'V'], description: 'Copy parent hash' },
