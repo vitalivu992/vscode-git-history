@@ -211,6 +211,14 @@ export async function handleMessage(
       await settingsService.saveSettings({ diffContextLines: message.value });
       break;
 
+    case 'copyCombinedDiff':
+      await handleCopyCombinedDiff(message.hashes, panel);
+      break;
+
+    case 'copyRangeDiff':
+      await handleCopyRangeDiff(message.fromHash, message.toHash, panel);
+      break;
+
     default:
       console.error('Unknown message type:', message);
   }
@@ -1331,5 +1339,64 @@ async function handleDismissFirstRunTip(firstRunTipService: FirstRunTipService):
     await firstRunTipService.markAsShown();
   } catch (error) {
     console.error('Failed to mark first-run tip as shown:', error);
+  }
+}
+
+/**
+ * Handle copy combined diff (multi-selected commits)
+ */
+async function handleCopyCombinedDiff(hashes: string[], panel: GitHistoryPanel): Promise<void> {
+  try {
+    if (hashes.length < 2) {
+      void vscode.window.showInformationMessage('Select at least 2 commits to copy combined diff');
+      return;
+    }
+
+    const cwd = panel.getCwd();
+    const diffResult = await getCombinedDiff(hashes, cwd, undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
+
+    if (diffResult.isBinary) {
+      void vscode.window.showInformationMessage('Cannot copy diff for binary file');
+      return;
+    }
+
+    if (diffResult.diff) {
+      await vscode.env.clipboard.writeText(diffResult.diff);
+      void vscode.window.showInformationMessage(`Combined diff for ${hashes.length} commits copied to clipboard`);
+    } else {
+      void vscode.window.showInformationMessage('No diff to copy');
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy combined diff: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle copy range diff (two commits selected)
+ */
+async function handleCopyRangeDiff(fromHash: string, toHash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const diffResult = await getCommitRangeDiff(fromHash, toHash, cwd, undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
+
+    if (diffResult.isBinary) {
+      void vscode.window.showInformationMessage('Cannot copy diff for binary file');
+      return;
+    }
+
+    if (diffResult.diff) {
+      await vscode.env.clipboard.writeText(diffResult.diff);
+      const shortFrom = fromHash.substring(0, 7);
+      const shortTo = toHash.substring(0, 7);
+      void vscode.window.showInformationMessage(`Range diff ${shortFrom}..${shortTo} copied to clipboard`);
+    } else {
+      void vscode.window.showInformationMessage('No diff to copy');
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy range diff: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
