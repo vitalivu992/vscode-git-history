@@ -108,6 +108,10 @@ export async function handleMessage(
       handleCopySubject(message.hash, panel);
       break;
 
+    case 'copyCoAuthors':
+      handleCopyCoAuthors(message.hash, panel);
+      break;
+
     case 'copyCommitDate':
       handleCopyCommitDate(message.hash, panel);
       break;
@@ -788,6 +792,47 @@ function handleCopySubject(hash: string, panel: GitHistoryPanel): void {
   void vscode.env.clipboard.writeText(subject).then(() => {
     void vscode.window.showInformationMessage(`Copied subject: ${truncatedSubject}`);
   });
+}
+
+function handleCopyCoAuthors(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const coAuthors = extractCoAuthors(commit.fullMessage);
+
+  if (coAuthors.length === 0) {
+    void vscode.window.showInformationMessage('No co-authors on commit');
+    return;
+  }
+
+  const coAuthorsText = coAuthors.join('\n');
+  void vscode.env.clipboard.writeText(coAuthorsText).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${coAuthors.length} co-author${coAuthors.length > 1 ? 's' : ''}`);
+  });
+}
+
+/**
+ * Extract co-authors from commit message body.
+ * Looks for "Co-authored-by:" trailers in the format:
+ * Co-authored-by: Name <email@example.com>
+ */
+function extractCoAuthors(fullMessage: string): string[] {
+  const coAuthors: string[] = [];
+  const lines = fullMessage.split('\n');
+
+  for (const line of lines) {
+    const match = line.match(/^\s*Co-authored-by:\s*(.+?)\s*<([^>]+)>/i);
+    if (match) {
+      const name = match[1].trim();
+      const email = match[2];
+      coAuthors.push(`${name} <${email}>`);
+    }
+  }
+
+  return coAuthors;
 }
 
 function handleCopyCommitDate(hash: string, panel: GitHistoryPanel): void {

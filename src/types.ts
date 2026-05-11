@@ -87,6 +87,7 @@ export type WebviewAction =
   | 'copyAuthorEmail'
   | 'copyShortHash'
   | 'copySubject'
+  | 'copyCoAuthors'
   | 'copyCommitDate'
   | 'exportCommits'
   | 'quickCompare'
@@ -141,6 +142,7 @@ export type WebviewToExtMessage =
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }
+  | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
   | { type: 'quickCompare'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
