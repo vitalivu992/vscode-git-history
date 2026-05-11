@@ -581,3 +581,17 @@ export async function getCommitUrl(
       return null;
   }
 }
+
+/**
+ * Create a new branch at a specific commit
+ * @param branchName The name for the new branch
+ * @param commitHash The commit hash to create the branch at
+ * @param cwd Working directory
+ */
+export async function createBranchFromCommit(
+  branchName: string,
+  commitHash: string,
+  cwd: string
+): Promise<void> {
+  await execGit(['branch', branchName, commitHash], cwd);
+}
