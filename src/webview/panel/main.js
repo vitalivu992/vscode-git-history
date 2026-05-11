@@ -560,6 +560,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+L: Copy commit URL
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'l') {
+    e.preventDefault();
+    handleCopyUrl();
+    return;
+  }
+
   // Ctrl+Alt+P: Quick compare with parent
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'p') {
     e.preventDefault();
@@ -587,6 +594,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'j') {
     e.preventDefault();
     handleCopyJson();
+    return;
+  }
+
+  // Ctrl+Alt+O: Copy remote URL
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'o') {
+    e.preventDefault();
+    handleCopyRemoteUrl();
     return;
   }
 
@@ -1704,6 +1718,7 @@ function handleMessage(event) {
         case 'copyCommitUrl': handleCopyUrl(); break;
         case 'copyBranchName': handleCopyBranchName(); break;
         case 'copyBranchUrl': handleCopyBranchUrl(); break;
+        case 'copyRemoteUrl': handleCopyRemoteUrl(); break;
         case 'copyTags': handleCopyTags(); break;
         case 'copyAuthorEmail': handleCopyAuthorEmail(); break;
         case 'copyAuthorName': handleCopyAuthorName(); break;
@@ -2390,6 +2405,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🔗</span>
       <span class="context-menu-label">Copy branch URL</span>
     </div>
+    <div class="context-menu-item" data-action="copy-remote-url">
+      <span class="context-menu-icon">📡</span>
+      <span class="context-menu-label">Copy remote URL</span>
+    </div>
     <div class="context-menu-item" data-action="copy-tags">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy tags</span>
@@ -2480,6 +2499,8 @@ function showCommitContextMenu(event, commit) {
         handleCopyBranchName();
       } else if (action === 'copy-branch-url') {
         handleCopyBranchUrl();
+      } else if (action === 'copy-remote-url') {
+        handleCopyRemoteUrl();
       } else if (action === 'copy-tags') {
         handleCopyTags();
       } else if (action === 'create-branch') {
@@ -2801,6 +2822,10 @@ function handleCopyBranchUrl() {
     return;
   }
   vscode.postMessage({ type: 'copyBranchUrl' });
+}
+
+function handleCopyRemoteUrl() {
+  vscode.postMessage({ type: 'copyRemoteUrl' });
 }
 
 function handleCopyTags() {
@@ -3546,6 +3571,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'S'], description: 'Copy commit stats' },
         { keys: [cmdKey, 'Alt', 'B'], description: 'Copy branch name' },
         { keys: [cmdKey, 'Alt', 'U'], description: 'Copy branch URL' },
+        { keys: [cmdKey, 'Alt', 'O'], description: 'Copy remote URL' },
         { keys: [cmdKey, 'Shift', 'A'], description: 'Copy author email' },
         { keys: [cmdKey, 'Shift', 'N'], description: 'Copy author name' },
         { keys: [cmdKey, 'Shift', 'V'], description: 'Copy parent hash' },
