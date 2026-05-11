@@ -589,3 +589,127 @@ suite('Keybinding Registration E2E Tests', () => {
     }
   });
 });
+
+suite('Copy Combined Diff E2E Tests', () => {
+  test('copyCombinedDiff message type exists in WebviewToExtMessage', () => {
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes("type: 'copyCombinedDiff'"), 'types.ts should define copyCombinedDiff message type');
+    assert.ok(source.includes('hashes: string[]'), 'copyCombinedDiff should have hashes field');
+  });
+
+  test('handleCopyCombinedDiff is implemented in messageHandler.ts', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    assert.ok(source.includes('async function handleCopyCombinedDiff'), 'Should have handleCopyCombinedDiff function');
+    assert.ok(source.includes("case 'copyCombinedDiff':"), 'Should handle copyCombinedDiff message type');
+  });
+
+  test('handleCopyCombinedDiff uses getCombinedDiff from gitService', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('async function handleCopyCombinedDiff');
+    const fnEnd = source.indexOf('\n}', source.indexOf('\n}', fnStart) + 1) + 1;
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('getCombinedDiff'), 'Should call getCombinedDiff function');
+    assert.ok(fnBody.includes('hashes.length < 2'), 'Should validate minimum 2 commits');
+  });
+
+  test('main.js handleCopyCombinedDiff sends correct message', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyCombinedDiff');
+    const fnEnd = source.indexOf('\n}', source.indexOf('\n}', fnStart) + 1) + 1;
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes("type: 'copyCombinedDiff'"), 'Should send copyCombinedDiff message');
+    assert.ok(fnBody.includes('selectedCommits'), 'Should use selectedCommits');
+  });
+
+  test('Ctrl+Alt+D keyboard shortcut triggers handleCopyCombinedDiff', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("e.key === 'd'") && source.includes('e.altKey'), 'Should handle Alt+D key combination');
+    assert.ok(source.includes('handleCopyCombinedDiff()'), 'Should call handleCopyCombinedDiff function');
+  });
+
+  test('package.json registers copyCombinedDiff command', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    const commands = packageJson.contributes?.commands || [];
+    assert.ok(commands.some((c: any) => c.command === 'gitHistory.copyCombinedDiff'), 'Should register copyCombinedDiff command');
+
+    const keybindings = packageJson.contributes?.keybindings || [];
+    assert.ok(keybindings.some((kb: any) => kb.command === 'gitHistory.copyCombinedDiff'), 'Should define keybinding for copyCombinedDiff');
+  });
+});
+
+suite('Copy Range Diff E2E Tests', () => {
+  test('copyRangeDiff message type exists in WebviewToExtMessage', () => {
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes("type: 'copyRangeDiff'"), 'types.ts should define copyRangeDiff message type');
+    assert.ok(source.includes('fromHash: string'), 'copyRangeDiff should have fromHash field');
+    assert.ok(source.includes('toHash: string'), 'copyRangeDiff should have toHash field');
+  });
+
+  test('handleCopyRangeDiff is implemented in messageHandler.ts', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    assert.ok(source.includes('async function handleCopyRangeDiff'), 'Should have handleCopyRangeDiff function');
+    assert.ok(source.includes("case 'copyRangeDiff':"), 'Should handle copyRangeDiff message type');
+  });
+
+  test('handleCopyRangeDiff uses getCommitRangeDiff from gitService', () => {
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('async function handleCopyRangeDiff');
+    const fnEnd = source.indexOf('\n}', source.indexOf('\n}', fnStart) + 1) + 1;
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('getCommitRangeDiff'), 'Should call getCommitRangeDiff function');
+    assert.ok(fnBody.includes('fromHash') && fnBody.includes('toHash'), 'Should use fromHash and toHash');
+  });
+
+  test('main.js handleCopyRangeDiff sends correct message', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyRangeDiff');
+    const fnEnd = source.indexOf('\n}', source.indexOf('\n}', fnStart) + 1) + 1;
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes("type: 'copyRangeDiff'"), 'Should send copyRangeDiff message');
+    assert.ok(fnBody.includes('rangeSelectionAnchor'), 'Should use rangeSelectionAnchor');
+    assert.ok(fnBody.includes('rangeSelectionTarget'), 'Should use rangeSelectionTarget');
+  });
+
+  test('Ctrl+Alt+R keyboard shortcut triggers handleCopyRangeDiff', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("e.key === 'r'") && source.includes('e.altKey'), 'Should handle Alt+R key combination');
+    assert.ok(source.includes('handleCopyRangeDiff()'), 'Should call handleCopyRangeDiff function');
+  });
+
+  test('package.json registers copyRangeDiff command', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    const commands = packageJson.contributes?.commands || [];
+    assert.ok(commands.some((c: any) => c.command === 'gitHistory.copyRangeDiff'), 'Should register copyRangeDiff command');
+
+    const keybindings = packageJson.contributes?.keybindings || [];
+    assert.ok(keybindings.some((kb: any) => kb.command === 'gitHistory.copyRangeDiff'), 'Should define keybinding for copyRangeDiff');
+  });
+});

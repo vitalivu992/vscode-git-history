@@ -320,4 +320,43 @@ suite('Range Diff E2E Git Integration Tests', () => {
       assert.strictEqual(commit.shortHash.length, 7, 'Short hash should be 7 characters');
     }
   });
+
+  test('handleCopyRangeDiff writes range diff to clipboard', async () => {
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = require('fs').readFileSync(messageHandlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('async function handleCopyRangeDiff');
+    assert.ok(fnStart >= 0, 'handleCopyRangeDiff should exist');
+
+    const fnEnd = source.indexOf('\n}', source.indexOf('\n}', fnStart) + 1) + 1;
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('vscode.env.clipboard.writeText'), 'Should write to clipboard');
+    assert.ok(fnBody.includes('Range diff'), 'Should show confirmation message');
+  });
+
+  test('handleCopyRangeDiff handles binary files', async () => {
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const source = require('fs').readFileSync(messageHandlerPath, 'utf-8');
+
+    const fnStart = source.indexOf('async function handleCopyRangeDiff');
+    const fnEnd = source.indexOf('\n}', source.indexOf('\n}', fnStart) + 1) + 1;
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('isBinary'), 'Should check for binary files');
+    assert.ok(fnBody.includes('Cannot copy diff for binary file'), 'Should handle binary file error');
+  });
+
+  test('handleCopyRangeDiff validates range selection', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = require('fs').readFileSync(mainJsPath, 'utf-8');
+
+    const fnStart = source.indexOf('function handleCopyRangeDiff');
+    const fnEnd = source.indexOf('\n}', source.indexOf('\n}', fnStart) + 1) + 1;
+    const fnBody = source.substring(fnStart, fnEnd);
+
+    assert.ok(fnBody.includes('rangeSelectionAnchor'), 'Should check rangeSelectionAnchor');
+    assert.ok(fnBody.includes('rangeSelectionTarget'), 'Should check rangeSelectionTarget');
+    assert.ok(fnBody.includes('Select a range of commits'), 'Should show error for invalid range');
+  });
 });
