@@ -201,13 +201,16 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+8` / `Cmd+Shift+8` | Copy relative date (e.g., "Today 2:30 PM", "3 days ago") to clipboard |
 | `Ctrl+Shift+;` / `Cmd+Shift+;` | Copy selected hashes to clipboard (2+ commits) |
 | `Ctrl+Shift+,` / `Cmd+Shift+,` | Copy file name only to clipboard |
+| `Ctrl+Shift+.` / `Cmd+Shift+.` | Copy file path to clipboard (for focused file in changed files list) |
+| `Ctrl+Shift+O` / `Cmd+Shift+O` | Export filtered commits to file |
+| `Ctrl+Shift+5` / `Cmd+Shift+5` | Copy filter query state to clipboard (includes search query and all toggle states as JSON) |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Show branch switcher |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
-| `Ctrl+Shift+O` / `Cmd+Shift+O` | Export filtered commits to file |
 | `Ctrl+Shift+X` / `Cmd+Shift+X` | Toggle regex search mode |
 | `Ctrl+Shift+Q` / `Cmd+Shift+Q` | Toggle hide merge commits |
+| `Ctrl+Shift+/` / `Cmd+Shift+/` | Cycle diff context lines (1-10) |
 | `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
 | `?` | Show keyboard shortcuts help |
 | `Escape` | Clear selection and search focus |
