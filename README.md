@@ -169,10 +169,13 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+C` / `Cmd+Shift+C` | Copy commit message to clipboard |
 | `Ctrl+Shift+H` / `Cmd+Shift+H` | Copy commit hash to clipboard |
 | `Ctrl+Shift+I` / `Cmd+Shift+I` | Copy full commit info to clipboard |
+| `Ctrl+Shift+J` / `Cmd+Shift+J` | Toggle ignore whitespace in diffs |
 | `Ctrl+Shift+P` / `Cmd+Shift+P` | Copy cherry-pick command to clipboard |
 | `Ctrl+Shift+U` / `Cmd+Shift+U` | Copy revert command to clipboard |
+| `Ctrl+Shift+W` / `Cmd+Shift+W` | Toggle word wrap in diff viewer |
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
+| `Ctrl+Shift+M` / `Cmd+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Shift+B` / `Cmd+Shift+B` | Copy branch name to clipboard |
 | `Ctrl+Shift+G` / `Cmd+Shift+G` | Copy tags to clipboard |
