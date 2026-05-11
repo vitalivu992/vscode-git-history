@@ -281,6 +281,7 @@ export class GitHistoryPanel {
             <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | path:name | after:2024-01-01 | last:7days">
             <button id="regex-toggle-btn" class="regex-toggle-btn" title="Toggle regex search mode (Ctrl+Shift+X)">.*</button>
             <button id="copy-filter-query-btn" class="copy-filter-query-btn" title="Copy filter query (Ctrl+Shift+5)">Copy Filter</button>
+            <button id="paste-filter-query-btn" class="paste-filter-query-btn" title="Paste filter query from clipboard (Ctrl+Shift+4)">Paste Filter</button>
             <div id="commit-count" class="commit-count"></div>
           </div>
           <table id="commit-table">

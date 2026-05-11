@@ -150,6 +150,10 @@ export async function handleMessage(
       handleCopyFilterQuery(message.filterState, panel);
       break;
 
+    case 'pasteFilterQuery':
+      handlePasteFilterQuery(panel);
+      break;
+
     case 'copyFilePath':
       handleCopyFilePath(message.filePath, panel);
       break;
@@ -1127,6 +1131,24 @@ function handleCopyFilterQuery(filterState: FilterQueryState, panel: GitHistoryP
   const formatted = JSON.stringify(filterState);
   void vscode.env.clipboard.writeText(formatted).then(() => {
     void vscode.window.showInformationMessage('Filter query copied to clipboard');
+  });
+}
+
+/**
+ * Handle paste filter query from clipboard
+ */
+function handlePasteFilterQuery(panel: GitHistoryPanel): void {
+  void vscode.env.clipboard.readText().then((text) => {
+    try {
+      const filterState = JSON.parse(text);
+      if (!filterState || typeof filterState !== 'object') {
+        void vscode.window.showWarningMessage('Invalid filter query format');
+        return;
+      }
+      panel.postMessage({ type: 'applyFilterQuery', filterState });
+    } catch {
+      void vscode.window.showWarningMessage('Clipboard does not contain a valid filter query');
+    }
   });
 }
 
