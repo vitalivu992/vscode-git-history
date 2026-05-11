@@ -13,7 +13,7 @@ let currentCommitHash = null;
 let trackedFilePath = null;
 let expandedMessages = new Set(); // Track which commit messages are expanded
 let focusedIndex = -1; // Keyboard focus index for commit list navigation
-let sortOldestFirst = false; // Sort order: false = newest first (default), true = oldest first
+let sortMode = 0; // 0=newest first, 1=oldest first, 2=author A-Z, 3=author Z-A
 let currentBranch = null; // Current git branch name
 let hideMergeCommits = false; // Filter out merge commits (commits with multiple parents)
 let wordWrapEnabled = false; // Word wrap toggle for diff view
@@ -775,32 +775,52 @@ function getFilteredCommits() {
 }
 
 function getOrderedCommits(filteredCommits) {
-  if (sortOldestFirst) {
-    return filteredCommits.slice().reverse();
+  const sorted = filteredCommits.slice();
+  switch (sortMode) {
+    case 0: return sorted;           // newest first (default)
+    case 1: return sorted.reverse(); // oldest first
+    case 2: return sorted.sort((a, b) => a.author.localeCompare(b.author));   // author A-Z
+    case 3: return sorted.sort((a, b) => b.author.localeCompare(a.author));   // author Z-A
   }
-  return filteredCommits;
+  return sorted;
+}
+
+function updateSortButton() {
+  if (!sortBtn) return;
+  switch (sortMode) {
+    case 0:
+      sortBtn.innerHTML = '&#x2193; Newest';
+      sortBtn.title = 'Sort: Newest first (click to cycle)';
+      sortBtn.classList.remove('sort-active');
+      break;
+    case 1:
+      sortBtn.innerHTML = '&#x2191; Oldest';
+      sortBtn.title = 'Sort: Oldest first (click to cycle)';
+      sortBtn.classList.add('sort-active');
+      break;
+    case 2:
+      sortBtn.innerHTML = 'A&#x2192;Z Author';
+      sortBtn.title = 'Sort: Author A-Z (click to cycle)';
+      sortBtn.classList.add('sort-active');
+      break;
+    case 3:
+      sortBtn.innerHTML = 'Z&#x2192;A Author';
+      sortBtn.title = 'Sort: Author Z-A (click to cycle)';
+      sortBtn.classList.add('sort-active');
+      break;
+  }
 }
 
 function handleSortToggle() {
-  sortOldestFirst = !sortOldestFirst;
-  if (sortBtn) {
-    if (sortOldestFirst) {
-      sortBtn.innerHTML = '&#x2191; Oldest';
-      sortBtn.title = 'Sort: Oldest first (click to toggle)';
-      sortBtn.classList.add('sort-active');
-    } else {
-      sortBtn.innerHTML = '&#x2193; Newest';
-      sortBtn.title = 'Sort: Newest first (click to toggle)';
-      sortBtn.classList.remove('sort-active');
-    }
-  }
+  sortMode = (sortMode + 1) % 4;
+  updateSortButton();
   const graphTh = document.querySelector('th.graph-col');
-  if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
+  if (graphTh) { graphTh.style.display = (showGraph && sortMode < 2) ? '' : 'none'; }
   focusedIndex = -1;
   renderCommits();
 
   // Persist the setting
-  vscode.postMessage({ type: 'saveSettings', settings: { sortOldestFirst } });
+  vscode.postMessage({ type: 'saveSettings', settings: { sortMode } });
 }
 
 function handleMergeToggle() {
@@ -1420,20 +1440,10 @@ function handleMessage(event) {
           }
         }
 
-        // Apply sort order
-        if (settings.sortOldestFirst !== sortOldestFirst) {
-          sortOldestFirst = settings.sortOldestFirst;
-          if (sortBtn) {
-            if (sortOldestFirst) {
-              sortBtn.innerHTML = '&#x2191; Oldest';
-              sortBtn.title = 'Sort: Oldest first (click to toggle)';
-              sortBtn.classList.add('sort-active');
-            } else {
-              sortBtn.innerHTML = '&#x2193; Newest';
-              sortBtn.title = 'Sort: Newest first (click to toggle)';
-              sortBtn.classList.remove('sort-active');
-            }
-          }
+        // Apply sort mode
+        if (settings.sortMode !== undefined && settings.sortMode !== sortMode) {
+          sortMode = settings.sortMode;
+          updateSortButton();
         }
 
         // Apply merge commits filter
@@ -1498,7 +1508,7 @@ function handleMessage(event) {
       }
 
       const graphTh = document.querySelector('th.graph-col');
-      if (graphTh) { graphTh.style.display = (showGraph && !sortOldestFirst) ? '' : 'none'; }
+      if (graphTh) { graphTh.style.display = (showGraph && sortMode < 2) ? '' : 'none'; }
 
       // Update merge toggle button state
       if (mergeToggleBtn) {
@@ -1634,6 +1644,7 @@ function handleMessage(event) {
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
         case 'cycleDiffContextLines': handleDiffContextLinesCycle(); break;
+        case 'cycleSortMode': handleSortToggle(); break;
         case 'copyFilterQuery': handleCopyFilterQuery(); break;
       }
       break;
@@ -1663,7 +1674,7 @@ function renderCommits() {
   }
 
   // Graph is only shown in newest-first order
-  const effectiveShowGraph = showGraph && !sortOldestFirst;
+  const effectiveShowGraph = showGraph && sortMode < 2;
   const colspan = effectiveShowGraph ? 6 : 5;
 
   if (displayCommits.length === 0) {
@@ -2790,7 +2801,7 @@ function handleCopyFilterQuery() {
   const filterState = {
     query: searchInput.value,
     hideMergeCommits: hideMergeCommits,
-    sortOldestFirst: sortOldestFirst,
+    sortMode: sortMode,
     showMyCommitsOnly: showMyCommitsOnly
   };
   vscode.postMessage({ type: 'copyFilterQuery', filterState });
@@ -3256,7 +3267,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
         { keys: [cmdKey, 'Alt', 'P'], description: 'Quick compare with parent' },
         { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' },
-        { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' }
+        { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' },
+        { keys: [cmdKey, 'Shift', '3'], description: 'Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A)' }
       ]
     },
     {
