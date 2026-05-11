@@ -112,7 +112,8 @@ export type WebviewAction =
   | 'focusSearch'
   | 'showKeyboardHelp'
   | 'copyFilterQuery'
-  | 'pasteFilterQuery';
+  | 'pasteFilterQuery'
+  | 'clearAllFilters';
 
 /**
  * Filter state for copy filter query feature
@@ -190,4 +191,5 @@ export type WebviewToExtMessage =
   | { type: 'changeDiffContextLines'; value: number }
   | { type: 'dismissFirstRunTip' }
   | { type: 'copyFilterQuery'; filterState: FilterQueryState }
-  | { type: 'pasteFilterQuery' };
+  | { type: 'pasteFilterQuery' }
+  | { type: 'clearAllFilters' };

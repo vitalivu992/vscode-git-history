@@ -184,6 +184,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.cycleSortMode', action: 'cycleSortMode' },
     { command: 'gitHistory.copyFilterQuery', action: 'copyFilterQuery' },
     { command: 'gitHistory.pasteFilterQuery', action: 'pasteFilterQuery' },
+    { command: 'gitHistory.clearAllFilters', action: 'clearAllFilters' },
   ] as const;
 
   for (const { command, action } of webviewActions) {
