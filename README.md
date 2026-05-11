@@ -159,6 +159,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **View diff for this file** | Show the diff for this specific file only |
 | **Copy file content** | Copy the full content of a file at the selected commit to clipboard. Useful for sharing code snippets from historical versions. |
 | **Copy file path** | Copy the full file path to clipboard |
+| **Copy file name only** | Copy just the filename (e.g., `main.js`) to clipboard |
 
 #### Keyboard Navigation
 
