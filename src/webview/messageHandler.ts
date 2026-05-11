@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 
@@ -138,6 +138,10 @@ export async function handleMessage(
 
     case 'openFileAtCommit':
       await handleOpenFileAtCommit(message.hash, message.filePath, panel);
+      break;
+
+    case 'copyFileContent':
+      await handleCopyFileContent(message.hash, message.filePath, panel);
       break;
 
     case 'quickCompare':
@@ -475,6 +479,29 @@ async function handleOpenFileAtCommit(
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to open file at commit: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleCopyFileContent(
+  hash: string,
+  filePath: string,
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const content = await getFileContentAtCommit(filePath, hash, cwd);
+
+    if (content) {
+      await vscode.env.clipboard.writeText(content);
+      const fileName = path.basename(filePath);
+      void vscode.window.showInformationMessage(`Copied content: ${fileName}`);
+    } else {
+      void vscode.window.showInformationMessage('No content to copy');
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy file content: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
