@@ -1767,6 +1767,7 @@ function handleMessage(event) {
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFileExtension': handleCopyExtension(); break;
+        case 'copyFileDirectory': handleCopyFileDirectory(); break;
         case 'copyFilePath': handleCopyFilePath(); break;
         case 'copyRelativePath': handleCopyRelativePath(); break;
         case 'copyFileDiff': handleCopyFileDiff(); break;
@@ -2271,6 +2272,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy file extension</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-directory">
+      <span class="context-menu-icon">📁</span>
+      <span class="context-menu-label">Copy file directory</span>
+    </div>
     <div class="context-menu-item" data-action="copy-relative-path">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy relative path</span>
@@ -2332,6 +2337,11 @@ function showFileContextMenu(event, filePath, commitHash) {
       } else if (action === 'copy-file-extension') {
         vscode.postMessage({
           type: 'copyFileExtension',
+          filePath: filePath
+        });
+      } else if (action === 'copy-file-directory') {
+        vscode.postMessage({
+          type: 'copyFileDirectory',
           filePath: filePath
         });
       } else if (action === 'copy-relative-path') {
@@ -3719,6 +3729,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
         { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' },
         { keys: [cmdKey, 'Alt', 'E'], description: 'Copy file extension' },
+        { keys: [cmdKey, 'Alt', 'K'], description: 'Copy file directory' },
         { keys: [cmdKey, 'Alt', 'L'], description: 'Copy relative path' }
       ]
     },
@@ -3871,6 +3882,14 @@ function handleCopyExtension() {
     return;
   }
   vscode.postMessage({ type: 'copyFileExtension', filePath: selectedFile });
+}
+
+function handleCopyFileDirectory() {
+  if (!selectedFile) {
+    showError('Select a file to copy its directory');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFileDirectory', filePath: selectedFile });
 }
 
 function handleCopyFilePath() {
