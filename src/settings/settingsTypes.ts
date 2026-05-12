@@ -20,6 +20,8 @@ export interface UserSettings {
   diffContextLines: number;
   /** Whether to show the commit graph */
   showGraph: boolean;
+  /** Whether to show GPG signature verification badges */
+  showSignatures: boolean;
   /** Saved search query for persistence across sessions */
   searchQuery: string;
 }
@@ -37,6 +39,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   ignoreWhitespace: false,
   diffContextLines: 3,
   showGraph: true,
+  showSignatures: true,
   searchQuery: ''
 };
 
