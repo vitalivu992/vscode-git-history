@@ -2,6 +2,8 @@
 
 A powerful VS Code extension that provides git history visualization inspired by IntelliJ's Git History. View file history, selection history, and explore diffs with an intuitive interface.
 
+See [CHANGELOG](CHANGELOG.md) for version history.
+
 ### File History
 
 ![File History](docs/file-history.png)
