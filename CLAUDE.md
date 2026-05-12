@@ -257,10 +257,30 @@ The extension detects and displays the current git branch in the history panel:
 ### Message Protocol
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):
-- Extension sends: `init`, `diff`, `combinedDiff`, `rangeDiff`, `commitFiles`, `error`, `selectCommit`, `branchHashes`, `applyFilterQuery`
-- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFileDiff`, `copyFilePath`, `copyFileName`, `copyFileExtension`, `copyRelativePath`, `copyCommitPatch`, `copyCommitUrl`, `copyCommitMention`, `copyCommitRef`, `copyCommitStats`, `copyBranchName`, `copyBranchUrl`, `copyRemoteUrl`, `copyTags`, `copyAuthorEmail`, `copyAuthorName`, `copyParentHash`, `copyShortHash`, `copySubject`, `copyDiffStatSummary`, `copyCoAuthors`, `copyCommitDate`, `copyOneline`, `copyCommitBody`, `copyCommitMarkdown`, `copyFileContent`, `copySelectedHashes`, `copyFilterQuery`, `pasteFilterQuery`, `openFileAtCommit`, `openCommitUrl`, `openFileUrl`, `quickCompare`, `createBranch`, `createTag`, `saveSettings`, `exportCommits`, `requestBranchHashes`
+- Extension sends: `init`, `diff`, `combinedDiff`, `rangeDiff`, `commitFiles`, `error`, `selectCommit`, `branchHashes`, `applyFilterQuery`, `filterPresets`
+- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFileDiff`, `copyFilePath`, `copyFileName`, `copyFileExtension`, `copyRelativePath`, `copyCommitPatch`, `copyCommitUrl`, `copyCommitMention`, `copyCommitRef`, `copyCommitStats`, `copyBranchName`, `copyBranchUrl`, `copyRemoteUrl`, `copyTags`, `copyAuthorEmail`, `copyAuthorName`, `copyParentHash`, `copyShortHash`, `copySubject`, `copyDiffStatSummary`, `copyCoAuthors`, `copyCommitDate`, `copyOneline`, `copyCommitBody`, `copyCommitMarkdown`, `copyFileContent`, `copySelectedHashes`, `copyFilterQuery`, `pasteFilterQuery`, `openFileAtCommit`, `openCommitUrl`, `openFileUrl`, `quickCompare`, `createBranch`, `createTag`, `saveSettings`, `exportCommits`, `requestBranchHashes`, `saveFilterPreset`, `deleteFilterPreset`, `getFilterPresets`, `applyPreset`
 
 The `saveSettings` message is sent by the webview when UI preferences change (diff type, word wrap, sort order, hide merge commits, regex mode) to persist them across sessions.
+
+### Saved Filter Presets
+
+The extension allows users to save, name, and quickly restore filter presets with a maximum of 10 presets stored across sessions using VS Code's `ExtensionContext.globalState`.
+
+- **Save Filter Preset**: Click the "Save Preset" button or press `Ctrl+Shift+0` / `Cmd+Shift+0` to save the current filter state as a named preset. A modal dialog appears where you can enter a preset name (max 50 characters). The preset includes the current search query, hide merge commits toggle, sort mode, and my commits filter. Preset names are validated for duplicates (case-insensitive), empty names, and invalid characters (path separators, control characters). A maximum of 10 presets can be saved.
+
+- **Load Filter Preset**: Click the "⭐ Presets" dropdown button or press `Ctrl+Shift+1` / `Cmd+Shift+1` to open the presets dropdown menu. Each preset shows its name and a summary of the filter state. Click on a preset to apply its filter state. The dropdown can be dismissed by clicking outside or pressing Escape. Each preset item also has a delete button (×) to remove it.
+
+- **Preset Persistence**: Presets are stored in VS Code's globalState using the `gitHistory.savedPresets` key and persist across VS Code sessions. The preset data structure includes the name, filter state (query, hideMergeCommits, sortMode, showMyCommitsOnly), and creation timestamp.
+
+- **Preset Summary**: Each preset displays a human-readable summary showing the active filters: search query in quotes, "No Merge" if hide merge commits is enabled, "My Commits" if my commits filter is on, and the sort mode label (Newest, Oldest, A-Z, Z-A). For example: `"bug fix" • No Merge • Newest`.
+
+**Implementation**:
+- `src/types.ts` - `SavedFilterPreset` interface, `SAVED_PRESETS_STORAGE_KEY` constant, message types
+- `src/settings/settingsTypes.ts` - `MAX_SAVED_PRESETS` (10), `PRESET_NAME_MAX_LENGTH` (50) constants
+- `src/webview/messageHandler.ts` - `handleSaveFilterPreset`, `handleDeleteFilterPreset`, `handleGetFilterPresets`, `validatePresetName` helper
+- `src/webview/webviewProvider.ts` - passes `savedPresets` in init message, provides `getContext()` method
+- `src/webview/panel/main.js` - `savedPresets` state, `showSavePresetDialog()`, `showPresetDropdown()`, `loadPreset()`, `deletePreset()`, `renderPresetDropdown()`, `getPresetSummary()`, event handlers for buttons
+- `src/webview/panel/styles.css` - styles for preset save modal, dropdown menu, and buttons
 
 ### Build System
 
