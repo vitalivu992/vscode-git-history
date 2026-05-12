@@ -684,6 +684,15 @@ export async function createTagFromCommit(
 }
 
 /**
+ * Delete a tag from a commit
+ * @param tagName The name of the tag to delete
+ * @param cwd Working directory
+ */
+export async function deleteTagFromCommit(tagName: string, cwd: string): Promise<void> {
+  await execGit(['tag', '-d', tagName], cwd);
+}
+
+/**
  * Checkout an existing branch
  * @param branchName The name of the branch to checkout
  * @param cwd Working directory
