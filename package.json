@@ -332,6 +332,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.toggleSignatures",
+        "title": "Git History: Toggle Signatures",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.jumpToHash",
         "title": "Git History: Jump to Hash",
         "category": "Git History"
@@ -736,6 +741,12 @@
         "command": "gitHistory.toggleGraph",
         "key": "ctrl+alt+t",
         "mac": "cmd+alt+t",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleSignatures",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

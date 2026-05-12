@@ -145,7 +145,8 @@ export type WebviewAction =
   | 'openFileUrl'
   | 'saveFilterPreset'
   | 'loadFilterPreset'
-  | 'toggleGraph';
+  | 'toggleGraph'
+  | 'toggleSignatures';
 
 /**
  * Filter state for copy filter query feature

@@ -145,12 +145,14 @@ function clearAllFilters() {
   hideMergeCommits = false;
   regexSearchEnabled = false;
   showMyCommitsOnly = false;
+  sortMode = 0; // Reset to newest first
 
   // Update UI elements
   searchInput.value = '';
   mergeToggleBtn.classList.remove('active');
   regexToggleBtn.classList.remove('active');
   myCommitsBtn.classList.remove('active');
+  updateSortButton();
 
   // Render commits with no filters
   renderCommits();
@@ -160,7 +162,7 @@ function clearAllFilters() {
   updateClearAllButton();
 
   // Save settings
-  saveSettings();
+  vscode.postMessage({ type: 'saveSettings', settings: { sortMode, hideMergeCommits: false, regexSearchEnabled: false, showMyCommitsOnly: false, searchQuery: '' } });
 }
 
 /**
@@ -685,6 +687,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+3: Cycle sort mode
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '3') {
+    e.preventDefault();
+    handleSortToggle();
+    return;
+  }
+
   // / or Ctrl+F: Focus search
   if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key === 'f')) {
     e.preventDefault();
@@ -1007,6 +1016,23 @@ function handleToggleGraph() {
 
   // Persist the setting
   vscode.postMessage({ type: 'saveSettings', settings: { showGraph } });
+}
+
+function handleToggleSignatures() {
+  showSignatures = !showSignatures;
+  const signaturesToggleBtn = document.getElementById('signatures-toggle-btn');
+  if (signaturesToggleBtn) {
+    if (showSignatures) {
+      signaturesToggleBtn.classList.add('active');
+      signaturesToggleBtn.title = 'GPG signatures visible (click to hide)';
+    } else {
+      signaturesToggleBtn.classList.remove('active');
+      signaturesToggleBtn.title = 'Show GPG signatures';
+    }
+  }
+  renderCommits();
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { showSignatures } });
 }
 
 /**
@@ -1446,6 +1472,10 @@ function init() {
   if (graphToggleBtn) {
     graphToggleBtn.addEventListener('click', handleToggleGraph);
   }
+  const signaturesToggleBtn = document.getElementById('signatures-toggle-btn');
+  if (signaturesToggleBtn) {
+    signaturesToggleBtn.addEventListener('click', handleToggleSignatures);
+  }
 
   // Keyboard shortcuts
   document.addEventListener('keydown', handleKeyDown);
@@ -1862,6 +1892,7 @@ function handleMessage(event) {
         case 'toggleIgnoreWhitespace': handleIgnoreWhitespaceToggle(); break;
         case 'toggleHideMergeCommits': handleMergeToggle(); break;
         case 'toggleGraph': handleToggleGraph(); break;
+        case 'toggleSignatures': handleToggleSignatures(); break;
         case 'jumpToHash': showJumpToHashDialog(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
