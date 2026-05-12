@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       try {
         const cwd = await getGitRoot(filePath);
-        await GitHistoryPanel.createOrShow(context.extensionUri, filePath, cwd, settingsService, firstRunTipService);
+        await GitHistoryPanel.createOrShow(context.extensionUri, filePath, cwd, settingsService, firstRunTipService, context);
       } catch (error) {
         vscode.window.showErrorMessage(
           `Failed to open git history: ${error instanceof Error ? error.message : String(error)}`
@@ -69,6 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
           cwd,
           settingsService,
           firstRunTipService,
+          context,
           { startLine, endLine }
         );
       } catch (error) {
@@ -116,7 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         const filePath = activeEditor.document.uri.fsPath;
         const cwd = await getGitRoot(filePath);
-        await GitHistoryPanel.showCommitDiff(context.extensionUri, filePath, cwd, settingsService, firstRunTipService, bl.hash);
+        await GitHistoryPanel.showCommitDiff(context.extensionUri, filePath, cwd, settingsService, firstRunTipService, context, bl.hash);
       } catch (error) {
         vscode.window.showErrorMessage(
           `Failed to show commit: ${error instanceof Error ? error.message : String(error)}`
@@ -200,6 +201,8 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.clearAllFilters', action: 'clearAllFilters' },
     { command: 'gitHistory.openCommitUrl', action: 'openCommitUrl' },
     { command: 'gitHistory.openFileUrl', action: 'openFileUrl' },
+    { command: 'gitHistory.saveFilterPreset', action: 'saveFilterPreset' },
+    { command: 'gitHistory.loadFilterPreset', action: 'loadFilterPreset' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

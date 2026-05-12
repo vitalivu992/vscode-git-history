@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { getFileHistory, getSelectionHistory, getCurrentBranch, getAllBranches, getCurrentGitUser } from '../git/gitService';
-import { CommitInfo } from '../types';
+import { CommitInfo, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
 import { handleMessage } from './messageHandler';
 import { SettingsService } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -26,6 +26,7 @@ export class GitHistoryPanel {
   private _pendingInit: (() => void) | null = null;
   private readonly _settingsService: SettingsService;
   private readonly _firstRunTipService: FirstRunTipService;
+  private readonly _context: vscode.ExtensionContext;
   private _ignoreWhitespace: boolean = false;
   private _diffContextLines: number = 3;
 
@@ -35,9 +36,10 @@ export class GitHistoryPanel {
     cwd: string,
     settingsService: SettingsService,
     firstRunTipService: FirstRunTipService,
+    context: vscode.ExtensionContext,
     commitHash: string
   ): Promise<void> {
-    await GitHistoryPanel.createOrShow(extensionUri, filePath, cwd, settingsService, firstRunTipService);
+    await GitHistoryPanel.createOrShow(extensionUri, filePath, cwd, settingsService, firstRunTipService, context);
     // After panel is ready, select the commit
     GitHistoryPanel.currentPanel?.postMessage({ type: 'selectCommit', hash: commitHash });
   }
@@ -48,6 +50,7 @@ export class GitHistoryPanel {
     cwd: string,
     settingsService: SettingsService,
     firstRunTipService: FirstRunTipService,
+    context: vscode.ExtensionContext,
     selection?: SelectionRange
   ): Promise<void> {
     const column = vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One;
@@ -84,7 +87,7 @@ export class GitHistoryPanel {
       }
     );
 
-    GitHistoryPanel.currentPanel = new GitHistoryPanel(panel, extensionUri, filePath, cwd, settingsService, firstRunTipService, selection);
+    GitHistoryPanel.currentPanel = new GitHistoryPanel(panel, extensionUri, filePath, cwd, settingsService, firstRunTipService, context, selection);
     await GitHistoryPanel.currentPanel.loadData();
   }
 
@@ -95,6 +98,7 @@ export class GitHistoryPanel {
     cwd: string,
     settingsService: SettingsService,
     firstRunTipService: FirstRunTipService,
+    context: vscode.ExtensionContext,
     selection?: SelectionRange
   ) {
     this._panel = panel;
@@ -102,6 +106,7 @@ export class GitHistoryPanel {
     this._cwd = cwd;
     this._settingsService = settingsService;
     this._firstRunTipService = firstRunTipService;
+    this._context = context;
     this._selection = selection;
 
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
@@ -139,6 +144,10 @@ export class GitHistoryPanel {
 
   public getBranch(): string | undefined {
     return this._branch;
+  }
+
+  public getContext(): vscode.ExtensionContext {
+    return this._context;
   }
 
   public getSettingsService(): SettingsService {
@@ -211,7 +220,10 @@ export class GitHistoryPanel {
 
         const showFirstRunTip = this._firstRunTipService.shouldShowTip();
 
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings, currentUser, showFirstRunTip });
+        // Get saved filter presets from globalState
+        const savedPresets = this._context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
+
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings, currentUser, showFirstRunTip, savedPresets });
       } catch (error) {
         this.postMessage({
           type: 'error',
@@ -283,6 +295,8 @@ export class GitHistoryPanel {
             <button id="copy-filter-query-btn" class="copy-filter-query-btn" title="Copy filter query (Ctrl+Shift+5)">Copy Filter</button>
             <button id="paste-filter-query-btn" class="paste-filter-query-btn" title="Paste filter query from clipboard (Ctrl+Shift+4)">Paste Filter</button>
             <button id="clear-all-filters-btn" class="clear-all-filters-btn" title="Clear all filters (Ctrl+Alt+Q)">Clear All</button>
+            <button id="save-preset-btn" class="save-preset-btn" title="Save filter preset (Ctrl+Shift+0)">Save Preset</button>
+            <button id="preset-dropdown-btn" class="preset-dropdown-btn" title="Load filter preset (Ctrl+Shift+1)">⭐ Presets</button>
             <div id="commit-count" class="commit-count"></div>
           </div>
           <table id="commit-table">
