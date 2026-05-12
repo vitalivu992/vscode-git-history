@@ -149,6 +149,10 @@ export async function handleMessage(
       handleCopyRelativeDate(message.hash, panel);
       break;
 
+    case 'copyCommitTimestamp':
+      handleCopyCommitTimestamp(message.hash, panel);
+      break;
+
     case 'copyOneline':
       handleCopyOneline(message.hash, panel);
       break;
@@ -1333,6 +1337,19 @@ function handleCopyRelativeDate(hash: string, panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(relativeDate).then(() => {
     void vscode.window.showInformationMessage(`Copied relative date: ${relativeDate}`);
+  });
+}
+
+function handleCopyCommitTimestamp(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const timestamp = Math.floor(new Date(commit.date).getTime() / 1000).toString();
+  void vscode.env.clipboard.writeText(timestamp).then(() => {
+    void vscode.window.showInformationMessage(`Copied timestamp: ${timestamp}`);
   });
 }
 
