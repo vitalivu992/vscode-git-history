@@ -143,6 +143,8 @@ export interface FilterQueryState {
   hideMergeCommits: boolean;
   sortMode: number;
   showMyCommitsOnly: boolean;
+  regexSearchEnabled: boolean;
+  pathFilter: string | null;
 }
 
 /**
