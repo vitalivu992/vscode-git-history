@@ -3,11 +3,11 @@ import { parseGitLog, parseNameStatus, parseLineHistoryLog, isBinaryFile } from 
 
 suite('Git Parser Tests', () => {
   test('parseGitLog should parse commit blocks', () => {
-    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n
+    // Format: %H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n
     // Note: hashes must be valid hex (0-9, a-f) for the parser to accept them
     // commit1 is a root commit (no parents), commit2 has commit1 as parent
-    const commit1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Initial commit\x00\x00\x00---COMMIT-END---';
-    const commit2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00Jane Smith\x00jane@example.com\x001234567900\x00Add feature\x00This adds a new feature.\x00\x00---COMMIT-END---';
+    const commit1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Initial commit\x00\x00\x00---COMMIT-END---';
+    const commit2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00Jane Smith\x00jane@example.com\x00\x00\x001234567900\x00Add feature\x00This adds a new feature.\x00\x00---COMMIT-END---';
     const input = commit1 + '\n' + commit2;
 
     const commits = parseGitLog(input);
@@ -67,15 +67,15 @@ suite('Git Parser Tests', () => {
   });
 
   test('parseLineHistoryLog should parse -L output', () => {
-    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d%x00%G?%x00%GS (one header line per commit, diff lines have no nulls)
+    // Format: %H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%d%x00%G?%x00%GS (one header line per commit, diff lines have no nulls)
     const hash1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
     const hash2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0';
     const input = [
-      `${hash1}\x00${hash2}\x00John Doe\x00john@example.com\x001234567890\x00Added line\x00\x00G\x00Alice <alice@example.com>`,
+      `${hash1}\x00${hash2}\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Added line\x00\x00G\x00Alice <alice@example.com>`,
       'diff --git a/file.ts b/file.ts',
       '--- a/file.ts',
       '+++ b/file.ts',
-      `${hash2}\x00\x00Jane Smith\x00jane@example.com\x001234567900\x00Modified line\x00\x00N\x00\x00`,
+      `${hash2}\x00\x00Jane Smith\x00jane@example.com\x00\x00\x001234567900\x00Modified line\x00\x00N\x00\x00`,
     ].join('\n');
 
     const commits = parseLineHistoryLog(input);
@@ -180,8 +180,8 @@ suite('Git Parser Tests', () => {
   });
 
   test('parseGitLog should parse tags from decorations field', () => {
-    const commitWithTag = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Release\x00\x00 (HEAD -> main, tag: v1.0.0, origin/main)\x00---COMMIT-END---';
-    const commitNoTag = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00John Doe\x00john@example.com\x001234567900\x00Normal commit\x00\x00\x00---COMMIT-END---';
+    const commitWithTag = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Release\x00\x00 (HEAD -> main, tag: v1.0.0, origin/main)\x00---COMMIT-END---';
+    const commitNoTag = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00John Doe\x00john@example.com\x00\x00\x001234567900\x00Normal commit\x00\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitWithTag + '\n' + commitNoTag);
 
@@ -199,7 +199,7 @@ suite('Git Parser Tests', () => {
     // First is invalid (not enough fields), second is valid
     // Note: hash must be valid hex (0-9, a-f) and exactly 40 chars
     const invalidCommit = 'invalid\x00data\x00---COMMIT-END---';
-    const validCommit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Valid commit\x00\x00\x00---COMMIT-END---';
+    const validCommit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Valid commit\x00\x00\x00---COMMIT-END---';
     const input = invalidCommit + '\n' + validCommit;
 
     const commits = parseGitLog(input);
@@ -211,7 +211,7 @@ suite('Git Parser Tests', () => {
     // Format includes body field after subject
     const subject = 'Add new feature';
     const body = 'This commit adds a new feature\nwith multiple lines\nof description.';
-    const commitWithBody = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00' + subject + '\x00' + body + '\x00\x00---COMMIT-END---';
+    const commitWithBody = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00' + subject + '\x00' + body + '\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitWithBody);
 
@@ -223,7 +223,7 @@ suite('Git Parser Tests', () => {
   test('parseGitLog should handle commit without body', () => {
     // Empty body field
     const subject = 'Simple commit';
-    const commitNoBody = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00' + subject + '\x00\x00\x00---COMMIT-END---';
+    const commitNoBody = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00' + subject + '\x00\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitNoBody);
 
@@ -233,7 +233,7 @@ suite('Git Parser Tests', () => {
   });
 
   test('parseGitLog should parse multiple tags from decorations', () => {
-    const commitMultipleTags = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Release\x00\x00 (HEAD -> main, tag: v1.0.0, tag: v1.1.0)\x00---COMMIT-END---';
+    const commitMultipleTags = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Release\x00\x00 (HEAD -> main, tag: v1.0.0, tag: v1.1.0)\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitMultipleTags);
 
@@ -242,7 +242,7 @@ suite('Git Parser Tests', () => {
   });
 
   test('parseGitLog should parse tags with special characters', () => {
-    const commitSpecial = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Release\x00\x00 (tag: release/v1.x, tag: v1.0.0-beta)\x00---COMMIT-END---';
+    const commitSpecial = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Release\x00\x00 (tag: release/v1.x, tag: v1.0.0-beta)\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitSpecial);
 
@@ -252,7 +252,7 @@ suite('Git Parser Tests', () => {
   });
 
   test('parseGitLog should handle empty decorations', () => {
-    const commitEmptyDecorations = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Commit\x00\x00\x00---COMMIT-END---';
+    const commitEmptyDecorations = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Commit\x00\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitEmptyDecorations);
 
@@ -262,9 +262,9 @@ suite('Git Parser Tests', () => {
 
   test('parseGitLog should return null for invalid date', () => {
     // Invalid timestamp (not a number)
-    const commitInvalidDate = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00invalid\x00Commit\x00\x00\x00---COMMIT-END---';
+    const commitInvalidDate = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x00invalid\x00Commit\x00\x00\x00---COMMIT-END---';
     // Followed by valid commit
-    const validCommit = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00\x00John Doe\x00john@example.com\x001234567890\x00Valid\x00\x00\x00---COMMIT-END---';
+    const validCommit = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Valid\x00\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitInvalidDate + '\n' + validCommit);
 
@@ -274,7 +274,7 @@ suite('Git Parser Tests', () => {
 
   test('parseGitLog should handle merge commits with multiple parents', () => {
     // Merge commit with two parents
-    const mergeCommit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00parent1 parent2\x00Jane Doe\x00jane@example.com\x001234567890\x00Merge branch\x00\x00\x00---COMMIT-END---';
+    const mergeCommit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00parent1 parent2\x00Jane Doe\x00jane@example.com\x00\x00\x001234567890\x00Merge branch\x00\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(mergeCommit);
 
@@ -285,7 +285,7 @@ suite('Git Parser Tests', () => {
   test('parseGitLog should parse GPG signature status (verified)', () => {
     // G = good/verified signature, with signer name
     const commitWithSig = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
-      'John Doe\x00john@example.com\x001234567890\x00Signed commit\x00\x00\x00G\x00Alice Smith <alice@example.com>\x00---COMMIT-END---';
+      'John Doe\x00john@example.com\x00\x00\x001234567890\x00Signed commit\x00\x00\x00G\x00Alice Smith <alice@example.com>\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitWithSig);
 
@@ -297,7 +297,7 @@ suite('Git Parser Tests', () => {
   test('parseGitLog should parse invalid signature', () => {
     // B = bad signature
     const commitBadSig = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
-      'John Doe\x00john@example.com\x001234567890\x00Bad signed commit\x00\x00\x00B\x00\x00---COMMIT-END---';
+      'John Doe\x00john@example.com\x00\x00\x001234567890\x00Bad signed commit\x00\x00\x00B\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitBadSig);
 
@@ -309,7 +309,7 @@ suite('Git Parser Tests', () => {
   test('parseGitLog should handle unsigned commits (N)', () => {
     // N = no signature
     const commitUnsigned = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
-      'John Doe\x00john@example.com\x001234567890\x00Unsigned commit\x00\x00\x00N\x00\x00---COMMIT-END---';
+      'John Doe\x00john@example.com\x00\x00\x001234567890\x00Unsigned commit\x00\x00\x00N\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitUnsigned);
 
@@ -320,7 +320,7 @@ suite('Git Parser Tests', () => {
   test('parseGitLog should handle expired signature (X)', () => {
     // X = good signature that has expired
     const commitExpiredSig = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
-      'John Doe\x00john@example.com\x001234567890\x00Expired sig commit\x00\x00\x00X\x00Bob <bob@example.com>\x00---COMMIT-END---';
+      'John Doe\x00john@example.com\x00\x00\x001234567890\x00Expired sig commit\x00\x00\x00X\x00Bob <bob@example.com>\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitExpiredSig);
 
@@ -332,7 +332,7 @@ suite('Git Parser Tests', () => {
   test('parseGitLog should handle untrusted signature (U)', () => {
     // U = good signature with unknown validity
     const commitUntrustedSig = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
-      'John Doe\x00john@example.com\x001234567890\x00Untrusted sig\x00\x00\x00U\x00\x00---COMMIT-END---';
+      'John Doe\x00john@example.com\x00\x00\x001234567890\x00Untrusted sig\x00\x00\x00U\x00\x00---COMMIT-END---';
 
     const commits = parseGitLog(commitUntrustedSig);
 
