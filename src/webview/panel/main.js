@@ -1791,6 +1791,8 @@ function handleMessage(event) {
         case 'copyFilterQuery': handleCopyFilterQuery(); break;
         case 'pasteFilterQuery': handlePasteFilterQuery(); break;
         case 'clearAllFilters': clearAllFilters(); break;
+        case 'openCommitUrl': handleOpenUrl(); break;
+        case 'openFileUrl': handleOpenFileUrl(); break;
       }
       break;
   }
@@ -2277,6 +2279,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">🔗</span>
       <span class="context-menu-label">Copy file permalink</span>
     </div>
+    <div class="context-menu-item" data-action="open-file-url">
+      <span class="context-menu-icon">🌐</span>
+      <span class="context-menu-label">Open file permalink in browser</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -2336,6 +2342,12 @@ function showFileContextMenu(event, filePath, commitHash) {
       } else if (action === 'copy-file-url') {
         vscode.postMessage({
           type: 'copyFileUrl',
+          hash: commitHash,
+          filePath: filePath
+        });
+      } else if (action === 'open-file-url') {
+        vscode.postMessage({
+          type: 'openFileUrl',
           hash: commitHash,
           filePath: filePath
         });
@@ -2409,6 +2421,10 @@ function showCommitContextMenu(event, commit) {
     <div class="context-menu-item" data-action="copy-url">
       <span class="context-menu-icon">🔗</span>
       <span class="context-menu-label">Copy commit URL</span>
+    </div>
+    <div class="context-menu-item" data-action="open-url">
+      <span class="context-menu-icon">🌐</span>
+      <span class="context-menu-label">Open in browser</span>
     </div>
     <div class="context-menu-item" data-action="copy-mention">
       <span class="context-menu-icon">📢</span>
@@ -2546,6 +2562,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitPatch', hash: commit.hash });
       } else if (action === 'copy-url') {
         vscode.postMessage({ type: 'copyCommitUrl', hash: commit.hash });
+      } else if (action === 'open-url') {
+        vscode.postMessage({ type: 'openCommitUrl', hash: commit.hash });
       } else if (action === 'copy-mention') {
         vscode.postMessage({ type: 'copyCommitMention', hash: commit.hash });
       } else if (action === 'copy-ref') {
@@ -3929,6 +3947,39 @@ function handleCopyFileUrl() {
     return;
   }
   vscode.postMessage({ type: 'copyFileUrl', hash: targetCommit.hash, filePath: selectedFile });
+}
+
+function handleOpenUrl() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'openCommitUrl', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'openCommitUrl', hash });
+  } else {
+    showError('Select a commit to open its URL');
+  }
+}
+
+function handleOpenFileUrl() {
+  if (!selectedFile) {
+    showError('Select a file to open its URL');
+    return;
+  }
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+  if (!targetCommit) {
+    showError('Select a commit to open file URL');
+    return;
+  }
+  vscode.postMessage({ type: 'openFileUrl', hash: targetCommit.hash, filePath: selectedFile });
 }
 
 function handleCopyDescribe() {

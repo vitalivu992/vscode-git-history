@@ -258,6 +258,14 @@ export async function handleMessage(
       await handleCopyFileUrl(message.hash, message.filePath, panel);
       break;
 
+    case 'openCommitUrl':
+      await handleOpenCommitUrl(message.hash, panel);
+      break;
+
+    case 'openFileUrl':
+      await handleOpenFileUrl(message.hash, message.filePath, panel);
+      break;
+
     default:
       console.error('Unknown message type:', message);
   }
@@ -1644,6 +1652,42 @@ async function handleCopyFileUrl(hash: string, filePath: string, panel: GitHisto
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to generate file URL: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleOpenCommitUrl(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const commitUrl = await getCommitUrl(hash, cwd);
+
+    if (!commitUrl) {
+      void vscode.window.showInformationMessage('Unable to generate commit URL. No remote configured or unsupported platform.');
+      return;
+    }
+
+    await vscode.env.openExternal(vscode.Uri.parse(commitUrl));
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to open commit URL: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleOpenFileUrl(hash: string, filePath: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const fileUrl = await getFileUrl(filePath, hash, cwd);
+
+    if (!fileUrl) {
+      void vscode.window.showInformationMessage('Unable to generate file URL. No remote configured or unsupported platform.');
+      return;
+    }
+
+    await vscode.env.openExternal(vscode.Uri.parse(fileUrl));
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to open file URL: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
