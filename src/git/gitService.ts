@@ -706,6 +706,17 @@ export async function deleteTagFromCommit(tagName: string, cwd: string): Promise
 }
 
 /**
+ * Delete a local branch
+ * @param branchName The name of the branch to delete
+ * @param cwd Working directory
+ * @param force If true, use -D to force delete even if not fully merged
+ */
+export async function deleteBranch(branchName: string, cwd: string, force: boolean = false): Promise<void> {
+  const args = force ? ['branch', '-D', branchName] : ['branch', '-d', branchName];
+  await execGit(args, cwd);
+}
+
+/**
  * Checkout an existing branch
  * @param branchName The name of the branch to checkout
  * @param cwd Working directory
