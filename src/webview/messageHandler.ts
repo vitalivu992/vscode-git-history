@@ -161,6 +161,10 @@ export async function handleMessage(
       handleCopySelectedHashes(message.hashes, panel);
       break;
 
+    case 'copyAllFilteredHashes':
+      handleCopyAllFilteredHashes(message.hashes, panel);
+      break;
+
     case 'copyFilterQuery':
       handleCopyFilterQuery(message.filterState, panel);
       break;
@@ -1479,6 +1483,21 @@ function handleCopySelectedHashes(hashes: string[], panel: GitHistoryPanel): voi
   const hashText = hashes.join('\n');
   void vscode.env.clipboard.writeText(hashText).then(() => {
     void vscode.window.showInformationMessage(`Copied ${hashes.length} commit hash${hashes.length > 1 ? 'es' : ''}`);
+  });
+}
+
+/**
+ * Handle copy all filtered hashes to clipboard
+ */
+function handleCopyAllFilteredHashes(hashes: string[], _panel: GitHistoryPanel): void {
+  if (hashes.length === 0) {
+    void vscode.window.showInformationMessage('No commits visible in current view');
+    return;
+  }
+
+  const hashText = hashes.join('\n');
+  void vscode.env.clipboard.writeText(hashText).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${hashes.length} filtered commit hash${hashes.length > 1 ? 'es' : ''}`);
   });
 }
 
