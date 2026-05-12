@@ -287,6 +287,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.deleteTag",
+        "title": "Git History: Delete Tag from Commit",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.checkoutBranch",
         "title": "Git History: Checkout Branch",
         "category": "Git History"

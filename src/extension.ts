@@ -185,6 +185,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.quickCompare', action: 'quickCompare' },
     { command: 'gitHistory.createBranch', action: 'createBranch' },
     { command: 'gitHistory.createTag', action: 'createTag' },
+    { command: 'gitHistory.deleteTag', action: 'deleteTag' },
     { command: 'gitHistory.checkoutBranch', action: 'checkoutBranch' },
     { command: 'gitHistory.toggleMyCommits', action: 'toggleMyCommits' },
     { command: 'gitHistory.toggleWordWrap', action: 'toggleWordWrap' },
