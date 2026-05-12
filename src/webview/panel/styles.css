@@ -1859,3 +1859,206 @@ body {
 .first-run-tip-dismiss:active {
   transform: scale(0.98);
 }
+
+/* ─── Filter Presets ───────────────────────────────────────────────────────────── */
+
+.save-preset-btn {
+  padding: 6px 12px;
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s;
+  white-space: nowrap;
+}
+
+.save-preset-btn:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.preset-dropdown-btn {
+  padding: 6px 12px;
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.preset-dropdown-btn:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.preset-save-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.preset-save-content {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 300px;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.preset-save-content h3 {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+.preset-save-input {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: var(--vscode-font-family);
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+
+.preset-save-input:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+.preset-save-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.preset-save-cancel,
+.preset-save-confirm {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.preset-save-cancel {
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+
+.preset-save-cancel:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.preset-save-confirm {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.preset-save-confirm:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.preset-dropdown-menu {
+  position: fixed;
+  background-color: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  min-width: 200px;
+}
+
+.preset-dropdown-empty {
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  text-align: center;
+}
+
+.preset-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.1s;
+  border-bottom: 1px solid var(--vscode-dropdown-border);
+}
+
+.preset-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.preset-dropdown-item:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.preset-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.preset-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-summary {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.preset-delete-btn {
+  padding: 2px 6px;
+  background-color: transparent;
+  color: var(--vscode-errorForeground);
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.preset-delete-btn:hover {
+  background-color: var(--vscode-errorBackground);
+}
+

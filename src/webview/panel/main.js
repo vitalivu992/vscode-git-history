@@ -28,6 +28,8 @@ let ignoreWhitespace = false; // Ignore whitespace in diffs
 let diffContextLines = 3; // Number of context lines in diffs (1-10)
 let commitFilesMap = new Map(); // hash -> CommitFileChange[]
 let firstRunTipVisible = false; // First-run tip banner visibility state
+let savedPresets = []; // Saved filter presets
+let presetDropdownVisible = false; // Preset dropdown visibility state
 
 /**
  * Parse filters from search query
@@ -303,6 +305,8 @@ const commitCountEl = document.getElementById('commit-count');
 const copyFilterQueryBtn = document.getElementById('copy-filter-query-btn');
 const pasteFilterQueryBtn = document.getElementById('paste-filter-query-btn');
 const clearAllFiltersBtn = document.getElementById('clear-all-filters-btn');
+const savePresetBtn = document.getElementById('save-preset-btn');
+const presetDropdownBtn = document.getElementById('preset-dropdown-btn');
 
 let isRefreshing = false;
 
@@ -1391,6 +1395,16 @@ function init() {
     clearAllFiltersBtn.addEventListener('click', clearAllFilters);
   }
 
+  const savePresetBtn = document.getElementById('save-preset-btn');
+  if (savePresetBtn) {
+    savePresetBtn.addEventListener('click', showSavePresetDialog);
+  }
+
+  const presetDropdownBtn = document.getElementById('preset-dropdown-btn');
+  if (presetDropdownBtn) {
+    presetDropdownBtn.addEventListener('click', showPresetDropdown);
+  }
+
   if (ignoreWsBtn) {
     ignoreWsBtn.addEventListener('click', handleIgnoreWhitespaceToggle);
   }
@@ -1671,6 +1685,11 @@ function handleMessage(event) {
         vscode.postMessage({ type: 'requestBranchHashes', branches: branches });
       }
 
+      // Initialize saved filter presets
+      if (message.savedPresets) {
+        savedPresets = message.savedPresets;
+      }
+
       renderBranchBadge();
       renderCommits();
       updateClearAllButton();
@@ -1723,6 +1742,11 @@ function handleMessage(event) {
 
     case 'selectCommit':
       handleSelectCommit(message.hash);
+      break;
+
+    case 'filterPresets':
+      savedPresets = message.presets || [];
+      renderPresetDropdown();
       break;
 
     case 'applyFilterQuery':
@@ -1799,6 +1823,8 @@ function handleMessage(event) {
         case 'clearAllFilters': clearAllFilters(); break;
         case 'openCommitUrl': handleOpenUrl(); break;
         case 'openFileUrl': handleOpenFileUrl(); break;
+        case 'saveFilterPreset': showSavePresetDialog(); break;
+        case 'loadFilterPreset': showPresetDropdown(); break;
       }
       break;
   }
@@ -4020,6 +4046,211 @@ function handleCopyDescribe() {
     return;
   }
   vscode.postMessage({ type: 'copyDescribe', hash: targetCommit.hash });
+}
+
+// ─── Filter Presets ───────────────────────────────────────────────────────────────
+
+function showSavePresetDialog() {
+  // Create modal dialog
+  const modal = document.createElement('div');
+  modal.id = 'preset-save-modal';
+  modal.className = 'preset-save-modal';
+  modal.innerHTML = `
+    <div class="preset-save-content">
+      <h3>Save Filter Preset</h3>
+      <input type="text" id="preset-name-input" class="preset-save-input" placeholder="Preset name (max 50 chars)" maxlength="50">
+      <div class="preset-save-buttons">
+        <button id="preset-save-cancel" class="preset-save-cancel">Cancel</button>
+        <button id="preset-save-confirm" class="preset-save-confirm">Save</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const input = modal.querySelector('#preset-name-input');
+  const cancelBtn = modal.querySelector('#preset-save-cancel');
+  const confirmBtn = modal.querySelector('#preset-save-confirm');
+
+  // Focus input
+  setTimeout(() => input.focus(), 50);
+
+  // Handle enter key
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      confirmBtn.click();
+    } else if (e.key === 'Escape') {
+      modal.remove();
+    }
+  });
+
+  // Handle cancel
+  cancelBtn.addEventListener('click', () => {
+    modal.remove();
+  });
+
+  // Handle save
+  confirmBtn.addEventListener('click', () => {
+    const name = input.value.trim();
+    if (!name) {
+      showError('Preset name cannot be empty');
+      return;
+    }
+
+    const filterState = {
+      query: searchQuery,
+      hideMergeCommits: hideMergeCommits,
+      sortMode: sortMode,
+      showMyCommitsOnly: showMyCommitsOnly
+    };
+
+    vscode.postMessage({
+      type: 'saveFilterPreset',
+      name: name,
+      filterState: filterState
+    });
+
+    modal.remove();
+  });
+
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+}
+
+function savePreset(name) {
+  const filterState = {
+    query: searchQuery,
+    hideMergeCommits: hideMergeCommits,
+    sortMode: sortMode,
+    showMyCommitsOnly: showMyCommitsOnly
+  };
+
+  vscode.postMessage({
+    type: 'saveFilterPreset',
+    name: name,
+    filterState: filterState
+  });
+}
+
+function showPresetDropdown() {
+  presetDropdownVisible = !presetDropdownVisible;
+  renderPresetDropdown();
+}
+
+function loadPreset(preset) {
+  vscode.postMessage({
+    type: 'applyPreset',
+    presetName: preset.name
+  });
+  presetDropdownVisible = false;
+  renderPresetDropdown();
+}
+
+function deletePreset(name) {
+  vscode.postMessage({
+    type: 'deleteFilterPreset',
+    name: name
+  });
+}
+
+function renderPresetDropdown() {
+  // Remove existing dropdown
+  const existing = document.getElementById('preset-dropdown-menu');
+  if (existing) {
+    existing.remove();
+  }
+
+  if (!presetDropdownVisible) {
+    return;
+  }
+
+  const btn = document.getElementById('preset-dropdown-btn');
+  if (!btn) {
+    return;
+  }
+
+  const dropdown = document.createElement('div');
+  dropdown.id = 'preset-dropdown-menu';
+  dropdown.className = 'preset-dropdown-menu';
+
+  if (savedPresets.length === 0) {
+    dropdown.innerHTML = '<div class="preset-dropdown-empty">No saved presets</div>';
+  } else {
+    savedPresets.forEach(preset => {
+      const item = document.createElement('div');
+      item.className = 'preset-dropdown-item';
+
+      const summary = getPresetSummary(preset);
+      const content = document.createElement('div');
+      content.className = 'preset-item-content';
+      content.innerHTML = `
+        <div class="preset-name">${escapeHtml(preset.name)}</div>
+        <div class="preset-summary">${summary}</div>
+      `;
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'preset-delete-btn';
+      deleteBtn.innerHTML = '×';
+      deleteBtn.title = 'Delete preset';
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deletePreset(preset.name);
+      });
+
+      item.appendChild(content);
+      item.appendChild(deleteBtn);
+      item.addEventListener('click', () => loadPreset(preset));
+
+      dropdown.appendChild(item);
+    });
+  }
+
+  // Position dropdown below the button
+  const rect = btn.getBoundingClientRect();
+  dropdown.style.top = `${rect.bottom + 5}px`;
+  dropdown.style.left = `${rect.left}px`;
+
+  document.body.appendChild(dropdown);
+
+  // Close dropdown when clicking outside
+  setTimeout(() => {
+    const closeHandler = (e) => {
+      if (!dropdown.contains(e.target) && e.target !== btn) {
+        dropdown.remove();
+        presetDropdownVisible = false;
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+    document.addEventListener('click', closeHandler);
+  }, 0);
+}
+
+function getPresetSummary(preset) {
+  const parts = [];
+  if (preset.filterState.query) {
+    parts.push(`"${escapeHtml(preset.filterState.query)}"`);
+  }
+  if (preset.filterState.hideMergeCommits) {
+    parts.push('No Merge');
+  }
+  if (preset.filterState.showMyCommitsOnly) {
+    parts.push('My Commits');
+  }
+  const sortLabels = ['Newest', 'Oldest', 'A-Z', 'Z-A'];
+  if (preset.filterState.sortMode >= 0 && preset.filterState.sortMode < 4) {
+    parts.push(sortLabels[preset.filterState.sortMode]);
+  }
+  return parts.length > 0 ? parts.join(' • ') : 'Default filters';
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // Initialize on load
