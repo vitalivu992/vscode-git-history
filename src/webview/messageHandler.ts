@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo, FilterQueryState } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -252,6 +252,10 @@ export async function handleMessage(
 
     case 'copyCommitRef':
       handleCopyCommitRef(message.hash, panel);
+      break;
+
+    case 'copyFileUrl':
+      await handleCopyFileUrl(message.hash, message.filePath, panel);
       break;
 
     default:
@@ -1617,4 +1621,29 @@ function handleCopyCommitRef(hash: string, panel: GitHistoryPanel): void {
   void vscode.env.clipboard.writeText(ref).then(() => {
     void vscode.window.showInformationMessage(`Commit reference copied: ${commit.shortHash}`);
   });
+}
+
+async function handleCopyFileUrl(hash: string, filePath: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const commit = panel.getCommits().find(c => c.hash === hash);
+    if (!commit) {
+      void vscode.window.showInformationMessage('Commit not found');
+      return;
+    }
+
+    const cwd = panel.getCwd();
+    const fileUrl = await getFileUrl(filePath, hash, cwd);
+
+    if (!fileUrl) {
+      void vscode.window.showInformationMessage('Unable to generate file URL');
+      return;
+    }
+
+    await vscode.env.clipboard.writeText(fileUrl);
+    void vscode.window.showInformationMessage(`File URL copied: ${commit.shortHash}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to generate file URL: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 }

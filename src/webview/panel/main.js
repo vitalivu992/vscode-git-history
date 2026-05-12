@@ -400,9 +400,16 @@ function handleKeyDown(e) {
   }
 
   // Ctrl+Shift+U: Copy revert command
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'u') {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey && e.key === 'u') {
     e.preventDefault();
     handleCopyRevert();
+    return;
+  }
+
+  // Ctrl+Alt+Shift+U: Copy file URL
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.shiftKey && e.key === 'u') {
+    e.preventDefault();
+    handleCopyFileUrl();
     return;
   }
 
@@ -1764,6 +1771,7 @@ function handleMessage(event) {
         case 'copyRelativePath': handleCopyRelativePath(); break;
         case 'copyFileDiff': handleCopyFileDiff(); break;
         case 'copyFileContent': handleCopyFileContent(); break;
+        case 'copyFileUrl': handleCopyFileUrl(); break;
         case 'copyDescribe': handleCopyDescribe(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
@@ -2265,6 +2273,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy relative path</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-url">
+      <span class="context-menu-icon">🔗</span>
+      <span class="context-menu-label">Copy file permalink</span>
+    </div>
   `;
 
   // Position the menu at click location
@@ -2319,6 +2331,12 @@ function showFileContextMenu(event, filePath, commitHash) {
       } else if (action === 'copy-relative-path') {
         vscode.postMessage({
           type: 'copyRelativePath',
+          filePath: filePath
+        });
+      } else if (action === 'copy-file-url') {
+        vscode.postMessage({
+          type: 'copyFileUrl',
+          hash: commitHash,
           filePath: filePath
         });
       }
@@ -3891,6 +3909,26 @@ function handleCopyFileContent() {
     return;
   }
   vscode.postMessage({ type: 'copyFileContent', hash: targetCommit.hash, filePath: selectedFile });
+}
+
+function handleCopyFileUrl() {
+  if (!selectedFile) {
+    showError('Select a file to copy its URL');
+    return;
+  }
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+  if (!targetCommit) {
+    showError('Select a commit to copy file URL');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFileUrl', hash: targetCommit.hash, filePath: selectedFile });
 }
 
 function handleCopyDescribe() {

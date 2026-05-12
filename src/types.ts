@@ -124,7 +124,8 @@ export type WebviewAction =
   | 'copyCombinedDiff'
   | 'copyRangeDiff'
   | 'copyCommitMention'
-  | 'copyCommitRef';
+  | 'copyCommitRef'
+  | 'copyFileUrl';
 
 /**
  * Filter state for copy filter query feature
@@ -214,4 +215,5 @@ export type WebviewToExtMessage =
   | { type: 'copyCombinedDiff'; hashes: string[] }
   | { type: 'copyRangeDiff'; fromHash: string; toHash: string }
   | { type: 'copyCommitMention'; hash: string }
-  | { type: 'copyCommitRef'; hash: string };
+  | { type: 'copyCommitRef'; hash: string }
+  | { type: 'copyFileUrl'; hash: string; filePath: string };

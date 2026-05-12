@@ -232,6 +232,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFileUrl",
+        "title": "Git History: Copy File Permalink",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyFilterQuery",
         "title": "Git History: Copy Filter Query",
         "category": "Git History"
@@ -577,6 +582,12 @@
         "command": "gitHistory.copyRelativePath",
         "key": "ctrl+alt+l",
         "mac": "cmd+alt+l",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFileUrl",
+        "key": "ctrl+alt+shift+u",
+        "mac": "cmd+alt+shift+u",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

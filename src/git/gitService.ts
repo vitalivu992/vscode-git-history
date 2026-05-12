@@ -672,3 +672,44 @@ export async function createTagFromCommit(
 export async function checkoutBranch(branchName: string, cwd: string): Promise<void> {
   await execGit(['checkout', branchName], cwd);
 }
+
+/**
+ * Generate a web URL for browsing a file at a specific commit
+ * Auto-detects the git remote and generates platform-specific file URLs
+ * @param filePath The file path (absolute or relative to cwd)
+ * @param hash The commit hash
+ * @param cwd Working directory
+ * @param remote Remote name (default: 'origin')
+ * @returns File URL or null if unable to generate
+ */
+export async function getFileUrl(
+  filePath: string,
+  hash: string,
+  cwd: string,
+  remote = 'origin'
+): Promise<string | null> {
+  const remoteUrl = await getRemoteUrl(cwd, remote);
+  if (!remoteUrl) {
+    return null;
+  }
+
+  const remoteInfo = parseRemoteUrl(remoteUrl);
+  if (!remoteInfo || remoteInfo.platform === 'unknown') {
+    return null;
+  }
+
+  const shortHash = hash.substring(0, 7);
+  // Ensure path starts with / and remove leading ./
+  const normalizedPath = filePath.startsWith('./') ? filePath.slice(2) : filePath;
+
+  switch (remoteInfo.platform) {
+    case 'github':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/blob/${shortHash}/${normalizedPath}`;
+    case 'gitlab':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/-/blob/${shortHash}/${normalizedPath}`;
+    case 'bitbucket':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/src/${shortHash}/${normalizedPath}`;
+    default:
+      return null;
+  }
+}
