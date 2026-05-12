@@ -292,6 +292,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.deleteBranch",
+        "title": "Git History: Delete Branch",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.checkoutBranch",
         "title": "Git History: Checkout Branch",
         "category": "Git History"
@@ -678,6 +683,12 @@
         "command": "gitHistory.quickCompare",
         "key": "ctrl+alt+p",
         "mac": "cmd+alt+p",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.deleteBranch",
+        "key": "ctrl+alt+x",
+        "mac": "cmd+alt+x",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
