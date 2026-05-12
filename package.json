@@ -222,6 +222,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFileExtension",
+        "title": "Git History: Copy File Extension",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyRelativePath",
         "title": "Git History: Copy Relative File Path",
         "category": "Git History"
@@ -560,6 +565,12 @@
         "command": "gitHistory.copyFileName",
         "key": "ctrl+shift+,",
         "mac": "cmd+shift+,",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFileExtension",
+        "key": "ctrl+alt+e",
+        "mac": "cmd+alt+e",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
