@@ -214,4 +214,40 @@ src/file.ts | 10 ++++++-----
     assert.strictEqual(result.insertions, 0);
     assert.strictEqual(result.deletions, 0);
   });
+
+  test('parseCommitStats should handle malformed numbers gracefully', () => {
+    const statLine = 'abc files changed, xyz insertions(+), def deletions(-)';
+    const result = parseCommitStats(statLine);
+
+    assert.strictEqual(result.filesChanged, 0);
+    assert.strictEqual(result.insertions, 0);
+    assert.strictEqual(result.deletions, 0);
+  });
+
+  test('parseCommitStats should handle partially malformed stat line', () => {
+    const statLine = 'abc files changed, 5 insertions(+)';
+    const result = parseCommitStats(statLine);
+
+    assert.strictEqual(result.filesChanged, 0);
+    assert.strictEqual(result.insertions, 5);
+    assert.strictEqual(result.deletions, 0);
+  });
+
+  test('parseCommitStats should handle stat line with only numbers (no text)', () => {
+    const statLine = '5 10 3';
+    const result = parseCommitStats(statLine);
+
+    assert.strictEqual(result.filesChanged, 0);
+    assert.strictEqual(result.insertions, 0);
+    assert.strictEqual(result.deletions, 0);
+  });
+
+  test('parseCommitStats should handle zero values correctly', () => {
+    const statLine = '0 files changed, 0 insertions(+), 0 deletions(-)';
+    const result = parseCommitStats(statLine);
+
+    assert.strictEqual(result.filesChanged, 0);
+    assert.strictEqual(result.insertions, 0);
+    assert.strictEqual(result.deletions, 0);
+  });
 });

@@ -31,19 +31,22 @@ export function parseCommitStats(statLine: string): ParsedStats {
   // Match files changed: handles "file" or "files", numbers may include commas (e.g., "1,500")
   const filesMatch = statLine.match(/([\d,]+)\s+file[s]?\s+changed/);
   if (filesMatch) {
-    result.filesChanged = parseInt(filesMatch[1].replace(/,/g, ''), 10);
+    const parsed = parseInt(filesMatch[1].replace(/,/g, ''), 10);
+    result.filesChanged = isNaN(parsed) ? 0 : Math.max(0, parsed);
   }
 
   // Match insertions: handles "insertion" or "insertions"
   const insertionsMatch = statLine.match(/([\d,]+)\s+insertion[s]?\s*\(\+\)/);
   if (insertionsMatch) {
-    result.insertions = parseInt(insertionsMatch[1].replace(/,/g, ''), 10);
+    const parsed = parseInt(insertionsMatch[1].replace(/,/g, ''), 10);
+    result.insertions = isNaN(parsed) ? 0 : Math.max(0, parsed);
   }
 
   // Match deletions: handles "deletion" or "deletions"
   const deletionsMatch = statLine.match(/([\d,]+)\s+deletion[s]?\s*\(-\)/);
   if (deletionsMatch) {
-    result.deletions = parseInt(deletionsMatch[1].replace(/,/g, ''), 10);
+    const parsed = parseInt(deletionsMatch[1].replace(/,/g, ''), 10);
+    result.deletions = isNaN(parsed) ? 0 : Math.max(0, parsed);
   }
 
   return result;
