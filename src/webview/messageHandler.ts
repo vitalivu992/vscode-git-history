@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl, getCommitsAsMbox } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl, getCommitsAsMbox } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
 import { SettingsService, UserSettings, MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -227,6 +227,10 @@ export async function handleMessage(
 
     case 'deleteTag':
       await handleDeleteTag(message.hash, panel);
+      break;
+
+    case 'deleteBranch':
+      await handleDeleteBranch(message.branch, panel, message.force);
       break;
 
     case 'checkoutBranch':
@@ -1631,6 +1635,55 @@ async function handleDeleteTag(hash: string, panel: GitHistoryPanel): Promise<vo
     } catch (error) {
       void vscode.window.showErrorMessage(
         `Failed to delete tag: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+}
+
+async function handleDeleteBranch(branchName: string, panel: GitHistoryPanel, force: boolean = false): Promise<void> {
+  const currentBranch = panel.getBranch();
+
+  if (!currentBranch) {
+    void vscode.window.showErrorMessage('No branch detected');
+    return;
+  }
+
+  if (branchName === currentBranch) {
+    void vscode.window.showErrorMessage('Cannot delete the current branch');
+    return;
+  }
+
+  // Confirm deletion
+  const confirm = await vscode.window.showInformationMessage(
+    force ? `Force delete branch "${branchName}"?` : `Delete branch "${branchName}"?`,
+    { modal: true },
+    'Delete'
+  );
+
+  if (confirm !== 'Delete') {
+    return;
+  }
+
+  try {
+    await deleteBranch(branchName, panel.getCwd(), force);
+    void vscode.window.showInformationMessage(`Branch "${branchName}" deleted`);
+    await panel.loadData();
+  } catch (error) {
+    // Check if it's a "not fully merged" error - offer force delete
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (!force && errorMessage.includes('not fully merged')) {
+      const forceDelete = await vscode.window.showInformationMessage(
+        `Branch "${branchName}" is not fully merged. Force delete?`,
+        { modal: true },
+        'Force Delete'
+      );
+      if (forceDelete === 'Force Delete') {
+        await handleDeleteBranch(branchName, panel, true);
+        return;
+      }
+    } else {
+      void vscode.window.showErrorMessage(
+        `Failed to delete branch: ${errorMessage}`
       );
     }
   }
