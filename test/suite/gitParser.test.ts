@@ -3,7 +3,7 @@ import { parseGitLog, parseNameStatus, parseLineHistoryLog, isBinaryFile } from 
 
 suite('Git Parser Tests', () => {
   test('parseGitLog should parse commit blocks', () => {
-    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00---COMMIT-END---%n
+    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n
     // Note: hashes must be valid hex (0-9, a-f) for the parser to accept them
     // commit1 is a root commit (no parents), commit2 has commit1 as parent
     const commit1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x001234567890\x00Initial commit\x00\x00\x00---COMMIT-END---';
@@ -67,15 +67,15 @@ suite('Git Parser Tests', () => {
   });
 
   test('parseLineHistoryLog should parse -L output', () => {
-    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d (one header line per commit, diff lines have no nulls)
+    // Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d%x00%G?%x00%GS (one header line per commit, diff lines have no nulls)
     const hash1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
     const hash2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0';
     const input = [
-      `${hash1}\x00${hash2}\x00John Doe\x00john@example.com\x001234567890\x00Added line\x00`,
+      `${hash1}\x00${hash2}\x00John Doe\x00john@example.com\x001234567890\x00Added line\x00\x00G\x00Alice <alice@example.com>`,
       'diff --git a/file.ts b/file.ts',
       '--- a/file.ts',
       '+++ b/file.ts',
-      `${hash2}\x00\x00Jane Smith\x00jane@example.com\x001234567900\x00Modified line\x00`,
+      `${hash2}\x00\x00Jane Smith\x00jane@example.com\x001234567900\x00Modified line\x00\x00N\x00\x00`,
     ].join('\n');
 
     const commits = parseLineHistoryLog(input);
@@ -85,9 +85,12 @@ suite('Git Parser Tests', () => {
     assert.strictEqual(commits[0].author, 'John Doe');
     assert.strictEqual(commits[0].message, 'Added line');
     assert.deepStrictEqual(commits[0].parentHashes, [hash2]);
+    assert.strictEqual(commits[0].signature?.verified, true);
+    assert.strictEqual(commits[0].signature?.signer, 'Alice <alice@example.com>');
     assert.strictEqual(commits[1].hash, hash2);
     assert.strictEqual(commits[1].message, 'Modified line');
     assert.deepStrictEqual(commits[1].parentHashes, []);
+    assert.strictEqual(commits[1].signature, undefined);
   });
 
   test('parseLineHistoryLog should handle empty input', () => {
@@ -223,5 +226,64 @@ suite('Git Parser Tests', () => {
 
     assert.strictEqual(commits.length, 1);
     assert.deepStrictEqual(commits[0].parentHashes, ['parent1', 'parent2']);
+  });
+
+  test('parseGitLog should parse GPG signature status (verified)', () => {
+    // G = good/verified signature, with signer name
+    const commitWithSig = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
+      'John Doe\x00john@example.com\x001234567890\x00Signed commit\x00\x00\x00G\x00Alice Smith <alice@example.com>\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitWithSig);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].signature?.verified, true);
+    assert.strictEqual(commits[0].signature?.signer, 'Alice Smith <alice@example.com>');
+  });
+
+  test('parseGitLog should parse invalid signature', () => {
+    // B = bad signature
+    const commitBadSig = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
+      'John Doe\x00john@example.com\x001234567890\x00Bad signed commit\x00\x00\x00B\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitBadSig);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].signature?.verified, false);
+    assert.strictEqual(commits[0].signature?.signer, null);
+  });
+
+  test('parseGitLog should handle unsigned commits (N)', () => {
+    // N = no signature
+    const commitUnsigned = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
+      'John Doe\x00john@example.com\x001234567890\x00Unsigned commit\x00\x00\x00N\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitUnsigned);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].signature, undefined);
+  });
+
+  test('parseGitLog should handle expired signature (X)', () => {
+    // X = good signature that has expired
+    const commitExpiredSig = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
+      'John Doe\x00john@example.com\x001234567890\x00Expired sig commit\x00\x00\x00X\x00Bob <bob@example.com>\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitExpiredSig);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].signature?.verified, false);
+    assert.strictEqual(commits[0].signature?.signer, 'Bob <bob@example.com>');
+  });
+
+  test('parseGitLog should handle untrusted signature (U)', () => {
+    // U = good signature with unknown validity
+    const commitUntrustedSig = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00' +
+      'John Doe\x00john@example.com\x001234567890\x00Untrusted sig\x00\x00\x00U\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commitUntrustedSig);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].signature?.verified, false);
+    assert.strictEqual(commits[0].signature?.signer, null);
   });
 });
