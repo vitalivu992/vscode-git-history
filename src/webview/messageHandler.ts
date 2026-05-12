@@ -928,7 +928,7 @@ async function handleCopyCommitUrl(hash: string, panel: GitHistoryPanel): Promis
     const remoteInfo = parseRemoteUrl(remoteUrl);
     if (!remoteInfo || remoteInfo.platform === 'unknown') {
       void vscode.window.showInformationMessage(
-        'Unable to detect git platform. Supported: GitHub, GitLab, Bitbucket.'
+        'Unable to detect git platform. Supported: GitHub, GitLab, Bitbucket, Azure DevOps.'
       );
       return;
     }
