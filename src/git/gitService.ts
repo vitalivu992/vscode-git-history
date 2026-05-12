@@ -48,7 +48,7 @@ export async function getFileHistory(filePath: string, cwd: string): Promise<Com
   const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   // Use %x00 as field separator for cleaner parsing
-  const format = '%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n';
+  const format = '%H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n';
 
   const args = [
     'log',
@@ -92,7 +92,7 @@ export async function getSelectionHistory(
   const args = [
     'log',
     `-L${startLine},${endLine}:${relativePath}`,
-    '--format=%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d%x00%G?%x00%GS'
+    '--format=%H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%d%x00%G?%x00%GS'
   ];
 
   const output = await execGit(args, cwd);
@@ -544,6 +544,18 @@ export function parseRemoteUrl(remoteUrl: string): GitRemoteInfo | null {
   if (match) {
     const [, host, sshOwner, sshRepo] = match;
     const platform = detectPlatform(host);
+    const baseUrl = `https://${host}`;
+    return { platform, baseUrl, owner: sshOwner, repo: sshRepo };
+  }
+
+  // Try ssh:// URL format with optional port: ssh://git@host:port/owner/repo.git
+  // Must be checked AFTER Azure-specific patterns but BEFORE SCP-like pattern
+  const sshUrlPattern = /^ssh:\/\/(?:git@)?([^:/?]+)(?::(\d+))?\/([^/]+)\/(.+?)(?:\.git)?$/;
+  match = remoteUrl.match(sshUrlPattern);
+  if (match) {
+    const [, host, port, sshOwner, sshRepo] = match;
+    const platform = detectPlatform(host);
+    // Port is intentionally excluded from baseUrl as git hosting platforms don't use custom ports for web URLs
     const baseUrl = `https://${host}`;
     return { platform, baseUrl, owner: sshOwner, repo: sshRepo };
   }

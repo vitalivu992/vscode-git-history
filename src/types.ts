@@ -28,6 +28,8 @@ export interface CommitInfo {
   parentHashes: string[];
   author: string;
   email: string;
+  committer?: string;
+  committerEmail?: string;
   date: string;
   message: string;
   fullMessage: string;
@@ -147,7 +149,9 @@ export type WebviewAction =
   | 'loadFilterPreset'
   | 'toggleGraph'
   | 'toggleSignatures'
-  | 'copyAllFilteredHashes';
+  | 'copyAllFilteredHashes'
+  | 'copyCommitterEmail'
+  | 'copyCommitterName';
 
 /**
  * Filter state for copy filter query feature
@@ -226,6 +230,8 @@ export type WebviewToExtMessage =
   | { type: 'copySelectedHashes'; hashes: string[] }
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyAuthorName'; hash: string }
+  | { type: 'copyCommitterEmail'; hash: string }
+  | { type: 'copyCommitterName'; hash: string }
   | { type: 'copyParentHash'; hash: string }
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }
