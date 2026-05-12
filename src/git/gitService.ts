@@ -398,6 +398,19 @@ export async function getCommitPatch(
 }
 
 /**
+ * Export multiple commits as mbox format (RFC 822 patches)
+ * Uses git format-patch to generate email-friendly output for git am
+ */
+export async function getCommitsAsMbox(
+  fromHash: string,
+  toHash: string,
+  cwd: string
+): Promise<string> {
+  const args = ['format-patch', '--stdout', `${fromHash}^..${toHash}`];
+  return execGit(args, cwd);
+}
+
+/**
  * Get diff between two specific commits (fromHash..toHash)
  * Shows all changes between two arbitrary commits
  */

@@ -107,6 +107,7 @@ export type WebviewAction =
   | 'copyRelativePath'
   | 'copyFileDiff'
   | 'exportCommits'
+  | 'exportCommitsMbox'
   | 'quickCompare'
   | 'createBranch'
   | 'createTag'
@@ -228,6 +229,7 @@ export type WebviewToExtMessage =
   | { type: 'deleteTag'; hash: string }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
   | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown'; commits: CommitInfo[] }
+  | { type: 'exportCommitsMbox'; fromHash: string; toHash: string }
   | { type: 'requestBranchHashes'; branches: string[] }
   | { type: 'checkoutBranch'; branch: string }
   | { type: 'changeDiffContextLines'; value: number }

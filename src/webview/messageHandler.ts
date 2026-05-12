@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl, getCommitsAsMbox } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
 import { SettingsService, UserSettings, MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -235,6 +235,10 @@ export async function handleMessage(
 
     case 'exportCommits':
       await handleExportCommits(message.format, message.commits, panel);
+      break;
+
+    case 'exportCommitsMbox':
+      await handleExportCommitsMbox(message.fromHash, message.toHash, panel);
       break;
 
     case 'dismissFirstRunTip':
@@ -938,6 +942,38 @@ async function handleExportCommits(
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to export commits: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle exporting commits as mbox format
+ * Uses git format-patch to generate RFC 822 patches
+ */
+async function handleExportCommitsMbox(
+  fromHash: string,
+  toHash: string,
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const uri = await vscode.window.showSaveDialog({
+      defaultUri: vscode.Uri.file(path.join(panel.getCwd(), 'commits.mbox')),
+      filters: { 'Mbox': ['mbox'] }
+    });
+
+    if (!uri) {
+      return;
+    }
+
+    const content = await getCommitsAsMbox(fromHash, toHash, panel.getCwd());
+    await fs.promises.writeFile(uri.fsPath, content, 'utf-8');
+
+    void vscode.window.showInformationMessage(
+      `Exported commits as mbox to ${path.basename(uri.fsPath)}`
+    );
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to export mbox: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
