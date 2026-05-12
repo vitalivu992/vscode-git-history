@@ -218,6 +218,8 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Copy branch name to clipboard |
 | `Ctrl+Alt+D` / `Cmd+Alt+D` | Copy combined diff to clipboard (2+ commits selected) |
 | `Ctrl+Alt+F` / `Cmd+Alt+F` | Copy file diff to clipboard (for focused file in changed files list) |
+| `Ctrl+Alt+C` / `Cmd+Alt+C` | Copy file content at commit to clipboard (for focused file in changed files list) |
+| `Ctrl+Alt+G` / `Cmd+Alt+G` | Copy git describe to clipboard |
 | `Ctrl+Alt+L` / `Cmd+Alt+L` | Copy relative file path to clipboard |
 | `Ctrl+Alt+O` / `Cmd+Alt+O` | Copy remote URL to clipboard |
 | `Ctrl+Alt+Q` / `Cmd+Alt+Q` | Clear all filters |
@@ -339,6 +341,8 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy combined diff | `Ctrl+Alt+D` / `Cmd+Alt+D` (2+ selected) |
 | Copy range diff | `Ctrl+Alt+R` / `Cmd+Alt+R` (range selected) |
 | Copy file diff | `Ctrl+Alt+F` / `Cmd+Alt+F` |
+| Copy file content | `Ctrl+Alt+C` / `Cmd+Alt+C` |
+| Copy git describe | `Ctrl+Alt+G` / `Cmd+Alt+G` |
 | Copy selected hashes | `Ctrl+Shift+;` / `Cmd+Shift+;` (when 2+ selected) |
 | Clear selection | `Escape` |
 
