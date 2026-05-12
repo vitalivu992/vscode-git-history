@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo, FilterQueryState } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -187,6 +187,10 @@ export async function handleMessage(
 
     case 'copyFileContent':
       await handleCopyFileContent(message.hash, message.filePath, panel);
+      break;
+
+    case 'copyDescribe':
+      await handleCopyDescribe(message.hash, panel);
       break;
 
     case 'copyFileDiff':
@@ -586,6 +590,27 @@ async function handleCopyFileContent(
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to copy file content: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleCopyDescribe(
+  hash: string,
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const describe = await getCommitDescribe(hash, cwd);
+
+    if (describe) {
+      await vscode.env.clipboard.writeText(describe);
+      void vscode.window.showInformationMessage(`Copied git describe: ${describe}`);
+    } else {
+      void vscode.window.showInformationMessage('Failed to get git describe');
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to get git describe: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }

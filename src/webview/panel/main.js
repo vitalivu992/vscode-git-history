@@ -448,6 +448,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Alt+G: Copy git describe
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'g') {
+    e.preventDefault();
+    handleCopyDescribe();
+    return;
+  }
+
   // Ctrl+Alt+B: Copy branch name
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'b') {
     e.preventDefault();
@@ -1740,6 +1747,7 @@ function handleMessage(event) {
         case 'copyRelativePath': handleCopyRelativePath(); break;
         case 'copyFileDiff': handleCopyFileDiff(); break;
         case 'copyFileContent': handleCopyFileContent(); break;
+        case 'copyDescribe': handleCopyDescribe(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
         case 'createBranch': handleCreateBranch(); break;
@@ -2346,6 +2354,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📄</span>
       <span class="context-menu-label">Copy commit diff</span>
     </div>
+    <div class="context-menu-item" data-action="copy-describe">
+      <span class="context-menu-icon">🏷️</span>
+      <span class="context-menu-label">Copy as Git Describe</span>
+    </div>
     <div class="context-menu-item" data-action="copy-patch">
       <span class="context-menu-icon">🩹</span>
       <span class="context-menu-label">Copy as patch</span>
@@ -2476,6 +2488,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitFiles', hash: commit.hash });
       } else if (action === 'copy-diff') {
         vscode.postMessage({ type: 'copyCommitDiff', hash: commit.hash });
+      } else if (action === 'copy-describe') {
+        vscode.postMessage({ type: 'copyDescribe', hash: commit.hash });
       } else if (action === 'copy-patch') {
         vscode.postMessage({ type: 'copyCommitPatch', hash: commit.hash });
       } else if (action === 'copy-url') {
@@ -3804,6 +3818,22 @@ function handleCopyFileContent() {
     return;
   }
   vscode.postMessage({ type: 'copyFileContent', hash: targetCommit.hash, filePath: selectedFile });
+}
+
+function handleCopyDescribe() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+  if (!targetCommit) {
+    showError('Select a commit to copy git describe');
+    return;
+  }
+  vscode.postMessage({ type: 'copyDescribe', hash: targetCommit.hash });
 }
 
 // Initialize on load

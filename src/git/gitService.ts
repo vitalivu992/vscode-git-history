@@ -372,6 +372,19 @@ export async function getFileContentAtCommit(
 }
 
 /**
+ * Get commit as git describe output
+ * Returns the nearest tag, number of commits since that tag, and abbreviated hash
+ * e.g., v1.2.3-45-gabcdef1
+ */
+export async function getCommitDescribe(
+  hash: string,
+  cwd: string
+): Promise<string> {
+  const output = await execGit(['describe', '--always', '--long', '--tags', hash], cwd);
+  return output;
+}
+
+/**
  * Get commit as a patch (format-patch output)
  * Returns a unified diff with git headers suitable for git apply or git am
  */
