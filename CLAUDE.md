@@ -313,8 +313,26 @@ Tests use VS Code's test framework with Mocha. Run with `npm test` or `make test
 Unit tests for pure parsing functions are located in:
 - `test/suite/gitParser.test.ts` - Tests for `parseGitLog`, `parseNameStatus`, `parseLineHistoryLog`, `isBinaryFile`
 - `test/suite/gitStatsParser.test.ts` - Tests for `parseCommitStats`, `extractStatsFromCommitBlock`, `parseMultipleCommitStats`
+- `test/suite/messageHandlerUtils.test.ts` - Tests for utility functions in `messageHandler.ts`
 
 These tests validate edge cases in git output parsing without requiring actual git operations.
+
+### Testing messageHandlerUtils
+
+The `test/suite/messageHandlerUtils.test.ts` file contains unit tests for pure utility functions in `src/webview/messageHandler.ts`:
+
+**Export Formatting Functions:**
+- `escapeCsvField()` - CSV field escaping for commas, quotes, newlines
+- `formatCommitsAsJson()` - JSON formatting with 2-space indentation
+- `formatCommitsAsCsv()` - CSV formatting with proper field escaping
+- `formatCommitsAsMarkdown()` - Markdown changelog formatting for multiple commits
+- `formatCommitAsMarkdown()` - Markdown formatting for single commit with relative/absolute dates
+
+**Utility Functions:**
+- `extractCoAuthors()` - Extracts "Co-authored-by:" trailers from commit messages
+- `validatePresetName()` - Validates saved filter preset names (length, invalid characters, duplicates)
+
+These functions are pure (no side effects) and can be tested with simple input/output assertions using sample `CommitInfo` data.
 
 ### Testing SettingsService
 
