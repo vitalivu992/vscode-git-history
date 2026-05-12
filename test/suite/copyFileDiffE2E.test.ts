@@ -243,4 +243,20 @@ suite('Copy File Diff E2E Source Integration Tests', () => {
     assert.ok(keybinding.includes('activeWebviewPanelId == gitHistory.webview'),
       'copyFileDiff keybinding should be scoped to webview');
   });
+
+  test('main.js triggerAction should dispatch copyFileDiff', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("case 'copyFileDiff': handleCopyFileDiff()"),
+      'main.js triggerAction should dispatch copyFileDiff');
+  });
+
+  test('main.js should have handleCopyFileDiff function', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('function handleCopyFileDiff'),
+      'main.js should have handleCopyFileDiff function');
+  });
 });

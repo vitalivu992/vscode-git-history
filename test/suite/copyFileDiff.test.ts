@@ -178,4 +178,40 @@ suite('Copy File Diff Feature Tests', () => {
       'handleCopyFileDiff should show both info and error messages'
     );
   });
+
+  test('main.js should have handleCopyFileDiff function', () => {
+    const mainJsContent = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(
+      mainJsContent.includes('function handleCopyFileDiff'),
+      'main.js should have handleCopyFileDiff function'
+    );
+  });
+
+  test('main.js triggerAction should dispatch copyFileDiff', () => {
+    const mainJsContent = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(
+      mainJsContent.includes("case 'copyFileDiff': handleCopyFileDiff()"),
+      'main.js triggerAction should dispatch copyFileDiff'
+    );
+  });
+
+  test('handleCopyFileDiff should use selectedFile and get target commit', () => {
+    const mainJsContent = fs.readFileSync(mainJsPath, 'utf-8');
+
+    // Find the handleCopyFileDiff function
+    const fnStart = mainJsContent.indexOf('function handleCopyFileDiff');
+    const fnEnd = mainJsContent.indexOf('\nfunction', fnStart + 1);
+    const fnBody = mainJsContent.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
+
+    assert.ok(
+      fnBody.includes('selectedFile'),
+      'handleCopyFileDiff should check selectedFile'
+    );
+    assert.ok(
+      fnBody.includes('getOrderedCommits(getFilteredCommits())'),
+      'handleCopyFileDiff should use getOrderedCommits(getFilteredCommits())'
+    );
+  });
 });
