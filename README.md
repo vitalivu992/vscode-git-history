@@ -194,6 +194,8 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy file content** | Copy the full content of a file at the selected commit to clipboard |
 | **Copy file path** | Copy the full file path to clipboard |
 | **Copy file name only** | Copy just the filename (e.g., `main.js`) to clipboard |
+| **Copy file extension** | Copy just the file extension (e.g., `ts` from `main.ts`) to clipboard |
+| **Copy file directory** | Copy the directory path containing the file (with trailing separator, e.g., `src/webview/panel/`) |
 | **Copy relative path** | Copy the file path relative to the git repository root (e.g., `src/webview/panel/main.js`) |
 | **Copy file permalink** | Copy permanent web URL for the file at the selected commit (GitHub/GitLab/Bitbucket) |
 
@@ -229,6 +231,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Alt+F` / `Cmd+Alt+F` | Copy file diff to clipboard (for focused file in changed files list) |
 | `Ctrl+Alt+C` / `Cmd+Alt+C` | Copy file content at commit to clipboard (for focused file in changed files list) |
 | `Ctrl+Alt+G` / `Cmd+Alt+G` | Copy git describe to clipboard |
+| `Ctrl+Alt+K` / `Cmd+Alt+K` | Copy file directory to clipboard (for focused file in changed files list) |
 | `Ctrl+Alt+L` / `Cmd+Alt+L` | Copy relative file path to clipboard |
 | `Ctrl+Alt+O` / `Cmd+Alt+O` | Copy remote URL to clipboard |
 | `Ctrl+Alt+Q` / `Cmd+Alt+Q` | Clear all filters |
