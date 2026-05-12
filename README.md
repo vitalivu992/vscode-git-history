@@ -53,6 +53,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Commit as Patch**: Copy the commit as a unified diff patch (with git headers) suitable for `git apply` or `git am` with `Ctrl+Shift+E` / `Cmd+Shift+E` keyboard shortcut, or right-click on any commit
 - **Copy Commit URL**: Copy the web URL for a commit to share with others. Automatically detects GitHub, GitLab, and Bitbucket remotes (including self-hosted instances). Use `Ctrl+Shift+L` / `Cmd+Shift+L` or right-click on any commit
 - **📢 Copy as Platform Mention**: Copy the commit in platform-specific mention format (e.g., `owner/repo@1b55bc0`) for use in issues, pull requests, and team discussions. Supports GitHub, GitLab, and Bitbucket. Use `Ctrl+Shift+@` / `Cmd+Shift+@` or right-click on any commit
+- **🔗 Copy Commit Reference**: Copy the commit in canonical Git reference format (`refs/commit/<hash>`) to clipboard. Useful for Git submodule configurations, Git notes references, portable commit references in scripts, and Git blame references. Use `Ctrl+Shift+]` / `Cmd+Shift+]` or right-click on any commit
 - **Copy Commit Stats**: Copy commit statistics (files changed, insertions, deletions) to clipboard with `Ctrl+Shift+S` / `Cmd+Shift+S` keyboard shortcut, or right-click on any commit
 - **Quick Compare with Parent**: Instantly compare the selected commit with its parent to see what changed in that specific commit. Use the "Compare" button or press `Ctrl+Alt+P` / `Cmd+Alt+P`. For root commits (first commit), an error is shown since there's no parent.
 - **Create Branch from Commit**: Right-click on any commit to create a new branch at that point in history. You'll be prompted for a branch name, and the branch will be created at the selected commit using `git branch <name> <hash>`.
@@ -216,6 +217,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
 | `Ctrl+Shift+@` / `Cmd+Shift+@` | Copy as platform mention (`owner/repo@hash`) |
+| `Ctrl+Shift+]` / `Cmd+Shift+]` | Copy commit reference (`refs/commit/<hash>`) |
 | `Ctrl+Shift+M` / `Cmd+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Copy branch name to clipboard |

@@ -176,6 +176,8 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Copy Relative File Path**: Press `Ctrl+Alt+L` / `Cmd+Alt+L` to copy the file path relative to the git repository root. This is useful for documentation, code reviews, and bug reports where you want portable file references without system-specific paths (e.g., `src/webview/panel/main.js` instead of `/home/user/projects/repo/src/webview/panel/main.js`). The `handleCopyRelativePath` function in `main.js` sends a `copyRelativePath` message. The message is handled by `handleCopyRelativePath` in `messageHandler.ts` which uses `path.relative(cwd, filePath)` to compute the relative path and writes it to `vscode.env.clipboard`. Also available in the file context menu with right-click on any file in the changed files list. The `copyRelativePath` message type and `copyRelativePath` webview action are defined in `src/types.ts`.
 
+- **Copy File Extension**: Press `Ctrl+Alt+E` / `Cmd+Alt+E` to copy just the file extension to clipboard (e.g., "ts" from "main.ts"). Useful for documentation and configuration. The `handleCopyExtension` function in `main.js` sends a `copyFileExtension` message. The message is handled by `handleCopyFileExtension` in `messageHandler.ts` which uses `path.extname(filePath).replace(/^\./, '')` to extract the extension without the leading dot and writes it to `vscode.env.clipboard`. Shows "no extension" for files without an extension. Also available in the file context menu with right-click on any file in the changed files list. The `copyFileExtension` message type and `copyFileExtension` webview action are defined in `src/types.ts`.
+
 - **Copy File Content**: Press `Ctrl+Alt+C` / `Cmd+Alt+C` to copy the full content of a file at the selected commit to the clipboard. This is useful for saving code snapshots, comparing file contents across commits, or extracting file content at specific points in history. The `handleCopyFileContent` function in `main.js` sends a `copyFileContent` message with the file path and commit hash. The message is handled by `handleCopyFileContent` in `messageHandler.ts` which uses `getFileContentAtCommit()` from `gitService.ts` to fetch the file content via `git show` and writes it to `vscode.env.clipboard`. Shows a confirmation message with the file name and short hash. Also available in the file context menu with right-click on any file in the changed files list. The `copyFileContent` message type and `copyFileContent` webview action are defined in `src/types.ts`.
 
 - **Copy as Git Describe**: Press `Ctrl+Alt+G` / `Cmd+Alt+G` to copy the git describe output for the selected commit. This outputs the nearest tag, number of commits since that tag, and abbreviated hash (e.g., `v1.2.3-45-gabcdef1`). If no tags exist, it falls back to the abbreviated hash. Useful for release notes, bug reports, and build scripts. The command uses `git describe --always --long --tags <hash>`. Also available in the commit row right-click context menu with a 🏷️ icon.
@@ -230,7 +232,7 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Quick Compare with Parent**: Users can quickly compare a commit with its direct parent using the "Compare" button or `Ctrl+Alt+P` / `Cmd+Alt+P` keyboard shortcut. This shows the diff between the commit and its parent (`git diff parent..commit`), useful for quickly reviewing what changed in each individual commit without requiring manual selection. The feature is implemented in `src/webview/panel/main.js` (`handleQuickCompare` function), `src/git/gitService.ts` (`getCommitParentDiff` function using `git diff hash~1..hash`), and `src/webview/messageHandler.ts` (`handleQuickCompare` handler). The button is added in `webviewProvider.ts` with id `compare-parent-btn`. For root commits (no parent), an error message is shown indicating there's no parent to compare with. Also available in the commit row right-click context menu as "Compare with parent" with a ⧁ icon.
 
-- **File Context Menu**: Right-click on any file in the changed files list to open a context menu with options: "Open file at this commit" (opens file using the `git-history` URI scheme), "View diff for this file" (shows file-scoped diff), "Copy diff for this file" (copies the file-scoped diff to clipboard using `handleCopyFileDiff`), "Copy file content" (copies the file content at this commit to clipboard using `handleCopyFileContent`), "Copy file path" (copies the file path to clipboard using `handleCopyFilePath`), "Copy file name only" (copies just the filename using `handleCopyFileName`), and "Copy relative path" (copies the path relative to git root using `handleCopyRelativePath`). Keyboard shortcuts: `Ctrl+Alt+F` for file diff, `Ctrl+Alt+C` for file content, `Ctrl+Shift+.` for file path, `Ctrl+Shift+,` for file name, and `Ctrl+Alt+L` for relative path. The `openFileAtCommit` message is handled by `handleOpenFileAtCommit` in `messageHandler.ts` which constructs a `git-history` URI and calls `vscode.window.showTextDocument`. The `copyFileDiff` message is handled by `handleCopyFileDiff` which uses `getCommitDiff` with the filePath parameter to get the file-scoped diff and writes it to `vscode.env.clipboard`. The `copyFileContent` message is handled by `handleCopyFileContent` which uses `getFileContentAtCommit` to get the file content and writes it to `vscode.env.clipboard`. The `copyFilePath` message is handled by `handleCopyFilePath` which writes the file path to `vscode.env.clipboard`. The `copyFileName` message is handled by `handleCopyFileName` which uses `path.basename()` to extract the filename and writes it to `vscode.env.clipboard`. The `copyRelativePath` message is handled by `handleCopyRelativePath` which uses `path.relative(cwd, filePath)` to compute the relative path and writes it to `vscode.env.clipboard`. All message types are dispatched through the `handleMessage` switch statement in `messageHandler.ts`.
+- **File Context Menu**: Right-click on any file in the changed files list to open a context menu with options: "Open file at this commit" (opens file using the `git-history` URI scheme), "View diff for this file" (shows file-scoped diff), "Copy diff for this file" (copies the file-scoped diff to clipboard using `handleCopyFileDiff`), "Copy file content" (copies the file content at this commit to clipboard using `handleCopyFileContent`), "Copy file path" (copies the file path to clipboard using `handleCopyFilePath`), "Copy file name only" (copies just the filename using `handleCopyFileName`), "Copy file extension" (copies just the file extension using `handleCopyExtension`), and "Copy relative path" (copies the path relative to git root using `handleCopyRelativePath`). Keyboard shortcuts: `Ctrl+Alt+F` for file diff, `Ctrl+Alt+C` for file content, `Ctrl+Shift+.` for file path, `Ctrl+Shift+,` for file name, `Ctrl+Alt+E` for file extension, and `Ctrl+Alt+L` for relative path. The `openFileAtCommit` message is handled by `handleOpenFileAtCommit` in `messageHandler.ts` which constructs a `git-history` URI and calls `vscode.window.showTextDocument`. The `copyFileDiff` message is handled by `handleCopyFileDiff` which uses `getCommitDiff` with the filePath parameter to get the file-scoped diff and writes it to `vscode.env.clipboard`. The `copyFileContent` message is handled by `handleCopyFileContent` which uses `getFileContentAtCommit` to get the file content and writes it to `vscode.env.clipboard`. The `copyFilePath` message is handled by `handleCopyFilePath` which writes the file path to `vscode.env.clipboard`. The `copyFileName` message is handled by `handleCopyFileName` which uses `path.basename()` to extract the filename and writes it to `vscode.env.clipboard`. The `copyRelativePath` message is handled by `handleCopyRelativePath` which uses `path.relative(cwd, filePath)` to compute the relative path and writes it to `vscode.env.clipboard`. All message types are dispatched through the `handleMessage` switch statement in `messageHandler.ts`.
 
 - **Create Branch from Commit**: Right-click on any commit to create a new branch at that commit. The `handleCreateBranch` function in `messageHandler.ts` prompts for branch name via `vscode.window.showInputBox()` and calls `createBranchFromCommit` from `gitService.ts` which executes `git branch <name> <hash>`. Shows confirmation message on success. Invalid branch names (containing `..`, `~`, `:`, spaces, etc.) are rejected by git, and the error is displayed to the user. Empty input is treated as cancel. The feature is available via the commit row right-click context menu with a 🌿 icon.
 
@@ -250,7 +252,7 @@ The extension detects and displays the current git branch in the history panel:
 
 Extension ↔ Webview communication uses typed messages (see `ExtToWebviewMessage` and `WebviewToExtMessage` in `src/types.ts`):
 - Extension sends: `init`, `diff`, `combinedDiff`, `rangeDiff`, `commitFiles`, `error`, `selectCommit`, `branchHashes`, `applyFilterQuery`
-- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFileDiff`, `copyFilePath`, `copyFileName`, `copyRelativePath`, `copyCommitPatch`, `copyCommitUrl`, `copyCommitMention`, `copyCommitRef`, `copyCommitStats`, `copyBranchName`, `copyBranchUrl`, `copyRemoteUrl`, `copyTags`, `copyAuthorEmail`, `copyAuthorName`, `copyParentHash`, `copyShortHash`, `copySubject`, `copyDiffStatSummary`, `copyCoAuthors`, `copyCommitDate`, `copyOneline`, `copyCommitBody`, `copyCommitMarkdown`, `copyFileContent`, `copySelectedHashes`, `copyFilterQuery`, `pasteFilterQuery`, `openFileAtCommit`, `quickCompare`, `createBranch`, `createTag`, `saveSettings`, `exportCommits`, `requestBranchHashes`
+- Webview sends: `ready`, `requestDiff`, `requestCombinedDiff`, `requestRangeDiff`, `requestCommitFiles`, `requestFileDiff`, `requestRefresh`, `copyCommitMessage`, `copyCommitHash`, `copyCommitInfo`, `copyCherryPickCommand`, `copyRevertCommand`, `copyCommitFiles`, `copyCommitDiff`, `copyFileDiff`, `copyFilePath`, `copyFileName`, `copyFileExtension`, `copyRelativePath`, `copyCommitPatch`, `copyCommitUrl`, `copyCommitMention`, `copyCommitRef`, `copyCommitStats`, `copyBranchName`, `copyBranchUrl`, `copyRemoteUrl`, `copyTags`, `copyAuthorEmail`, `copyAuthorName`, `copyParentHash`, `copyShortHash`, `copySubject`, `copyDiffStatSummary`, `copyCoAuthors`, `copyCommitDate`, `copyOneline`, `copyCommitBody`, `copyCommitMarkdown`, `copyFileContent`, `copySelectedHashes`, `copyFilterQuery`, `pasteFilterQuery`, `openFileAtCommit`, `quickCompare`, `createBranch`, `createTag`, `saveSettings`, `exportCommits`, `requestBranchHashes`
 
 The `saveSettings` message is sent by the webview when UI preferences change (diff type, word wrap, sort order, hide merge commits, regex mode) to persist them across sessions.
 
@@ -272,3 +274,56 @@ Unit tests for pure parsing functions are located in:
 - `test/suite/gitStatsParser.test.ts` - Tests for `parseCommitStats`, `extractStatsFromCommitBlock`, `parseMultipleCommitStats`
 
 These tests validate edge cases in git output parsing without requiring actual git operations.
+
+### Testing SettingsService
+
+When adding new `UserSettings` properties:
+
+1. **Add the property to `src/settings/settingsTypes.ts`**
+   - Add the property to the `UserSettings` interface
+   - Add the default value to `DEFAULT_SETTINGS`
+
+2. **Update unit tests in `test/suite/settingsServiceUnit.test.ts`**
+   - Add tests for `getSetting()` with the new property
+   - Add tests for `setSetting()` with the new property
+   - Add tests for backward compatibility (partial settings merge)
+
+3. **Verify backward compatibility**
+   - Test that partial settings (missing the new property) merge with defaults correctly
+   - Existing users without the new property should get the default value
+
+4. **Add E2E tests in `test/suite/settingsServiceE2E.test.ts`**
+   - Test UI persistence across sessions (if the setting has UI controls)
+   - Verify data flow: extension → provider → webview
+   - Verify data flow: webview → extension → globalState
+
+**Example: Adding a new setting**
+
+```typescript
+// 1. Update src/settings/settingsTypes.ts
+export interface UserSettings {
+  // ... existing properties
+  newSetting: boolean;
+}
+
+export const DEFAULT_SETTINGS: UserSettings = {
+  // ... existing defaults
+  newSetting: false
+};
+
+// 2. Update test/suite/settingsServiceUnit.test.ts
+test('getSetting returns newSetting default value', () => {
+  const value = settingsService.getSetting('newSetting');
+  assert.strictEqual(value, false);
+});
+
+test('setSetting updates newSetting', async () => {
+  await settingsService.setSetting('newSetting', true);
+  assert.strictEqual(settingsService.getSetting('newSetting'), true);
+});
+```
+
+**Test Files**
+- `test/suite/settingsServiceUnit.test.ts` - Mock-based unit tests for SettingsService methods
+- `test/suite/settingsServiceE2E.test.ts` - Integration tests verifying settings persistence and data flow
+- `test/suite/settingsService.test.ts` - Source verification tests (ensures files exist and are structured correctly)
