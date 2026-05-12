@@ -307,6 +307,7 @@ const pasteFilterQueryBtn = document.getElementById('paste-filter-query-btn');
 const clearAllFiltersBtn = document.getElementById('clear-all-filters-btn');
 const savePresetBtn = document.getElementById('save-preset-btn');
 const presetDropdownBtn = document.getElementById('preset-dropdown-btn');
+const graphToggleBtn = document.getElementById('graph-toggle-btn');
 
 let isRefreshing = false;
 
@@ -986,6 +987,27 @@ function handleWordWrapToggle() {
   vscode.postMessage({ type: 'saveSettings', settings: { wordWrapEnabled } });
 }
 
+function handleToggleGraph() {
+  showGraph = !showGraph;
+  if (graphToggleBtn) {
+    if (showGraph) {
+      graphToggleBtn.classList.add('active');
+      graphToggleBtn.title = 'Graph visible (click to hide)';
+    } else {
+      graphToggleBtn.classList.remove('active');
+      graphToggleBtn.title = 'Show graph';
+    }
+  }
+  const graphTh = document.querySelector('th.graph-col');
+  if (graphTh) { graphTh.style.display = (showGraph && sortMode < 2) ? '' : 'none'; }
+  focusedIndex = -1;
+  renderCommits();
+  updateCommitCount();
+
+  // Persist the setting
+  vscode.postMessage({ type: 'saveSettings', settings: { showGraph } });
+}
+
 /**
  * Check if text matches the regex pattern
  * @param {string} text - Text to test
@@ -1420,6 +1442,9 @@ function init() {
   if (myCommitsBtn) {
     myCommitsBtn.addEventListener('click', handleMyCommitsToggle);
   }
+  if (graphToggleBtn) {
+    graphToggleBtn.addEventListener('click', handleToggleGraph);
+  }
 
   // Keyboard shortcuts
   document.addEventListener('keydown', handleKeyDown);
@@ -1630,6 +1655,20 @@ function handleMessage(event) {
 
         // Apply my commits only filter
         showMyCommitsOnly = settings.showMyCommitsOnly;
+
+        // Apply graph visibility from persisted settings
+        if (settings.showGraph !== undefined) {
+          showGraph = settings.showGraph;
+        }
+        if (graphToggleBtn) {
+          if (showGraph) {
+            graphToggleBtn.classList.add('active');
+            graphToggleBtn.title = 'Graph visible (click to hide)';
+          } else {
+            graphToggleBtn.classList.remove('active');
+            graphToggleBtn.title = 'Show graph';
+          }
+        }
         renderCommits();
         updateCommitCount();
 
@@ -1815,6 +1854,7 @@ function handleMessage(event) {
         case 'toggleRegex': handleRegexToggle(); break;
         case 'toggleIgnoreWhitespace': handleIgnoreWhitespaceToggle(); break;
         case 'toggleHideMergeCommits': handleMergeToggle(); break;
+        case 'toggleGraph': handleToggleGraph(); break;
         case 'jumpToHash': showJumpToHashDialog(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
@@ -3863,7 +3903,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Alt', 'P'], description: 'Quick compare with parent' },
         { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' },
         { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' },
-        { keys: [cmdKey, 'Shift', '3'], description: 'Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A)' }
+        { keys: [cmdKey, 'Shift', '3'], description: 'Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A)' },
+        { keys: [cmdKey, altKey, 'T'], description: 'Toggle commit graph' }
       ]
     },
     {

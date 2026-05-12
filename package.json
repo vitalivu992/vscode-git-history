@@ -327,6 +327,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.toggleGraph",
+        "title": "Git History: Toggle Commit Graph",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.jumpToHash",
         "title": "Git History: Jump to Hash",
         "category": "Git History"
@@ -725,6 +730,12 @@
         "command": "gitHistory.toggleHideMergeCommits",
         "key": "ctrl+shift+q",
         "mac": "cmd+shift+q",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleGraph",
+        "key": "ctrl+alt+t",
+        "mac": "cmd+alt+t",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

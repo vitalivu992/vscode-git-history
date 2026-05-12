@@ -205,6 +205,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.openFileUrl', action: 'openFileUrl' },
     { command: 'gitHistory.saveFilterPreset', action: 'saveFilterPreset' },
     { command: 'gitHistory.loadFilterPreset', action: 'loadFilterPreset' },
+    { command: 'gitHistory.toggleGraph', action: 'toggleGraph' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

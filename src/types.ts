@@ -133,7 +133,8 @@ export type WebviewAction =
   | 'openCommitUrl'
   | 'openFileUrl'
   | 'saveFilterPreset'
-  | 'loadFilterPreset';
+  | 'loadFilterPreset'
+  | 'toggleGraph';
 
 /**
  * Filter state for copy filter query feature

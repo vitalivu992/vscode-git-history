@@ -200,7 +200,7 @@ export class GitHistoryPanel {
         }
 
         this._commits = commits;
-        const showGraph = vscode.workspace.getConfiguration('gitHistory').get<boolean>('showGraph', true);
+        const configShowGraph = vscode.workspace.getConfiguration('gitHistory').get<boolean>('showGraph', true);
         const hideMergeCommits = vscode.workspace.getConfiguration('gitHistory').get<boolean>('hideMergeCommits', false);
         const defaultDiffView = vscode.workspace.getConfiguration('gitHistory').get<string>('defaultDiffView', 'unified');
         const diffContextLines = vscode.workspace.getConfiguration('gitHistory').get<number>('diffContextLines', 3);
@@ -223,7 +223,7 @@ export class GitHistoryPanel {
         // Get saved filter presets from globalState
         const savedPresets = this._context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
 
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings, currentUser, showFirstRunTip, savedPresets });
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, showGraph: userSettings.showGraph !== undefined ? userSettings.showGraph : configShowGraph, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, userSettings, currentUser, showFirstRunTip, savedPresets });
       } catch (error) {
         this.postMessage({
           type: 'error',
@@ -278,6 +278,7 @@ export class GitHistoryPanel {
       </button>
       <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
+      <button id="graph-toggle-btn" class="graph-toggle-btn active" title="Graph visible (click to hide)">Graph</button>
       <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>
       <button id="export-btn" class="export-btn" title="Export filtered commits (Ctrl+Shift+O)">Export</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>
