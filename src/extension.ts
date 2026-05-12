@@ -181,6 +181,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyFileUrl', action: 'copyFileUrl' },
     { command: 'gitHistory.copyRelativePath', action: 'copyRelativePath' },
     { command: 'gitHistory.copySelectedHashes', action: 'copySelectedHashes' },
+    { command: 'gitHistory.copyAllFilteredHashes', action: 'copyAllFilteredHashes' },
     { command: 'gitHistory.exportCommits', action: 'exportCommits' },
     { command: 'gitHistory.quickCompare', action: 'quickCompare' },
     { command: 'gitHistory.createBranch', action: 'createBranch' },
