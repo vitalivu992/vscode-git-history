@@ -146,7 +146,8 @@ export type WebviewAction =
   | 'saveFilterPreset'
   | 'loadFilterPreset'
   | 'toggleGraph'
-  | 'toggleSignatures';
+  | 'toggleSignatures'
+  | 'copyAllFilteredHashes';
 
 /**
  * Filter state for copy filter query feature
@@ -264,4 +265,5 @@ export type WebviewToExtMessage =
   | { type: 'saveFilterPreset'; name: string; filterState: FilterQueryState }
   | { type: 'deleteFilterPreset'; name: string }
   | { type: 'getFilterPresets' }
-  | { type: 'applyPreset'; presetName: string };
+  | { type: 'applyPreset'; presetName: string }
+  | { type: 'copyAllFilteredHashes'; hashes: string[] };
