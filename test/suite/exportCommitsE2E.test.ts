@@ -402,6 +402,14 @@ suite('Export Commits Source Verification', () => {
       'messageHandler.ts should define formatCommitsAsMarkdown function');
   });
 
+  test('messageHandler.ts should handle exportCommitsMbox case', () => {
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+    assert.ok(source.includes("case 'exportCommitsMbox'"),
+      'messageHandler.ts should handle exportCommitsMbox case');
+    assert.ok(source.includes('function handleExportCommitsMbox'),
+      'messageHandler.ts should define handleExportCommitsMbox function');
+  });
+
   test('webviewProvider.ts should include export button', () => {
     const source = fs.readFileSync(webviewProviderPath, 'utf-8');
     assert.ok(source.includes('id="export-btn"'),
@@ -422,5 +430,19 @@ suite('Export Commits Source Verification', () => {
       'styles.css should include export-options styling');
     assert.ok(source.includes('.export-option-btn'),
       'styles.css should include export-option-btn styling');
+  });
+
+  test('types.ts should define exportCommitsMbox message type', () => {
+    const source = fs.readFileSync(typesPath, 'utf-8');
+    assert.ok(source.includes("type: 'exportCommitsMbox'"),
+      'types.ts should define exportCommitsMbox message type');
+  });
+
+  test('main.js should include mbox option in export dialog', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes("data-format='mbox'") || source.includes('data-format="mbox"'),
+      'main.js export dialog should include mbox format option');
+    assert.ok(source.includes("type: 'exportCommitsMbox'"),
+      'main.js should send exportCommitsMbox message');
   });
 });

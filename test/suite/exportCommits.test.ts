@@ -268,6 +268,20 @@ suite('Export Feature Source Verification', () => {
       'messageHandler should define handleExportCommits function');
   });
 
+  test('messageHandler.ts should define exportCommitsMbox message type handler', () => {
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+    assert.ok(source.includes("case 'exportCommitsMbox'"),
+      'messageHandler should handle exportCommitsMbox case');
+    assert.ok(source.includes('handleExportCommitsMbox'),
+      'messageHandler should define handleExportCommitsMbox function');
+  });
+
+  test('messageHandler.ts should import getCommitsAsMbox from gitService', () => {
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+    assert.ok(source.includes('getCommitsAsMbox'),
+      'messageHandler should import getCommitsAsMbox');
+  });
+
   test('handleExportCommits should use vscode.window.showSaveDialog', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function handleExportCommits');
@@ -289,12 +303,37 @@ suite('Export Feature Source Verification', () => {
       'exportCommits should accept json or csv format');
   });
 
+  test('types.ts should define exportCommitsMbox message type', () => {
+    const source = fs.readFileSync(typesPath, 'utf-8');
+    assert.ok(source.includes("type: 'exportCommitsMbox'"),
+      'WebviewToExtMessage should include exportCommitsMbox type');
+    assert.ok(source.includes("'exportCommitsMbox'"),
+      'WebviewAction should include exportCommitsMbox');
+  });
+
+  test('gitService.ts should define getCommitsAsMbox function', () => {
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
+    const source = fs.readFileSync(gitServicePath, 'utf-8');
+    assert.ok(source.includes('function getCommitsAsMbox'),
+      'gitService should define getCommitsAsMbox function');
+    assert.ok(source.includes('format-patch'),
+      'getCommitsAsMbox should use git format-patch');
+  });
+
   test('main.js should define handleExportCommits function', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
     assert.ok(source.includes('function handleExportCommits'),
       'main.js should define handleExportCommits function');
     assert.ok(source.includes('showExportFormatDialog'),
       'main.js should define showExportFormatDialog function');
+  });
+
+  test('main.js should include mbox option in export dialog', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes("data-format='mbox'") || source.includes('data-format="mbox"'),
+      'main.js export dialog should include mbox format option');
+    assert.ok(source.includes("type: 'exportCommitsMbox'"),
+      'main.js should send exportCommitsMbox message');
   });
 
   test('main.js should handle Ctrl+Shift+O keyboard shortcut', () => {
