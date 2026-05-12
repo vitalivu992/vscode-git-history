@@ -350,6 +350,16 @@
         "command": "gitHistory.openFileUrl",
         "title": "Git History: Open File Permalink in Browser",
         "category": "Git History"
+      },
+      {
+        "command": "gitHistory.saveFilterPreset",
+        "title": "Git History: Save Filter Preset",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.loadFilterPreset",
+        "title": "Git History: Load Filter Preset",
+        "category": "Git History"
       }
     ],
     "menus": {
@@ -741,6 +751,18 @@
         "command": "gitHistory.openFileUrl",
         "key": "ctrl+k ctrl+p",
         "mac": "cmd+k cmd+p",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.saveFilterPreset",
+        "key": "ctrl+shift+0",
+        "mac": "cmd+shift+0",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.loadFilterPreset",
+        "key": "ctrl+shift+1",
+        "mac": "cmd+shift+1",
         "when": "activeWebviewPanelId == gitHistory.webview"
       }
     ],
