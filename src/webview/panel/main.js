@@ -1807,6 +1807,7 @@ function handleMessage(event) {
         case 'quickCompare': handleQuickCompare(); break;
         case 'createBranch': handleCreateBranch(); break;
         case 'createTag': handleCreateTag(); break;
+        case 'deleteTag': handleDeleteTag(); break;
         case 'checkoutBranch': showBranchPickerDialog(); break;
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
         case 'toggleWordWrap': handleWordWrapToggle(); break;
@@ -2556,6 +2557,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🏷️</span>
       <span class="context-menu-label">Create tag from commit</span>
     </div>
+    <div class="context-menu-item" data-action="delete-tag" style="display: ${(commit.tags && commit.tags.length > 0) ? 'flex' : 'none'}">
+      <span class="context-menu-icon">🗑️</span>
+      <span class="context-menu-label">Delete tag from commit</span>
+    </div>
     <div class="context-menu-item" data-action="copy-selected-hashes" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy selected hashes</span>
@@ -2649,6 +2654,8 @@ function showCommitContextMenu(event, commit) {
         handleCreateBranch();
       } else if (action === 'create-tag') {
         handleCreateTag();
+      } else if (action === 'delete-tag') {
+        handleDeleteTag();
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
       } else if (action === 'copy-combined-diff') {
@@ -3415,6 +3422,34 @@ function handleCreateTag() {
 
   vscode.postMessage({
     type: 'createTag',
+    hash: targetCommit.hash
+  });
+}
+
+function handleDeleteTag() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to delete tags from');
+    return;
+  }
+
+  if (!targetCommit.tags || targetCommit.tags.length === 0) {
+    showError('This commit has no tags');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'deleteTag',
     hash: targetCommit.hash
   });
 }
