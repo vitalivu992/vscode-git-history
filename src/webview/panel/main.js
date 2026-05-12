@@ -3530,6 +3530,9 @@ function showExportFormatDialog(commitsToExport) {
     existingModal.remove();
   }
 
+  const orderedCommits = getOrderedCommits(commitsToExport);
+  const mboxDisabled = orderedCommits.length < 2;
+
   const modal = document.createElement('div');
   modal.id = 'export-modal';
   modal.innerHTML = `
@@ -3557,6 +3560,11 @@ function showExportFormatDialog(commitsToExport) {
             <span class="export-option-label">Markdown</span>
             <span class="export-option-desc">Changelog format for documentation</span>
           </button>
+          <button class="export-option-btn${mboxDisabled ? ' disabled' : ''}" data-format="mbox" ${mboxDisabled ? 'disabled' : ''} title="${mboxDisabled ? 'Select 2+ commits to enable' : 'Export as mbox for email/git am'}">
+            <span class="export-option-icon">📧</span>
+            <span class="export-option-label">mbox${mboxDisabled ? ' (2+ commits)' : ''}</span>
+            <span class="export-option-desc">RFC 822 patches for email clients and git am</span>
+          </button>
         </div>
       </div>
     </div>
@@ -3575,11 +3583,21 @@ function showExportFormatDialog(commitsToExport) {
   modal.querySelectorAll('.export-option-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const format = btn.dataset.format;
-      vscode.postMessage({
-        type: 'exportCommits',
-        format,
-        commits: commitsToExport
-      });
+      if (format === 'mbox') {
+        const fromHash = orderedCommits[0].hash;
+        const toHash = orderedCommits[orderedCommits.length - 1].hash;
+        vscode.postMessage({
+          type: 'exportCommitsMbox',
+          fromHash,
+          toHash
+        });
+      } else {
+        vscode.postMessage({
+          type: 'exportCommits',
+          format,
+          commits: commitsToExport
+        });
+      }
       closeModal();
     });
   });
@@ -3796,7 +3814,11 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' },
         { keys: [cmdKey, 'Alt', 'E'], description: 'Copy file extension' },
         { keys: [cmdKey, 'Alt', 'K'], description: 'Copy file directory' },
-        { keys: [cmdKey, 'Alt', 'L'], description: 'Copy relative path' }
+        { keys: [cmdKey, 'Alt', 'L'], description: 'Copy relative path' },
+        { keys: [cmdKey, 'Shift', '@'], description: 'Copy as platform mention (owner/repo@hash)' },
+        { keys: [cmdKey, 'Shift', ']'], description: 'Copy commit reference (refs/commit/<hash>)' },
+        { keys: [cmdKey, 'Alt', 'Shift', 'U'], description: 'Copy file permalink' },
+        { keys: [cmdKey, 'Alt', 'G'], description: 'Copy as Git Describe' }
       ]
     },
     {
@@ -3804,7 +3826,11 @@ function showKeyboardHelpDialog() {
       items: [
         { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history' },
         { keys: [cmdKey, 'Alt', 'Q'], description: 'Clear all filters' },
-        { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' }
+        { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' },
+        { keys: [cmdKey, 'Shift', '0'], description: 'Save filter preset' },
+        { keys: [cmdKey, 'Shift', '1'], description: 'Load filter preset' },
+        { keys: [cmdKey, 'K', cmdKey, 'O'], description: 'Open commit URL in browser' },
+        { keys: [cmdKey, 'K', cmdKey, 'P'], description: 'Open file URL in browser' }
       ]
     }
   ];
