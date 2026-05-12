@@ -39,6 +39,11 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **Copy Commit Hash**: Copy the full commit hash to clipboard with `Ctrl+Shift+H` / `Cmd+Shift+H` keyboard shortcut, or click any hash chip
 - **Copy Author Email**: Copy the author email address to clipboard with `Ctrl+Shift+A` / `Cmd+Shift+A` keyboard shortcut, or right-click context menu
 - **Copy Author Name**: Copy the author name to clipboard with `Ctrl+Shift+N` / `Cmd+Shift+N` keyboard shortcut, or right-click context menu
+- **Copy Committer Email**: Copy the committer email address to clipboard via right-click context menu. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author email if committer information is not available.
+- **Copy Committer Name**: Copy the committer name to clipboard via right-click context menu. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author name if committer information is not available.
+
+> **Note**: Git distinguishes between **author** (who wrote the code) and **committer** (who applied the commit). These are often the same person, but can differ when maintainers apply patches from contributors, cherry-pick commits, or merge pull requests.
+
 - **Copy Parent Hash**: Copy the first parent hash to clipboard with `Ctrl+Shift+V` / `Cmd+Shift+V` keyboard shortcut, or right-click context menu. For root commits (no parent), an error message is shown.
 - **Copy Short Hash**: Copy the 7-character short hash to clipboard with `Ctrl+Shift+7` / `Cmd+Shift+7` keyboard shortcut, or right-click context menu
 - **📌 Copy Subject**: Copy only the commit subject (first line of the commit message) to clipboard with `Ctrl+Shift+6` / `Cmd+Shift+6` keyboard shortcut, or right-click context menu
@@ -164,6 +169,8 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy stats** | Copy commit statistics (files changed, insertions, deletions) to clipboard |
 | **Copy author email** | Copy the author email address |
 | **Copy author name** | Copy the author name |
+| **Copy committer email** | Copy the committer email address (person who applied the commit) |
+| **Copy committer name** | Copy the committer name (person who applied the commit) |
 | **Copy parent hash** | Copy the first parent hash (error for root commits) |
 | **Copy short hash** | Copy the 7-character short hash |
 | **Copy subject** | Copy only the commit subject (first line) |
