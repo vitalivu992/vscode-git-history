@@ -90,16 +90,16 @@ User preferences are automatically persisted across VS Code sessions using VS Co
 
 File history uses:
 ```
-%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n
+%H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n
 ```
-Fields: hash, parent hashes (space-separated), author, email, timestamp, subject, body, decorations, GPG signature status, GPG signer name.
+Fields: hash, parent hashes (space-separated), author, email, committer name, committer email, timestamp, subject, body, decorations, GPG signature status, GPG signer name.
 Commits are separated by `---COMMIT-END---` markers. `%P` is empty for root commits.
 
 The `%d` decorations field contains tag references (e.g., `tag: v1.0.0`, `tag: v1.0.0, origin/main`). Tags are parsed from this field and rendered as badges in the webview commit list. Both annotated and lightweight tags are supported.
 
 Selection history (`git log -L`) uses the same null-separated format (without body/`---COMMIT-END---`):
 ```
-%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d%x00%G?%x00%GS
+%H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%d%x00%G?%x00%GS
 ```
 Each commit appears as a single header line; inline diff lines (no null chars) are skipped by the parser.
 
@@ -207,9 +207,9 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Copy Author Name**: Press `Ctrl+Shift+N` / `Cmd+Shift+N` to copy the author name of the focused or selected commit to clipboard. The author name is also available via right-click context menu with a 👤 icon. The `handleCopyAuthorName` function in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyAuthorName` message. The message is handled by `handleCopyAuthorName` in `messageHandler.ts` which writes `commit.author` to `vscode.env.clipboard`. The `copyAuthorName` message type is defined in `src/types.ts`.
 
-- **Copy Committer Name**: Right-click on any commit to copy the committer name to clipboard. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author name if committer information is not available. The `handleCopyCommitterName` function in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyCommitterName` message. The message is handled by `handleCopyCommitterName` in `messageHandler.ts` which writes `commit.committer || commit.author` to `vscode.env.clipboard`. Also available in the commit row right-click context menu with a 👤 icon. The `copyCommitterName` message type is defined in `src/types.ts`.
+- **Copy Committer Name**: Press `Ctrl+Alt+N` / `Cmd+Alt+N` to copy the committer name of the focused or selected commit to clipboard. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author name if committer information is not available. The `handleCopyCommitterName` function in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyCommitterName` message. The message is handled by `handleCopyCommitterName` in `messageHandler.ts` which writes `commit.committer || commit.author` to `vscode.env.clipboard`. Also available in the commit row right-click context menu with a 👤 icon. The `copyCommitterName` message type is defined in `src/types.ts`.
 
-- **Copy Committer Email**: Right-click on any commit to copy the committer email address to clipboard. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author email if committer information is not available. The `handleCopyCommitterEmail` function in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyCommitterEmail` message. The message is handled by `handleCopyCommitterEmail` in `messageHandler.ts` which writes `commit.committerEmail || commit.email` to `vscode.env.clipboard`. Also available in the commit row right-click context menu. The `copyCommitterEmail` message type is defined in `src/types.ts`.
+- **Copy Committer Email**: Press `Ctrl+Alt+A` / `Cmd+Alt+A` to copy the committer email address of the focused or selected commit to clipboard. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author email if committer information is not available. The `handleCopyCommitterEmail` function in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyCommitterEmail` message. The message is handled by `handleCopyCommitterEmail` in `messageHandler.ts` which writes `commit.committerEmail || commit.email` to `vscode.env.clipboard`. Also available in the commit row right-click context menu. The `copyCommitterEmail` message type is defined in `src/types.ts`.
 
 - **Copy Parent Hash**: Press `Ctrl+Shift+V` / `Cmd+Shift+V` to copy the first parent hash of the focused or selected commit to clipboard. The parent hash is also available via right-click context menu with a ⧁ icon. The `handleCopyParentHash` function in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyParentHash` message. The message is handled by `handleCopyParentHash` in `messageHandler.ts` which checks for root commits (no parent) and writes `commit.parentHashes[0]` to `vscode.env.clipboard`, showing a confirmation with the short hash. For root commits (no parent), an error message "Root commit has no parent" is shown. The `copyParentHash` message type is defined in `src/types.ts`.
 
