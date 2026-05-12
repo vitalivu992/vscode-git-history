@@ -222,6 +222,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCommitTimestamp",
+        "title": "Git History: Copy Commit Unix Timestamp",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyFileDiff",
         "title": "Git History: Copy File Diff",
         "category": "Git History"
@@ -696,6 +701,12 @@
         "command": "gitHistory.copyDescribe",
         "key": "ctrl+alt+g",
         "mac": "cmd+alt+g",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitTimestamp",
+        "key": "ctrl+shift+2",
+        "mac": "cmd+shift+2",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
