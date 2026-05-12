@@ -13,10 +13,11 @@ const execFileAsync = util.promisify(execFile);
  * Git remote information extracted from a remote URL
  */
 interface GitRemoteInfo {
-  platform: 'github' | 'gitlab' | 'bitbucket' | 'unknown';
+  platform: 'github' | 'gitlab' | 'bitbucket' | 'azure' | 'unknown';
   baseUrl: string;
   owner: string;
   repo: string;
+  project?: string; // Azure DevOps: project name
 }
 
 const EMPTY_TREE_HASH = '4b825dc642cb6eb9a060e54bf899d69f82cf0163';
@@ -500,37 +501,48 @@ export async function getRemoteUrl(cwd: string, remote = 'origin'): Promise<stri
  * @returns Parsed remote info or null if unrecognized format
  */
 export function parseRemoteUrl(remoteUrl: string): GitRemoteInfo | null {
-  // HTTPS format: https://github.com/owner/repo.git
-  // SSH format: git@github.com:owner/repo.git
+  // Azure DevOps SSH format: git@ssh.dev.azure.com:v3/{org}/{project}/{repo}
+  const azureSshPattern = /^git@ssh\.dev\.azure\.com:v3\/([^/]+)\/([^/]+)\/(.+?)(?:\.git)?$/;
+  let match = remoteUrl.match(azureSshPattern);
+  if (match) {
+    const [, owner, project, repo] = match;
+    return { platform: 'azure', baseUrl: 'https://dev.azure.com', owner, project, repo };
+  }
 
-  let match: RegExpMatchArray | null;
-  let platform: 'github' | 'gitlab' | 'bitbucket' | 'unknown';
-  let baseUrl: string;
-  let owner: string;
-  let repo: string;
+  // Azure DevOps HTTPS format: https://dev.azure.com/{org}/{project}/_git/{repo}
+  const azureHttpsPattern = /^https?:\/\/dev\.azure\.com\/([^/]+)\/([^/]+)\/_git\/(.+?)(?:\.git)?$/;
+  match = remoteUrl.match(azureHttpsPattern);
+  if (match) {
+    const [, owner, project, repo] = match;
+    return { platform: 'azure', baseUrl: 'https://dev.azure.com', owner, project, repo };
+  }
 
-  // Try SSH format first (git@host:owner/repo.git)
+  // Azure DevOps legacy HTTPS format: https://{org}.visualstudio.com/{project}/_git/{repo}
+  const azureLegacyPattern = /^https?:\/\/([^/]+)\.visualstudio\.com\/([^/]+)\/_git\/(.+?)(?:\.git)?$/;
+  match = remoteUrl.match(azureLegacyPattern);
+  if (match) {
+    const [, owner, project, repo] = match;
+    return { platform: 'azure', baseUrl: `https://${owner}.visualstudio.com`, owner, project, repo };
+  }
+
+  // Try general SSH format (git@host:owner/repo.git)
   const sshPattern = /^git@([^:]+):([^/]+)\/(.+?)(?:\.git)?$/;
   match = remoteUrl.match(sshPattern);
   if (match) {
     const [, host, sshOwner, sshRepo] = match;
-    platform = detectPlatform(host);
-    baseUrl = `https://${host}`;
-    owner = sshOwner;
-    repo = sshRepo;
-    return { platform, baseUrl, owner, repo };
+    const platform = detectPlatform(host);
+    const baseUrl = `https://${host}`;
+    return { platform, baseUrl, owner: sshOwner, repo: sshRepo };
   }
 
-  // Try HTTPS format (https://host/owner/repo.git)
+  // Try general HTTPS format (https://host/owner/repo.git)
   const httpsPattern = /^https?:\/\/([^/]+)\/([^/]+)\/(.+?)(?:\.git)?$/;
   match = remoteUrl.match(httpsPattern);
   if (match) {
     const [, host, httpsOwner, httpsRepo] = match;
-    platform = detectPlatform(host);
-    baseUrl = `https://${host}`;
-    owner = httpsOwner;
-    repo = httpsRepo;
-    return { platform, baseUrl, owner, repo };
+    const platform = detectPlatform(host);
+    const baseUrl = `https://${host}`;
+    return { platform, baseUrl, owner: httpsOwner, repo: httpsRepo };
   }
 
   return null;
@@ -541,7 +553,7 @@ export function parseRemoteUrl(remoteUrl: string): GitRemoteInfo | null {
  * @param hostname The hostname to check
  * @returns The detected platform
  */
-function detectPlatform(hostname: string): 'github' | 'gitlab' | 'bitbucket' | 'unknown' {
+function detectPlatform(hostname: string): 'github' | 'gitlab' | 'bitbucket' | 'azure' | 'unknown' {
   const lowerHost = hostname.toLowerCase();
 
   if (lowerHost === 'github.com' || lowerHost.endsWith('.github.com')) {
@@ -552,6 +564,9 @@ function detectPlatform(hostname: string): 'github' | 'gitlab' | 'bitbucket' | '
   }
   if (lowerHost === 'bitbucket.org' || lowerHost.includes('bitbucket')) {
     return 'bitbucket';
+  }
+  if (lowerHost === 'dev.azure.com' || lowerHost === 'ssh.dev.azure.com' || lowerHost.endsWith('.visualstudio.com')) {
+    return 'azure';
   }
 
   return 'unknown';
@@ -590,6 +605,8 @@ export async function getCommitUrl(
       return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/-/commit/${shortHash}`;
     case 'bitbucket':
       return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/commits/${shortHash}`;
+    case 'azure':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.project}/_git/${remoteInfo.repo}/commit/${shortHash}`;
     default:
       return null;
   }
@@ -625,6 +642,8 @@ export async function getBranchUrl(
       return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/-/tree/${branch}`;
     case 'bitbucket':
       return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/src/${branch}`;
+    case 'azure':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.project}/_git/${remoteInfo.repo}?version=GB${branch}`;
     default:
       return null;
   }
@@ -709,6 +728,8 @@ export async function getFileUrl(
       return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/-/blob/${shortHash}/${normalizedPath}`;
     case 'bitbucket':
       return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/src/${shortHash}/${normalizedPath}`;
+    case 'azure':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.project}/_git/${remoteInfo.repo}?path=%2F${encodeURIComponent(normalizedPath)}&version=${shortHash}`;
     default:
       return null;
   }
