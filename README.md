@@ -52,6 +52,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 - **Copy Revert Command**: Copy a pre-formatted `git revert <hash>` command to the clipboard with `Ctrl+Shift+U` / `Cmd+Shift+U` keyboard shortcut, or right-click on any commit
 - **Copy Commit as Patch**: Copy the commit as a unified diff patch (with git headers) suitable for `git apply` or `git am` with `Ctrl+Shift+E` / `Cmd+Shift+E` keyboard shortcut, or right-click on any commit
 - **Copy Commit URL**: Copy the web URL for a commit to share with others. Automatically detects GitHub, GitLab, and Bitbucket remotes (including self-hosted instances). Use `Ctrl+Shift+L` / `Cmd+Shift+L` or right-click on any commit
+- **📢 Copy as Platform Mention**: Copy the commit in platform-specific mention format (e.g., `owner/repo@1b55bc0`) for use in issues, pull requests, and team discussions. Supports GitHub, GitLab, and Bitbucket. Use `Ctrl+Shift+@` / `Cmd+Shift+@` or right-click on any commit
 - **Copy Commit Stats**: Copy commit statistics (files changed, insertions, deletions) to clipboard with `Ctrl+Shift+S` / `Cmd+Shift+S` keyboard shortcut, or right-click on any commit
 - **Quick Compare with Parent**: Instantly compare the selected commit with its parent to see what changed in that specific commit. Use the "Compare" button or press `Ctrl+Alt+P` / `Cmd+Alt+P`. For root commits (first commit), an error is shown since there's no parent.
 - **Create Branch from Commit**: Right-click on any commit to create a new branch at that point in history. You'll be prompted for a branch name, and the branch will be created at the selected commit using `git branch <name> <hash>`.
@@ -153,6 +154,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy commit diff** | Copy the full diff output to clipboard |
 | **Copy as patch** | Copy the commit as a unified diff patch (for `git apply` or `git am`) |
 | **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket) for the commit |
+| **Copy as platform mention** | Copy in `owner/repo@hash` format for issues and discussions |
 | **Copy stats** | Copy commit statistics (files changed, insertions, deletions) to clipboard |
 | **Copy author email** | Copy the author email address |
 | **Copy author name** | Copy the author name |
@@ -213,6 +215,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+W` / `Cmd+Shift+W` | Toggle word wrap in diff viewer |
 | `Ctrl+Shift+E` / `Cmd+Shift+E` | Copy commit as patch to clipboard |
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL to clipboard |
+| `Ctrl+Shift+@` / `Cmd+Shift+@` | Copy as platform mention (`owner/repo@hash`) |
 | `Ctrl+Shift+M` / `Cmd+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Copy branch name to clipboard |
