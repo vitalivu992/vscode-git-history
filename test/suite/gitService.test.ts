@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, checkoutBranch, getCommitUrl, getBranchUrl } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, checkoutBranch, getCommitUrl, getBranchUrl, getFileUrl } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -905,6 +905,218 @@ suite('Commit URL Generation Tests', () => {
       await withBranchRemote('https://github.com/owner/repo.git', 'upstream', async () => {
         const url = await getBranchUrl('main', branchUrlTestDir, 'upstream');
         assert.strictEqual(url, 'https://github.com/owner/repo/tree/main');
+      });
+    });
+  });
+
+  // Azure DevOps URL tests
+  suite('parseRemoteUrl - Azure DevOps', () => {
+    test('parses Azure DevOps HTTPS URLs (dev.azure.com) with .git suffix', () => {
+      const result = parseRemoteUrl('https://dev.azure.com/myorg/myproject/_git/myrepo.git');
+      assert.ok(result, 'Should parse Azure DevOps HTTPS URL with .git');
+      assert.strictEqual(result?.platform, 'azure');
+      assert.strictEqual(result?.baseUrl, 'https://dev.azure.com');
+      assert.strictEqual(result?.owner, 'myorg');
+      assert.strictEqual(result?.project, 'myproject');
+      assert.strictEqual(result?.repo, 'myrepo');
+    });
+
+    test('parses Azure DevOps HTTPS URLs (dev.azure.com) without .git suffix', () => {
+      const result = parseRemoteUrl('https://dev.azure.com/myorg/myproject/_git/myrepo');
+      assert.ok(result, 'Should parse Azure DevOps HTTPS URL without .git');
+      assert.strictEqual(result?.platform, 'azure');
+      assert.strictEqual(result?.baseUrl, 'https://dev.azure.com');
+      assert.strictEqual(result?.owner, 'myorg');
+      assert.strictEqual(result?.project, 'myproject');
+      assert.strictEqual(result?.repo, 'myrepo');
+    });
+
+    test('parses Azure DevOps legacy HTTPS URLs (*.visualstudio.com)', () => {
+      const result = parseRemoteUrl('https://myorg.visualstudio.com/myproject/_git/myrepo.git');
+      assert.ok(result, 'Should parse Azure DevOps legacy URL');
+      assert.strictEqual(result?.platform, 'azure');
+      assert.strictEqual(result?.baseUrl, 'https://myorg.visualstudio.com');
+      assert.strictEqual(result?.owner, 'myorg');
+      assert.strictEqual(result?.project, 'myproject');
+      assert.strictEqual(result?.repo, 'myrepo');
+    });
+
+    test('parses Azure DevOps SSH URLs (ssh.dev.azure.com)', () => {
+      const result = parseRemoteUrl('git@ssh.dev.azure.com:v3/myorg/myproject/myrepo');
+      assert.ok(result, 'Should parse Azure DevOps SSH URL');
+      assert.strictEqual(result?.platform, 'azure');
+      assert.strictEqual(result?.baseUrl, 'https://dev.azure.com');
+      assert.strictEqual(result?.owner, 'myorg');
+      assert.strictEqual(result?.project, 'myproject');
+      assert.strictEqual(result?.repo, 'myrepo');
+    });
+
+    test('parses Azure DevOps SSH URLs with .git suffix', () => {
+      const result = parseRemoteUrl('git@ssh.dev.azure.com:v3/myorg/myproject/myrepo.git');
+      assert.ok(result, 'Should parse Azure DevOps SSH URL with .git');
+      assert.strictEqual(result?.platform, 'azure');
+      assert.strictEqual(result?.owner, 'myorg');
+      assert.strictEqual(result?.project, 'myproject');
+      assert.strictEqual(result?.repo, 'myrepo');
+    });
+  });
+
+  suite('getCommitUrl - Azure DevOps', () => {
+    const { execSync } = require('child_process');
+    let azureUrlTestDir: string;
+    let azureCommitHash: string;
+
+    suiteSetup(() => {
+      azureUrlTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-azure-url-test-'));
+      execSync('git init', { cwd: azureUrlTestDir });
+      execSync('git config user.name "Test User"', { cwd: azureUrlTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: azureUrlTestDir });
+      execSync('git commit --allow-empty -m "Initial"', { cwd: azureUrlTestDir });
+      azureCommitHash = execSync('git rev-parse HEAD', { cwd: azureUrlTestDir }).toString().trim();
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(azureUrlTestDir)) {
+        fs.rmSync(azureUrlTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withAzureRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: azureUrlTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: azureUrlTestDir });
+      }
+    }
+
+    test('generates correct commit URL for Azure DevOps (dev.azure.com)', async () => {
+      await withAzureRemote('https://dev.azure.com/myorg/myproject/_git/myrepo.git', 'origin', async () => {
+        const url = await getCommitUrl(azureCommitHash, azureUrlTestDir);
+        assert.strictEqual(url, `https://dev.azure.com/myorg/myproject/_git/myrepo/commit/${azureCommitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('generates correct commit URL for Azure DevOps legacy (visualstudio.com)', async () => {
+      await withAzureRemote('https://myorg.visualstudio.com/myproject/_git/myrepo.git', 'origin', async () => {
+        const url = await getCommitUrl(azureCommitHash, azureUrlTestDir);
+        assert.strictEqual(url, `https://myorg.visualstudio.com/myorg/myproject/_git/myrepo/commit/${azureCommitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('generates correct commit URL for Azure DevOps SSH', async () => {
+      await withAzureRemote('git@ssh.dev.azure.com:v3/myorg/myproject/myrepo', 'origin', async () => {
+        const url = await getCommitUrl(azureCommitHash, azureUrlTestDir);
+        assert.strictEqual(url, `https://dev.azure.com/myorg/myproject/_git/myrepo/commit/${azureCommitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('generates correct commit URL for self-hosted Azure DevOps Server', async () => {
+      await withAzureRemote('https://mycompany.visualstudio.com/myproject/_git/myrepo.git', 'origin', async () => {
+        const url = await getCommitUrl(azureCommitHash, azureUrlTestDir);
+        assert.strictEqual(url, `https://mycompany.visualstudio.com/mycompany/myproject/_git/myrepo/commit/${azureCommitHash.substring(0, 7)}`);
+      });
+    });
+  });
+
+  suite('getBranchUrl - Azure DevOps', () => {
+    const { execSync } = require('child_process');
+    let azureBranchTestDir: string;
+
+    suiteSetup(() => {
+      azureBranchTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-azure-branch-test-'));
+      execSync('git init', { cwd: azureBranchTestDir });
+      execSync('git config user.name "Test User"', { cwd: azureBranchTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: azureBranchTestDir });
+      execSync('git commit --allow-empty -m "Initial"', { cwd: azureBranchTestDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(azureBranchTestDir)) {
+        fs.rmSync(azureBranchTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withAzureBranchRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: azureBranchTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: azureBranchTestDir });
+      }
+    }
+
+    test('generates correct branch URL for Azure DevOps', async () => {
+      await withAzureBranchRemote('https://dev.azure.com/myorg/myproject/_git/myrepo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', azureBranchTestDir);
+        assert.strictEqual(url, 'https://dev.azure.com/myorg/myproject/_git/myrepo?version=GBmain');
+      });
+    });
+
+    test('handles branch names with slashes for Azure DevOps', async () => {
+      await withAzureBranchRemote('https://dev.azure.com/myorg/myproject/_git/myrepo.git', 'origin', async () => {
+        const url = await getBranchUrl('feature/my-feature', azureBranchTestDir);
+        assert.strictEqual(url, 'https://dev.azure.com/myorg/myproject/_git/myrepo?version=GBfeature/my-feature');
+      });
+    });
+
+    test('generates correct branch URL for Azure DevOps SSH', async () => {
+      await withAzureBranchRemote('git@ssh.dev.azure.com:v3/myorg/myproject/myrepo', 'origin', async () => {
+        const url = await getBranchUrl('develop', azureBranchTestDir);
+        assert.strictEqual(url, 'https://dev.azure.com/myorg/myproject/_git/myrepo?version=GBdevelop');
+      });
+    });
+  });
+
+  suite('getFileUrl - Azure DevOps', () => {
+    const { execSync } = require('child_process');
+    let azureFileTestDir: string;
+    let azureFileHash: string;
+
+    suiteSetup(() => {
+      azureFileTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-azure-file-test-'));
+      execSync('git init', { cwd: azureFileTestDir });
+      execSync('git config user.name "Test User"', { cwd: azureFileTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: azureFileTestDir });
+      fs.writeFileSync(path.join(azureFileTestDir, 'test.txt'), 'content\n');
+      execSync('git add .', { cwd: azureFileTestDir });
+      execSync('git commit -m "Initial"', { cwd: azureFileTestDir });
+      azureFileHash = execSync('git rev-parse HEAD', { cwd: azureFileTestDir }).toString().trim();
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(azureFileTestDir)) {
+        fs.rmSync(azureFileTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withAzureFileRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: azureFileTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: azureFileTestDir });
+      }
+    }
+
+    test('generates correct file URL for Azure DevOps', async () => {
+      await withAzureFileRemote('https://dev.azure.com/myorg/myproject/_git/myrepo.git', 'origin', async () => {
+        const url = await getFileUrl('src/main.ts', azureFileHash, azureFileTestDir);
+        assert.strictEqual(url, `https://dev.azure.com/myorg/myproject/_git/myrepo?path=%2Fsrc%2Fmain.ts&version=${azureFileHash.substring(0, 7)}`);
+      });
+    });
+
+    test('handles nested file paths for Azure DevOps', async () => {
+      await withAzureFileRemote('https://dev.azure.com/myorg/myproject/_git/myrepo.git', 'origin', async () => {
+        const url = await getFileUrl('src/webview/panel/main.js', azureFileHash, azureFileTestDir);
+        assert.strictEqual(url, `https://dev.azure.com/myorg/myproject/_git/myrepo?path=%2Fsrc%2Fwebview%2Fpanel%2Fmain.js&version=${azureFileHash.substring(0, 7)}`);
+      });
+    });
+
+    test('generates correct file URL for Azure DevOps SSH', async () => {
+      await withAzureFileRemote('git@ssh.dev.azure.com:v3/myorg/myproject/myrepo', 'origin', async () => {
+        const url = await getFileUrl('test.txt', azureFileHash, azureFileTestDir);
+        assert.strictEqual(url, `https://dev.azure.com/myorg/myproject/_git/myrepo?path=%2Ftest.txt&version=${azureFileHash.substring(0, 7)}`);
       });
     });
   });
