@@ -148,13 +148,35 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy commit message** | Copy the commit message to clipboard |
 | **Copy commit info** | Copy full commit information (hash, author, date, message) |
 | **Copy cherry-pick command** | Copy a pre-formatted `git cherry-pick <hash>` command |
+| **Copy revert command** | Copy a pre-formatted `git revert <hash>` command |
 | **Copy changed files** | Copy the list of changed files to clipboard |
 | **Copy commit diff** | Copy the full diff output to clipboard |
 | **Copy as patch** | Copy the commit as a unified diff patch (for `git apply` or `git am`) |
 | **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket) for the commit |
 | **Copy stats** | Copy commit statistics (files changed, insertions, deletions) to clipboard |
-| **Copy co-authors** | Copy co-authors from commit message ("Co-authored-by:" trailers) |
-| **Create branch from commit** | Create a new branch at the selected commit. You'll be prompted for a branch name. |
+| **Copy author email** | Copy the author email address |
+| **Copy author name** | Copy the author name |
+| **Copy parent hash** | Copy the first parent hash (error for root commits) |
+| **Copy short hash** | Copy the 7-character short hash |
+| **Copy subject** | Copy only the commit subject (first line) |
+| **Copy diff stat summary** | Copy the diff stat (e.g., "3 files changed, 45 insertions(+), 12 deletions(-)") |
+| **Copy as oneline** | Copy in `git log --oneline` format |
+| **Copy commit body** | Copy the commit body (description after subject) |
+| **Copy as Markdown** | Copy formatted as Markdown |
+| **Copy as JSON** | Copy as formatted JSON |
+| **Copy co-authors** | Copy co-authors from commit message |
+| **Copy commit date** | Copy date in ISO 8601 format |
+| **Copy relative date** | Copy date in relative format |
+| **Copy branch name** | Copy the current branch name |
+| **Copy branch URL** | Copy the web URL for the current branch |
+| **Copy remote URL** | Copy the raw git remote URL |
+| **Copy tags** | Copy all tags for this commit |
+| **Copy selected hashes** | Copy all selected commit hashes (2+ commits selected) |
+| **Copy combined diff** | Copy combined diff of all selected commits |
+| **Copy range diff** | Copy diff between two commits (range selected) |
+| **Compare with parent** | Compare this commit with its parent |
+| **Create branch from commit** | Create a new branch at the selected commit |
+| **Create tag from commit** | Create a git tag at the selected commit |
 
 **Changed Files Context Menu:**
 
@@ -162,9 +184,11 @@ Right-click on commits in the commit list or files in the changed files list to 
 |--------|-------------|
 | **Open file at this commit** | View the file content as it was at the selected commit |
 | **View diff for this file** | Show the diff for this specific file only |
-| **Copy file content** | Copy the full content of a file at the selected commit to clipboard. Useful for sharing code snippets from historical versions. |
+| **Copy diff for this file** | Copy the diff for this specific file to clipboard |
+| **Copy file content** | Copy the full content of a file at the selected commit to clipboard |
 | **Copy file path** | Copy the full file path to clipboard |
 | **Copy file name only** | Copy just the filename (e.g., `main.js`) to clipboard |
+| **Copy relative path** | Copy the file path relative to the git repository root (e.g., `src/webview/panel/main.js`) |
 
 #### Keyboard Navigation
 
@@ -192,7 +216,14 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+M` / `Cmd+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Copy branch name to clipboard |
+| `Ctrl+Alt+D` / `Cmd+Alt+D` | Copy combined diff to clipboard (2+ commits selected) |
+| `Ctrl+Alt+F` / `Cmd+Alt+F` | Copy file diff to clipboard (for focused file in changed files list) |
+| `Ctrl+Alt+L` / `Cmd+Alt+L` | Copy relative file path to clipboard |
+| `Ctrl+Alt+O` / `Cmd+Alt+O` | Copy remote URL to clipboard |
 | `Ctrl+Alt+Q` / `Cmd+Alt+Q` | Clear all filters |
+| `Ctrl+Alt+R` / `Cmd+Alt+R` | Copy range diff to clipboard (range selected) |
+| `Ctrl+Alt+S` / `Cmd+Alt+S` | Show branch switcher |
+| `Ctrl+Alt+U` / `Cmd+Alt+U` | Copy branch URL to clipboard |
 | `Ctrl+Shift+G` / `Cmd+Shift+G` | Copy tags to clipboard |
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email to clipboard |
 | `Ctrl+Shift+N` / `Cmd+Shift+N` | Copy author name to clipboard |
@@ -302,6 +333,12 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy co-authors | `Ctrl+Shift+K` / `Cmd+Shift+K` |
 | Copy file path | `Ctrl+Shift+.` / `Cmd+Shift+.` |
 | Copy file name | `Ctrl+Shift+,` / `Cmd+Shift+,` |
+| Copy relative path | `Ctrl+Alt+L` / `Cmd+Alt+L` |
+| Copy branch URL | `Ctrl+Alt+U` / `Cmd+Alt+U` |
+| Copy remote URL | `Ctrl+Alt+O` / `Cmd+Alt+O` |
+| Copy combined diff | `Ctrl+Alt+D` / `Cmd+Alt+D` (2+ selected) |
+| Copy range diff | `Ctrl+Alt+R` / `Cmd+Alt+R` (range selected) |
+| Copy file diff | `Ctrl+Alt+F` / `Cmd+Alt+F` |
 | Copy selected hashes | `Ctrl+Shift+;` / `Cmd+Shift+;` (when 2+ selected) |
 | Clear selection | `Escape` |
 
