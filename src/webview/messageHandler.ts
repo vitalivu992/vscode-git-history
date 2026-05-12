@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
 import { SettingsService, UserSettings, MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -223,6 +223,10 @@ export async function handleMessage(
 
     case 'createTag':
       await handleCreateTag(message.hash, panel);
+      break;
+
+    case 'deleteTag':
+      await handleDeleteTag(message.hash, panel);
       break;
 
     case 'checkoutBranch':
@@ -1532,6 +1536,67 @@ async function handleCreateTag(hash: string, panel: GitHistoryPanel): Promise<vo
     void vscode.window.showErrorMessage(
       `Failed to create tag: ${error instanceof Error ? error.message : String(error)}`
     );
+  }
+}
+
+async function handleDeleteTag(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commits = panel.getCommits();
+  const commit = commits.find(c => c.hash === hash);
+
+  if (!commit) {
+    void vscode.window.showErrorMessage('Commit not found');
+    return;
+  }
+
+  if (!commit.tags || commit.tags.length === 0) {
+    void vscode.window.showErrorMessage('This commit has no tags');
+    return;
+  }
+
+  const tags = commit.tags;
+
+  if (tags.length === 1) {
+    // Single tag - confirm and delete
+    const tagName = tags[0];
+    const confirm = await vscode.window.showInformationMessage(
+      `Delete tag "${tagName}"?`,
+      { modal: true },
+      'Delete'
+    );
+
+    if (confirm !== 'Delete') {
+      return;
+    }
+
+    try {
+      await deleteTagFromCommit(tagName, panel.getCwd());
+      void vscode.window.showInformationMessage(`Tag "${tagName}" deleted`);
+      await panel.loadData();
+    } catch (error) {
+      void vscode.window.showErrorMessage(
+        `Failed to delete tag: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  } else {
+    // Multiple tags - show QuickPick
+    const selected = await vscode.window.showQuickPick(tags, {
+      placeHolder: 'Select a tag to delete',
+      title: 'Delete tag from commit'
+    });
+
+    if (!selected) {
+      return;
+    }
+
+    try {
+      await deleteTagFromCommit(selected, panel.getCwd());
+      void vscode.window.showInformationMessage(`Tag "${selected}" deleted`);
+      await panel.loadData();
+    } catch (error) {
+      void vscode.window.showErrorMessage(
+        `Failed to delete tag: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 }
 
