@@ -828,14 +828,14 @@ async function handleSaveSettings(
 /**
  * Format commits as JSON
  */
-function formatCommitsAsJson(commits: CommitInfo[]): string {
+export function formatCommitsAsJson(commits: CommitInfo[]): string {
   return JSON.stringify(commits, null, 2);
 }
 
 /**
  * Escape a field for CSV output
  */
-function escapeCsvField(field: string): string {
+export function escapeCsvField(field: string): string {
   // If field contains comma, quote, or newline, wrap in quotes and escape internal quotes
   if (/[",\n\r]/.test(field)) {
     return `"${field.replace(/"/g, '""')}"`;
@@ -846,7 +846,7 @@ function escapeCsvField(field: string): string {
 /**
  * Format commits as CSV
  */
-function formatCommitsAsCsv(commits: CommitInfo[]): string {
+export function formatCommitsAsCsv(commits: CommitInfo[]): string {
   const headers = ['Hash', 'Short Hash', 'Author', 'Email', 'Date', 'Message', 'Tags', 'Files Changed', 'Insertions', 'Deletions'];
   const lines = [headers.join(',')];
 
@@ -872,7 +872,7 @@ function formatCommitsAsCsv(commits: CommitInfo[]): string {
 /**
  * Format commits as Markdown (changelog format)
  */
-function formatCommitsAsMarkdown(commits: CommitInfo[]): string {
+export function formatCommitsAsMarkdown(commits: CommitInfo[]): string {
   const lines: string[] = [];
 
   for (const commit of commits) {
@@ -1238,7 +1238,7 @@ function handleCopyCoAuthors(hash: string, panel: GitHistoryPanel): void {
  * Looks for "Co-authored-by:" trailers in the format:
  * Co-authored-by: Name <email@example.com>
  */
-function extractCoAuthors(fullMessage: string): string[] {
+export function extractCoAuthors(fullMessage: string): string[] {
   const coAuthors: string[] = [];
   const lines = fullMessage.split('\n');
 
@@ -1345,7 +1345,7 @@ function handleCopyCommitBody(hash: string, panel: GitHistoryPanel): void {
 /**
  * Format a single commit as Markdown
  */
-function formatCommitAsMarkdown(commit: CommitInfo): string {
+export function formatCommitAsMarkdown(commit: CommitInfo): string {
   const lines: string[] = [];
 
   // Header with commit message and short hash
@@ -1879,7 +1879,7 @@ async function handleOpenFileUrl(hash: string, filePath: string, panel: GitHisto
  * Validate preset name
  * Returns { valid: boolean, error?: string }
  */
-function validatePresetName(name: string, existingPresets: SavedFilterPreset[]): { valid: boolean; error?: string } {
+export function validatePresetName(name: string, existingPresets: SavedFilterPreset[]): { valid: boolean; error?: string } {
   if (!name || name.trim() === '') {
     return { valid: false, error: 'Preset name cannot be empty' };
   }
