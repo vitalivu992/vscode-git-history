@@ -66,7 +66,7 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
 - **Copy File Path**: Right-click on any file in the changed files list to copy its full path to clipboard
 - **Open File at Commit**: Right-click on any file in the changed files list to view the file content as it was at that specific commit
-- **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to JSON, CSV, or Markdown format. The Markdown format generates a changelog-style output with commit hashes, authors, dates, messages, tags, and statistics—perfect for release notes and documentation.
+- **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to JSON, CSV, Markdown, or mbox format. The Markdown format generates a changelog-style output with commit hashes, authors, dates, messages, tags, and statistics—perfect for release notes and documentation. The mbox format (available when 2+ commits are selected) exports RFC 822 compliant patches suitable for email clients and `git am`.
 - **Import Filter Query**: Press `Ctrl+Shift+4` / `Cmd+Shift+4` or click the "Paste Filter" button to restore a previously copied filter query from clipboard. This allows you to share reproducible commit views with team members.
 - **Clear All Filters**: Press `Ctrl+Alt+Q` / `Cmd+Alt+Q` or click the "Clear All" button to remove all active filters at once. Useful when you have multiple filters applied and want to quickly reset to the full commit list.
 - **Select All Commits**: Press `Ctrl+A` / `Cmd+A` to quickly select all visible commits for bulk operations like export or copy
@@ -266,6 +266,10 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+Q` / `Cmd+Shift+Q` | Toggle hide merge commits |
 | `Ctrl+Shift+/` / `Cmd+Shift+/` | Cycle diff context lines (1-10) |
 | `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
+| `Ctrl+K Ctrl+O` / `Cmd+K Cmd+O` | Open commit URL in browser |
+| `Ctrl+K Ctrl+P` / `Cmd+K Cmd+P` | Open file URL in browser |
+| `Ctrl+Shift+0` / `Cmd+Shift+0` | Save filter preset |
+| `Ctrl+Shift+1` / `Cmd+Shift+1` | Load filter preset |
 | `?` | Show keyboard shortcuts help |
 | `Escape` | Clear selection and search focus |
 
