@@ -180,6 +180,40 @@ suite('Copy File Content Tests', () => {
     assert.ok(functionBody.includes('showErrorMessage'),
       'handleCopyFileContent should show error message on failure');
   });
+
+  test('main.js should have handleCopyFileContent function', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('function handleCopyFileContent'),
+      'main.js should have handleCopyFileContent function');
+  });
+
+  test('main.js triggerAction should dispatch copyFileContent', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("case 'copyFileContent': handleCopyFileContent()"),
+      'main.js triggerAction should dispatch copyFileContent');
+  });
+
+  test('handleCopyFileContent should use selectedFile and get target commit', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    // Find the handleCopyFileContent function
+    const fnStart = source.indexOf('function handleCopyFileContent');
+    const fnEnd = source.indexOf('\nfunction', fnStart + 1);
+    const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
+
+    assert.ok(fnBody.includes('selectedFile'),
+      'handleCopyFileContent should check selectedFile');
+    assert.ok(fnBody.includes('getOrderedCommits(getFilteredCommits())'),
+      'handleCopyFileContent should use getOrderedCommits(getFilteredCommits())');
+  });
 });
 
 suite('Copy File Content Integration Tests', () => {

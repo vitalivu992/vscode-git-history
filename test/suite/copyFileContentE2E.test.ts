@@ -240,4 +240,20 @@ suite('Copy File Content E2E Tests', () => {
     assert.ok(menuItem.includes('Copy file content'),
       'copy-file-content should have correct label');
   });
+
+  test('main.js triggerAction should dispatch copyFileContent', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("case 'copyFileContent': handleCopyFileContent()"),
+      'main.js triggerAction should dispatch copyFileContent');
+  });
+
+  test('main.js should have handleCopyFileContent function', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('function handleCopyFileContent'),
+      'main.js should have handleCopyFileContent function');
+  });
 });
