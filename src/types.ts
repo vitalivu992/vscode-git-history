@@ -10,6 +10,16 @@ export interface CommitStats {
 }
 
 /**
+ * GPG signature information for a commit
+ */
+export interface CommitSignature {
+  /** Whether the signature is valid (verified) */
+  verified: boolean;
+  /** Name of the signer (key holder), null if unavailable */
+  signer: string | null;
+}
+
+/**
  * Represents a single git commit
  */
 export interface CommitInfo {
@@ -23,6 +33,7 @@ export interface CommitInfo {
   fullMessage: string;
   tags?: string[];
   stats?: CommitStats;
+  signature?: CommitSignature | null;
 }
 
 /**
