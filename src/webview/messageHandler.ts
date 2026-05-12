@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl } from '../git/gitService';
-import { ExtToWebviewMessage, CommitInfo, FilterQueryState } from '../types';
-import { SettingsService, UserSettings } from '../settings';
+import { ExtToWebviewMessage, CommitInfo, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
+import { SettingsService, UserSettings, MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
 
 /**
@@ -268,6 +268,22 @@ export async function handleMessage(
 
     case 'openFileUrl':
       await handleOpenFileUrl(message.hash, message.filePath, panel);
+      break;
+
+    case 'saveFilterPreset':
+      await handleSaveFilterPreset(message.name, message.filterState, panel);
+      break;
+
+    case 'deleteFilterPreset':
+      await handleDeleteFilterPreset(message.name, panel);
+      break;
+
+    case 'getFilterPresets':
+      await handleGetFilterPresets(panel);
+      break;
+
+    case 'applyPreset':
+      await handleApplyPreset(message.presetName, panel);
       break;
 
     default:
@@ -1701,6 +1717,158 @@ async function handleOpenFileUrl(hash: string, filePath: string, panel: GitHisto
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to open file URL: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Validate preset name
+ * Returns { valid: boolean, error?: string }
+ */
+function validatePresetName(name: string, existingPresets: SavedFilterPreset[]): { valid: boolean; error?: string } {
+  if (!name || name.trim() === '') {
+    return { valid: false, error: 'Preset name cannot be empty' };
+  }
+
+  if (name.length > PRESET_NAME_MAX_LENGTH) {
+    return { valid: false, error: `Preset name cannot exceed ${PRESET_NAME_MAX_LENGTH} characters` };
+  }
+
+  // Check for invalid characters (control characters, path separators)
+  if (/[\/\\:*?"<>|\x00-\x1F]/.test(name)) {
+    return { valid: false, error: 'Preset name contains invalid characters' };
+  }
+
+  // Check for duplicate names (case-insensitive)
+  const duplicate = existingPresets.find(p => p.name.toLowerCase() === name.toLowerCase());
+  if (duplicate) {
+    return { valid: false, error: `Preset "${name}" already exists` };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Handle save filter preset
+ */
+async function handleSaveFilterPreset(name: string, filterState: FilterQueryState, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const context = panel.getContext();
+    const existingPresets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
+
+    // Validate preset name
+    const validation = validatePresetName(name, existingPresets);
+    if (!validation.valid) {
+      void vscode.window.showWarningMessage(validation.error || 'Invalid preset name');
+      return;
+    }
+
+    // Enforce max presets limit
+    if (existingPresets.length >= MAX_SAVED_PRESETS) {
+      void vscode.window.showWarningMessage(`Maximum ${MAX_SAVED_PRESETS} presets allowed. Delete a preset first.`);
+      return;
+    }
+
+    // Create new preset
+    const newPreset: SavedFilterPreset = {
+      name: name.trim(),
+      filterState,
+      createdAt: new Date().toISOString()
+    };
+
+    // Save to globalState
+    const updatedPresets = [...existingPresets, newPreset];
+    await context.globalState.update(SAVED_PRESETS_STORAGE_KEY, updatedPresets);
+
+    // Send updated presets to webview
+    panel.postMessage({
+      type: 'filterPresets',
+      presets: updatedPresets
+    });
+
+    void vscode.window.showInformationMessage(`Preset "${name}" saved`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to save preset: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle delete filter preset
+ */
+async function handleDeleteFilterPreset(name: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const context = panel.getContext();
+    const existingPresets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
+
+    // Find and remove preset (case-insensitive match)
+    const updatedPresets = existingPresets.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+
+    if (updatedPresets.length === existingPresets.length) {
+      void vscode.window.showInformationMessage(`Preset "${name}" not found`);
+      return;
+    }
+
+    await context.globalState.update(SAVED_PRESETS_STORAGE_KEY, updatedPresets);
+
+    // Send updated presets to webview
+    panel.postMessage({
+      type: 'filterPresets',
+      presets: updatedPresets
+    });
+
+    void vscode.window.showInformationMessage(`Preset "${name}" deleted`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to delete preset: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle get filter presets
+ */
+async function handleGetFilterPresets(panel: GitHistoryPanel): Promise<void> {
+  try {
+    const context = panel.getContext();
+    const presets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
+
+    panel.postMessage({
+      type: 'filterPresets',
+      presets
+    });
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to get presets: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle apply preset
+ */
+async function handleApplyPreset(presetName: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const context = panel.getContext();
+    const presets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
+
+    const preset = presets.find(p => p.name.toLowerCase() === presetName.toLowerCase());
+    if (!preset) {
+      void vscode.window.showInformationMessage(`Preset "${presetName}" not found`);
+      return;
+    }
+
+    // Send applyFilterQuery message to webview
+    panel.postMessage({
+      type: 'applyFilterQuery',
+      filterState: preset.filterState
+    });
+
+    void vscode.window.showInformationMessage(`Applied preset: ${preset.name}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to apply preset: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
