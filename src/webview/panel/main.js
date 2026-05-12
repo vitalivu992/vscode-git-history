@@ -1930,6 +1930,7 @@ function handleMessage(event) {
         case 'copyFileUrl': handleCopyFileUrl(); break;
         case 'copyDescribe': handleCopyDescribe(); break;
         case 'exportCommits': handleExportCommits(); break;
+        case 'exportCommitsMbox': showExportFormatDialog(selectedCommits); break;
         case 'quickCompare': handleQuickCompare(); break;
         case 'createBranch': handleCreateBranch(); break;
         case 'createTag': handleCreateTag(); break;
@@ -4392,7 +4393,9 @@ function showSavePresetDialog() {
       query: searchQuery,
       hideMergeCommits: hideMergeCommits,
       sortMode: sortMode,
-      showMyCommitsOnly: showMyCommitsOnly
+      showMyCommitsOnly: showMyCommitsOnly,
+      regexSearchEnabled: regexSearchEnabled,
+      pathFilter: pathFilter
     };
 
     vscode.postMessage({
@@ -4417,7 +4420,9 @@ function savePreset(name) {
     query: searchQuery,
     hideMergeCommits: hideMergeCommits,
     sortMode: sortMode,
-    showMyCommitsOnly: showMyCommitsOnly
+    showMyCommitsOnly: showMyCommitsOnly,
+    regexSearchEnabled: regexSearchEnabled,
+    pathFilter: pathFilter
   };
 
   vscode.postMessage({
@@ -4524,6 +4529,9 @@ function getPresetSummary(preset) {
   const parts = [];
   if (preset.filterState.query) {
     parts.push(`"${escapeHtml(preset.filterState.query)}"`);
+  }
+  if (preset.filterState.regexSearchEnabled) {
+    parts.push('.*');
   }
   if (preset.filterState.hideMergeCommits) {
     parts.push('No Merge');
