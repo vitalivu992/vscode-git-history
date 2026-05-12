@@ -242,6 +242,10 @@ export async function handleMessage(
       await handleCopyRangeDiff(message.fromHash, message.toHash, panel);
       break;
 
+    case 'copyCommitMention':
+      await handleCopyCommitMention(message.hash, panel);
+      break;
+
     default:
       console.error('Unknown message type:', message);
   }
@@ -1551,6 +1555,36 @@ async function handleCopyRangeDiff(fromHash: string, toHash: string, panel: GitH
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to copy range diff: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle copy commit mention (owner/repo@hash format) to clipboard
+ */
+async function handleCopyCommitMention(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const remoteUrl = await getRemoteUrl(cwd);
+
+    if (!remoteUrl) {
+      void vscode.window.showInformationMessage('No git remote configured');
+      return;
+    }
+
+    const remoteInfo = parseRemoteUrl(remoteUrl);
+    if (!remoteInfo || remoteInfo.platform === 'unknown') {
+      void vscode.window.showInformationMessage('Unable to detect git platform');
+      return;
+    }
+
+    const shortHash = hash.substring(0, 7);
+    const mention = `${remoteInfo.owner}/${remoteInfo.repo}@${shortHash}`;
+    await vscode.env.clipboard.writeText(mention);
+    void vscode.window.showInformationMessage(`Copied: ${mention}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy mention: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }

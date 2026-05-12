@@ -121,7 +121,8 @@ export type WebviewAction =
   | 'pasteFilterQuery'
   | 'clearAllFilters'
   | 'copyCombinedDiff'
-  | 'copyRangeDiff';
+  | 'copyRangeDiff'
+  | 'copyCommitMention';
 
 /**
  * Filter state for copy filter query feature
@@ -208,4 +209,5 @@ export type WebviewToExtMessage =
   | { type: 'pasteFilterQuery' }
   | { type: 'clearAllFilters' }
   | { type: 'copyCombinedDiff'; hashes: string[] }
-  | { type: 'copyRangeDiff'; fromHash: string; toHash: string };
+  | { type: 'copyRangeDiff'; fromHash: string; toHash: string }
+  | { type: 'copyCommitMention'; hash: string };
