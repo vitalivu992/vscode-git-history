@@ -4,7 +4,7 @@ const COMMIT_SEPARATOR = '---COMMIT-END---';
 
 /**
  * Parse git log output with null-separated fields
- * Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00---COMMIT-END---%n
+ * Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n
  */
 export function parseGitLog(output: string): CommitInfo[] {
   const commits: CommitInfo[] = [];
@@ -44,6 +44,17 @@ function parseCommitBlock(block: string): CommitInfo | null {
   const body = fields[6] || '';
   const decorations = fields[7] || '';
   const tags = parseTagsFromDecorations(decorations);
+  const signatureStatus = fields[8] || 'N';
+  const signerName = fields[9] || '';
+
+  // Parse signature status (G=good, B=bad, U=untrusted, X=expired, Y=expired key, R=revoked, E=error, N=none)
+  let signature: import('../types').CommitSignature | null = null;
+  if (signatureStatus && signatureStatus !== 'N') {
+    signature = {
+      verified: signatureStatus === 'G',
+      signer: signerName || null
+    };
+  }
 
   // Validate hash format
   if (!/^[0-9a-f]{40}$/i.test(hash)) {
@@ -70,7 +81,8 @@ function parseCommitBlock(block: string): CommitInfo | null {
     date: date.toISOString(),
     message: subject,
     fullMessage: fullMessage.trim(),
-    ...(tags.length > 0 ? { tags } : {})
+    ...(tags.length > 0 ? { tags } : {}),
+    ...(signature !== null ? { signature } : {})
   };
 }
 
@@ -125,7 +137,7 @@ export function parseNameStatus(output: string): Map<string, { status: string; p
 
 /**
  * Parse git log -L output (line history)
- * Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d
+ * Format: %H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d%x00%G?%x00%GS
  * Each commit header line contains null-separated fields; diff lines are skipped.
  */
 export function parseLineHistoryLog(output: string): CommitInfo[] {
@@ -150,7 +162,18 @@ export function parseLineHistoryLog(output: string): CommitInfo[] {
     const subject = fields[5] || '';
     const decorations = fields[6] || '';
     const tags = parseTagsFromDecorations(decorations);
+    const signatureStatus = fields[7] || 'N';
+    const signerName = fields[8] || '';
     const date = new Date(parseInt(dateStr) * 1000);
+
+    // Parse signature status
+    let signature: import('../types').CommitSignature | null = null;
+    if (signatureStatus && signatureStatus !== 'N') {
+      signature = {
+        verified: signatureStatus === 'G',
+        signer: signerName || null
+      };
+    }
     if (!author || isNaN(date.getTime())) { continue; }
 
     commits.push({
@@ -162,7 +185,8 @@ export function parseLineHistoryLog(output: string): CommitInfo[] {
       date: date.toISOString(),
       message: subject,
       fullMessage: subject,
-      ...(tags.length > 0 ? { tags } : {})
+      ...(tags.length > 0 ? { tags } : {}),
+      ...(signature !== null ? { signature } : {})
     });
   }
 
