@@ -475,4 +475,10 @@ suite('Copy Commit Stats Source Verification', () => {
     assert.ok(source.includes("type: 'copyCommitStats'"),
       'main.js should send copyCommitStats message on copy-stats action');
   });
+
+  test('main.js triggerAction should dispatch copyCommitStats', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes("case 'copyCommitStats': handleCopyStats()"),
+      'main.js triggerAction should dispatch copyCommitStats');
+  });
 });

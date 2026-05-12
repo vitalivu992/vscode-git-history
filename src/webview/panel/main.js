@@ -1726,6 +1726,7 @@ function handleMessage(event) {
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
         case 'copyDiffStatSummary': handleCopyDiffStatSummary(); break;
+        case 'copyCommitStats': handleCopyStats(); break;
         case 'copyOneline': handleCopyOneline(); break;
         case 'copyCommitBody': handleCopyCommitBody(); break;
         case 'copyCommitMarkdown': handleCopyMarkdown(); break;
@@ -1737,6 +1738,8 @@ function handleMessage(event) {
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFilePath': handleCopyFilePath(); break;
         case 'copyRelativePath': handleCopyRelativePath(); break;
+        case 'copyFileDiff': handleCopyFileDiff(); break;
+        case 'copyFileContent': handleCopyFileContent(); break;
         case 'exportCommits': handleExportCommits(); break;
         case 'quickCompare': handleQuickCompare(); break;
         case 'createBranch': handleCreateBranch(); break;
@@ -3761,6 +3764,46 @@ function handleCopyRelativePath() {
     return;
   }
   vscode.postMessage({ type: 'copyRelativePath', filePath: selectedFile });
+}
+
+function handleCopyFileDiff() {
+  if (!selectedFile) {
+    showError('Select a file to copy its diff');
+    return;
+  }
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+  if (!targetCommit) {
+    showError('Select a commit to copy its file diff');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFileDiff', hash: targetCommit.hash, filePath: selectedFile });
+}
+
+function handleCopyFileContent() {
+  if (!selectedFile) {
+    showError('Select a file to copy its content');
+    return;
+  }
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+  if (!targetCommit) {
+    showError('Select a commit to copy file content');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFileContent', hash: targetCommit.hash, filePath: selectedFile });
 }
 
 // Initialize on load
