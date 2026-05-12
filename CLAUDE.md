@@ -118,6 +118,8 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Branch Switching**: Right-click the branch badge to show a context menu with all local and remote branches, or press `Ctrl+Alt+S` / `Cmd+Alt+S` to open a searchable branch picker dialog. Clicking a branch sends a `checkoutBranch` message to the extension which executes `git checkout <branch>`. On success, the panel automatically refreshes to show the new branch's commits. Implemented in `main.js` (`showBranchContextMenu()`, `showBranchPickerDialog()`, `setAllBranches()`), `messageHandler.ts` (`handleCheckoutBranch()`), `gitService.ts` (`checkoutBranch()`), and `styles.css` (`.branch-context-menu`, `.branch-picker-modal`).
 
+- **Delete Branch**: Press `Ctrl+Alt+X` / `Cmd+Alt+X` to open a modal dialog to select and delete local branches. The modal shows all local branches (excluding remote tracking branches), with the current branch marked and not deletable. When deleting a branch that is not fully merged, git will reject the operation and offer a force delete option. Cannot delete the current branch - shows an error message. Implemented in `main.js` (`handleDeleteBranch()`), `messageHandler.ts` (`handleDeleteBranch()`), `gitService.ts` (`deleteBranch()`), and `package.json` (command definition).
+
 ### UI Features
 
 - **Date Display**: Commit dates are displayed in relative format with time for recent commits (e.g., "Today 2:30 PM", "Yesterday 3:45 PM", "2 days ago", "2 weeks ago"). Hovering over a date reveals the absolute timestamp in locale format. Implemented in `src/webview/panel/main.js` (`formatDate()` and `formatTime()` functions) and uses a `title` attribute on date elements.
