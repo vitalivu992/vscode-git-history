@@ -584,6 +584,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+2: Copy Unix timestamp
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '2') {
+    e.preventDefault();
+    handleCopyCommitTimestamp();
+    return;
+  }
+
   // Ctrl+Shift+Y: Copy as oneline
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'y') {
     e.preventDefault();
@@ -1928,6 +1935,7 @@ function handleMessage(event) {
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
         case 'copyCommitDate': handleCopyCommitDate(); break;
         case 'copyRelativeDate': handleCopyRelativeDate(); break;
+        case 'copyCommitTimestamp': handleCopyCommitTimestamp(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
         case 'copyAllFilteredHashes': handleCopyAllFilteredHashes(); break;
         case 'copyFileName': handleCopyFileName(); break;
@@ -2687,6 +2695,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🕒</span>
       <span class="context-menu-label">Copy relative date</span>
     </div>
+    <div class="context-menu-item" data-action="copy-timestamp">
+      <span class="context-menu-icon">⏱️</span>
+      <span class="context-menu-label">Copy Unix timestamp</span>
+    </div>
     <div class="context-menu-item" data-action="copy-branch-name">
       <span class="context-menu-icon">🌿</span>
       <span class="context-menu-label">Copy branch name</span>
@@ -2805,6 +2817,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitDate', hash: commit.hash });
       } else if (action === 'copy-relative-date') {
         vscode.postMessage({ type: 'copyRelativeDate', hash: commit.hash });
+      } else if (action === 'copy-timestamp') {
+        vscode.postMessage({ type: 'copyCommitTimestamp', hash: commit.hash });
       } else if (action === 'copy-branch-name') {
         handleCopyBranchName();
       } else if (action === 'copy-branch-url') {
@@ -3604,6 +3618,28 @@ function handleCopyRelativeDate() {
   });
 }
 
+function handleCopyCommitTimestamp() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy its timestamp');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitTimestamp',
+    hash: targetCommit.hash
+  });
+}
+
 function handleCreateBranch() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -4114,6 +4150,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' },
         { keys: [cmdKey, 'Shift', 'T'], description: 'Copy commit date' },
         { keys: [cmdKey, 'Shift', '8'], description: 'Copy relative date' },
+        { keys: [cmdKey, 'Shift', '2'], description: 'Copy Unix timestamp' },
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'Alt', 'H'], description: 'Copy all filtered hashes' },
