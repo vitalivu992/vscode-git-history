@@ -974,6 +974,77 @@ body {
   color: var(--vscode-disabledForeground);
 }
 
+/* Delete Branch Modal */
+#delete-branch-modal.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.delete-branch-content {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 6px;
+  width: 350px;
+  max-height: 500px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.delete-branch-content .modal-title {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--vscode-border-color);
+}
+
+.delete-branch-content .branch-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.delete-branch-content .branch-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+}
+
+.delete-branch-content .branch-item:hover {
+  background-color: var(--vscode-list-hoverBackground, #2a2d2e);
+}
+
+.delete-branch-content .branch-item.current-branch {
+  color: var(--vscode-disabledForeground);
+  cursor: default;
+}
+
+.delete-branch-content .modal-close-btn {
+  margin: 8px 16px 12px;
+  padding: 6px 16px;
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: center;
+}
+
+.delete-branch-content .modal-close-btn:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
 .detail-hash-chip {
   display: inline-block;
   font-family: 'Consolas', 'Monaco', monospace;

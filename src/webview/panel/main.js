@@ -1808,6 +1808,7 @@ function handleMessage(event) {
         case 'createBranch': handleCreateBranch(); break;
         case 'createTag': handleCreateTag(); break;
         case 'deleteTag': handleDeleteTag(); break;
+        case 'deleteBranch': handleDeleteBranch(); break;
         case 'checkoutBranch': showBranchPickerDialog(); break;
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
         case 'toggleWordWrap': handleWordWrapToggle(); break;
@@ -3454,6 +3455,85 @@ function handleDeleteTag() {
   });
 }
 
+function handleDeleteBranch() {
+  if (!_allBranches || _allBranches.length === 0) {
+    showError('No branches available');
+    return;
+  }
+
+  // Filter to local branches only (exclude remotes)
+  const localBranches = _allBranches.filter(b => !b.startsWith('remotes/'));
+
+  if (localBranches.length === 0) {
+    showError('No local branches available');
+    return;
+  }
+
+  // Show a modal to select branch to delete
+  const modal = document.createElement('div');
+  modal.id = 'delete-branch-modal';
+  modal.className = 'modal-overlay';
+
+  const content = document.createElement('div');
+  content.className = 'modal-content delete-branch-content';
+
+  const title = document.createElement('div');
+  title.className = 'modal-title';
+  title.textContent = 'Delete Branch';
+  content.appendChild(title);
+
+  const list = document.createElement('div');
+  list.className = 'branch-list';
+
+  localBranches.forEach(branch => {
+    const item = document.createElement('div');
+    item.className = 'branch-item';
+    if (branch === currentBranch) {
+      item.classList.add('current-branch');
+      item.textContent = '✓ ' + branch + ' (current)';
+      item.title = 'Cannot delete current branch';
+    } else {
+      item.textContent = branch;
+      item.addEventListener('click', () => {
+        closeModal();
+        vscode.postMessage({ type: 'deleteBranch', branch: branch });
+      });
+    }
+    list.appendChild(item);
+  });
+
+  content.appendChild(list);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close-btn';
+  closeBtn.textContent = 'Cancel';
+  closeBtn.addEventListener('click', closeModal);
+  content.appendChild(closeBtn);
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+
+  function closeModal() {
+    modal.remove();
+  }
+
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  // Close on Escape
+  function handleKeyDown(e) {
+    if (e.key === 'Escape') {
+      closeModal();
+      document.removeEventListener('keydown', handleKeyDown);
+    }
+  }
+  document.addEventListener('keydown', handleKeyDown);
+}
+
 function handleCopySelectedHashes() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
 
@@ -3830,7 +3910,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '0'], description: 'Save filter preset' },
         { keys: [cmdKey, 'Shift', '1'], description: 'Load filter preset' },
         { keys: [cmdKey, 'K', cmdKey, 'O'], description: 'Open commit URL in browser' },
-        { keys: [cmdKey, 'K', cmdKey, 'P'], description: 'Open file URL in browser' }
+        { keys: [cmdKey, 'K', cmdKey, 'P'], description: 'Open file URL in browser' },
+        { keys: [cmdKey, 'Alt', 'X'], description: 'Delete local branch' }
       ]
     }
   ];
