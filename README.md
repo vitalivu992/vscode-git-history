@@ -173,6 +173,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy branch name** | Copy the current branch name |
 | **Copy branch URL** | Copy the web URL for the current branch |
 | **Copy remote URL** | Copy the raw git remote URL |
+| **Copy file permalink** | Copy permanent web URL for a file at a specific commit |
 | **Copy tags** | Copy all tags for this commit |
 | **Copy selected hashes** | Copy all selected commit hashes (2+ commits selected) |
 | **Copy combined diff** | Copy combined diff of all selected commits |
@@ -192,6 +193,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy file path** | Copy the full file path to clipboard |
 | **Copy file name only** | Copy just the filename (e.g., `main.js`) to clipboard |
 | **Copy relative path** | Copy the file path relative to the git repository root (e.g., `src/webview/panel/main.js`) |
+| **Copy file permalink** | Copy permanent web URL for the file at the selected commit (GitHub/GitLab/Bitbucket) |
 
 #### Keyboard Navigation
 
@@ -231,6 +233,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Alt+R` / `Cmd+Alt+R` | Copy range diff to clipboard (range selected) |
 | `Ctrl+Alt+S` / `Cmd+Alt+S` | Show branch switcher |
 | `Ctrl+Alt+U` / `Cmd+Alt+U` | Copy branch URL to clipboard |
+| `Ctrl+Alt+Shift+U` / `Cmd+Alt+Shift+U` | Copy file permalink to clipboard |
 | `Ctrl+Shift+G` / `Cmd+Shift+G` | Copy tags to clipboard |
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email to clipboard |
 | `Ctrl+Shift+N` / `Cmd+Shift+N` | Copy author name to clipboard |
@@ -342,6 +345,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy file name | `Ctrl+Shift+,` / `Cmd+Shift+,` |
 | Copy relative path | `Ctrl+Alt+L` / `Cmd+Alt+L` |
 | Copy branch URL | `Ctrl+Alt+U` / `Cmd+Alt+U` |
+| Copy file permalink | `Ctrl+Alt+Shift+U` / `Cmd+Alt+Shift+U` |
 | Copy remote URL | `Ctrl+Alt+O` / `Cmd+Alt+O` |
 | Copy combined diff | `Ctrl+Alt+D` / `Cmd+Alt+D` (2+ selected) |
 | Copy range diff | `Ctrl+Alt+R` / `Cmd+Alt+R` (range selected) |
