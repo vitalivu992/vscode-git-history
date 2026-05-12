@@ -102,6 +102,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCommitMention",
+        "title": "Git History: Copy as Platform Mention",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitStats",
         "title": "Git History: Copy Commit Stats",
         "category": "Git History"
@@ -418,6 +423,12 @@
         "command": "gitHistory.copyCommitUrl",
         "key": "ctrl+shift+l",
         "mac": "cmd+shift+l",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitMention",
+        "key": "ctrl+shift+@",
+        "mac": "cmd+shift+@",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
