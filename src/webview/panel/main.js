@@ -30,6 +30,7 @@ let commitFilesMap = new Map(); // hash -> CommitFileChange[]
 let firstRunTipVisible = false; // First-run tip banner visibility state
 let savedPresets = []; // Saved filter presets
 let presetDropdownVisible = false; // Preset dropdown visibility state
+let showSignatures = true; // Show GPG signature verification badges
 
 /**
  * Parse filters from search query
@@ -1669,6 +1670,12 @@ function handleMessage(event) {
             graphToggleBtn.title = 'Show graph';
           }
         }
+
+        // Apply signature visibility from persisted settings
+        if (settings.showSignatures !== undefined) {
+          showSignatures = settings.showSignatures;
+        }
+
         renderCommits();
         updateCommitCount();
 
@@ -1960,6 +1967,13 @@ function renderCommits() {
 
     const mergeBadge = isMerge ? '<span class="merge-badge">merge</span>' : '';
 
+    const signatureBadge = commit.signature && showSignatures
+      ? `<span class="signature-badge ${commit.signature.verified ? 'verified' : 'unverified'}"
+           title="${commit.signature.verified ? 'Verified' : 'Unverified'} signature${commit.signature.signer ? ' by: ' + escapeHtml(commit.signature.signer) : ''}">
+           ${commit.signature.verified ? '✓' : '✗'}
+         </span>`
+      : '';
+
     const avatarColor = getAuthorColor(commit.author);
     const initials = getAuthorInitials(commit.author);
 
@@ -1971,7 +1985,7 @@ function renderCommits() {
       const bodyContent = commit.fullMessage.substring(commit.message.length).trim();
       messageHtml = `
         <div class="message-content ${isExpanded ? 'expanded' : ''}">
-          <div class="message-subject">${mergeBadge}${tagBadges}${escapeHtml(commit.message)}</div>
+          <div class="message-subject">${mergeBadge}${signatureBadge}${tagBadges}${escapeHtml(commit.message)}</div>
           ${isExpanded ? `<div class="message-body">${escapeHtml(bodyContent)}</div>` : ''}
         </div>
         <button class="message-expand-btn" data-hash="${commit.hash}" title="${isExpanded ? 'Collapse' : 'Expand'} message">
@@ -1979,7 +1993,7 @@ function renderCommits() {
         </button>
       `;
     } else {
-      messageHtml = `<div class="message-content">${mergeBadge}${tagBadges}${escapeHtml(commit.message)}</div>`;
+      messageHtml = `<div class="message-content">${mergeBadge}${signatureBadge}${tagBadges}${escapeHtml(commit.message)}</div>`;
     }
 
     tr.innerHTML = `
