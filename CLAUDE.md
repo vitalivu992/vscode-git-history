@@ -39,6 +39,7 @@ User preferences are automatically persisted across VS Code sessions using VS Co
 - **Regex Search Mode**: Whether regex search is enabled
 - **Search Query**: Search query text for filtering commits
 - **Show Graph**: Whether the commit graph column is visible
+- **Show Signatures**: Whether GPG signature verification badges are visible
 
 **Implementation**:
 - `src/settings/settingsService.ts` - Service for saving/loading settings via `globalState`
@@ -86,16 +87,16 @@ User preferences are automatically persisted across VS Code sessions using VS Co
 
 File history uses:
 ```
-%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00---COMMIT-END---%n
+%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n
 ```
-Fields: hash, parent hashes (space-separated), author, email, timestamp, subject, body, decorations.
+Fields: hash, parent hashes (space-separated), author, email, timestamp, subject, body, decorations, GPG signature status, GPG signer name.
 Commits are separated by `---COMMIT-END---` markers. `%P` is empty for root commits.
 
 The `%d` decorations field contains tag references (e.g., `tag: v1.0.0`, `tag: v1.0.0, origin/main`). Tags are parsed from this field and rendered as badges in the webview commit list. Both annotated and lightweight tags are supported.
 
 Selection history (`git log -L`) uses the same null-separated format (without body/`---COMMIT-END---`):
 ```
-%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d
+%H%x00%P%x00%an%x00%ae%x00%at%x00%s%x00%d%x00%G?%x00%GS
 ```
 Each commit appears as a single header line; inline diff lines (no null chars) are skipped by the parser.
 
@@ -260,6 +261,8 @@ The extension detects and displays the current git branch in the history panel:
 - **Clear All Filters**: Press `Ctrl+Alt+Q` / `Cmd+Alt+Q` or click the "Clear All" button (next to the search input) to clear all active filters at once. The button appears only when filters are active (search query, date filters, author/tag/branch/path filters, hide merge commits toggle, regex mode, or my commits toggle). When clicked, it resets all filter state and refreshes the view to show the full commit list. The `clearAllFilters` function in `main.js` resets `searchQuery`, `hideMergeCommits`, `regexSearchEnabled`, and `showMyCommitsOnly`, then calls `renderCommits()`, `renderFilterBadges()`, `updateClearAllButton()`, and `saveSettings()`. The `clearAllFilters` action is also handled via the `triggerAction` message pattern for keyboard shortcut discoverability. The `clearAllFilters` webview action is defined in `src/types.ts`.
 
 - **Keyboard Help**: Press `?` in the history panel to show a modal dialog displaying all available keyboard shortcuts organized by category (Navigation, Search & Filter, View Options, Copy Commands, Actions). The dialog detects the platform (Mac/Windows/Linux) and displays the appropriate modifier keys (Cmd/Ctrl, Option/Alt). Shortcuts are rendered with styled key badges and organized sections. The modal can be closed by clicking the overlay, clicking the X button, or pressing Escape. Implementation is in `src/webview/panel/main.js` (`showKeyboardHelpDialog` function) with styling in `styles.css` (`#keyboard-help-modal` and related classes). The shortcuts data structure is defined inline in the function and includes all keyboard shortcuts documented in the README.
+
+- **GPG Signature Verification**: The extension displays GPG signature verification status for signed commits as colored badges next to the commit message. Green checkmark (✓) indicates a valid, verified signature; red X (✗) indicates an invalid signature (bad, expired, untrusted, revoked, or error). Unsigned commits show no badge. Hovering over a signature badge displays the signer's name and verification status. The `gitHistory.showSignatures` configuration setting controls badge visibility (default: true). Signature status is detected using git's `%G?` format specifier and signer name via `%GS`: `G` (good/valid), `B` (bad), `U` (untrusted), `X` (expired), `Y` (expired key), `R` (revoked), `E` (missing key), `N` (no signature). Only `G` is treated as verified. The `CommitSignature` interface in `src/types.ts` stores `verified` (boolean) and `signer` (string | null). Parsing is done in `src/git/gitParser.ts` (`parseCommitBlock` and `parseLineHistoryLog`). Rendering uses `.signature-badge.verified` and `.signature-badge.unverified` CSS classes in `styles.css`. The `showSignatures` setting is persisted in `UserSettings` across sessions.
 
 ### Message Protocol
 
