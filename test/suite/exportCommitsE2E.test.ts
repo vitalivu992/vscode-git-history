@@ -445,4 +445,16 @@ suite('Export Commits Source Verification', () => {
     assert.ok(source.includes("type: 'exportCommitsMbox'"),
       'main.js should send exportCommitsMbox message');
   });
+
+  test('main.js triggerAction switch should handle exportCommitsMbox', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    // Find the triggerAction switch statement
+    const triggerStart = source.indexOf("case 'triggerAction'");
+    assert.ok(triggerStart > -1, 'main.js should have triggerAction handler');
+    const triggerEnd = source.indexOf('default:', triggerStart);
+    const triggerBody = source.substring(triggerStart, triggerEnd > triggerStart ? triggerEnd : undefined);
+
+    assert.ok(triggerBody.includes("case 'exportCommitsMbox'"),
+      'triggerAction switch should handle exportCommitsMbox action');
+  });
 });

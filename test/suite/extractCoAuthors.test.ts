@@ -1,26 +1,5 @@
 import * as assert from 'assert';
-
-/**
- * extractCoAuthors function (copied from messageHandler.ts for unit testing)
- * Extracts co-authors from commit message body.
- * Looks for "Co-authored-by:" trailers in the format:
- * Co-authored-by: Name <email@example.com>
- */
-function extractCoAuthors(fullMessage: string): string[] {
-  const coAuthors: string[] = [];
-  const lines = fullMessage.split('\n');
-
-  for (const line of lines) {
-    const match = line.match(/^\s*Co-authored-by:\s*(.+?)\s*<([^>]+)>/i);
-    if (match) {
-      const name = match[1].trim();
-      const email = match[2];
-      coAuthors.push(`${name} <${email}>`);
-    }
-  }
-
-  return coAuthors;
-}
+import { extractCoAuthors } from '../../src/webview/messageHandler';
 
 suite('Extract Co-Authors Tests', () => {
   test('should extract single co-author with standard format', () => {

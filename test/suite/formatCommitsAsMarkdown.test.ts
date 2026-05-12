@@ -1,53 +1,8 @@
 import * as assert from 'assert';
+import { CommitInfo } from '../../src/types';
+import { formatCommitsAsMarkdown } from '../../src/webview/messageHandler';
 
-// Test types matching CommitInfo interface
-interface TestCommitInfo {
-  hash: string;
-  shortHash: string;
-  parentHashes: string[];
-  author: string;
-  email: string;
-  date: string;
-  message: string;
-  fullMessage: string;
-  tags?: string[];
-  stats?: {
-    filesChanged: number;
-    insertions: number;
-    deletions: number;
-  };
-}
-
-// Formatter function (mirroring the implementation in messageHandler.ts)
-function formatCommitsAsMarkdown(commits: TestCommitInfo[]): string {
-  const lines: string[] = [];
-
-  for (const commit of commits) {
-    const tags = commit.tags && commit.tags.length > 0
-      ? ` ${commit.tags.map(t => `\`${t}\``).join(' ')}`
-      : '';
-    const stats = commit.stats
-      ? ` (${commit.stats.filesChanged} file${commit.stats.filesChanged === 1 ? '' : 's'}, +${commit.stats.insertions}, -${commit.stats.deletions})`
-      : '';
-
-    lines.push(`### ${commit.shortHash}${stats}${tags}`);
-    lines.push('');
-    lines.push(`**Author:** ${commit.author} <${commit.email}>`);
-    lines.push(`**Date:** ${commit.date}`);
-    lines.push('');
-    lines.push(commit.message);
-    lines.push('');
-
-    if (commit.fullMessage && commit.fullMessage !== commit.message) {
-      lines.push('---');
-      lines.push('');
-      lines.push(commit.fullMessage.replace(commit.message, '').trim());
-      lines.push('');
-    }
-  }
-
-  return lines.join('\n');
-}
+type TestCommitInfo = CommitInfo;
 
 suite('Markdown Formatter Unit Tests', () => {
   const sampleCommits: TestCommitInfo[] = [

@@ -1,62 +1,11 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-
-// Test types matching CommitInfo interface
-interface TestCommitInfo {
-  hash: string;
-  shortHash: string;
-  parentHashes: string[];
-  author: string;
-  email: string;
-  date: string;
-  message: string;
-  fullMessage: string;
-  tags?: string[];
-  stats?: {
-    filesChanged: number;
-    insertions: number;
-    deletions: number;
-  };
-}
-
-// Formatter functions (mirroring the implementation in messageHandler.ts)
-function formatCommitsAsJson(commits: TestCommitInfo[]): string {
-  return JSON.stringify(commits, null, 2);
-}
-
-function escapeCsvField(field: string): string {
-  if (/[",\n\r]/.test(field)) {
-    return `"${field.replace(/"/g, '""')}"`;
-  }
-  return field;
-}
-
-function formatCommitsAsCsv(commits: TestCommitInfo[]): string {
-  const headers = ['Hash', 'Short Hash', 'Author', 'Email', 'Date', 'Message', 'Tags', 'Files Changed', 'Insertions', 'Deletions'];
-  const lines = [headers.join(',')];
-
-  for (const commit of commits) {
-    const fields = [
-      commit.hash,
-      commit.shortHash,
-      escapeCsvField(commit.author),
-      commit.email,
-      commit.date,
-      escapeCsvField(commit.message),
-      commit.tags ? commit.tags.join(';') : '',
-      commit.stats?.filesChanged?.toString() || '0',
-      commit.stats?.insertions?.toString() || '0',
-      commit.stats?.deletions?.toString() || '0'
-    ];
-    lines.push(fields.join(','));
-  }
-
-  return lines.join('\n');
-}
+import { CommitInfo, CommitStats } from '../../src/types';
+import { formatCommitsAsJson, escapeCsvField, formatCommitsAsCsv, formatCommitsAsMarkdown } from '../../src/webview/messageHandler';
 
 suite('Export Formatters Unit Tests', () => {
-  const sampleCommits: TestCommitInfo[] = [
+  const sampleCommits: CommitInfo[] = [
     {
       hash: 'abc123def456abc123def456abc123def456abc1',
       shortHash: 'abc123d',
@@ -114,7 +63,7 @@ suite('Export Formatters Unit Tests', () => {
 
   test('formatCommitsAsJson preserves all commit fields', () => {
     const result = formatCommitsAsJson(sampleCommits);
-    const parsed = JSON.parse(result) as TestCommitInfo[];
+    const parsed = JSON.parse(result) as CommitInfo[];
 
     assert.strictEqual(parsed[0].hash, sampleCommits[0].hash);
     assert.strictEqual(parsed[0].author, sampleCommits[0].author);
@@ -130,7 +79,7 @@ suite('Export Formatters Unit Tests', () => {
 
   test('formatCommitsAsJson includes tags when present', () => {
     const result = formatCommitsAsJson(sampleCommits);
-    const parsed = JSON.parse(result) as TestCommitInfo[];
+    const parsed = JSON.parse(result) as CommitInfo[];
 
     assert.deepStrictEqual(parsed[0].tags, ['v1.0.0']);
     assert.deepStrictEqual(parsed[1].tags, ['v1.1.0', 'release']);
@@ -219,7 +168,7 @@ suite('Export Formatters Unit Tests', () => {
   });
 
   test('formatCommitsAsCsv escapes author names with commas', () => {
-    const commit: TestCommitInfo = {
+    const commit: CommitInfo = {
       ...sampleCommits[0],
       author: 'Smith, John'
     };
@@ -228,7 +177,7 @@ suite('Export Formatters Unit Tests', () => {
   });
 
   test('formatCommitsAsCsv escapes messages with quotes', () => {
-    const commit: TestCommitInfo = {
+    const commit: CommitInfo = {
       ...sampleCommits[0],
       message: 'Fix "critical" bug'
     };
@@ -242,7 +191,7 @@ suite('Export Formatters Unit Tests', () => {
   });
 
   test('formatCommitsAsCsv handles message with newlines', () => {
-    const commit: TestCommitInfo = {
+    const commit: CommitInfo = {
       ...sampleCommits[0],
       message: 'First line\nSecond line'
     };

@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import { SavedFilterPreset, FilterQueryState } from '../../src/types';
 import { MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../../src/settings/settingsTypes';
+import { validatePresetName } from '../../src/webview/messageHandler';
 
 suite('Saved Filter Presets Tests', function() {
 
@@ -205,29 +206,3 @@ suite('Saved Filter Presets Tests', function() {
     });
   });
 });
-
-// Export validatePresetName for testing (note: this would need to be exported in the actual implementation)
-export function validatePresetName(name: string, existingPresets: SavedFilterPreset[]): { valid: boolean; error?: string } {
-  if (!name || name.trim() === '') {
-    return { valid: false, error: 'Preset name cannot be empty' };
-  }
-
-  if (name.length > PRESET_NAME_MAX_LENGTH) {
-    return { valid: false, error: `Preset name cannot exceed ${PRESET_NAME_MAX_LENGTH} characters` };
-  }
-
-  if (/[\/\\:*?"<>|\x00-\x1F]/.test(name)) {
-    return { valid: false, error: 'Preset name contains invalid characters' };
-  }
-
-  const duplicate = existingPresets.find(p => p.name.toLowerCase() === name.toLowerCase());
-  if (duplicate) {
-    return { valid: false, error: `Preset "${name}" already exists` };
-  }
-
-  if (existingPresets.length >= MAX_SAVED_PRESETS) {
-    return { valid: false, error: `Maximum ${MAX_SAVED_PRESETS} presets allowed. Delete a preset first.` };
-  }
-
-  return { valid: true };
-}
