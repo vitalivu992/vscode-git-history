@@ -105,7 +105,8 @@ function parseDateFilter(query) {
     textQuery = textQuery.replace(lastMatch[0], '').trim();
   }
 
-  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter, branchFilter, pathFilter };
+  const lastFilter = lastMatch ? lastMatch[0] : null;
+  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter, branchFilter, pathFilter, lastFilter };
 }
 
 /**
@@ -168,9 +169,9 @@ function renderFilterBadges() {
     existingBadges.remove();
   }
 
-  const { dateFilters, authorFilter, tagFilter, branchFilter, pathFilter } = parseDateFilter(searchQuery);
+  const { dateFilters, authorFilter, tagFilter, branchFilter, pathFilter, lastFilter } = parseDateFilter(searchQuery);
   const hasDateFilters = !!(dateFilters.after || dateFilters.before);
-  const hasFilters = hasDateFilters || authorFilter || tagFilter || branchFilter || pathFilter;
+  const hasFilters = hasDateFilters || authorFilter || tagFilter || branchFilter || pathFilter || lastFilter;
 
   if (!hasFilters) {
     return;
@@ -220,7 +221,12 @@ function renderFilterBadges() {
     badgesContainer.appendChild(pathBadge);
   }
 
-  if (dateFilters.after) {
+  if (lastFilter) {
+    const lastBadge = document.createElement('span');
+    lastBadge.className = 'filter-badge';
+    lastBadge.innerHTML = `${escapeHtml(lastFilter)} <span class="filter-badge-clear" data-filter="last">&times;</span>`;
+    badgesContainer.appendChild(lastBadge);
+  } else if (dateFilters.after) {
     const afterBadge = document.createElement('span');
     afterBadge.className = 'filter-badge';
     afterBadge.innerHTML = `after: ${formatDate(dateFilters.after)} <span class="filter-badge-clear" data-filter="after">&times;</span>`;
@@ -255,10 +261,9 @@ function renderFilterBadges() {
         newQuery = newQuery.replace(/branch:[^\s]+/i, '').trim();
       } else if (filterToRemove === 'path') {
         newQuery = newQuery.replace(/path:[^\s]+/i, '').trim();
+      } else if (filterToRemove === 'last') {
+        newQuery = newQuery.replace(/last:\d+\s*(day|days|week|weeks|month|months)/i, '').trim();
       }
-
-      // Also remove any orphaned "last:" filter if it was the only thing
-      newQuery = newQuery.replace(/last:\d+\s*(day|days|week|weeks|month|months)/i, '').trim();
 
       searchInput.value = newQuery;
       searchQuery = newQuery;

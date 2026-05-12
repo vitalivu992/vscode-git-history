@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 
-function parseDateFilter(query: string): { textQuery: string; dateFilters: { after?: Date; before?: Date }; authorFilter: string | null; tagFilter: string | null } {
+function parseDateFilter(query: string): { textQuery: string; dateFilters: { after?: Date; before?: Date }; authorFilter: string | null; tagFilter: string | null; lastFilter: string | null } {
   const dateFilters: { after?: Date; before?: Date } = {};
   let textQuery = query;
 
@@ -57,7 +57,8 @@ function parseDateFilter(query: string): { textQuery: string; dateFilters: { aft
     textQuery = textQuery.replace(lastMatch[0], '').trim();
   }
 
-  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter };
+  const lastFilter = lastMatch ? lastMatch[0] : null;
+  return { textQuery: textQuery.trim(), dateFilters, authorFilter, tagFilter, lastFilter };
 }
 
 interface TestCommit {
@@ -193,6 +194,28 @@ suite('Author Filter Tests', () => {
     test('should extract author filter and leave remaining text query with date filter', () => {
       const result = parseDateFilter('author:Bob after:2024-02-01');
       assert.strictEqual(result.authorFilter, 'bob');
+      assert.ok(result.dateFilters.after);
+    });
+
+    test('should return lastFilter when last:N syntax is used', () => {
+      const result = parseDateFilter('last:7days');
+      assert.strictEqual(result.lastFilter, 'last:7days');
+    });
+
+    test('should return null lastFilter when last: syntax is not used', () => {
+      const result = parseDateFilter('after:2024-01-01');
+      assert.strictEqual(result.lastFilter, null);
+    });
+
+    test('should parse last: and author: together', () => {
+      const result = parseDateFilter('last:3weeks author:Bob');
+      assert.strictEqual(result.lastFilter, 'last:3weeks');
+      assert.strictEqual(result.authorFilter, 'bob');
+    });
+
+    test('should parse last:2months and set dateFilters.after', () => {
+      const result = parseDateFilter('last:2months');
+      assert.strictEqual(result.lastFilter, 'last:2months');
       assert.ok(result.dateFilters.after);
     });
   });
@@ -363,6 +386,56 @@ suite('Author Filter Source Verification Tests', () => {
     assert.ok(
       hasActiveSection.includes('authorFilter'),
       'hasActiveFilters should check authorFilter'
+    );
+  });
+
+  test('parseDateFilter in main.js returns lastFilter', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const parseDateFilterSection = source.substring(
+      source.indexOf('function parseDateFilter'),
+      source.indexOf('function hasActiveFilters')
+    );
+    assert.ok(
+      parseDateFilterSection.includes('lastFilter'),
+      'parseDateFilter should return lastFilter'
+    );
+    assert.ok(
+      parseDateFilterSection.includes("const lastFilter = lastMatch ? lastMatch[0] : null"),
+      'parseDateFilter should extract lastMatch as lastFilter'
+    );
+  });
+
+  test('renderFilterBadges in main.js renders lastFilter badge', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const renderFilterBadgesSection = source.substring(
+      source.indexOf('function renderFilterBadges'),
+      source.indexOf('const GRAPH_COLORS')
+    );
+    assert.ok(
+      renderFilterBadgesSection.includes('lastFilter'),
+      'renderFilterBadges should check lastFilter'
+    );
+    assert.ok(
+      renderFilterBadgesSection.includes("data-filter=\"last\""),
+      'renderFilterBadges should render last filter badge with clear button'
+    );
+  });
+
+  test('renderFilterBadges clear handler includes last filter case', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const renderFilterBadgesSection = source.substring(
+      source.indexOf('function renderFilterBadges'),
+      source.indexOf('const GRAPH_COLORS')
+    );
+    assert.ok(
+      renderFilterBadgesSection.includes("filterToRemove === 'last'"),
+      'Clear handler should include last filter case'
     );
   });
 });
