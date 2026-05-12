@@ -8,7 +8,9 @@ suite('Paste Filter Query E2E Tests', () => {
       query: 'author:alice after:2024-01-01',
       hideMergeCommits: true,
       sortMode: 1,
-      showMyCommitsOnly: true
+      showMyCommitsOnly: true,
+      regexSearchEnabled: false,
+      pathFilter: null
     };
 
     // Simulate copy
@@ -23,6 +25,8 @@ suite('Paste Filter Query E2E Tests', () => {
     assert.strictEqual(parsed.hideMergeCommits, true);
     assert.strictEqual(parsed.sortMode, 1);
     assert.strictEqual(parsed.showMyCommitsOnly, true);
+    assert.strictEqual(parsed.regexSearchEnabled, false);
+    assert.strictEqual(parsed.pathFilter, null);
   });
 
   test('invalid JSON in clipboard is handled gracefully', async () => {
@@ -50,16 +54,18 @@ suite('Paste Filter Query E2E Tests', () => {
     assert.strictEqual(parsed.hideMergeCommits, undefined);
     assert.strictEqual(parsed.sortMode, undefined);
     assert.strictEqual(parsed.showMyCommitsOnly, undefined);
+    assert.strictEqual(parsed.regexSearchEnabled, undefined);
+    assert.strictEqual(parsed.pathFilter, undefined);
   });
 
   test('filter state with out-of-range sortMode is handled', () => {
-    const state = { query: '', hideMergeCommits: false, sortMode: 5, showMyCommitsOnly: false };
+    const state = { query: '', hideMergeCommits: false, sortMode: 5, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null };
     const validSortMode = typeof state.sortMode === 'number' && state.sortMode >= 0 && state.sortMode <= 3;
     assert.strictEqual(validSortMode, false, 'sortMode 5 should be invalid');
   });
 
   test('filter state with negative sortMode is handled', () => {
-    const state = { query: '', hideMergeCommits: false, sortMode: -1, showMyCommitsOnly: false };
+    const state = { query: '', hideMergeCommits: false, sortMode: -1, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null };
     const validSortMode = typeof state.sortMode === 'number' && state.sortMode >= 0 && state.sortMode <= 3;
     assert.strictEqual(validSortMode, false, 'Negative sortMode should be invalid');
   });
@@ -69,7 +75,9 @@ suite('Paste Filter Query E2E Tests', () => {
       query: '',
       hideMergeCommits: false,
       sortMode: 0,
-      showMyCommitsOnly: false
+      showMyCommitsOnly: false,
+      regexSearchEnabled: false,
+      pathFilter: null
     };
 
     const json = JSON.stringify(filterState);
@@ -82,6 +90,8 @@ suite('Paste Filter Query E2E Tests', () => {
     assert.strictEqual(parsed.hideMergeCommits, false);
     assert.strictEqual(parsed.sortMode, 0);
     assert.strictEqual(parsed.showMyCommitsOnly, false);
+    assert.strictEqual(parsed.regexSearchEnabled, false);
+    assert.strictEqual(parsed.pathFilter, null);
   });
 
   test('filter state with all filters active round-trip works', async () => {
@@ -89,7 +99,9 @@ suite('Paste Filter Query E2E Tests', () => {
       query: 'author:alice tag:v2.0 after:2024-06-01 branch:main fix',
       hideMergeCommits: true,
       sortMode: 3,
-      showMyCommitsOnly: true
+      showMyCommitsOnly: true,
+      regexSearchEnabled: true,
+      pathFilter: 'src/'
     };
 
     const json = JSON.stringify(filterState);
@@ -102,5 +114,7 @@ suite('Paste Filter Query E2E Tests', () => {
     assert.strictEqual(parsed.hideMergeCommits, true);
     assert.strictEqual(parsed.sortMode, 3);
     assert.strictEqual(parsed.showMyCommitsOnly, true);
+    assert.strictEqual(parsed.regexSearchEnabled, true);
+    assert.strictEqual(parsed.pathFilter, 'src/');
   });
 });

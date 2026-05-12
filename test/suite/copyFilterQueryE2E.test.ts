@@ -15,12 +15,14 @@ suite('Copy Filter Query E2E Tests', () => {
       query: 'test query',
       hideMergeCommits: true,
       sortMode: 0,
-      showMyCommitsOnly: false
+      showMyCommitsOnly: false,
+      regexSearchEnabled: false,
+      pathFilter: null
     };
 
     // Test that filter state can be formatted as JSON
     const formatted = JSON.stringify(filterState);
-    assert.strictEqual(formatted, '{"query":"test query","hideMergeCommits":true,"sortMode":0,"showMyCommitsOnly":false}');
+    assert.strictEqual(formatted, '{"query":"test query","hideMergeCommits":true,"sortMode":0,"showMyCommitsOnly":false,"regexSearchEnabled":false,"pathFilter":null}');
 
     // Test that write to clipboard would work (simulate by checking clipboard API exists)
     const clipboardText = await vscode.env.clipboard.writeText(formatted);
@@ -33,7 +35,9 @@ suite('Copy Filter Query E2E Tests', () => {
       query: 'author:Alice after:2024-01-01 tag:v1.0',
       hideMergeCommits: true,
       sortMode: 2,
-      showMyCommitsOnly: true
+      showMyCommitsOnly: true,
+      regexSearchEnabled: true,
+      pathFilter: 'src/'
     };
 
     // Verify shape has all required properties
@@ -41,31 +45,39 @@ suite('Copy Filter Query E2E Tests', () => {
     assert.ok('hideMergeCommits' in filterState);
     assert.ok('sortMode' in filterState);
     assert.ok('showMyCommitsOnly' in filterState);
+    assert.ok('regexSearchEnabled' in filterState);
+    assert.ok('pathFilter' in filterState);
 
     // Verify value types
     assert.strictEqual(typeof filterState.query, 'string');
     assert.strictEqual(typeof filterState.hideMergeCommits, 'boolean');
     assert.strictEqual(typeof filterState.sortMode, 'number');
     assert.strictEqual(typeof filterState.showMyCommitsOnly, 'boolean');
+    assert.strictEqual(typeof filterState.regexSearchEnabled, 'boolean');
+    assert.strictEqual(typeof filterState.pathFilter === 'string' || filterState.pathFilter === null, true);
   });
 
   test('filter state parses correctly from JSON', () => {
-    const json = '{"query":"author:bob before:2024-12-31","hideMergeCommits":false,"sortMode":1,"showMyCommitsOnly":true}';
+    const json = '{"query":"author:bob before:2024-12-31","hideMergeCommits":false,"sortMode":1,"showMyCommitsOnly":true,"regexSearchEnabled":false,"pathFilter":null}';
     const filterState: FilterQueryState = JSON.parse(json);
 
     assert.strictEqual(filterState.query, 'author:bob before:2024-12-31');
     assert.strictEqual(filterState.hideMergeCommits, false);
     assert.strictEqual(filterState.sortMode, 1);
     assert.strictEqual(filterState.showMyCommitsOnly, true);
+    assert.strictEqual(filterState.regexSearchEnabled, false);
+    assert.strictEqual(filterState.pathFilter, null);
   });
 
   test('empty filter state works', () => {
-    const json = '{"query":"","hideMergeCommits":false,"sortMode":0,"showMyCommitsOnly":false}';
+    const json = '{"query":"","hideMergeCommits":false,"sortMode":0,"showMyCommitsOnly":false,"regexSearchEnabled":false,"pathFilter":null}';
     const filterState: FilterQueryState = JSON.parse(json);
 
     assert.strictEqual(filterState.query, '');
     assert.strictEqual(filterState.hideMergeCommits, false);
     assert.strictEqual(filterState.sortMode, 0);
     assert.strictEqual(filterState.showMyCommitsOnly, false);
+    assert.strictEqual(filterState.regexSearchEnabled, false);
+    assert.strictEqual(filterState.pathFilter, null);
   });
 });

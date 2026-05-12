@@ -28,7 +28,9 @@ suite('Saved Filter Presets E2E Tests', () => {
       query: 'bug fix',
       hideMergeCommits: true,
       sortMode: 0,
-      showMyCommitsOnly: false
+      showMyCommitsOnly: false,
+      regexSearchEnabled: false,
+      pathFilter: null
     };
 
     // Simulate saving to globalState
@@ -51,7 +53,7 @@ suite('Saved Filter Presets E2E Tests', () => {
     const existingPresets: SavedFilterPreset[] = [
       {
         name: 'Bug Fixes',
-        filterState: { query: 'bug', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false },
+        filterState: { query: 'bug', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null },
         createdAt: '2024-01-01T00:00:00.000Z'
       }
     ];
@@ -70,7 +72,7 @@ suite('Saved Filter Presets E2E Tests', () => {
     for (let i = 0; i < MAX_SAVED_PRESETS; i++) {
       presets.push({
         name: `Preset ${i}`,
-        filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false },
+        filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null },
         createdAt: new Date(i).toISOString()
       });
     }
@@ -90,7 +92,9 @@ suite('Saved Filter Presets E2E Tests', () => {
         query: 'author:alice feature',
         hideMergeCommits: true,
         sortMode: 1,
-        showMyCommitsOnly: false
+        showMyCommitsOnly: false,
+        regexSearchEnabled: true,
+        pathFilter: null
       },
       createdAt: '2024-01-01T00:00:00.000Z'
     };
@@ -102,13 +106,15 @@ suite('Saved Filter Presets E2E Tests', () => {
     assert.strictEqual(appliedState.hideMergeCommits, true);
     assert.strictEqual(appliedState.sortMode, 1);
     assert.strictEqual(appliedState.showMyCommitsOnly, false);
+    assert.strictEqual(appliedState.regexSearchEnabled, true);
+    assert.strictEqual(appliedState.pathFilter, null);
   });
 
   test('delete preset removes from storage', async () => {
     const presets: SavedFilterPreset[] = [
-      { name: 'Preset 1', filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false }, createdAt: '2024-01-01T00:00:00.000Z' },
-      { name: 'Preset 2', filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false }, createdAt: '2024-01-02T00:00:00.000Z' },
-      { name: 'Preset 3', filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false }, createdAt: '2024-01-03T00:00:00.000Z' }
+      { name: 'Preset 1', filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-01T00:00:00.000Z' },
+      { name: 'Preset 2', filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-02T00:00:00.000Z' },
+      { name: 'Preset 3', filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-03T00:00:00.000Z' }
     ];
 
     const nameToDelete = 'Preset 2';
@@ -123,7 +129,7 @@ suite('Saved Filter Presets E2E Tests', () => {
   test('presets persist across sessions (simulation)', async () => {
     // Simulate session 1: Save presets
     const session1Presets: SavedFilterPreset[] = [
-      { name: 'Session Preset', filterState: { query: 'test', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false }, createdAt: '2024-01-01T00:00:00.000Z' }
+      { name: 'Session Preset', filterState: { query: 'test', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-01T00:00:00.000Z' }
     ];
 
     // Simulate session 2: Load presets from "storage"
@@ -157,7 +163,7 @@ suite('Saved Filter Presets E2E Tests', () => {
     const beforeSave = new Date().toISOString();
     const preset: SavedFilterPreset = {
       name: 'Timestamp Test',
-      filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false },
+      filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null },
       createdAt: new Date().toISOString()
     };
     const afterSave = new Date().toISOString();
@@ -177,7 +183,9 @@ suite('Saved Filter Presets E2E Tests', () => {
       query: 'author:john tag:v2.0 after:2024-01-01',
       hideMergeCommits: true,
       sortMode: 3,
-      showMyCommitsOnly: true
+      showMyCommitsOnly: true,
+      regexSearchEnabled: true,
+      pathFilter: 'src/'
     };
 
     assert.ok(filterState.query.includes('author:john'));
@@ -186,6 +194,8 @@ suite('Saved Filter Presets E2E Tests', () => {
     assert.strictEqual(filterState.hideMergeCommits, true);
     assert.strictEqual(filterState.sortMode, 3);
     assert.strictEqual(filterState.showMyCommitsOnly, true);
+    assert.strictEqual(filterState.regexSearchEnabled, true);
+    assert.strictEqual(filterState.pathFilter, 'src/');
   });
 
   test('preset name with special characters is rejected', () => {
@@ -199,8 +209,8 @@ suite('Saved Filter Presets E2E Tests', () => {
 
   test('preset dropdown renders correctly', async () => {
     const presets: SavedFilterPreset[] = [
-      { name: 'Preset A', filterState: { query: 'test', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false }, createdAt: '2024-01-01T00:00:00.000Z' },
-      { name: 'Preset B', filterState: { query: '', hideMergeCommits: true, sortMode: 1, showMyCommitsOnly: false }, createdAt: '2024-01-02T00:00:00.000Z' }
+      { name: 'Preset A', filterState: { query: 'test', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-01T00:00:00.000Z' },
+      { name: 'Preset B', filterState: { query: '', hideMergeCommits: true, sortMode: 1, showMyCommitsOnly: false, regexSearchEnabled: true, pathFilter: 'src/' }, createdAt: '2024-01-02T00:00:00.000Z' }
     ];
 
     assert.strictEqual(presets.length, 2);
@@ -215,7 +225,9 @@ suite('Saved Filter Presets E2E Tests', () => {
         query: 'bug fix',
         hideMergeCommits: true,
         sortMode: 2,
-        showMyCommitsOnly: false
+        showMyCommitsOnly: false,
+        regexSearchEnabled: true,
+        pathFilter: 'src/utils.ts'
       },
       createdAt: '2024-01-01T00:00:00.000Z'
     };
@@ -224,9 +236,14 @@ suite('Saved Filter Presets E2E Tests', () => {
     const hasNoMerge = preset.filterState.hideMergeCommits;
     const sortLabels = ['Newest', 'Oldest', 'A-Z', 'Z-A'];
     const sortLabel = sortLabels[preset.filterState.sortMode];
+    const hasRegex = preset.filterState.regexSearchEnabled;
+    const hasPathFilter = preset.filterState.pathFilter !== null;
 
     assert.strictEqual(hasQuery, true);
     assert.strictEqual(hasNoMerge, true);
     assert.strictEqual(sortLabel, 'A-Z');
+    assert.strictEqual(hasRegex, true);
+    assert.strictEqual(hasPathFilter, true);
+    assert.strictEqual(preset.filterState.pathFilter, 'src/utils.ts');
   });
 });

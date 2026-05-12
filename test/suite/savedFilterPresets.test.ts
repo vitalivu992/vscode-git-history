@@ -6,8 +6,8 @@ suite('Saved Filter Presets Tests', function() {
 
   suite('Preset Name Validation', function() {
     const existingPresets: SavedFilterPreset[] = [
-      { name: 'Bug Fixes', filterState: { query: 'bug', hideMergeCommits: true, sortMode: 0, showMyCommitsOnly: false }, createdAt: '2024-01-01T00:00:00.000Z' },
-      { name: 'My Commits', filterState: { query: '', hideMergeCommits: false, sortMode: 1, showMyCommitsOnly: true }, createdAt: '2024-01-02T00:00:00.000Z' }
+      { name: 'Bug Fixes', filterState: { query: 'bug', hideMergeCommits: true, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-01T00:00:00.000Z' },
+      { name: 'My Commits', filterState: { query: '', hideMergeCommits: false, sortMode: 1, showMyCommitsOnly: true, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-02T00:00:00.000Z' }
     ];
 
     test('should accept valid preset name', function() {
@@ -74,7 +74,7 @@ suite('Saved Filter Presets Tests', function() {
       for (let i = 0; i < MAX_SAVED_PRESETS; i++) {
         presets.push({
           name: `Preset ${i}`,
-          filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false },
+          filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null },
           createdAt: new Date(i).toISOString()
         });
       }
@@ -90,7 +90,7 @@ suite('Saved Filter Presets Tests', function() {
       for (let i = 0; i < MAX_SAVED_PRESETS - 1; i++) {
         presets.push({
           name: `Preset ${i}`,
-          filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false },
+          filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null },
           createdAt: new Date(i).toISOString()
         });
       }
@@ -106,13 +106,17 @@ suite('Saved Filter Presets Tests', function() {
         query: 'author:john bug fix',
         hideMergeCommits: true,
         sortMode: 1,
-        showMyCommitsOnly: false
+        showMyCommitsOnly: false,
+        regexSearchEnabled: false,
+        pathFilter: null
       };
 
       assert.strictEqual(filterState.query, 'author:john bug fix');
       assert.strictEqual(filterState.hideMergeCommits, true);
       assert.strictEqual(filterState.sortMode, 1);
       assert.strictEqual(filterState.showMyCommitsOnly, false);
+      assert.strictEqual(filterState.regexSearchEnabled, false);
+      assert.strictEqual(filterState.pathFilter, null);
     });
 
     test('should handle empty filter state', function() {
@@ -120,13 +124,30 @@ suite('Saved Filter Presets Tests', function() {
         query: '',
         hideMergeCommits: false,
         sortMode: 0,
-        showMyCommitsOnly: false
+        showMyCommitsOnly: false,
+        regexSearchEnabled: false,
+        pathFilter: null
       };
 
       assert.strictEqual(filterState.query, '');
       assert.strictEqual(filterState.hideMergeCommits, false);
       assert.strictEqual(filterState.sortMode, 0);
       assert.strictEqual(filterState.showMyCommitsOnly, false);
+      assert.strictEqual(filterState.regexSearchEnabled, false);
+      assert.strictEqual(filterState.pathFilter, null);
+    });
+
+    test('should handle regexSearchEnabled and pathFilter', function() {
+      const filterState: FilterQueryState = {
+        query: 'author:john',
+        hideMergeCommits: false,
+        sortMode: 0,
+        showMyCommitsOnly: false,
+        regexSearchEnabled: true,
+        pathFilter: 'src/utils.ts'
+      };
+      assert.strictEqual(filterState.regexSearchEnabled, true);
+      assert.strictEqual(filterState.pathFilter, 'src/utils.ts');
     });
   });
 
@@ -134,7 +155,7 @@ suite('Saved Filter Presets Tests', function() {
     test('should generate summary for query-only preset', function() {
       const preset: SavedFilterPreset = {
         name: 'Search Preset',
-        filterState: { query: 'bug fix', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false },
+        filterState: { query: 'bug fix', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null },
         createdAt: '2024-01-01T00:00:00.000Z'
       };
 
@@ -145,13 +166,15 @@ suite('Saved Filter Presets Tests', function() {
     test('should generate summary for multi-filter preset', function() {
       const preset: SavedFilterPreset = {
         name: 'Complex Preset',
-        filterState: { query: 'author:alice', hideMergeCommits: true, sortMode: 2, showMyCommitsOnly: false },
+        filterState: { query: 'author:alice', hideMergeCommits: true, sortMode: 2, showMyCommitsOnly: false, regexSearchEnabled: true, pathFilter: 'src/' },
         createdAt: '2024-01-01T00:00:00.000Z'
       };
 
       assert.ok(preset.filterState.query.includes('author:alice'));
       assert.strictEqual(preset.filterState.hideMergeCommits, true);
       assert.strictEqual(preset.filterState.sortMode, 2);
+      assert.strictEqual(preset.filterState.regexSearchEnabled, true);
+      assert.strictEqual(preset.filterState.pathFilter, 'src/');
     });
   });
 
@@ -169,7 +192,7 @@ suite('Saved Filter Presets Tests', function() {
     test('should export SavedFilterPreset type', function() {
       const preset: SavedFilterPreset = {
         name: 'Test',
-        filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false },
+        filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null },
         createdAt: '2024-01-01T00:00:00.000Z'
       };
       assert.ok(preset.name);
