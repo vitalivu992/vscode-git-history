@@ -704,6 +704,18 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyCommitterEmail",
+        "key": "ctrl+alt+a",
+        "mac": "cmd+alt+a",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitterName",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyCommitTimestamp",
         "key": "ctrl+shift+2",
         "mac": "cmd+shift+2",
