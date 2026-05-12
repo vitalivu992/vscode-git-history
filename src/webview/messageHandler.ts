@@ -181,6 +181,10 @@ export async function handleMessage(
       handleCopyFileExtension(message.filePath, panel);
       break;
 
+    case 'copyFileDirectory':
+      handleCopyFileDirectory(message.filePath, panel);
+      break;
+
     case 'copyRelativePath':
       handleCopyRelativePath(message.filePath, panel);
       break;
@@ -565,6 +569,15 @@ function handleCopyFileExtension(filePath: string, _panel: GitHistoryPanel): voi
 
   void vscode.env.clipboard.writeText(displayExt).then(() => {
     void vscode.window.showInformationMessage(`Copied extension: ${displayExt}`);
+  });
+}
+
+function handleCopyFileDirectory(filePath: string, _panel: GitHistoryPanel): void {
+  const dirPath = path.dirname(filePath) + path.sep;
+  const dirName = path.basename(path.dirname(filePath));
+
+  void vscode.env.clipboard.writeText(dirPath).then(() => {
+    void vscode.window.showInformationMessage(`Copied directory: ${dirName}${path.sep}`);
   });
 }
 

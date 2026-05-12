@@ -103,6 +103,7 @@ export type WebviewAction =
   | 'copyDescribe'
   | 'copyFileName'
   | 'copyFileExtension'
+  | 'copyFileDirectory'
   | 'copyRelativePath'
   | 'copyFileDiff'
   | 'exportCommits'
@@ -176,6 +177,7 @@ export type WebviewToExtMessage =
   | { type: 'copyFilePath'; filePath: string }
   | { type: 'copyFileName'; filePath: string }
   | { type: 'copyFileExtension'; filePath: string }
+  | { type: 'copyFileDirectory'; filePath: string }
   | { type: 'copyRelativePath'; filePath: string }
   | { type: 'openFileAtCommit'; hash: string; filePath: string }
   | { type: 'copyCommitPatch'; hash: string }
