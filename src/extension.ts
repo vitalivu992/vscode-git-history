@@ -197,6 +197,8 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyFilterQuery', action: 'copyFilterQuery' },
     { command: 'gitHistory.pasteFilterQuery', action: 'pasteFilterQuery' },
     { command: 'gitHistory.clearAllFilters', action: 'clearAllFilters' },
+    { command: 'gitHistory.openCommitUrl', action: 'openCommitUrl' },
+    { command: 'gitHistory.openFileUrl', action: 'openFileUrl' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

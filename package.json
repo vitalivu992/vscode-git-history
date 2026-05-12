@@ -335,6 +335,16 @@
         "command": "gitHistory.cycleSortMode",
         "title": "Git History: Cycle Sort Mode",
         "category": "Git History"
+      },
+      {
+        "command": "gitHistory.openCommitUrl",
+        "title": "Git History: Open Commit URL in Browser",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.openFileUrl",
+        "title": "Git History: Open File Permalink in Browser",
+        "category": "Git History"
       }
     ],
     "menus": {
@@ -708,6 +718,18 @@
         "command": "gitHistory.cycleSortMode",
         "key": "ctrl+shift+3",
         "mac": "cmd+shift+3",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.openCommitUrl",
+        "key": "ctrl+k ctrl+o",
+        "mac": "cmd+k cmd+o",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.openFileUrl",
+        "key": "ctrl+k ctrl+p",
+        "mac": "cmd+k cmd+p",
         "when": "activeWebviewPanelId == gitHistory.webview"
       }
     ],
