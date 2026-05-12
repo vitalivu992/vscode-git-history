@@ -616,6 +616,90 @@ suite('Commit URL Generation Tests', () => {
     });
   });
 
+  suite('parseRemoteUrl - SSH URLs with custom ports', () => {
+    test('parses ssh:// URLs with port 22', () => {
+      const result = parseRemoteUrl('ssh://git@github.com:22/owner/repo.git');
+      assert.ok(result, 'Should parse ssh:// URL with port 22');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses ssh:// URLs with custom port 443', () => {
+      const result = parseRemoteUrl('ssh://git@gitlab.company.com:443/owner/repo.git');
+      assert.ok(result, 'Should parse ssh:// URL with custom port 443');
+      assert.strictEqual(result?.platform, 'gitlab');
+      assert.strictEqual(result?.baseUrl, 'https://gitlab.company.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses ssh:// URLs without port', () => {
+      const result = parseRemoteUrl('ssh://git@github.com/owner/repo.git');
+      assert.ok(result, 'Should parse ssh:// URL without port');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses ssh:// URLs without git@ user', () => {
+      const result = parseRemoteUrl('ssh://github.com/owner/repo.git');
+      assert.ok(result, 'Should parse ssh:// URL without git@ user');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('parses ssh:// URLs for self-hosted GitLab', () => {
+      const result = parseRemoteUrl('ssh://git@gitlab.internal:2222/engineering/pipeline.git');
+      assert.ok(result, 'Should parse ssh:// URL for self-hosted GitLab');
+      assert.strictEqual(result?.platform, 'gitlab');
+      assert.strictEqual(result?.baseUrl, 'https://gitlab.internal');
+      assert.strictEqual(result?.owner, 'engineering');
+      assert.strictEqual(result?.repo, 'pipeline');
+    });
+
+    test('parses ssh:// URLs for GitHub Enterprise', () => {
+      const result = parseRemoteUrl('ssh://git@github.company.com:2222/myorg/myrepo.git');
+      assert.ok(result, 'Should parse ssh:// URL for GitHub Enterprise');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.company.com');
+      assert.strictEqual(result?.owner, 'myorg');
+      assert.strictEqual(result?.repo, 'myrepo');
+    });
+
+    test('parses ssh:// URLs with nested groups', () => {
+      const result = parseRemoteUrl('ssh://git@gitlab.com:22/group1/group2/project.git');
+      assert.ok(result, 'Should parse ssh:// URL with nested groups');
+      assert.strictEqual(result?.platform, 'gitlab');
+      assert.strictEqual(result?.baseUrl, 'https://gitlab.com');
+      assert.strictEqual(result?.owner, 'group1/group2');
+      assert.strictEqual(result?.repo, 'project');
+    });
+
+    test('parses ssh:// URLs without .git suffix', () => {
+      const result = parseRemoteUrl('ssh://git@github.com/owner/repo');
+      assert.ok(result, 'Should parse ssh:// URL without .git suffix');
+      assert.strictEqual(result?.platform, 'github');
+      assert.strictEqual(result?.baseUrl, 'https://github.com');
+      assert.strictEqual(result?.owner, 'owner');
+      assert.strictEqual(result?.repo, 'repo');
+    });
+
+    test('handles ssh:// URLs with various port numbers', () => {
+      const ports = ['22', '443', '2222', '3022', '10022'];
+      ports.forEach((port) => {
+        const result = parseRemoteUrl(`ssh://git@github.com:${port}/owner/repo.git`);
+        assert.ok(result, `Should parse ssh:// URL with port ${port}`);
+        assert.strictEqual(result?.platform, 'github');
+        assert.strictEqual(result?.baseUrl, 'https://github.com');
+      });
+    });
+  });
+
   suite('getRemoteUrl', () => {
     test('returns null when no remote configured', async () => {
       const result = await getRemoteUrl('/non/existent/path');
@@ -804,6 +888,34 @@ suite('Commit URL Generation Tests', () => {
         assert.strictEqual(url, `https://github.com/owner/repo/commit/${commitHash.substring(0, 7)}`);
       });
     });
+
+    test('should generate URL from ssh:// with port 22', async () => {
+      await withRemote('ssh://git@github.com:22/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate URL from ssh:// with custom port 443', async () => {
+      await withRemote('ssh://git@gitlab.company.com:443/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://gitlab.company.com/owner/repo/-/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate URL from ssh:// with custom port 2222', async () => {
+      await withRemote('ssh://git@github.company.com:2222/myorg/myrepo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://github.company.com/myorg/myrepo/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
+
+    test('should generate URL from ssh:// without port', async () => {
+      await withRemote('ssh://github.com/owner/repo.git', 'origin', async () => {
+        const url = await getCommitUrl(commitHash, urlTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/commit/${commitHash.substring(0, 7)}`);
+      });
+    });
   });
 
   suite('getBranchUrl', () => {
@@ -904,6 +1016,34 @@ suite('Commit URL Generation Tests', () => {
     test('should work with custom remote name', async () => {
       await withBranchRemote('https://github.com/owner/repo.git', 'upstream', async () => {
         const url = await getBranchUrl('main', branchUrlTestDir, 'upstream');
+        assert.strictEqual(url, 'https://github.com/owner/repo/tree/main');
+      });
+    });
+
+    test('should generate branch URL from ssh:// with port 22', async () => {
+      await withBranchRemote('ssh://git@github.com:22/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, 'https://github.com/owner/repo/tree/main');
+      });
+    });
+
+    test('should generate branch URL from ssh:// with custom port 443', async () => {
+      await withBranchRemote('ssh://git@gitlab.company.com:443/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, 'https://gitlab.company.com/owner/repo/-/tree/main');
+      });
+    });
+
+    test('should generate branch URL from ssh:// with custom port 2222', async () => {
+      await withBranchRemote('ssh://git@github.company.com:2222/myorg/myrepo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
+        assert.strictEqual(url, 'https://github.company.com/myorg/myrepo/tree/main');
+      });
+    });
+
+    test('should generate branch URL from ssh:// without port', async () => {
+      await withBranchRemote('ssh://github.com/owner/repo.git', 'origin', async () => {
+        const url = await getBranchUrl('main', branchUrlTestDir);
         assert.strictEqual(url, 'https://github.com/owner/repo/tree/main');
       });
     });
@@ -1576,6 +1716,73 @@ suite('Commit URL Generation Tests', () => {
       await withBitbucketFileRemote('https://bitbucket.org/owner/repo.git', 'origin', async () => {
         const url = await getFileUrl('src/webview/panel/main.js', bitbucketFileHash, bitbucketFileTestDir);
         assert.strictEqual(url, `https://bitbucket.org/owner/repo/src/${bitbucketFileHash.substring(0, 7)}/src/webview/panel/main.js`);
+      });
+    });
+  });
+
+  suite('getFileUrl - SSH URLs', () => {
+    const { execSync } = require('child_process');
+    let sshFileTestDir: string;
+    let sshFileHash: string;
+
+    suiteSetup(() => {
+      sshFileTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-ssh-file-test-'));
+      execSync('git init', { cwd: sshFileTestDir });
+      execSync('git config user.name "Test User"', { cwd: sshFileTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: sshFileTestDir });
+      fs.writeFileSync(path.join(sshFileTestDir, 'test.txt'), 'content\n');
+      execSync('git add .', { cwd: sshFileTestDir });
+      execSync('git commit -m "Initial"', { cwd: sshFileTestDir });
+      sshFileHash = execSync('git rev-parse HEAD', { cwd: sshFileTestDir }).toString().trim();
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(sshFileTestDir)) {
+        fs.rmSync(sshFileTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withSshFileRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: sshFileTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: sshFileTestDir });
+      }
+    }
+
+    test('generates correct file URL for ssh:// with port 22', async () => {
+      await withSshFileRemote('ssh://git@github.com:22/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/main.ts', sshFileHash, sshFileTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/blob/${sshFileHash.substring(0, 7)}/src/main.ts`);
+      });
+    });
+
+    test('generates correct file URL for ssh:// with custom port 443', async () => {
+      await withSshFileRemote('ssh://git@gitlab.company.com:443/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/main.ts', sshFileHash, sshFileTestDir);
+        assert.strictEqual(url, `https://gitlab.company.com/owner/repo/-/blob/${sshFileHash.substring(0, 7)}/src/main.ts`);
+      });
+    });
+
+    test('generates correct file URL for ssh:// with custom port 2222', async () => {
+      await withSshFileRemote('ssh://git@github.company.com:2222/myorg/myrepo.git', 'origin', async () => {
+        const url = await getFileUrl('README.md', sshFileHash, sshFileTestDir);
+        assert.strictEqual(url, `https://github.company.com/myorg/myrepo/blob/${sshFileHash.substring(0, 7)}/README.md`);
+      });
+    });
+
+    test('generates correct file URL for ssh:// without port', async () => {
+      await withSshFileRemote('ssh://github.com/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('README.md', sshFileHash, sshFileTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/blob/${sshFileHash.substring(0, 7)}/README.md`);
+      });
+    });
+
+    test('handles nested file paths for ssh:// URLs', async () => {
+      await withSshFileRemote('ssh://git@github.com:22/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/webview/panel/main.js', sshFileHash, sshFileTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/blob/${sshFileHash.substring(0, 7)}/src/webview/panel/main.js`);
       });
     });
   });

@@ -104,11 +104,11 @@ suite('Git Parser Tests', () => {
     const hash2 = 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0';
     // hash1 appears twice, should only be included once
     const input = [
-      `${hash1}\x00\x00John Doe\x00john@example.com\x001234567890\x00First commit\x00`,
+      `${hash1}\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00First commit\x00`,
       'diff line',
-      `${hash2}\x00\x00Jane Smith\x00jane@example.com\x001234567900\x00Second commit\x00`,
+      `${hash2}\x00\x00Jane Smith\x00jane@example.com\x00\x00\x001234567900\x00Second commit\x00`,
       'another diff line',
-      `${hash1}\x00\x00John Doe\x00john@example.com\x001234567890\x00First commit\x00`, // duplicate
+      `${hash1}\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00First commit\x00`, // duplicate
     ].join('\n');
 
     const commits = parseLineHistoryLog(input);
@@ -116,6 +116,60 @@ suite('Git Parser Tests', () => {
     assert.strictEqual(commits.length, 2);
     assert.strictEqual(commits[0].hash, hash1);
     assert.strictEqual(commits[1].hash, hash2);
+  });
+
+  test('parseGitLog should parse committer fields', () => {
+    // Format: %H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n
+    const commit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00Jane Smith\x00jane@example.com\x001234567890\x00Committed by Jane\x00\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commit);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].author, 'John Doe');
+    assert.strictEqual(commits[0].email, 'john@example.com');
+    assert.strictEqual(commits[0].committer, 'Jane Smith');
+    assert.strictEqual(commits[0].committerEmail, 'jane@example.com');
+  });
+
+  test('parseGitLog should fallback to author when committer is empty', () => {
+    // Empty committer fields (missing %cn and %ce)
+    const commit = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Self-authored\x00\x00\x00---COMMIT-END---';
+
+    const commits = parseGitLog(commit);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].author, 'John Doe');
+    assert.strictEqual(commits[0].email, 'john@example.com');
+    assert.strictEqual(commits[0].committer, 'John Doe'); // fallback to author
+    assert.strictEqual(commits[0].committerEmail, 'john@example.com'); // fallback to email
+  });
+
+  test('parseLineHistoryLog should parse committer fields', () => {
+    // Format: %H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%d%x00%G?%x00%GS
+    const hash1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
+    const input = `${hash1}\x00\x00John Doe\x00john@example.com\x00Jane Smith\x00jane@example.com\x001234567890\x00Added line\x00\x00G\x00Alice <alice@example.com>`;
+
+    const commits = parseLineHistoryLog(input);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].author, 'John Doe');
+    assert.strictEqual(commits[0].email, 'john@example.com');
+    assert.strictEqual(commits[0].committer, 'Jane Smith');
+    assert.strictEqual(commits[0].committerEmail, 'jane@example.com');
+  });
+
+  test('parseLineHistoryLog should fallback to author when committer is empty', () => {
+    // Empty committer fields in -L format
+    const hash1 = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
+    const input = `${hash1}\x00\x00John Doe\x00john@example.com\x00\x00\x001234567890\x00Self-authored\x00`;
+
+    const commits = parseLineHistoryLog(input);
+
+    assert.strictEqual(commits.length, 1);
+    assert.strictEqual(commits[0].author, 'John Doe');
+    assert.strictEqual(commits[0].email, 'john@example.com');
+    assert.strictEqual(commits[0].committer, 'John Doe'); // fallback to author
+    assert.strictEqual(commits[0].committerEmail, 'john@example.com'); // fallback to email
   });
 
   test('isBinaryFile should detect binary files', () => {
