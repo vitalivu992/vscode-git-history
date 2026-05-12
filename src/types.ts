@@ -108,6 +108,7 @@ export type WebviewAction =
   | 'copyCoAuthors'
   | 'copyCommitDate'
   | 'copyRelativeDate'
+  | 'copyCommitTimestamp'
   | 'copyOneline'
   | 'copyCommitBody'
   | 'copyCommitMarkdown'
@@ -239,6 +240,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
   | { type: 'copyRelativeDate'; hash: string }
+  | { type: 'copyCommitTimestamp'; hash: string }
   | { type: 'copyOneline'; hash: string }
   | { type: 'copyCommitBody'; hash: string }
   | { type: 'copyCommitMarkdown'; hash: string }

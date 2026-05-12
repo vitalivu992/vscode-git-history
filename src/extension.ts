@@ -175,6 +175,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyCommitJson', action: 'copyCommitJson' },
     { command: 'gitHistory.copyFileContent', action: 'copyFileContent' },
     { command: 'gitHistory.copyDescribe', action: 'copyDescribe' },
+    { command: 'gitHistory.copyCommitTimestamp', action: 'copyCommitTimestamp' },
     { command: 'gitHistory.copyFileDiff', action: 'copyFileDiff' },
     { command: 'gitHistory.copyFileExtension', action: 'copyFileExtension' },
     { command: 'gitHistory.copyFileDirectory', action: 'copyFileDirectory' },
