@@ -249,4 +249,71 @@ suite('Settings Service Tests', () => {
 
     assert.ok(source.includes("case 'saveSettings':"), 'messageHandler.ts should have saveSettings case');
   });
+
+  test('UserSettings should have showGraph property', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/settings/settingsTypes.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes('showGraph:'), 'UserSettings should have showGraph property');
+  });
+
+  test('DEFAULT_SETTINGS should have showGraph default', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/settings/settingsTypes.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes('showGraph: true'), 'DEFAULT_SETTINGS should have true as default showGraph');
+  });
+
+  test('WebviewAction should include toggleGraph', () => {
+    const fs = require('fs');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+    const source = fs.readFileSync(typesPath, 'utf-8');
+
+    assert.ok(source.includes("'toggleGraph'"), 'WebviewAction should include toggleGraph');
+  });
+
+  test('extension.ts should register toggleGraph command', () => {
+    const fs = require('fs');
+    const extPath = path.resolve(__dirname, '../../../src/extension.ts');
+    const source = fs.readFileSync(extPath, 'utf-8');
+
+    assert.ok(source.includes('toggleGraph'), 'extension.ts should register toggleGraph');
+  });
+
+  test('main.js should have handleToggleGraph function', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('handleToggleGraph'), 'main.js should have handleToggleGraph function');
+  });
+
+  test('webviewProvider should pass showGraph from userSettings', () => {
+    const fs = require('fs');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    assert.ok(source.includes('userSettings.showGraph'), 'webviewProvider should pass userSettings.showGraph in init');
+  });
+
+  test('package.json should have toggleGraph command', () => {
+    const fs = require('fs');
+    const pkgPath = path.resolve(__dirname, '../../../package.json');
+    const source = fs.readFileSync(pkgPath, 'utf-8');
+
+    assert.ok(source.includes('gitHistory.toggleGraph'), 'package.json should have toggleGraph command');
+  });
+
+  test('package.json should have toggleGraph keybinding', () => {
+    const fs = require('fs');
+    const pkgPath = path.resolve(__dirname, '../../../package.json');
+    const source = fs.readFileSync(pkgPath, 'utf-8');
+    const pkg = JSON.parse(source);
+
+    const keybinding = pkg.contributes.keybindings.find((kb: any) => kb.command === 'gitHistory.toggleGraph');
+    assert.ok(keybinding, 'toggleGraph keybinding should exist');
+    assert.ok(keybinding.key, 'toggleGraph keybinding should have key');
+  });
 });

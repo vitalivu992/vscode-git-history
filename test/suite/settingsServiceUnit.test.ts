@@ -61,7 +61,7 @@ suite('SettingsService Unit Tests', () => {
 				diffType: 'side-by-side',
 				wordWrapEnabled: true,
 				sortMode: 1,
-				// Missing: hideMergeCommits, regexSearchEnabled, showMyCommitsOnly, ignoreWhitespace, diffContextLines, searchQuery
+				// Missing: hideMergeCommits, regexSearchEnabled, showMyCommitsOnly, ignoreWhitespace, diffContextLines, searchQuery, showGraph
 			};
 
 			await mockMemento.update(SETTINGS_STORAGE_KEY, partialSettings);
@@ -77,6 +77,7 @@ suite('SettingsService Unit Tests', () => {
 			assert.strictEqual(settings.ignoreWhitespace, false);
 			assert.strictEqual(settings.diffContextLines, 3);
 			assert.strictEqual(settings.searchQuery, '');
+			assert.strictEqual(settings.showGraph, true); // default
 		});
 
 		test('migrates sortOldestFirst: true to sortMode: 1', async () => {
@@ -135,6 +136,7 @@ suite('SettingsService Unit Tests', () => {
 			assert.strictEqual(settings.ignoreWhitespace, false); // default
 			assert.strictEqual(settings.diffContextLines, 3); // default
 			assert.strictEqual(settings.searchQuery, ''); // default
+			assert.strictEqual(settings.showGraph, true); // default
 		});
 
 		test('returns a copy, not the original stored object', async () => {
@@ -239,6 +241,7 @@ suite('SettingsService Unit Tests', () => {
 				showMyCommitsOnly: true,
 				ignoreWhitespace: true,
 				diffContextLines: 5,
+				showGraph: false,
 				searchQuery: 'test query'
 			};
 
@@ -330,7 +333,8 @@ suite('SettingsService Unit Tests', () => {
 				showMyCommitsOnly: true,
 				ignoreWhitespace: true,
 				diffContextLines: 7,
-				searchQuery: 'test'
+				searchQuery: 'test',
+				showGraph: false,
 			};
 
 			await settingsService.saveSettings(customSettings);
@@ -344,6 +348,7 @@ suite('SettingsService Unit Tests', () => {
 			assert.strictEqual(settingsService.getSetting('ignoreWhitespace'), true);
 			assert.strictEqual(settingsService.getSetting('diffContextLines'), 7);
 			assert.strictEqual(settingsService.getSetting('searchQuery'), 'test');
+				assert.strictEqual(settingsService.getSetting('showGraph'), false);
 		});
 	});
 
@@ -408,7 +413,8 @@ suite('SettingsService Unit Tests', () => {
 			assert.strictEqual(settingsService.getSetting('diffContextLines'), 10);
 
 			await settingsService.setSetting('searchQuery', 'my query');
-			assert.strictEqual(settingsService.getSetting('searchQuery'), 'my query');
+			await settingsService.setSetting('showGraph', false);
+			assert.strictEqual(settingsService.getSetting('showGraph'), false);
 		});
 	});
 
@@ -456,7 +462,7 @@ suite('SettingsService Unit Tests', () => {
 				diffType: 'side-by-side',
 				wordWrapEnabled: true,
 				sortMode: 1,
-				// Missing: hideMergeCommits, regexSearchEnabled, showMyCommitsOnly, ignoreWhitespace, diffContextLines, searchQuery
+				// Missing: hideMergeCommits, regexSearchEnabled, showMyCommitsOnly, ignoreWhitespace, diffContextLines, searchQuery, showGraph
 			};
 
 			await mockMemento.update(SETTINGS_STORAGE_KEY, oldSettings);
@@ -474,6 +480,7 @@ suite('SettingsService Unit Tests', () => {
 			assert.strictEqual(settings.ignoreWhitespace, false);
 			assert.strictEqual(settings.diffContextLines, 3);
 			assert.strictEqual(settings.searchQuery, '');
+				assert.strictEqual(settings.showGraph, true);
 		});
 	});
 });

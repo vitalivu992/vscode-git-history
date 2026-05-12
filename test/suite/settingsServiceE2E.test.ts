@@ -94,6 +94,7 @@ suite('SettingsService E2E Tests', () => {
 			assert.ok(source.includes('ignoreWhitespace:'), 'UserSettings should have ignoreWhitespace');
 			assert.ok(source.includes('diffContextLines:'), 'UserSettings should have diffContextLines');
 			assert.ok(source.includes('searchQuery:'), 'UserSettings should have searchQuery');
+			assert.ok(source.includes('showGraph:'), 'UserSettings should have showGraph');
 		});
 
 		test('DEFAULT_SETTINGS contains all default values', () => {
@@ -109,6 +110,7 @@ suite('SettingsService E2E Tests', () => {
 			assert.ok(source.includes('ignoreWhitespace: false'), 'DEFAULT_SETTINGS should have false as default ignoreWhitespace');
 			assert.ok(source.includes('diffContextLines: 3'), 'DEFAULT_SETTINGS should have 3 as default diffContextLines');
 			assert.ok(source.includes("searchQuery: ''"), 'DEFAULT_SETTINGS should have empty string as default searchQuery');
+			assert.ok(source.includes('showGraph: true'), 'DEFAULT_SETTINGS should have true as default showGraph');
 		});
 	});
 
@@ -159,6 +161,15 @@ suite('SettingsService E2E Tests', () => {
 
 			assert.ok(source.includes('searchQuery'), 'main.js should reference searchQuery');
 			assert.ok(source.includes('saveSettings'), 'main.js should save settings on search change');
+		});
+
+		test('show graph setting persists across sessions', () => {
+			const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+			const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+			assert.ok(source.includes('handleToggleGraph'), 'main.js should have handleToggleGraph function');
+			assert.ok(source.includes('showGraph'), 'main.js should reference showGraph');
+			assert.ok(source.includes("settings: { showGraph }"), 'main.js should save showGraph setting');
 		});
 
 		test('init message applies user settings on panel load', () => {
