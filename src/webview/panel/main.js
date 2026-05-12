@@ -1914,6 +1914,8 @@ function handleMessage(event) {
         case 'copyTags': handleCopyTags(); break;
         case 'copyAuthorEmail': handleCopyAuthorEmail(); break;
         case 'copyAuthorName': handleCopyAuthorName(); break;
+        case 'copyCommitterEmail': handleCopyCommitterEmail(); break;
+        case 'copyCommitterName': handleCopyCommitterName(); break;
         case 'copyParentHash': handleCopyParentHash(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
@@ -2633,6 +2635,14 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">👤</span>
       <span class="context-menu-label">Copy author name</span>
     </div>
+    <div class="context-menu-item" data-action="copy-committer-email">
+      <span class="context-menu-icon">@</span>
+      <span class="context-menu-label">Copy committer email</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-committer-name">
+      <span class="context-menu-icon">👤</span>
+      <span class="context-menu-label">Copy committer name</span>
+    </div>
     <div class="context-menu-item" data-action="copy-parent-hash">
       <span class="context-menu-icon">⧁</span>
       <span class="context-menu-label">Copy parent hash</span>
@@ -2769,6 +2779,10 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyAuthorEmail', hash: commit.hash });
       } else if (action === 'copy-author-name') {
         vscode.postMessage({ type: 'copyAuthorName', hash: commit.hash });
+      } else if (action === 'copy-committer-email') {
+        vscode.postMessage({ type: 'copyCommitterEmail', hash: commit.hash });
+      } else if (action === 'copy-committer-name') {
+        vscode.postMessage({ type: 'copyCommitterName', hash: commit.hash });
       } else if (action === 'copy-parent-hash') {
         vscode.postMessage({ type: 'copyParentHash', hash: commit.hash });
       } else if (action === 'copy-short-hash') {
@@ -3217,6 +3231,52 @@ function handleCopyAuthorName() {
 
   vscode.postMessage({
     type: 'copyAuthorName',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyCommitterEmail() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy committer email');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitterEmail',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyCommitterName() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy committer name');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitterName',
     hash: targetCommit.hash
   });
 }

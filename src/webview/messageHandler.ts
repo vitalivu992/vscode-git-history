@@ -113,6 +113,14 @@ export async function handleMessage(
       handleCopyAuthorName(message.hash, panel);
       break;
 
+    case 'copyCommitterEmail':
+      handleCopyCommitterEmail(message.hash, panel);
+      break;
+
+    case 'copyCommitterName':
+      handleCopyCommitterName(message.hash, panel);
+      break;
+
     case 'copyParentHash':
       handleCopyParentHash(message.hash, panel);
       break;
@@ -1168,6 +1176,32 @@ function handleCopyAuthorName(hash: string, panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(commit.author).then(() => {
     void vscode.window.showInformationMessage(`Author name copied: ${commit.author}`);
+  });
+}
+
+function handleCopyCommitterEmail(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const emailToCopy = commit.committerEmail || commit.email;
+  void vscode.env.clipboard.writeText(emailToCopy).then(() => {
+    void vscode.window.showInformationMessage(`Committer email copied: ${emailToCopy}`);
+  });
+}
+
+function handleCopyCommitterName(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const nameToCopy = commit.committer || commit.author;
+  void vscode.env.clipboard.writeText(nameToCopy).then(() => {
+    void vscode.window.showInformationMessage(`Committer name copied: ${nameToCopy}`);
   });
 }
 

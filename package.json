@@ -147,6 +147,16 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCommitterEmail",
+        "title": "Git History: Copy Committer Email",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitterName",
+        "title": "Git History: Copy Committer Name",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyParentHash",
         "title": "Git History: Copy Parent Hash",
         "category": "Git History"
