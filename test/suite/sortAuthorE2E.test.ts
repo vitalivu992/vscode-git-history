@@ -137,4 +137,18 @@ suite('Author Sort E2E Tests', () => {
       'settingsService should handle sortMode/sortOldestFirst migration'
     );
   });
+
+  test('Ctrl+Shift+3 keyboard shortcut should be handled in handleKeyDown', () => {
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    const kdStart = source.indexOf('function handleKeyDown');
+    const kdEnd = source.indexOf('\nfunction', kdStart + 1);
+    const kdBody = source.substring(kdStart, kdEnd > kdStart ? kdEnd : undefined);
+
+    assert.ok(
+      kdBody.includes("e.key === '3'") && kdBody.includes('handleSortToggle'),
+      'handleKeyDown should handle Ctrl+Shift+3 and call handleSortToggle'
+    );
+  });
 });
