@@ -112,6 +112,7 @@ export type WebviewAction =
   | 'createBranch'
   | 'createTag'
   | 'deleteTag'
+  | 'deleteBranch'
   | 'checkoutBranch'
   | 'toggleMyCommits'
   | 'toggleWordWrap'
@@ -227,6 +228,7 @@ export type WebviewToExtMessage =
   | { type: 'createBranch'; hash: string }
   | { type: 'createTag'; hash: string }
   | { type: 'deleteTag'; hash: string }
+  | { type: 'deleteBranch'; branch: string; force?: boolean }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
   | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown'; commits: CommitInfo[] }
   | { type: 'exportCommitsMbox'; fromHash: string; toHash: string }
