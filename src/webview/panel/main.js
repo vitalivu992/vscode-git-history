@@ -152,6 +152,7 @@ function clearAllFilters() {
   mergeToggleBtn.classList.remove('active');
   regexToggleBtn.classList.remove('active');
   myCommitsBtn.classList.remove('active');
+  updateQuickDateFilterButtons();
   updateSortButton();
 
   // Render commits with no filters
@@ -163,6 +164,40 @@ function clearAllFilters() {
 
   // Save settings
   vscode.postMessage({ type: 'saveSettings', settings: { sortMode, hideMergeCommits: false, regexSearchEnabled: false, showMyCommitsOnly: false, searchQuery: '' } });
+}
+
+function updateQuickDateFilterButtons() {
+  const { lastFilter } = parseDateFilter(searchQuery);
+  [todayFilterBtn, thisWeekFilterBtn, thisMonthFilterBtn].forEach(btn => {
+    if (btn) btn.classList.remove('active');
+  });
+  if (lastFilter === 'last:1day' && todayFilterBtn) {
+    todayFilterBtn.classList.add('active');
+  } else if (lastFilter === 'last:7days' && thisWeekFilterBtn) {
+    thisWeekFilterBtn.classList.add('active');
+  } else if (lastFilter === 'last:1month' && thisMonthFilterBtn) {
+    thisMonthFilterBtn.classList.add('active');
+  }
+}
+
+function applyQuickDateFilter(filterValue) {
+  const { lastFilter, textQuery } = parseDateFilter(searchQuery);
+  const otherParts = textQuery || '';
+
+  if (lastFilter === filterValue) {
+    searchQuery = otherParts;
+  } else {
+    searchQuery = filterValue + (otherParts ? ' ' + otherParts : '');
+  }
+
+  searchInput.value = searchQuery;
+  focusedIndex = -1;
+  updateQuickDateFilterButtons();
+  renderCommits();
+  updateCommitCount();
+  renderFilterBadges();
+  updateClearAllButton();
+  vscode.postMessage({ type: 'saveSettings', settings: { searchQuery } });
 }
 
 /**
@@ -276,6 +311,7 @@ function renderFilterBadges() {
       renderCommits();
       updateCommitCount();
       renderFilterBadges();
+      updateQuickDateFilterButtons();
     });
   });
 }
@@ -311,6 +347,9 @@ const clearAllFiltersBtn = document.getElementById('clear-all-filters-btn');
 const savePresetBtn = document.getElementById('save-preset-btn');
 const presetDropdownBtn = document.getElementById('preset-dropdown-btn');
 const graphToggleBtn = document.getElementById('graph-toggle-btn');
+const todayFilterBtn = document.getElementById('today-filter-btn');
+const thisWeekFilterBtn = document.getElementById('this-week-filter-btn');
+const thisMonthFilterBtn = document.getElementById('this-month-filter-btn');
 
 let isRefreshing = false;
 
@@ -1444,6 +1483,16 @@ function init() {
     clearAllFiltersBtn.addEventListener('click', clearAllFilters);
   }
 
+  if (todayFilterBtn) {
+    todayFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:1day'));
+  }
+  if (thisWeekFilterBtn) {
+    thisWeekFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:7days'));
+  }
+  if (thisMonthFilterBtn) {
+    thisMonthFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:1month'));
+  }
+
   const savePresetBtn = document.getElementById('save-preset-btn');
   if (savePresetBtn) {
     savePresetBtn.addEventListener('click', showSavePresetDialog);
@@ -1718,6 +1767,7 @@ function handleMessage(event) {
           renderCommits();
           updateCommitCount();
           renderFilterBadges();
+          updateQuickDateFilterButtons();
         }
       } else if (message.defaultDiffView === 'side-by-side') {
         setDiffType('side-by-side');
@@ -2886,6 +2936,7 @@ function handleSearch(e) {
   renderCommits();
   updateCommitCount();
   renderFilterBadges();
+  updateQuickDateFilterButtons();
   updateRegexValidation();
   vscode.postMessage({ type: 'saveSettings', settings: { searchQuery } });
 }
@@ -3314,6 +3365,7 @@ function applyFilterQuery(filterState) {
   renderCommits();
   updateCommitCount();
   renderFilterBadges();
+  updateQuickDateFilterButtons();
 }
 
 function handleCopyOneline() {

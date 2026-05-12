@@ -2201,3 +2201,33 @@ body {
   background-color: var(--vscode-errorBackground);
 }
 
+/* ─── Quick Date Filter Buttons ────────────────────────────────────────────────── */
+
+.date-filter-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.date-filter-btn {
+  background: var(--vscode-button-secondaryBackground);
+  border: 1px solid var(--vscode-button-border);
+  color: var(--vscode-button-secondaryForeground);
+  padding: 2px 8px;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  border-radius: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.1s;
+}
+
+.date-filter-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+.date-filter-btn.active {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--vscode-button-border);
+}
+
