@@ -128,7 +128,9 @@ export type WebviewAction =
   | 'copyCommitRef'
   | 'copyFileUrl'
   | 'openCommitUrl'
-  | 'openFileUrl';
+  | 'openFileUrl'
+  | 'saveFilterPreset'
+  | 'loadFilterPreset';
 
 /**
  * Filter state for copy filter query feature
@@ -141,10 +143,24 @@ export interface FilterQueryState {
 }
 
 /**
+ * Saved filter preset for quick filter restoration
+ */
+export interface SavedFilterPreset {
+  name: string;
+  filterState: FilterQueryState;
+  createdAt: string;
+}
+
+/**
+ * Storage key for saved filter presets in VS Code's globalState
+ */
+export const SAVED_PRESETS_STORAGE_KEY = 'gitHistory.savedPresets';
+
+/**
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
-  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; userSettings?: UserSettings; currentUser?: { name: string; email: string } | null; showFirstRunTip?: boolean }
+  | { type: 'init'; commits: CommitInfo[]; filePath: string; showGraph: boolean; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; userSettings?: UserSettings; currentUser?: { name: string; email: string } | null; showFirstRunTip?: boolean; savedPresets?: SavedFilterPreset[] }
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[]; selectedFile?: string }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'rangeDiff'; fromHash: string; toHash: string; diff: string }
@@ -154,7 +170,8 @@ export type ExtToWebviewMessage =
   | { type: 'branchHashes'; hashes: Record<string, string[]> }
   | { type: 'triggerAction'; action: WebviewAction }
   | { type: 'showFirstRunTip' }
-  | { type: 'applyFilterQuery'; filterState: FilterQueryState };
+  | { type: 'applyFilterQuery'; filterState: FilterQueryState }
+  | { type: 'filterPresets'; presets: SavedFilterPreset[] };
 
 /**
  * Messages from webview to extension
@@ -222,4 +239,8 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitRef'; hash: string }
   | { type: 'copyFileUrl'; hash: string; filePath: string }
   | { type: 'openCommitUrl'; hash: string }
-  | { type: 'openFileUrl'; hash: string; filePath: string };
+  | { type: 'openFileUrl'; hash: string; filePath: string }
+  | { type: 'saveFilterPreset'; name: string; filterState: FilterQueryState }
+  | { type: 'deleteFilterPreset'; name: string }
+  | { type: 'getFilterPresets' }
+  | { type: 'applyPreset'; presetName: string };

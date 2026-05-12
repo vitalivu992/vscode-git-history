@@ -41,3 +41,13 @@ export const DEFAULT_SETTINGS: UserSettings = {
  * Storage key for settings in VS Code's globalState
  */
 export const SETTINGS_STORAGE_KEY = 'gitHistory.userSettings';
+
+/**
+ * Maximum number of saved filter presets allowed
+ */
+export const MAX_SAVED_PRESETS = 10;
+
+/**
+ * Maximum length of preset name
+ */
+export const PRESET_NAME_MAX_LENGTH = 50;
