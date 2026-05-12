@@ -38,6 +38,7 @@ User preferences are automatically persisted across VS Code sessions using VS Co
 - **Hide Merge Commits**: Whether to filter out merge commits
 - **Regex Search Mode**: Whether regex search is enabled
 - **Search Query**: Search query text for filtering commits
+- **Show Graph**: Whether the commit graph column is visible
 
 **Implementation**:
 - `src/settings/settingsService.ts` - Service for saving/loading settings via `globalState`
@@ -151,6 +152,8 @@ The extension detects and displays the current git branch in the history panel:
 - **Keyboard Navigation**: The commit list supports full keyboard navigation for accessibility and power users. Arrow keys (`↑`/`↓`) move focus between commits with wrapping support. `Home`/`End` jump to first/last commit. `Enter` selects the focused commit, while `Ctrl+Enter` toggles multi-selection. `Ctrl+A` / `Cmd+A` selects all visible commits in the current view, useful for bulk operations like exporting or copying all hashes. `/` or `Ctrl+F` focuses the search input. `Escape` clears selection and removes focus. The focused row has a distinct visual outline using the `focused` CSS class (separate from the `selected` class used for commit selection). Implementation spans `src/webview/panel/main.js` (`handleKeyDown`, `updateFocusedRow`, `scrollFocusedIntoView` functions) and `src/webview/panel/styles.css` (`.focused` class styling).
 
 - **Hide Merge Commits**: A toggle button in the toolbar allows filtering out merge commits from the history view. When enabled, commits with more than one parent (merge commits) are hidden from the commit list. This helps reduce clutter when reviewing history with many merge commits. The setting is controlled by `gitHistory.hideMergeCommits` configuration (default: false) and can be toggled per-session via the "No Merge" button or keyboard shortcut `Ctrl+Shift+Q` / `Cmd+Shift+Q`. State is tracked in `hideMergeCommits` variable in `main.js`, filtering logic is integrated into `getFilteredCommits()`, and the UI button styling is defined in `styles.css` with `.merge-toggle-btn` and `.merge-toggle-btn.active` classes.
+
+- **Graph Toggle**: A toggle button ("Graph") in the toolbar controls visibility of the commit graph column. The graph is shown by default. Toggling hides/shows the SVG graph column in the commit list. Also toggled via `Ctrl+Alt+T` / `Cmd+Alt+T`. Active state (graph visible) is indicated by highlighted button styling (`.graph-toggle-btn.active`). The `showGraph` state is persisted in `UserSettings` across sessions via `saveSettings`. The graph is automatically hidden when sort mode is author-based (sortMode ≥ 2) regardless of the toggle state. The initial value comes from `UserSettings.showGraph`, falling back to the `gitHistory.showGraph` VS Code configuration. Implementation spans `main.js` (`handleToggleGraph()` function, init handler), `webviewProvider.ts` (passes showGraph from userSettings in init message), and `styles.css` (`.graph-toggle-btn` styling).
 
 - **Jump to Hash**: Press `Ctrl+G` / `Cmd+G` to open a modal dialog where you can type a commit hash (full or short). As you type, matching commits are displayed. Press `Enter` to jump to the first match, or click on a result. The commit is scrolled into view and selected. Implementation is in `main.js` (`showJumpToHashDialog`, `scrollToCommitByHash`) and styled in `styles.css` (`#jump-to-hash-modal`, related classes).
 
@@ -357,3 +360,54 @@ test('setSetting updates newSetting', async () => {
 - `test/suite/settingsServiceUnit.test.ts` - Mock-based unit tests for SettingsService methods
 - `test/suite/settingsServiceE2E.test.ts` - Integration tests verifying settings persistence and data flow
 - `test/suite/settingsService.test.ts` - Source verification tests (ensures files exist and are structured correctly)
+
+### Testing FirstRunTipService
+
+When adding new functionality to the FirstRunTipService:
+
+1. **Unit tests in `test/suite/firstRunTipServiceUnit.test.ts`**
+   - Use `MockMemento` pattern (same as SettingsService)
+   - Test `shouldShowTip()` returns true on first run
+   - Test `shouldShowTip()` returns false after `markAsShown()`
+   - Test `reset()` allows tip to show again
+   - Test persistence across service restarts
+
+2. **E2E tests in `test/suite/firstRunTipServiceE2E.test.ts`**
+   - Test that `showFirstRunTip` flag is passed in init message
+   - Test that `dismissFirstRunTip` message calls `markAsShown`
+   - Test full data flow: extension → provider → webview → handler
+
+**MockMemento pattern**
+
+```typescript
+class MockMemento implements vscode.Memento {
+  private store = new Map<string, any>();
+
+  get<T>(key: string): T | undefined;
+  get<T>(key: string, defaultValue: T): T;
+  get<T>(key: string, defaultValue?: T): T | undefined {
+    if (defaultValue !== undefined) {
+      return this.store.has(key) ? (this.store.get(key) as T) : defaultValue;
+    }
+    return this.store.get(key) as T | undefined;
+  }
+
+  update(key: string, value: any): Thenable<void> {
+    if (value === undefined) {
+      this.store.delete(key);
+    } else {
+      this.store.set(key, value);
+    }
+    return Promise.resolve();
+  }
+
+  keys(): readonly string[] {
+    return Array.from(this.store.keys());
+  }
+}
+```
+
+**Test Files**
+- `test/suite/firstRunTipServiceUnit.test.ts` - Mock-based unit tests for FirstRunTipService methods
+- `test/suite/firstRunTipServiceE2E.test.ts` - Integration tests verifying tip flow and persistence
+- `test/suite/firstRunTip.test.ts` - Source verification tests
