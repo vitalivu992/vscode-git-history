@@ -246,6 +246,10 @@ export async function handleMessage(
       await handleCopyCommitMention(message.hash, panel);
       break;
 
+    case 'copyCommitRef':
+      handleCopyCommitRef(message.hash, panel);
+      break;
+
     default:
       console.error('Unknown message type:', message);
   }
@@ -1587,4 +1591,17 @@ async function handleCopyCommitMention(hash: string, panel: GitHistoryPanel): Pr
       `Failed to copy mention: ${error instanceof Error ? error.message : String(error)}`
     );
   }
+}
+
+function handleCopyCommitRef(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const ref = `refs/commit/${commit.hash}`;
+  void vscode.env.clipboard.writeText(ref).then(() => {
+    void vscode.window.showInformationMessage(`Commit reference copied: ${commit.shortHash}`);
+  });
 }

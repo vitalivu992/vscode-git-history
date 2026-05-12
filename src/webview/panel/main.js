@@ -581,6 +581,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+]: Copy commit reference
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === ']') {
+    e.preventDefault();
+    handleCopyRef();
+    return;
+  }
+
   // Ctrl+Alt+P: Quick compare with parent
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'p') {
     e.preventDefault();
@@ -1731,6 +1738,7 @@ function handleMessage(event) {
         case 'copyCommitPatch': handleCopyPatch(); break;
         case 'copyCommitUrl': handleCopyUrl(); break;
         case 'copyCommitMention': handleCopyMention(); break;
+        case 'copyCommitRef': handleCopyRef(); break;
         case 'copyBranchName': handleCopyBranchName(); break;
         case 'copyBranchUrl': handleCopyBranchUrl(); break;
         case 'copyRemoteUrl': handleCopyRemoteUrl(); break;
@@ -2378,6 +2386,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📢</span>
       <span class="context-menu-label">Copy as Platform Mention</span>
     </div>
+    <div class="context-menu-item" data-action="copy-ref">
+      <span class="context-menu-icon">🔗</span>
+      <span class="context-menu-label">Copy commit reference</span>
+    </div>
     <div class="context-menu-item" data-action="copy-stats">
       <span class="context-menu-icon">📊</span>
       <span class="context-menu-label">Copy stats</span>
@@ -2508,6 +2520,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitUrl', hash: commit.hash });
       } else if (action === 'copy-mention') {
         vscode.postMessage({ type: 'copyCommitMention', hash: commit.hash });
+      } else if (action === 'copy-ref') {
+        vscode.postMessage({ type: 'copyCommitRef', hash: commit.hash });
       } else if (action === 'copy-stats') {
         vscode.postMessage({ type: 'copyCommitStats', hash: commit.hash });
       } else if (action === 'copy-author-email') {
@@ -2859,6 +2873,19 @@ function handleCopyMention() {
     vscode.postMessage({ type: 'copyCommitMention', hash });
   } else {
     showError('Select a commit to copy mention');
+  }
+}
+
+function handleCopyRef() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyCommitRef', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyCommitRef', hash });
+  } else {
+    showError('Select a commit to copy reference');
   }
 }
 

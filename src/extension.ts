@@ -151,6 +151,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyCommitPatch', action: 'copyCommitPatch' },
     { command: 'gitHistory.copyCommitUrl', action: 'copyCommitUrl' },
     { command: 'gitHistory.copyCommitMention', action: 'copyCommitMention' },
+    { command: 'gitHistory.copyCommitRef', action: 'copyCommitRef' },
     { command: 'gitHistory.copyCommitStats', action: 'copyCommitStats' },
     { command: 'gitHistory.copyBranchName', action: 'copyBranchName' },
     { command: 'gitHistory.copyBranchUrl', action: 'copyBranchUrl' },

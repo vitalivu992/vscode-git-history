@@ -107,6 +107,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCommitRef",
+        "title": "Git History: Copy Commit Reference",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitStats",
         "title": "Git History: Copy Commit Stats",
         "category": "Git History"
@@ -429,6 +434,12 @@
         "command": "gitHistory.copyCommitMention",
         "key": "ctrl+shift+@",
         "mac": "cmd+shift+@",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitRef",
+        "key": "ctrl+shift+]",
+        "mac": "cmd+shift+]",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
