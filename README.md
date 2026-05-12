@@ -19,6 +19,7 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
 - **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions)
 - **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter. Supports tag filter: `tag:name` or click any tag badge to filter by tag. Supports regex mode with the .* button for advanced pattern matching like `bug(fix|patch)|hotfix` or `^feat:.*`.
+- **Quick Date Range Filters**: Three buttons ("Today", "Week", "Month") next to the search input provide one-click access to common date ranges. Click to apply, click again to remove.
 - **Sort Toggle**: Cycle through four sort modes with the sort button in the toolbar: Newest first, Oldest first, Author A-Z, and Author Z-A. Also accessible via `Ctrl+Shift+3` / `Cmd+Shift+3`
 - **Compare Any Two Commits**: Shift+click (or Shift+Enter) two commits to see the diff between them
 - **Multi-Select**: Select multiple commits to see a combined diff showing all changes
@@ -107,6 +108,7 @@ See [CHANGELOG](CHANGELOG.md) for version history.
   - `after:2024-01-01` - show commits after a specific date
   - `before:2024-06-01` - show commits before a specific date
   - `last:7days` or `last:2weeks` or `last:1month` - show commits within a recent time period
+  - Quick date buttons: Click "Today" (`last:1day`), "Week" (`last:7days`), or "Month" (`last:1month`) for one-click filtering
   - Combine filters: `bug fix after:2024-01-01` - search for "bug fix" in commits after January 1st
 - **Filter by author** using `author:` prefix or click any author name in the commit list:
   - `author:Alice` - show commits by author name (case-insensitive)
