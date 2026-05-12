@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, checkoutBranch, getCommitUrl, getBranchUrl, getFileUrl } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, getCommitDescribe, createBranchFromCommit, createTagFromCommit, checkoutBranch, getCommitUrl, getBranchUrl, getFileUrl, getCurrentGitUser } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -1117,6 +1117,465 @@ suite('Commit URL Generation Tests', () => {
       await withAzureFileRemote('git@ssh.dev.azure.com:v3/myorg/myproject/myrepo', 'origin', async () => {
         const url = await getFileUrl('test.txt', azureFileHash, azureFileTestDir);
         assert.strictEqual(url, `https://dev.azure.com/myorg/myproject/_git/myrepo?path=%2Ftest.txt&version=${azureFileHash.substring(0, 7)}`);
+      });
+    });
+  });
+
+  suite('getCurrentGitUser', () => {
+    const { execSync } = require('child_process');
+    let gitUserTestDir: string;
+
+    suiteSetup(() => {
+      gitUserTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-user-test-'));
+      execSync('git init', { cwd: gitUserTestDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(gitUserTestDir)) {
+        fs.rmSync(gitUserTestDir, { recursive: true, force: true });
+      }
+    });
+
+    test('returns name and email when both are configured', async () => {
+      execSync('git config user.name "Test User"', { cwd: gitUserTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: gitUserTestDir });
+
+      const result = await getCurrentGitUser(gitUserTestDir);
+
+      assert.ok(result, 'Should return an object');
+      assert.strictEqual(result!.name, 'Test User');
+      assert.strictEqual(result!.email, 'test@example.com');
+    });
+
+    test('returns object with name only when only name is configured', async () => {
+      execSync('git config --unset user.email', { cwd: gitUserTestDir });
+      execSync('git config user.name "Test User"', { cwd: gitUserTestDir });
+
+      const result = await getCurrentGitUser(gitUserTestDir);
+
+      assert.ok(result, 'Should return an object');
+      assert.strictEqual(result!.name, 'Test User');
+      assert.strictEqual(result!.email, '');
+    });
+
+    test('returns object with email only when only email is configured', async () => {
+      execSync('git config --unset user.name', { cwd: gitUserTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: gitUserTestDir });
+
+      const result = await getCurrentGitUser(gitUserTestDir);
+
+      assert.ok(result, 'Should return an object');
+      assert.strictEqual(result!.name, '');
+      assert.strictEqual(result!.email, 'test@example.com');
+    });
+
+    test('returns null when neither name nor email is configured', async () => {
+      execSync('git config --unset user.name', { cwd: gitUserTestDir });
+      execSync('git config --unset user.email', { cwd: gitUserTestDir });
+
+      const result = await getCurrentGitUser(gitUserTestDir);
+
+      assert.strictEqual(result, null, 'Should return null when no user configured');
+    });
+
+    test('trims whitespace from name and email', async () => {
+      execSync('git config user.name "Test User  "', { cwd: gitUserTestDir });
+      execSync('git config user.email "  test@example.com"', { cwd: gitUserTestDir });
+
+      const result = await getCurrentGitUser(gitUserTestDir);
+
+      assert.ok(result, 'Should return an object');
+      assert.strictEqual(result!.name, 'Test User');
+      assert.strictEqual(result!.email, 'test@example.com');
+    });
+  });
+
+  suite('getCommitDescribe', () => {
+    const { execSync } = require('child_process');
+    let describeTestDir: string;
+    let testFile: string;
+
+    suiteSetup(() => {
+      describeTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-describe-test-'));
+      testFile = path.join(describeTestDir, 'test.txt');
+      execSync('git init', { cwd: describeTestDir });
+      execSync('git config user.name "Test User"', { cwd: describeTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: describeTestDir });
+
+      // Create initial commit
+      fs.writeFileSync(testFile, 'Line 1\n');
+      execSync('git add .', { cwd: describeTestDir });
+      execSync('git commit -m "Initial commit"', { cwd: describeTestDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(describeTestDir)) {
+        fs.rmSync(describeTestDir, { recursive: true, force: true });
+      }
+    });
+
+    test('returns describe output when commit has tags', async () => {
+      const commits = await getFileHistory(testFile, describeTestDir);
+      const latestHash = commits[0].hash;
+
+      // Create a tag
+      execSync(`git tag v1.0.0 ${latestHash}`, { cwd: describeTestDir });
+
+      // Create another commit
+      fs.writeFileSync(testFile, 'Line 1\nLine 2\n');
+      execSync('git add .', { cwd: describeTestDir });
+      execSync('git commit -m "Second commit"', { cwd: describeTestDir });
+
+      const newCommits = await getFileHistory(testFile, describeTestDir);
+      const newHash = newCommits[0].hash;
+
+      const describe = await getCommitDescribe(newHash, describeTestDir);
+
+      // Should output something like v1.0.0-1-g<hash>
+      assert.ok(describe.includes('v1.0.0'), 'Describe should include tag name');
+      assert.ok(describe.includes('-1-'), 'Describe should show 1 commit since tag');
+
+      // Clean up tag
+      execSync('git tag -d v1.0.0', { cwd: describeTestDir });
+    });
+
+    test('returns describe output when commit has no tags (falls back to short hash)', async () => {
+      const commits = await getFileHistory(testFile, describeTestDir);
+      const latestHash = commits[0].hash;
+
+      const describe = await getCommitDescribe(latestHash, describeTestDir);
+
+      // When no tags exist, git describe --always falls back to abbreviated hash
+      assert.ok(describe.length > 0, 'Describe should return something even without tags');
+      assert.ok(/^[a-f0-9]+$/.test(describe), 'Should be a hex hash when no tags');
+    });
+
+    test('handles root commit', async () => {
+      const commits = await getFileHistory(testFile, describeTestDir);
+      const rootCommit = commits[commits.length - 1]; // Last commit is the oldest
+
+      const describe = await getCommitDescribe(rootCommit.hash, describeTestDir);
+
+      assert.ok(describe.length > 0, 'Describe should work for root commit');
+    });
+  });
+
+  suite('createBranchFromCommit', () => {
+    const { execSync } = require('child_process');
+    let branchTestDir: string;
+    let testFile: string;
+
+    suiteSetup(() => {
+      branchTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-branch-test-'));
+      testFile = path.join(branchTestDir, 'test.txt');
+      execSync('git init', { cwd: branchTestDir });
+      execSync('git config user.name "Test User"', { cwd: branchTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: branchTestDir });
+
+      fs.writeFileSync(testFile, 'Line 1\n');
+      execSync('git add .', { cwd: branchTestDir });
+      execSync('git commit -m "Initial commit"', { cwd: branchTestDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(branchTestDir)) {
+        fs.rmSync(branchTestDir, { recursive: true, force: true });
+      }
+    });
+
+    test('creates branch successfully', async () => {
+      const commits = await getFileHistory(testFile, branchTestDir);
+      const commitHash = commits[0].hash;
+
+      await createBranchFromCommit('test-branch', commitHash, branchTestDir);
+
+      // Verify branch was created
+      const branches = execSync('git branch', { cwd: branchTestDir, encoding: 'utf-8' });
+      assert.ok(branches.includes('test-branch'), 'Branch should be created');
+
+      // Clean up
+      execSync('git branch -D test-branch', { cwd: branchTestDir });
+    });
+
+    test('throws error for invalid branch name', async () => {
+      const commits = await getFileHistory(testFile, branchTestDir);
+      const commitHash = commits[0].hash;
+
+      await assert.rejects(
+        async () => {
+          await createBranchFromCommit('invalid..branch', commitHash, branchTestDir);
+        },
+        /not a valid branch name/
+      );
+    });
+
+    test('throws error when branch already exists', async () => {
+      const commits = await getFileHistory(testFile, branchTestDir);
+      const commitHash = commits[0].hash;
+
+      // Create branch first time
+      await createBranchFromCommit('existing-branch', commitHash, branchTestDir);
+
+      // Try to create same branch again
+      await assert.rejects(
+        async () => {
+          await createBranchFromCommit('existing-branch', commitHash, branchTestDir);
+        },
+        /already exists/
+      );
+
+      // Clean up
+      execSync('git branch -D existing-branch', { cwd: branchTestDir });
+    });
+  });
+
+  suite('createTagFromCommit', () => {
+    const { execSync } = require('child_process');
+    let tagTestDir: string;
+    let testFile: string;
+
+    suiteSetup(() => {
+      tagTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-tag-test-'));
+      testFile = path.join(tagTestDir, 'test.txt');
+      execSync('git init', { cwd: tagTestDir });
+      execSync('git config user.name "Test User"', { cwd: tagTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: tagTestDir });
+
+      fs.writeFileSync(testFile, 'Line 1\n');
+      execSync('git add .', { cwd: tagTestDir });
+      execSync('git commit -m "Initial commit"', { cwd: tagTestDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(tagTestDir)) {
+        fs.rmSync(tagTestDir, { recursive: true, force: true });
+      }
+    });
+
+    test('creates lightweight tag successfully', async () => {
+      const commits = await getFileHistory(testFile, tagTestDir);
+      const commitHash = commits[0].hash;
+
+      await createTagFromCommit('v1.0.0-light', commitHash, tagTestDir);
+
+      // Verify tag was created
+      const tags = execSync('git tag', { cwd: tagTestDir, encoding: 'utf-8' });
+      assert.ok(tags.includes('v1.0.0-light'), 'Lightweight tag should be created');
+
+      // Verify it's a lightweight tag (no annotation)
+      const tagOutput = execSync('git tag -l v1.0.0-light -n9', { cwd: tagTestDir, encoding: 'utf-8' });
+      // Lightweight tags show just the commit message, annotated tags show "tag message"
+      assert.ok(tagOutput.includes('Initial commit'), 'Should reference commit');
+
+      // Clean up
+      execSync('git tag -d v1.0.0-light', { cwd: tagTestDir });
+    });
+
+    test('creates annotated tag with message', async () => {
+      const commits = await getFileHistory(testFile, tagTestDir);
+      const commitHash = commits[0].hash;
+
+      await createTagFromCommit('v1.0.0-annotated', commitHash, tagTestDir, 'Release version 1.0.0');
+
+      // Verify tag was created
+      const tags = execSync('git tag', { cwd: tagTestDir, encoding: 'utf-8' });
+      assert.ok(tags.includes('v1.0.0-annotated'), 'Annotated tag should be created');
+
+      // Verify it's an annotated tag with the custom message
+      const tagOutput = execSync('git tag -l v1.0.0-annotated -n9', { cwd: tagTestDir, encoding: 'utf-8' });
+      assert.ok(tagOutput.includes('Release version 1.0.0'), 'Should include tag message');
+
+      // Clean up
+      execSync('git tag -d v1.0.0-annotated', { cwd: tagTestDir });
+    });
+
+    test('throws error for invalid tag name', async () => {
+      const commits = await getFileHistory(testFile, tagTestDir);
+      const commitHash = commits[0].hash;
+
+      await assert.rejects(
+        async () => {
+          await createTagFromCommit('invalid..tag', commitHash, tagTestDir);
+        },
+        /not a valid tag name/
+      );
+    });
+
+    test('throws error when tag already exists', async () => {
+      const commits = await getFileHistory(testFile, tagTestDir);
+      const commitHash = commits[0].hash;
+
+      // Create tag first time
+      await createTagFromCommit('existing-tag', commitHash, tagTestDir);
+
+      // Try to create same tag again
+      await assert.rejects(
+        async () => {
+          await createTagFromCommit('existing-tag', commitHash, tagTestDir);
+        },
+        /tag 'existing-tag' already exists/
+      );
+
+      // Clean up
+      execSync('git tag -d existing-tag', { cwd: tagTestDir });
+    });
+  });
+
+  suite('getFileUrl - GitHub', () => {
+    const { execSync } = require('child_process');
+    let githubFileTestDir: string;
+    let githubFileHash: string;
+
+    suiteSetup(() => {
+      githubFileTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-github-file-test-'));
+      execSync('git init', { cwd: githubFileTestDir });
+      execSync('git config user.name "Test User"', { cwd: githubFileTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: githubFileTestDir });
+      fs.writeFileSync(path.join(githubFileTestDir, 'test.txt'), 'content\n');
+      execSync('git add .', { cwd: githubFileTestDir });
+      execSync('git commit -m "Initial"', { cwd: githubFileTestDir });
+      githubFileHash = execSync('git rev-parse HEAD', { cwd: githubFileTestDir }).toString().trim();
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(githubFileTestDir)) {
+        fs.rmSync(githubFileTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withGithubFileRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: githubFileTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: githubFileTestDir });
+      }
+    }
+
+    test('generates correct file URL for GitHub', async () => {
+      await withGithubFileRemote('https://github.com/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/main.ts', githubFileHash, githubFileTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/blob/${githubFileHash.substring(0, 7)}/src/main.ts`);
+      });
+    });
+
+    test('generates correct file URL for GitHub SSH', async () => {
+      await withGithubFileRemote('git@github.com:owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('README.md', githubFileHash, githubFileTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/blob/${githubFileHash.substring(0, 7)}/README.md`);
+      });
+    });
+
+    test('handles nested file paths for GitHub', async () => {
+      await withGithubFileRemote('https://github.com/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/webview/panel/main.js', githubFileHash, githubFileTestDir);
+        assert.strictEqual(url, `https://github.com/owner/repo/blob/${githubFileHash.substring(0, 7)}/src/webview/panel/main.js`);
+      });
+    });
+  });
+
+  suite('getFileUrl - GitLab', () => {
+    const { execSync } = require('child_process');
+    let gitlabFileTestDir: string;
+    let gitlabFileHash: string;
+
+    suiteSetup(() => {
+      gitlabFileTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-gitlab-file-test-'));
+      execSync('git init', { cwd: gitlabFileTestDir });
+      execSync('git config user.name "Test User"', { cwd: gitlabFileTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: gitlabFileTestDir });
+      fs.writeFileSync(path.join(gitlabFileTestDir, 'test.txt'), 'content\n');
+      execSync('git add .', { cwd: gitlabFileTestDir });
+      execSync('git commit -m "Initial"', { cwd: gitlabFileTestDir });
+      gitlabFileHash = execSync('git rev-parse HEAD', { cwd: gitlabFileTestDir }).toString().trim();
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(gitlabFileTestDir)) {
+        fs.rmSync(gitlabFileTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withGitlabFileRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: gitlabFileTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: gitlabFileTestDir });
+      }
+    }
+
+    test('generates correct file URL for GitLab', async () => {
+      await withGitlabFileRemote('https://gitlab.com/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/main.ts', gitlabFileHash, gitlabFileTestDir);
+        assert.strictEqual(url, `https://gitlab.com/owner/repo/-/blob/${gitlabFileHash.substring(0, 7)}/src/main.ts`);
+      });
+    });
+
+    test('generates correct file URL for GitLab SSH', async () => {
+      await withGitlabFileRemote('git@gitlab.com:owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('README.md', gitlabFileHash, gitlabFileTestDir);
+        assert.strictEqual(url, `https://gitlab.com/owner/repo/-/blob/${gitlabFileHash.substring(0, 7)}/README.md`);
+      });
+    });
+
+    test('handles nested file paths for GitLab', async () => {
+      await withGitlabFileRemote('https://gitlab.com/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/webview/panel/main.js', gitlabFileHash, gitlabFileTestDir);
+        assert.strictEqual(url, `https://gitlab.com/owner/repo/-/blob/${gitlabFileHash.substring(0, 7)}/src/webview/panel/main.js`);
+      });
+    });
+  });
+
+  suite('getFileUrl - Bitbucket', () => {
+    const { execSync } = require('child_process');
+    let bitbucketFileTestDir: string;
+    let bitbucketFileHash: string;
+
+    suiteSetup(() => {
+      bitbucketFileTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-bitbucket-file-test-'));
+      execSync('git init', { cwd: bitbucketFileTestDir });
+      execSync('git config user.name "Test User"', { cwd: bitbucketFileTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: bitbucketFileTestDir });
+      fs.writeFileSync(path.join(bitbucketFileTestDir, 'test.txt'), 'content\n');
+      execSync('git add .', { cwd: bitbucketFileTestDir });
+      execSync('git commit -m "Initial"', { cwd: bitbucketFileTestDir });
+      bitbucketFileHash = execSync('git rev-parse HEAD', { cwd: bitbucketFileTestDir }).toString().trim();
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(bitbucketFileTestDir)) {
+        fs.rmSync(bitbucketFileTestDir, { recursive: true, force: true });
+      }
+    });
+
+    async function withBitbucketFileRemote(remoteUrl: string, remoteName: string, fn: () => Promise<void>) {
+      execSync(`git remote add ${remoteName} ${remoteUrl}`, { cwd: bitbucketFileTestDir });
+      try {
+        await fn();
+      } finally {
+        execSync(`git remote remove ${remoteName}`, { cwd: bitbucketFileTestDir });
+      }
+    }
+
+    test('generates correct file URL for Bitbucket', async () => {
+      await withBitbucketFileRemote('https://bitbucket.org/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/main.ts', bitbucketFileHash, bitbucketFileTestDir);
+        assert.strictEqual(url, `https://bitbucket.org/owner/repo/src/${bitbucketFileHash.substring(0, 7)}/src/main.ts`);
+      });
+    });
+
+    test('generates correct file URL for Bitbucket SSH', async () => {
+      await withBitbucketFileRemote('git@bitbucket.org:owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('README.md', bitbucketFileHash, bitbucketFileTestDir);
+        assert.strictEqual(url, `https://bitbucket.org/owner/repo/src/${bitbucketFileHash.substring(0, 7)}/README.md`);
+      });
+    });
+
+    test('handles nested file paths for Bitbucket', async () => {
+      await withBitbucketFileRemote('https://bitbucket.org/owner/repo.git', 'origin', async () => {
+        const url = await getFileUrl('src/webview/panel/main.js', bitbucketFileHash, bitbucketFileTestDir);
+        assert.strictEqual(url, `https://bitbucket.org/owner/repo/src/${bitbucketFileHash.substring(0, 7)}/src/webview/panel/main.js`);
       });
     });
   });
