@@ -3167,7 +3167,9 @@ function handleCopyFilterQuery() {
     query: searchInput.value,
     hideMergeCommits: hideMergeCommits,
     sortMode: sortMode,
-    showMyCommitsOnly: showMyCommitsOnly
+    showMyCommitsOnly: showMyCommitsOnly,
+    regexSearchEnabled: regexSearchEnabled,
+    pathFilter: pathFilter
   };
   vscode.postMessage({ type: 'copyFilterQuery', filterState });
 }
@@ -3212,6 +3214,15 @@ function applyFilterQuery(filterState) {
         myCommitsBtn.title = 'Show only my commits (Ctrl+Shift+M)';
       }
     }
+  }
+  if (typeof filterState.regexSearchEnabled === 'boolean') {
+    regexSearchEnabled = filterState.regexSearchEnabled;
+    if (regexToggleBtn) {
+      regexToggleBtn.classList.toggle('active', regexSearchEnabled);
+    }
+  }
+  if (typeof filterState.pathFilter === 'string' || filterState.pathFilter === null) {
+    pathFilter = filterState.pathFilter;
   }
 
   focusedIndex = -1;
