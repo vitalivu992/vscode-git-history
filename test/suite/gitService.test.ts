@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, getCommitDescribe, createBranchFromCommit, createTagFromCommit, checkoutBranch, getCommitUrl, getBranchUrl, getFileUrl, getCurrentGitUser } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, getCommitDescribe, createBranchFromCommit, createTagFromCommit, checkoutBranch, getCommitUrl, getBranchUrl, getFileUrl, getCurrentGitUser, deleteTagFromCommit, getCommitsAsMbox } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -1577,6 +1577,224 @@ suite('Commit URL Generation Tests', () => {
         const url = await getFileUrl('src/webview/panel/main.js', bitbucketFileHash, bitbucketFileTestDir);
         assert.strictEqual(url, `https://bitbucket.org/owner/repo/src/${bitbucketFileHash.substring(0, 7)}/src/webview/panel/main.js`);
       });
+    });
+  });
+
+  suite('deleteTagFromCommit', () => {
+    const { execSync } = require('child_process');
+    let deleteTagDir: string;
+    let deleteTagFile: string;
+
+    suiteSetup(() => {
+      deleteTagDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-delete-tag-unit-'));
+      deleteTagFile = path.join(deleteTagDir, 'test.txt');
+      execSync('git init', { cwd: deleteTagDir });
+      execSync('git config user.name "Test User"', { cwd: deleteTagDir });
+      execSync('git config user.email "test@example.com"', { cwd: deleteTagDir });
+
+      fs.writeFileSync(deleteTagFile, 'Line 1\n');
+      execSync('git add .', { cwd: deleteTagDir });
+      execSync('git commit -m "Initial commit"', { cwd: deleteTagDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(deleteTagDir)) {
+        fs.rmSync(deleteTagDir, { recursive: true, force: true });
+      }
+    });
+
+    test('deletes a lightweight tag', async () => {
+      execSync('git tag v-lightweight', { cwd: deleteTagDir });
+      let tags = execSync('git tag', { cwd: deleteTagDir, encoding: 'utf-8' });
+      assert.ok(tags.includes('v-lightweight'), 'Tag should exist before deletion');
+
+      await deleteTagFromCommit('v-lightweight', deleteTagDir);
+
+      tags = execSync('git tag', { cwd: deleteTagDir, encoding: 'utf-8' });
+      assert.ok(!tags.includes('v-lightweight'), 'Lightweight tag should be deleted');
+    });
+
+    test('deletes an annotated tag', async () => {
+      execSync('git tag -a v-annotated -m "Annotated tag message"', { cwd: deleteTagDir });
+      let tags = execSync('git tag', { cwd: deleteTagDir, encoding: 'utf-8' });
+      assert.ok(tags.includes('v-annotated'), 'Tag should exist before deletion');
+
+      await deleteTagFromCommit('v-annotated', deleteTagDir);
+
+      tags = execSync('git tag', { cwd: deleteTagDir, encoding: 'utf-8' });
+      assert.ok(!tags.includes('v-annotated'), 'Annotated tag should be deleted');
+    });
+
+    test('throws error for non-existent tag', async () => {
+      await assert.rejects(
+        async () => await deleteTagFromCommit('non-existent-tag', deleteTagDir),
+        /Git error|not found/,
+        'Should throw error for non-existent tag'
+      );
+    });
+
+    test('deletes one of multiple tags on same commit', async () => {
+      execSync('git tag v-multi-1', { cwd: deleteTagDir });
+      execSync('git tag v-multi-2', { cwd: deleteTagDir });
+
+      let tags = execSync('git tag', { cwd: deleteTagDir, encoding: 'utf-8' });
+      assert.ok(tags.includes('v-multi-1'), 'First tag should exist');
+      assert.ok(tags.includes('v-multi-2'), 'Second tag should exist');
+
+      await deleteTagFromCommit('v-multi-1', deleteTagDir);
+
+      tags = execSync('git tag', { cwd: deleteTagDir, encoding: 'utf-8' });
+      assert.ok(!tags.includes('v-multi-1'), 'First tag should be deleted');
+      assert.ok(tags.includes('v-multi-2'), 'Second tag should remain');
+
+      // Clean up remaining tag
+      execSync('git tag -d v-multi-2', { cwd: deleteTagDir });
+    });
+
+    test('works in detached HEAD state', async () => {
+      const commits = await getFileHistory(deleteTagFile, deleteTagDir);
+      const commitHash = commits[0].hash;
+
+      // Create tag while on a branch
+      execSync('git tag v-detached-test', { cwd: deleteTagDir });
+
+      // Enter detached HEAD
+      execSync(`git checkout ${commitHash}`, { cwd: deleteTagDir });
+
+      try {
+        await deleteTagFromCommit('v-detached-test', deleteTagDir);
+
+        const tags = execSync('git tag', { cwd: deleteTagDir, encoding: 'utf-8' });
+        assert.ok(!tags.includes('v-detached-test'), 'Tag should be deleted in detached HEAD');
+      } finally {
+        execSync('git checkout -', { cwd: deleteTagDir });
+      }
+    });
+  });
+
+  suite('getCommitsAsMbox', () => {
+    const { execSync } = require('child_process');
+    let mboxDir: string;
+    let mboxFile: string;
+
+    suiteSetup(() => {
+      mboxDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-mbox-test-'));
+      mboxFile = path.join(mboxDir, 'test.txt');
+      execSync('git init', { cwd: mboxDir });
+      execSync('git config user.name "Test User"', { cwd: mboxDir });
+      execSync('git config user.email "test@example.com"', { cwd: mboxDir });
+
+      // Create multiple commits for range testing
+      fs.writeFileSync(mboxFile, 'Line 1\n');
+      execSync('git add .', { cwd: mboxDir });
+      execSync('git commit -m "First commit"', { cwd: mboxDir });
+
+      fs.writeFileSync(mboxFile, 'Line 1\nLine 2\n');
+      execSync('git add .', { cwd: mboxDir });
+      execSync('git commit -m "Second commit"', { cwd: mboxDir });
+
+      fs.writeFileSync(mboxFile, 'Line 1\nLine 2\nLine 3\n');
+      execSync('git add .', { cwd: mboxDir });
+      execSync('git commit -m "Third commit"', { cwd: mboxDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(mboxDir)) {
+        fs.rmSync(mboxDir, { recursive: true, force: true });
+      }
+    });
+
+    test('generates mbox output for commit range', async () => {
+      const commits = await getFileHistory(mboxFile, mboxDir);
+      const oldest = commits[commits.length - 1].hash;
+      const newest = commits[0].hash;
+
+      const mbox = await getCommitsAsMbox(oldest, newest, mboxDir);
+
+      assert.ok(typeof mbox === 'string', 'Should return a string');
+      assert.ok(mbox.length > 0, 'Should not be empty');
+    });
+
+    test('includes RFC 822 headers (From, Date, Subject)', async () => {
+      const commits = await getFileHistory(mboxFile, mboxDir);
+      const oldest = commits[commits.length - 1].hash;
+      const newest = commits[0].hash;
+
+      const mbox = await getCommitsAsMbox(oldest, newest, mboxDir);
+
+      assert.ok(mbox.includes('From '), 'Should include From header');
+      assert.ok(mbox.includes('Date: '), 'Should include Date header');
+      assert.ok(mbox.includes('Subject: '), 'Should include Subject header');
+    });
+
+    test('includes diff content', async () => {
+      const commits = await getFileHistory(mboxFile, mboxDir);
+      const oldest = commits[commits.length - 1].hash;
+      const newest = commits[0].hash;
+
+      const mbox = await getCommitsAsMbox(oldest, newest, mboxDir);
+
+      assert.ok(mbox.includes('diff --git'), 'Should include diff content');
+      assert.ok(mbox.includes('--- '), 'Should include old file path');
+      assert.ok(mbox.includes('+++ '), 'Should include new file path');
+    });
+
+    test('includes commit messages in Subject headers', async () => {
+      const commits = await getFileHistory(mboxFile, mboxDir);
+      const oldest = commits[commits.length - 1].hash;
+      const newest = commits[0].hash;
+
+      const mbox = await getCommitsAsMbox(oldest, newest, mboxDir);
+
+      assert.ok(mbox.includes('First commit'), 'Should include first commit message');
+      assert.ok(mbox.includes('Second commit'), 'Should include second commit message');
+      assert.ok(mbox.includes('Third commit'), 'Should include third commit message');
+    });
+
+    test('generates multiple patches for multi-commit range', async () => {
+      const commits = await getFileHistory(mboxFile, mboxDir);
+      const oldest = commits[commits.length - 1].hash;
+      const newest = commits[0].hash;
+
+      const mbox = await getCommitsAsMbox(oldest, newest, mboxDir);
+
+      // Count From headers (each patch starts with "From <hash>")
+      const fromMatches = mbox.match(/^From [a-f0-9]{40}/gm);
+      assert.ok(fromMatches, 'Should have From headers');
+      assert.strictEqual(fromMatches.length, 3, 'Should have 3 patches for 3 commits');
+    });
+
+    test('generates single patch for single commit range', async () => {
+      const commits = await getFileHistory(mboxFile, mboxDir);
+      const singleHash = commits[0].hash;
+      // Use the parent as fromHash so we get exactly one commit
+      const parentHash = commits[0].parentHashes[0];
+
+      const mbox = await getCommitsAsMbox(parentHash, singleHash, mboxDir);
+
+      const fromMatches = mbox.match(/^From [a-f0-9]{40}/gm);
+      assert.ok(fromMatches, 'Should have From headers');
+      assert.strictEqual(fromMatches.length, 1, 'Should have exactly 1 patch');
+    });
+
+    test('throws error for invalid hashes', async () => {
+      await assert.rejects(
+        async () => await getCommitsAsMbox('invalidhash1', 'invalidhash2', mboxDir),
+        /Git error/,
+        'Should throw error for invalid hashes'
+      );
+    });
+
+    test('includes file additions in range', async () => {
+      const commits = await getFileHistory(mboxFile, mboxDir);
+      const oldest = commits[commits.length - 1].hash;
+      const newest = commits[0].hash;
+
+      const mbox = await getCommitsAsMbox(oldest, newest, mboxDir);
+
+      // The mbox should show file changes (additions with + lines)
+      assert.ok(mbox.includes('+'), 'Should include additions');
+      assert.ok(mbox.includes('test.txt'), 'Should reference the changed file');
     });
   });
 });
