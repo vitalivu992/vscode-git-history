@@ -605,6 +605,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+Alt+H: Copy all filtered hashes
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && (e.key === 'h' || e.key === 'H')) {
+    e.preventDefault();
+    handleCopyAllFilteredHashes();
+    return;
+  }
+
   // Ctrl+Shift+S: Copy commit stats
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
     e.preventDefault();
@@ -1920,6 +1927,7 @@ function handleMessage(event) {
         case 'copyCommitDate': handleCopyCommitDate(); break;
         case 'copyRelativeDate': handleCopyRelativeDate(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
+        case 'copyAllFilteredHashes': handleCopyAllFilteredHashes(); break;
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFileExtension': handleCopyExtension(); break;
         case 'copyFileDirectory': handleCopyFileDirectory(); break;
@@ -2702,6 +2710,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy selected hashes</span>
     </div>
+    <div class="context-menu-item" data-action="copy-all-filtered-hashes">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy all filtered hashes (${getOrderedCommits(getFilteredCommits()).length})</span>
+    </div>
     <div class="context-menu-item" data-action="copy-combined-diff" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy combined diff</span>
@@ -2795,6 +2807,8 @@ function showCommitContextMenu(event, commit) {
         handleDeleteTag();
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
+      } else if (action === 'copy-all-filtered-hashes') {
+        handleCopyAllFilteredHashes();
       } else if (action === 'copy-combined-diff') {
         handleCopyCombinedDiff();
       } else if (action === 'copy-range-diff') {
@@ -3712,6 +3726,16 @@ function handleCopySelectedHashes() {
   }
 }
 
+function handleCopyAllFilteredHashes() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (displayCommits.length === 0) {
+    showError('No commits visible in current view');
+    return;
+  }
+  const allHashes = displayCommits.map(commit => commit.hash);
+  vscode.postMessage({ type: 'copyAllFilteredHashes', hashes: allHashes });
+}
+
 function handleCopyStats() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -4032,6 +4056,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '8'], description: 'Copy relative date' },
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'H'], description: 'Copy all filtered hashes' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
         { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
         { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
