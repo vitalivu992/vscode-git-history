@@ -40,6 +40,9 @@ User preferences are automatically persisted across VS Code sessions using VS Co
 - **Search Query**: Search query text for filtering commits
 - **Show Graph**: Whether the commit graph column is visible
 - **Show Signatures**: Whether GPG signature verification badges are visible
+- **Ignore Whitespace**: Whether whitespace differences are ignored in diffs
+- **Show My Commits Only**: Whether to show commits authored by the current user only
+- **Diff Context Lines**: Number of context lines shown in diffs (1-10)
 
 **Implementation**:
 - `src/settings/settingsService.ts` - Service for saving/loading settings via `globalState`
