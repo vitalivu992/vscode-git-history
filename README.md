@@ -60,6 +60,7 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **Quick Compare with Parent**: Instantly compare the selected commit with its parent to see what changed in that specific commit. Use the "Compare" button or press `Ctrl+Alt+P` / `Cmd+Alt+P`. For root commits (first commit), an error is shown since there's no parent.
 - **Create Branch from Commit**: Right-click on any commit to create a new branch at that point in history. You'll be prompted for a branch name, and the branch will be created at the selected commit using `git branch <name> <hash>`.
 - **Create Tag from Commit**: Right-click on any commit to create a new git tag at that point in history. Supports both lightweight tags (enter tag name only) and annotated tags (enter a message when prompted). The tag will be created using `git tag <name> <hash>` or `git tag -a <name> -m <message> <hash>`.
+- **Delete Tag from Commit**: Right-click on any commit with tags to delete them. If the commit has only one tag, it will be deleted immediately with confirmation. If the commit has multiple tags, a picker lets you choose which one to delete. The tag is deleted using `git tag -d <tagname>`.
 - **Branch Switching**: Right-click on the branch badge or press `Ctrl+Alt+S` / `Cmd+Alt+S` to switch between branches. A searchable picker dialog shows all local and remote branches. The panel automatically refreshes after successful checkout.
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
@@ -183,6 +184,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Compare with parent** | Compare this commit with its parent |
 | **Create branch from commit** | Create a new branch at the selected commit |
 | **Create tag from commit** | Create a git tag at the selected commit |
+| **Delete tag from commit** | Delete a git tag from the selected commit (only shown when commit has tags) |
 
 **Changed Files Context Menu:**
 
