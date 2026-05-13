@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as util from 'util';
 import * as vscode from 'vscode';
 import { execFile } from 'child_process';
-import { CommitInfo, CommitFileChange, DiffResult, BlameLineInfo } from '../types';
+import { CommitInfo, CommitFileChange, DiffResult, BlameLineInfo, FileStats } from '../types';
 import { parseGitLog, parseNameStatus, isBinaryFile, parseLineHistoryLog } from './gitParser';
 import { parseBlameOutput } from './blameParser';
 import { parseMultipleCommitStats } from './gitStatsParser';
@@ -778,4 +778,60 @@ export async function getFileUrl(
     default:
       return null;
   }
+}
+
+/**
+ * Get per-file statistics for a commit
+ * Uses git show --numstat to get insertions/deletions per file
+ * @param hash The commit hash
+ * @param cwd Working directory
+ * @returns Array of file statistics with path, insertions, deletions, and binary flag
+ */
+export async function getFileStats(hash: string, cwd: string): Promise<FileStats[]> {
+  const args = ['show', '--numstat', '--format=', hash];
+  const output = await execGit(args, cwd);
+
+  const files: FileStats[] = [];
+  const lines = output.trim().split('\n');
+
+  for (const line of lines) {
+    if (!line.trim()) {
+      continue;
+    }
+
+    // Binary files show as "-\t-\tfilename" in git numstat output
+    if (line.startsWith('-\t-')) {
+      const binaryPath = line.substring(4).trim();
+      if (binaryPath) {
+        files.push({
+          path: binaryPath,
+          insertions: 0,
+          deletions: 0,
+          isBinary: true
+        });
+      }
+      continue;
+    }
+
+    // Regular files: "<additions>\t<deletions>\t<filename>"
+    const parts = line.split('\t');
+    if (parts.length >= 3) {
+      const insertions = parseInt(parts[0], 10);
+      const deletions = parseInt(parts[1], 10);
+      const filePath = parts.slice(2).join('\t'); // Handle filenames with tabs
+
+      // Validate numbers (git may output non-numeric in some edge cases)
+      const validInsertions = !isNaN(insertions) ? insertions : 0;
+      const validDeletions = !isNaN(deletions) ? deletions : 0;
+
+      files.push({
+        path: filePath,
+        insertions: validInsertions,
+        deletions: validDeletions,
+        isBinary: false
+      });
+    }
+  }
+
+  return files;
 }
