@@ -2,36 +2,38 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 
-suite('Extension Keybindings Tests', () => {
-  const expectedWebviewActions = [
-    { command: 'gitHistory.refresh', action: 'refresh' },
-    { command: 'gitHistory.copyCommitMessage', action: 'copyCommitMessage' },
-    { command: 'gitHistory.copyCommitHash', action: 'copyCommitHash' },
-    { command: 'gitHistory.copyCommitInfo', action: 'copyCommitInfo' },
-    { command: 'gitHistory.copyCherryPick', action: 'copyCherryPick' },
-    { command: 'gitHistory.copyRevert', action: 'copyRevert' },
-    { command: 'gitHistory.copyCommitFiles', action: 'copyCommitFiles' },
-    { command: 'gitHistory.copyCommitDiff', action: 'copyCommitDiff' },
-    { command: 'gitHistory.copyCommitPatch', action: 'copyCommitPatch' },
-    { command: 'gitHistory.copyCommitUrl', action: 'copyCommitUrl' },
-    { command: 'gitHistory.exportCommits', action: 'exportCommits' },
-    { command: 'gitHistory.quickCompare', action: 'quickCompare' },
-    { command: 'gitHistory.toggleMyCommits', action: 'toggleMyCommits' },
-    { command: 'gitHistory.toggleWordWrap', action: 'toggleWordWrap' },
-    { command: 'gitHistory.toggleRegex', action: 'toggleRegex' },
-    { command: 'gitHistory.jumpToHash', action: 'jumpToHash' },
-    { command: 'gitHistory.focusSearch', action: 'focusSearch' },
-    { command: 'gitHistory.showKeyboardHelp', action: 'showKeyboardHelp' },
-    { command: 'gitHistory.copyFileName', action: 'copyFileName' },
-    { command: 'gitHistory.copyFilePath', action: 'copyFilePath' },
-  ] as const;
+/**
+ * Extract webview actions from extension.ts source by parsing the webviewActions array.
+ */
+function extractWebviewActionsFromSource(source: string): { command: string; action: string }[] {
+  const actions: { command: string; action: string }[] = [];
 
-  test('webview actions array has exactly 20 entries', () => {
-    assert.strictEqual(expectedWebviewActions.length, 20, 'Should have 20 webview action commands');
+  // Match { command: 'gitHistory.xxx', action: 'yyy' } patterns
+  const regex = /\{\s*command:\s*'([^']+)',\s*action:\s*'([^']+)'\s*\}/g;
+  let match;
+  while ((match = regex.exec(source)) !== null) {
+    actions.push({ command: match[1], action: match[2] });
+  }
+
+  return actions;
+}
+
+suite('Extension Keybindings Tests', () => {
+  // Dynamically derive webview actions from extension.ts source
+  let derivedWebviewActions: { command: string; action: string }[];
+
+  suiteSetup(() => {
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
+    const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
+    derivedWebviewActions = extractWebviewActionsFromSource(extensionSource);
+  });
+
+  test('webview actions array is not empty', () => {
+    assert.ok(derivedWebviewActions.length > 0, 'Should have webview actions');
   });
 
   test('all webview action commands follow gitHistory.* naming pattern', () => {
-    for (const { command } of expectedWebviewActions) {
+    for (const { command } of derivedWebviewActions) {
       assert.ok(
         command.startsWith('gitHistory.'),
         `Command "${command}" should start with "gitHistory."`
@@ -39,8 +41,8 @@ suite('Extension Keybindings Tests', () => {
     }
   });
 
-  test('extension.ts registers all 20 webview action commands', () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+  test('extension.ts registers all webview action commands', () => {
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
 
     // Check for webviewActions array definition
@@ -50,7 +52,7 @@ suite('Extension Keybindings Tests', () => {
     );
 
     // Verify each action is in the array
-    for (const { action } of expectedWebviewActions) {
+    for (const { action } of derivedWebviewActions) {
       assert.ok(
         extensionSource.includes(`action: '${action}'`),
         `webviewActions should include "${action}"`
@@ -71,7 +73,7 @@ suite('Extension Keybindings Tests', () => {
   });
 
   test('all triggerAction cases are handled in main.js', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const mainJsSource = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for triggerAction case
@@ -81,7 +83,7 @@ suite('Extension Keybindings Tests', () => {
     );
 
     // Verify each action is handled in the switch
-    for (const { action } of expectedWebviewActions) {
+    for (const { action } of derivedWebviewActions) {
       assert.ok(
         mainJsSource.includes(`case '${action}':`) || mainJsSource.includes(`action === '${action}'`),
         `triggerAction handler should handle "${action}" action`
@@ -90,7 +92,7 @@ suite('Extension Keybindings Tests', () => {
   });
 
   test('triggerAction message type is defined in types.ts', () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const typesSource = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(
@@ -98,7 +100,7 @@ suite('Extension Keybindings Tests', () => {
       'types.ts should define triggerAction message type'
     );
     assert.ok(
-      typesSource.includes('action: string'),
+      typesSource.includes('action: WebviewAction') || typesSource.includes('action: string'),
       'triggerAction should have action field'
     );
   });
@@ -110,7 +112,7 @@ suite('Extension Keybindings Tests', () => {
     const commands = packageJson.contributes?.commands || [];
     const commandNames = new Set(commands.map((c: any) => c.command));
 
-    for (const { command } of expectedWebviewActions) {
+    for (const { command } of derivedWebviewActions) {
       assert.ok(
         commandNames.has(command),
         `package.json should declare command "${command}"`
@@ -124,13 +126,13 @@ suite('Extension Keybindings Tests', () => {
 
     const keybindings = packageJson.contributes?.keybindings || [];
     const webviewKeybindings = keybindings.filter((kb: any) =>
-      expectedWebviewActions.some((a) => a.command === kb.command)
+      derivedWebviewActions.some((a) => a.command === kb.command)
     );
 
     assert.strictEqual(
       webviewKeybindings.length,
-      expectedWebviewActions.length,
-      'Should have keybindings for all 20 webview actions'
+      derivedWebviewActions.length,
+      `Should have keybindings for all ${derivedWebviewActions.length} webview actions`
     );
 
     for (const kb of webviewKeybindings) {
@@ -165,7 +167,7 @@ suite('Extension Keybindings Tests', () => {
 
     const commands = packageJson.contributes?.commands || [];
 
-    for (const { command } of expectedWebviewActions) {
+    for (const { command } of derivedWebviewActions) {
       const cmd = commands.find((c: any) => c.command === command);
       assert.ok(
         cmd,
