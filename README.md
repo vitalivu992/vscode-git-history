@@ -189,6 +189,9 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy remote URL** | Copy the raw git remote URL |
 | **Copy file permalink** | Copy permanent web URL for a file at a specific commit |
 | **Copy tags** | Copy all tags for this commit |
+| **Copy Unix timestamp** | Copy the Unix timestamp (epoch seconds) for the commit |
+| **Copy file stats** | Copy per-file statistics showing insertions and deletions for each changed file |
+| **Copy message with stats** | Copy the commit message together with diff stat summary |
 | **Copy selected hashes** | Copy all selected commit hashes (2+ commits selected) |
 | **Copy combined diff** | Copy combined diff of all selected commits |
 | **Copy range diff** | Copy diff between two commits (range selected) |
@@ -246,6 +249,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Alt+G` / `Cmd+Alt+G` | Copy git describe to clipboard |
 | `Ctrl+Alt+K` / `Cmd+Alt+K` | Copy file directory to clipboard (for focused file in changed files list) |
 | `Ctrl+Alt+L` / `Cmd+Alt+L` | Copy relative file path to clipboard |
+| `Ctrl+Alt+W` / `Cmd+Alt+W` | Copy commit message with stats to clipboard |
 | `Ctrl+Alt+O` / `Cmd+Alt+O` | Copy remote URL to clipboard |
 | `Ctrl+Alt+Q` / `Cmd+Alt+Q` | Clear all filters |
 | `Ctrl+Alt+R` / `Cmd+Alt+R` | Copy range diff to clipboard (range selected) |
@@ -263,6 +267,8 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+K` / `Cmd+Shift+K` | Copy co-authors to clipboard |
 | `Ctrl+Shift+T` / `Cmd+Shift+T` | Copy commit date (ISO 8601 format) to clipboard |
 | `Ctrl+Shift+8` / `Cmd+Shift+8` | Copy relative date (e.g., "Today 2:30 PM", "3 days ago") to clipboard |
+| `Ctrl+Shift+2` / `Cmd+Shift+2` | Copy Unix timestamp (epoch seconds) to clipboard |
+| `Ctrl+Shift+Alt+F` / `Cmd+Shift+Alt+F` | Copy file stats (per-file insertions/deletions) to clipboard |
 | `Ctrl+Shift+;` / `Cmd+Shift+;` | Copy selected hashes to clipboard (2+ commits) |
 | `Ctrl+Shift+,` / `Cmd+Shift+,` | Copy file name only to clipboard |
 | `Ctrl+Shift+.` / `Cmd+Shift+.` | Copy file path to clipboard (for focused file in changed files list) |
@@ -310,6 +316,7 @@ This extension contributes the following settings:
 * `gitHistory.blame.dateFormat`: Date format for blame annotations - `relative` (e.g., "2 days ago"), `short` (e.g., "2024-03-15"), or `iso` (e.g., "2024-03-15T10:30:00Z") (default: `relative`)
 * `gitHistory.defaultDiffView`: Default diff view mode when opening Git History - `unified` or `side-by-side` (default: `unified`). **Note**: User settings from the previous session take precedence over this configuration.
 * `gitHistory.diffContextLines`: Number of context lines to show in diffs (default: `3`, range: `1-10`). Increase for more context during code review, decrease for more focused diffs.
+* `gitHistory.showSignatures`: Show GPG signature verification status for signed commits (default: true)
 
 ### Persistent User Preferences
 
