@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl, getCommitsAsMbox } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl, getCommitsAsMbox, getFileStats } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
 import { SettingsService, UserSettings, MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -92,6 +92,14 @@ export async function handleMessage(
 
     case 'copyCommitStats':
       await handleCopyCommitStats(message.hash, panel);
+      break;
+
+    case 'copyFileStats':
+      await handleCopyFileStats(message.hash, panel);
+      break;
+
+    case 'copyCommitWithStats':
+      await handleCopyCommitWithStats(message.hash, panel);
       break;
 
     case 'copyBranchName':
@@ -1088,6 +1096,48 @@ Net: ${netSign}${netChange}`;
   void vscode.window.showInformationMessage(`Commit stats copied: ${stats.filesChanged} ${filesWord}, +${stats.insertions}, -${stats.deletions}`);
 }
 
+/**
+ * Handle copy file-level stats to clipboard
+ * Copies per-file insertions/deletions for a commit
+ */
+async function handleCopyFileStats(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  try {
+    const cwd = panel.getCwd();
+    const files = await getFileStats(hash, cwd);
+
+    if (files.length === 0) {
+      void vscode.window.showInformationMessage('No files changed in this commit');
+      return;
+    }
+
+    const lines = files.map(f => {
+      if (f.isBinary) {
+        return `${f.path} | Binary`;
+      }
+      return `${f.path} | +${f.insertions}, -${f.deletions}`;
+    });
+
+    // Add summary line
+    lines.push(`\n${files.length} file${files.length === 1 ? '' : 's'} changed`);
+
+    const copyText = lines.join('\n');
+    await vscode.env.clipboard.writeText(copyText);
+
+    const filesWord = files.length === 1 ? 'file' : 'files';
+    void vscode.window.showInformationMessage(`File stats copied: ${files.length} ${filesWord}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy file stats: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
 function handleCopyDiffStatSummary(hash: string, panel: GitHistoryPanel): void {
   const commit = panel.getCommits().find(c => c.hash === hash);
   if (!commit) {
@@ -1110,6 +1160,39 @@ function handleCopyDiffStatSummary(hash: string, panel: GitHistoryPanel): void {
   void vscode.env.clipboard.writeText(copyText).then(() => {
     void vscode.window.showInformationMessage(`Diff stat summary copied: ${stats.filesChanged} ${filesWord}, +${stats.insertions}, -${stats.deletions}`);
   });
+}
+
+/**
+ * Handle copy commit message with stats to clipboard
+ */
+async function handleCopyCommitWithStats(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const { message, fullMessage, stats, shortHash } = commit;
+  let copyText = message;
+
+  // Add body if present
+  if (fullMessage) {
+    const body = fullMessage.split('\n').slice(1).join('\n').trim();
+    if (body) {
+      copyText += '\n\n' + body;
+    }
+  }
+
+  // Add stats if available
+  if (stats) {
+    const filesWord = stats.filesChanged === 1 ? 'file' : 'files';
+    const insertionsWord = stats.insertions === 1 ? 'insertion' : 'insertions';
+    const deletionsWord = stats.deletions === 1 ? 'deletion' : 'deletions';
+    copyText += '\n\n' + `${stats.filesChanged} ${filesWord} changed, ${stats.insertions} ${insertionsWord}(+), ${stats.deletions} ${deletionsWord}(-)`;
+  }
+
+  await vscode.env.clipboard.writeText(copyText);
+  void vscode.window.showInformationMessage(`Commit message with stats copied: ${shortHash}`);
 }
 
 function handleCopyBranchName(panel: GitHistoryPanel): void {
