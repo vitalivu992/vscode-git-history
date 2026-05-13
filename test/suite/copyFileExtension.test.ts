@@ -238,4 +238,17 @@ suite('Copy File Extension Source Verification', () => {
     assert.ok(source.includes('Copy file extension'),
       'main.js context menu label should say "Copy file extension"');
   });
+
+  test('main.js should handle Ctrl+Alt+E keyboard shortcut', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(
+      source.includes('e.altKey') &&
+      source.includes("e.key === 'e'") &&
+      source.includes('handleCopyExtension'),
+      'main.js should handle Ctrl+Alt+E and call handleCopyExtension'
+    );
+  });
 });

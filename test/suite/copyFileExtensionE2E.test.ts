@@ -207,4 +207,21 @@ suite('Copy File Extension E2E Tests', () => {
     assert.ok(source.includes("'Alt', 'E'") || source.includes("'cmdKey', 'Alt', 'E'"),
       'Keyboard shortcuts help should show Ctrl+Alt+E shortcut');
   });
+
+  test('main.js should handle Ctrl+Alt+E keyboard shortcut', async () => {
+    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    // Find handleKeyDown and verify Ctrl+Alt+E handler
+    const kdStart = source.indexOf('function handleKeyDown');
+    const kdEnd = source.indexOf('function ', kdStart + 1);
+    const kdBody = source.substring(kdStart, kdEnd > 0 ? kdEnd : kdStart + 3000);
+
+    assert.ok(
+      kdBody.includes('e.altKey') &&
+      kdBody.includes("e.key === 'e'") &&
+      kdBody.includes('handleCopyExtension'),
+      'handleKeyDown should handle Ctrl+Alt+E and call handleCopyExtension'
+    );
+  });
 });
