@@ -72,6 +72,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyShowCommand",
+        "title": "Git History: Copy Git Show Command",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitFiles",
         "title": "Git History: Copy Changed Files",
         "category": "Git History"
@@ -487,6 +492,12 @@
         "command": "gitHistory.copyRevert",
         "key": "ctrl+shift+u",
         "mac": "cmd+shift+u",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyShowCommand",
+        "key": "ctrl+alt+v",
+        "mac": "cmd+alt+v",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
