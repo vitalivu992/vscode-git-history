@@ -500,6 +500,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+Alt+F: Copy file stats
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && e.key === 'f') {
+    e.preventDefault();
+    handleCopyFileStats();
+    return;
+  }
+
   // Ctrl+Alt+Q: Clear all filters
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'q') {
     e.preventDefault();
@@ -1943,6 +1950,8 @@ function handleMessage(event) {
         case 'copySubject': handleCopySubject(); break;
         case 'copyDiffStatSummary': handleCopyDiffStatSummary(); break;
         case 'copyCommitStats': handleCopyStats(); break;
+        case 'copyFileStats': handleCopyFileStats(); break;
+        case 'copyCommitWithStats': handleCopyCommitWithStats(); break;
         case 'copyOneline': handleCopyOneline(); break;
         case 'copyCommitBody': handleCopyCommitBody(); break;
         case 'copyCommitMarkdown': handleCopyMarkdown(); break;
@@ -2689,6 +2698,14 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📊</span>
       <span class="context-menu-label">Copy diff stat summary</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-stats">
+      <span class="context-menu-icon">📊</span>
+      <span class="context-menu-label">Copy file stats</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-commit-with-stats">
+      <span class="context-menu-icon">📊</span>
+      <span class="context-menu-label">Copy message with stats</span>
+    </div>
     <div class="context-menu-item" data-action="copy-oneline">
       <span class="context-menu-icon">≡</span>
       <span class="context-menu-label">Copy as oneline</span>
@@ -2827,6 +2844,10 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copySubject', hash: commit.hash });
       } else if (action === 'copy-diff-stat-summary') {
         vscode.postMessage({ type: 'copyDiffStatSummary', hash: commit.hash });
+      } else if (action === 'copy-file-stats') {
+        vscode.postMessage({ type: 'copyFileStats', hash: commit.hash });
+      } else if (action === 'copy-commit-with-stats') {
+        vscode.postMessage({ type: 'copyCommitWithStats', hash: commit.hash });
       } else if (action === 'copy-oneline') {
         vscode.postMessage({ type: 'copyOneline', hash: commit.hash });
       } else if (action === 'copy-commit-body') {
@@ -3420,6 +3441,58 @@ function handleCopyDiffStatSummary() {
 
   vscode.postMessage({
     type: 'copyDiffStatSummary',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyCommitWithStats() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  } else if (displayCommits.length > 0) {
+    // Fall back to first commit
+    targetCommit = displayCommits[0];
+  }
+
+  if (!targetCommit) {
+    showError('No commits visible in current view');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitWithStats',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyFileStats() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  } else if (displayCommits.length > 0) {
+    // Fall back to first commit
+    targetCommit = displayCommits[0];
+  }
+
+  if (!targetCommit) {
+    showError('No commits visible in current view');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyFileStats',
     hash: targetCommit.hash
   });
 }
@@ -4301,6 +4374,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Alt', 'M'], description: 'Copy as Markdown' },
         { keys: [cmdKey, 'Alt', 'J'], description: 'Copy as JSON' },
         { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'F'], description: 'Copy file stats' },
+        { keys: [cmdKey, 'Alt', 'W'], description: 'Copy commit message with stats' },
         { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
         { keys: [cmdKey, 'Shift', '4'], description: 'Paste filter query from clipboard' },
         { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
