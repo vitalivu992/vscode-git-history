@@ -219,4 +219,20 @@ suite('Copy File Stats Tests', () => {
     assert.ok(keybinding.when.includes('gitHistory.webview'),
       'Keybinding should be scoped to gitHistory webview');
   });
+
+  suite('README Documentation Verification', () => {
+    const readmePath = path.resolve(__dirname, '../../../README.md');
+
+    test('README should document Copy file stats in Keyboard Navigation table', () => {
+      const source = fs.readFileSync(readmePath, 'utf-8');
+      assert.ok(source.includes('Copy file stats') && source.includes('Ctrl+Shift+Alt+F'),
+        'README should document Copy file stats keyboard shortcut in Keyboard Navigation table');
+    });
+
+    test('README should document Copy file stats in Commit Row Context Menu', () => {
+      const source = fs.readFileSync(readmePath, 'utf-8');
+      assert.ok(source.includes('Copy file stats'),
+        'README should document Copy file stats in Commit Row Context Menu table');
+    });
+  });
 });

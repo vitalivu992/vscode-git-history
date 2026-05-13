@@ -477,4 +477,20 @@ suite('Copy Commit Message with Stats Source Verification', () => {
       'keyboard help should include Alt+W shortcut'
     );
   });
+
+  suite('README Documentation Verification', () => {
+    const readmePath = path.resolve(__dirname, '../../../README.md');
+
+    test('README should document Copy message with stats in Commit Row Context Menu', () => {
+      const source = fs.readFileSync(readmePath, 'utf-8');
+      assert.ok(source.includes('Copy message with stats') || source.includes('Copy commit message with stats'),
+        'README should document Copy message with stats in Commit Row Context Menu table');
+    });
+
+    test('README should document Ctrl+Alt+W keyboard shortcut for Copy message with stats', () => {
+      const source = fs.readFileSync(readmePath, 'utf-8');
+      assert.ok(source.includes('Ctrl+Alt+W') || source.includes('Cmd+Alt+W'),
+        'README should document Ctrl+Alt+W / Cmd+Alt+W keyboard shortcut for Copy message with stats');
+    });
+  });
 });

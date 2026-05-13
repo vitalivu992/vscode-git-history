@@ -165,4 +165,20 @@ suite('Copy Commit Unix Timestamp Test Suite', () => {
     assert.ok(helpEntries && helpEntries.some((e: string) => e.includes('Copy Unix timestamp')),
       'main.js keyboard help should list Copy Unix timestamp');
   });
+
+  suite('README Documentation Verification', () => {
+    const readmePath = path.resolve(__dirname, '../../../README.md');
+
+    test('README should document Copy Unix timestamp in Keyboard Navigation table', () => {
+      const source = fs.readFileSync(readmePath, 'utf-8');
+      assert.ok(source.includes('Copy Unix timestamp') && source.includes('Ctrl+Shift+2'),
+        'README should document Copy Unix timestamp keyboard shortcut in Keyboard Navigation table');
+    });
+
+    test('README should document Copy Unix timestamp in Commit Row Context Menu', () => {
+      const source = fs.readFileSync(readmePath, 'utf-8');
+      assert.ok(source.includes('Copy Unix timestamp'),
+        'README should document Copy Unix timestamp in Commit Row Context Menu table');
+    });
+  });
 });

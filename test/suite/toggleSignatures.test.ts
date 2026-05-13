@@ -220,4 +220,17 @@ suite('Toggle Signatures Unit Tests', () => {
     assert.ok(toggleFn.includes('GPG signatures visible'), 'handleToggleSignatures title should describe visible state');
     assert.ok(toggleFn.includes('Show GPG signatures'), 'handleToggleSignatures title should describe hidden state');
   });
+
+  suite('README Documentation Verification', () => {
+    test('README should document gitHistory.showSignatures setting', () => {
+      const fs = require('fs');
+      const readmePath = path.resolve(__dirname, '../../../README.md');
+      const source = fs.readFileSync(readmePath, 'utf-8');
+
+      assert.ok(source.includes('gitHistory.showSignatures'),
+        'README should document gitHistory.showSignatures setting');
+      assert.ok(source.includes('GPG signature verification'),
+        'README should describe GPG signature verification');
+    });
+  });
 });
