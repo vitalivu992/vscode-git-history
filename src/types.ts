@@ -153,6 +153,7 @@ export type WebviewAction =
   | 'copyAllFilteredHashes'
   | 'copyCommitterEmail'
   | 'copyCommitterName'
+  | 'copyShowCommand'
   | 'jumpToNextTag'
   | 'jumpToPreviousTag'
   | 'jumpToParent';
@@ -236,6 +237,7 @@ export type WebviewToExtMessage =
   | { type: 'copyAuthorName'; hash: string }
   | { type: 'copyCommitterEmail'; hash: string }
   | { type: 'copyCommitterName'; hash: string }
+  | { type: 'copyShowCommand'; hash: string }
   | { type: 'copyParentHash'; hash: string }
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }

@@ -145,6 +145,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyCommitInfo', action: 'copyCommitInfo' },
     { command: 'gitHistory.copyCherryPick', action: 'copyCherryPick' },
     { command: 'gitHistory.copyRevert', action: 'copyRevert' },
+    { command: 'gitHistory.copyShowCommand', action: 'copyShowCommand' },
     { command: 'gitHistory.copyCommitFiles', action: 'copyCommitFiles' },
     { command: 'gitHistory.copyCommitDiff', action: 'copyCommitDiff' },
     { command: 'gitHistory.copyCombinedDiff', action: 'copyCombinedDiff' },

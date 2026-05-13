@@ -698,6 +698,20 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Alt+E: Copy file extension
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'e') {
+    e.preventDefault();
+    handleCopyExtension();
+    return;
+  }
+
+  // Ctrl+Alt+V: Copy git show command
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'v') {
+    e.preventDefault();
+    handleCopyShowCommand();
+    return;
+  }
+
   // Ctrl+Shift+M: Toggle my commits filter
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'm') {
     e.preventDefault();
@@ -1907,6 +1921,7 @@ function handleMessage(event) {
         case 'copyCommitInfo': handleCopyInfo(); break;
         case 'copyCherryPick': handleCopyCherryPick(); break;
         case 'copyRevert': handleCopyRevert(); break;
+        case 'copyShowCommand': handleCopyShowCommand(); break;
         case 'copyCommitFiles': handleCopyFiles(); break;
         case 'copyCommitDiff': handleCopyDiff(); break;
         case 'copyCombinedDiff': handleCopyCombinedDiff(); break;
@@ -2602,6 +2617,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">↩️</span>
       <span class="context-menu-label">Copy revert command</span>
     </div>
+    <div class="context-menu-item" data-action="copy-show-command">
+      <span class="context-menu-icon">👁️</span>
+      <span class="context-menu-label">Copy git show command</span>
+    </div>
     <div class="context-menu-item" data-action="copy-files">
       <span class="context-menu-icon">📁</span>
       <span class="context-menu-label">Copy changed files</span>
@@ -2772,6 +2791,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCherryPickCommand', hash: commit.hash });
       } else if (action === 'copy-revert') {
         vscode.postMessage({ type: 'copyRevertCommand', hash: commit.hash });
+      } else if (action === 'copy-show-command') {
+        vscode.postMessage({ type: 'copyShowCommand', hash: commit.hash });
       } else if (action === 'copy-files') {
         vscode.postMessage({ type: 'copyCommitFiles', hash: commit.hash });
       } else if (action === 'copy-diff') {
@@ -3068,6 +3089,19 @@ function handleCopyRevert() {
     vscode.postMessage({ type: 'copyRevertCommand', hash });
   } else {
     showError('Select a commit to copy revert command');
+  }
+}
+
+function handleCopyShowCommand() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyShowCommand', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyShowCommand', hash });
+  } else {
+    showError('Select a commit to copy git show command');
   }
 }
 
@@ -4239,6 +4273,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'I'], description: 'Copy commit info' },
         { keys: [cmdKey, 'Shift', 'P'], description: 'Copy cherry-pick command' },
         { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
+        { keys: [cmdKey, 'Alt', 'V'], description: 'Copy git show command' },
         { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
         { keys: [cmdKey, 'Shift', 'D'], description: 'Copy commit diff' },
         { keys: [cmdKey, 'Alt', 'D'], description: 'Copy combined diff (multi-select)' },

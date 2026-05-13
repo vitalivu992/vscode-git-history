@@ -70,6 +70,10 @@ export async function handleMessage(
       handleCopyRevertCommand(message.hash, panel);
       break;
 
+    case 'copyShowCommand':
+      handleCopyShowCommand(message.hash, panel);
+      break;
+
     case 'copyCommitFiles':
       handleCopyCommitFiles(message.hash, panel);
       break;
@@ -538,6 +542,20 @@ function handleCopyRevertCommand(hash: string, panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(revertCommand).then(() => {
     void vscode.window.showInformationMessage(`Revert command copied: ${commit.shortHash}`);
+  });
+}
+
+function handleCopyShowCommand(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const showCommand = `git show ${commit.hash}`;
+
+  void vscode.env.clipboard.writeText(showCommand).then(() => {
+    void vscode.window.showInformationMessage(`Copied git show command for ${commit.shortHash}`);
   });
 }
 
