@@ -152,7 +152,10 @@ export type WebviewAction =
   | 'toggleSignatures'
   | 'copyAllFilteredHashes'
   | 'copyCommitterEmail'
-  | 'copyCommitterName';
+  | 'copyCommitterName'
+  | 'jumpToNextTag'
+  | 'jumpToPreviousTag'
+  | 'jumpToParent';
 
 /**
  * Filter state for copy filter query feature

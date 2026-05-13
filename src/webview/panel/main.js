@@ -1963,6 +1963,9 @@ function handleMessage(event) {
         case 'toggleGraph': handleToggleGraph(); break;
         case 'toggleSignatures': handleToggleSignatures(); break;
         case 'jumpToHash': showJumpToHashDialog(); break;
+        case 'jumpToNextTag': jumpToNextTag(); break;
+        case 'jumpToPreviousTag': jumpToPreviousTag(); break;
+        case 'jumpToParent': jumpToParent(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
         case 'cycleDiffContextLines': handleDiffContextLinesCycle(); break;
@@ -4071,6 +4074,106 @@ function scrollToCommitByHash(hash) {
   }
 }
 
+// ─── Tag Navigation ──────────────────────────────────────────────────────
+
+function getTaggedCommits() {
+  return getOrderedCommits(getFilteredCommits()).filter(commit => commit.tags && commit.tags.length > 0);
+}
+
+function jumpToNextTag() {
+  const taggedCommits = getTaggedCommits();
+  if (taggedCommits.length === 0) {
+    showError('No tagged commits found');
+    return;
+  }
+
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  const currentHash = focusedIndex >= 0 && focusedIndex < displayCommits.length
+    ? displayCommits[focusedIndex].hash
+    : null;
+
+  let currentIndex = -1;
+  if (currentHash) {
+    currentIndex = taggedCommits.findIndex(c => c.hash === currentHash);
+  }
+
+  let nextIndex;
+  if (currentIndex < 0) {
+    nextIndex = 0;
+  } else if (currentIndex < taggedCommits.length - 1) {
+    nextIndex = currentIndex + 1;
+  } else {
+    nextIndex = 0;
+  }
+
+  const targetCommit = taggedCommits[nextIndex];
+  scrollToCommitByHash(targetCommit.hash);
+  setFocusedRow(targetCommit.hash);
+}
+
+function jumpToPreviousTag() {
+  const taggedCommits = getTaggedCommits();
+  if (taggedCommits.length === 0) {
+    showError('No tagged commits found');
+    return;
+  }
+
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  const currentHash = focusedIndex >= 0 && focusedIndex < displayCommits.length
+    ? displayCommits[focusedIndex].hash
+    : null;
+
+  let currentIndex = -1;
+  if (currentHash) {
+    currentIndex = taggedCommits.findIndex(c => c.hash === currentHash);
+  }
+
+  let prevIndex;
+  if (currentIndex < 0) {
+    prevIndex = taggedCommits.length - 1;
+  } else if (currentIndex > 0) {
+    prevIndex = currentIndex - 1;
+  } else {
+    prevIndex = taggedCommits.length - 1;
+  }
+
+  const targetCommit = taggedCommits[prevIndex];
+  scrollToCommitByHash(targetCommit.hash);
+  setFocusedRow(targetCommit.hash);
+}
+
+function jumpToParent() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+
+  // Get the currently focused commit
+  if (focusedIndex < 0 || focusedIndex >= displayCommits.length) {
+    showError('No commit focused');
+    return;
+  }
+
+  const currentCommit = displayCommits[focusedIndex];
+
+  // Check if commit has a parent
+  if (!currentCommit.parentHashes || currentCommit.parentHashes.length === 0) {
+    showError('Root commit has no parent');
+    return;
+  }
+
+  // Get the first parent hash
+  const parentHash = currentCommit.parentHashes[0];
+
+  // Check if parent is in the current filtered list
+  const parentExists = displayCommits.some(c => c.hash === parentHash);
+  if (!parentExists) {
+    showError('Parent commit not in current view (try clearing filters)');
+    return;
+  }
+
+  // Navigate to parent
+  scrollToCommitByHash(parentHash);
+  setFocusedRow(parentHash);
+}
+
 // ─── Keyboard Help Dialog ────────────────────────────────────────────────────
 
 /**
@@ -4109,6 +4212,9 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'F'], description: 'Focus search input' },
         { keys: [cmdKey, 'Shift', 'X'], description: 'Toggle regex search mode' },
         { keys: [cmdKey, 'G'], description: 'Jump to commit by hash' },
+        { keys: [cmdKey, 'P'], description: 'Jump to parent commit' },
+        { keys: [cmdKey, ']'], description: 'Jump to next tagged commit' },
+        { keys: [cmdKey, '['], description: 'Jump to previous tagged commit' },
         { keys: [cmdKey, 'Shift', 'Q'], description: 'Toggle hide merge commits' },
         { keys: [cmdKey, 'Alt', 'S'], description: 'Show branch picker' }
       ]
