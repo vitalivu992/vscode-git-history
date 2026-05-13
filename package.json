@@ -292,6 +292,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.exportCommitsMbox",
+        "title": "Git History: Export as Mbox",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.quickCompare",
         "title": "Git History: Quick Compare with Parent",
         "category": "Git History"
@@ -359,6 +364,21 @@
       {
         "command": "gitHistory.jumpToHash",
         "title": "Git History: Jump to Hash",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToNextTag",
+        "title": "Git History: Jump to Next Tag",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToPreviousTag",
+        "title": "Git History: Jump to Previous Tag",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToParent",
+        "title": "Git History: Jump to Parent Commit",
         "category": "Git History"
       },
       {
@@ -800,6 +820,24 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.jumpToNextTag",
+        "key": "ctrl+]",
+        "mac": "cmd+]",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToPreviousTag",
+        "key": "ctrl+[",
+        "mac": "cmd+[",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToParent",
+        "key": "ctrl+p",
+        "mac": "cmd+p",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.focusSearch",
         "key": "ctrl+f",
         "mac": "cmd+f",
@@ -845,6 +883,30 @@
         "command": "gitHistory.loadFilterPreset",
         "key": "ctrl+shift+1",
         "mac": "cmd+shift+1",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.createBranch",
+        "key": "ctrl+alt+b",
+        "mac": "cmd+alt+b",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.createTag",
+        "key": "ctrl+alt+i",
+        "mac": "cmd+alt+i",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.deleteTag",
+        "key": "ctrl+alt+.",
+        "mac": "cmd+alt+.",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.exportCommitsMbox",
+        "key": "ctrl+shift+alt+e",
+        "mac": "cmd+shift+alt+e",
         "when": "activeWebviewPanelId == gitHistory.webview"
       }
     ],
