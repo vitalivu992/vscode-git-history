@@ -10,6 +10,16 @@ export interface CommitStats {
 }
 
 /**
+ * Statistics for a single file in a commit
+ */
+export interface FileStats {
+  path: string;
+  insertions: number;
+  deletions: number;
+  isBinary: boolean;
+}
+
+/**
  * GPG signature information for a commit
  */
 export interface CommitSignature {
@@ -94,6 +104,7 @@ export type WebviewAction =
   | 'copyCommitPatch'
   | 'copyCommitUrl'
   | 'copyCommitStats'
+  | 'copyFileStats'
   | 'copyBranchName'
   | 'copyBranchUrl'
   | 'copyRemoteUrl'
@@ -105,6 +116,7 @@ export type WebviewAction =
   | 'copyShortHash'
   | 'copySubject'
   | 'copyDiffStatSummary'
+  | 'copyCommitWithStats'
   | 'copyCoAuthors'
   | 'copyCommitDate'
   | 'copyRelativeDate'
@@ -228,6 +240,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitPatch'; hash: string }
   | { type: 'copyCommitUrl'; hash: string }
   | { type: 'copyCommitStats'; hash: string }
+  | { type: 'copyFileStats'; hash: string }
   | { type: 'copyBranchName' }
   | { type: 'copyBranchUrl' }
   | { type: 'copyRemoteUrl' }
@@ -242,6 +255,7 @@ export type WebviewToExtMessage =
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }
   | { type: 'copyDiffStatSummary'; hash: string }
+  | { type: 'copyCommitWithStats'; hash: string }
   | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
   | { type: 'copyRelativeDate'; hash: string }
