@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 suite('README Documentation Comprehensive Tests', () => {
-  const readmePath = path.resolve(__dirname, '../../README.md');
-  const packageJsonPath = path.resolve(__dirname, '../../package.json');
-  const typesPath = path.resolve(__dirname, '../../src/types.ts');
+  const readmePath = path.resolve(__dirname, '../../../README.md');
+  const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+  const typesPath = path.resolve(__dirname, '../../../src/types.ts');
   const readmeContent = fs.readFileSync(readmePath, 'utf-8');
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
   const typesContent = fs.readFileSync(typesPath, 'utf-8');
