@@ -342,6 +342,7 @@ Unit tests for pure parsing functions are located in:
 - `test/suite/gitParser.test.ts` - Tests for `parseGitLog`, `parseNameStatus`, `parseLineHistoryLog`, `isBinaryFile`
 - `test/suite/gitStatsParser.test.ts` - Tests for `parseCommitStats`, `extractStatsFromCommitBlock`, `parseMultipleCommitStats`
 - `test/suite/messageHandlerUtils.test.ts` - Tests for utility functions in `messageHandler.ts`
+- `test/suite/formatRelativeTime.test.ts` - Tests for `formatRelativeTime` function in `blameService.ts`
 
 These tests validate edge cases in git output parsing without requiring actual git operations.
 
@@ -465,3 +466,27 @@ class MockMemento implements vscode.Memento {
 - `test/suite/firstRunTipServiceUnit.test.ts` - Mock-based unit tests for FirstRunTipService methods
 - `test/suite/firstRunTipServiceE2E.test.ts` - Integration tests verifying tip flow and persistence
 - `test/suite/firstRunTip.test.ts` - Source verification tests
+
+### Testing formatRelativeTime
+
+The `test/suite/formatRelativeTime.test.ts` file contains comprehensive unit tests for the `formatRelativeTime` function in `src/blame/blameService.ts`:
+
+**Time Range Tests:**
+- Tests for all time ranges (seconds, minutes, hours, days, weeks, months, years)
+- Verifies correct thresholds and boundary conditions
+
+**Singular/Plural Forms:**
+- Tests singular forms (1 minute, 1 hour, etc.) at exact thresholds
+- Tests plural forms (2 minutes, 2 hours, etc.) for proper English grammar
+
+**Boundary Conditions:**
+- Tests exact thresholds (60s, 3600s, 86400s, 604800s, 2592000s, 31536000s)
+- Tests values just before and after each threshold
+
+**Edge Cases:**
+- Tests current time (0 seconds ago)
+- Tests 1 second ago
+- Tests large time differences (10+ years)
+- Tests fractional minute boundaries
+
+These tests ensure the relative time formatting is correct for all time ranges, which is important for the blame annotations feature that displays commit dates in a user-friendly format.
