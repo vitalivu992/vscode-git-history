@@ -982,11 +982,16 @@ async function handleExportCommits(
     const fileExtension = format === 'json' ? 'json' : format === 'csv' ? 'csv' : format === 'text' ? 'txt' : 'md';
     const defaultFileName = `git-history-export.${fileExtension}`;
 
-    const filters = format === 'markdown'
-      ? { 'Markdown': ['md'] }
-      : format === 'text'
-      ? { 'Text': ['txt'] }
-      : { [format.toUpperCase()]: [fileExtension] };
+    let filters: { [name: string]: string[] } = {};
+    if (format === 'markdown') {
+      filters = { 'Markdown': ['md'] };
+    } else if (format === 'text') {
+      filters = { 'Text': ['txt'] };
+    } else if (format === 'json') {
+      filters = { 'JSON': ['json'] };
+    } else if (format === 'csv') {
+      filters = { 'CSV': ['csv'] };
+    }
 
     const uri = await vscode.window.showSaveDialog({
       defaultUri: vscode.Uri.file(path.join(panel.getCwd(), defaultFileName)),

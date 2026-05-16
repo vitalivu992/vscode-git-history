@@ -108,6 +108,23 @@ function formatCommitsAsCsv(commits: TestCommitInfo[]): string {
   return lines.join('\n');
 }
 
+function formatCommitsAsText(commits: TestCommitInfo[]): string {
+  const lines: string[] = [];
+
+  for (const commit of commits) {
+    const authorPart = `${commit.author} <${commit.email}>`;
+    let line = `${commit.shortHash} - ${commit.message} (${authorPart})`;
+
+    if (commit.stats) {
+      line += ` [+${commit.stats.insertions}, -${commit.stats.deletions}, ${commit.stats.filesChanged} files]`;
+    }
+
+    lines.push(line);
+  }
+
+  return lines.join('\n');
+}
+
 suite('Export Commits E2E Tests', () => {
   const testCommits: TestCommitInfo[] = [
     {
@@ -314,6 +331,100 @@ suite('Export Commits E2E Tests', () => {
 
     const csv = formatCommitsAsCsv(filtered);
     assert.strictEqual(csv, 'Hash,Short Hash,Author,Email,Date,Message,Tags,Files Changed,Insertions,Deletions');
+  });
+
+  // ─── Plain Text E2E Tests ───────────────────────────────────────────────────
+
+  test('export all commits as text includes basic data', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const text = formatCommitsAsText(filtered);
+    const lines = text.split('\n');
+
+    assert.strictEqual(lines.length, 3);
+    assert.ok(lines[0].includes('abc123d'));
+    assert.ok(lines[0].includes('Initial commit'));
+    assert.ok(lines[0].includes('Alice Cooper'));
+    assert.ok(lines[0].includes('alice@example.com'));
+  });
+
+  test('export as text includes stats when available', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const text = formatCommitsAsText(filtered);
+
+    assert.ok(text.includes('[+150, -0, 3 files]'));
+    assert.ok(text.includes('[+200, -50, 5 files]'));
+  });
+
+  test('export filtered commits as text respects search filter', () => {
+    const filtered = getFilteredCommits(testCommits, 'feature', false);
+    const text = formatCommitsAsText(filtered);
+    const lines = text.split('\n');
+
+    assert.strictEqual(lines.length, 1);
+    assert.ok(lines[0].includes('Add feature X'));
+    assert.ok(lines[0].includes('def456a'));
+  });
+
+  test('export as text handles commits without stats', () => {
+    const noStatsCommits = [{ ...testCommits[2], stats: undefined }];
+    const text = formatCommitsAsText(noStatsCommits);
+
+    assert.ok(!text.includes('[')); // No stats brackets
+    assert.ok(text.includes('789def1'));
+    assert.ok(text.includes('Merge pull request'));
+  });
+
+  test('export empty commits as text produces empty string', () => {
+    const text = formatCommitsAsText([]);
+    assert.strictEqual(text, '');
+  });
+
+  test('export as text handles special characters in message', () => {
+    const specialCommit: TestCommitInfo = {
+      ...testCommits[0],
+      message: 'Fix "critical" bug with nested quotes'
+    };
+    const text = formatCommitsAsText([specialCommit]);
+
+    assert.ok(text.includes('Fix "critical" bug with nested quotes'));
+  });
+
+  test('export as text formats with correct structure', () => {
+    const filtered = getFilteredCommits(testCommits, 'Alice', false);
+    const text = formatCommitsAsText(filtered);
+
+    // Format: hash - message (author <email>) [+stats]
+    assert.ok(text.match(/abc123d - Initial commit \(Alice Cooper <alice@example\.com>\) \[\+150, -0, 3 files\]/));
+  });
+
+  test('export as text handles single file change', () => {
+    const singleFileCommit: TestCommitInfo = {
+      ...testCommits[0],
+      stats: { filesChanged: 1, insertions: 10, deletions: 2 }
+    };
+    const text = formatCommitsAsText([singleFileCommit]);
+
+    assert.ok(text.includes('[+10, -2, 1 files]'));
+  });
+
+  test('export as text handles commit with no changes', () => {
+    const noChangesCommit: TestCommitInfo = {
+      ...testCommits[0],
+      stats: { filesChanged: 0, insertions: 0, deletions: 0 }
+    };
+    const text = formatCommitsAsText([noChangesCommit]);
+
+    assert.ok(text.includes('[+0, -0, 0 files]'));
+  });
+
+  test('export as text with hideMergeCommits excludes merge commits', () => {
+    const filtered = getFilteredCommits(testCommits, '', true);
+    const text = formatCommitsAsText(filtered);
+
+    // Should not include the merge commit
+    assert.ok(!text.includes('Merge pull request'));
+    assert.ok(text.includes('Initial commit'));
+    assert.ok(text.includes('Add feature X'));
   });
 });
 
