@@ -167,6 +167,56 @@ suite('Git Service Integration Tests', () => {
     assert.ok(history.length >= 1);
   });
 
+  test('getSelectionHistory should respect maxCommits configuration', async () => {
+    const { execSync } = require('child_process');
+
+    // Create more commits modifying line 2
+    for (let i = 0; i < 8; i++) {
+      fs.writeFileSync(testFile, 'Line 1\nLine 2 modified ' + i + '\nLine 3\n');
+      execSync('git add .', { cwd: tempDir });
+      execSync('git commit -m "Modify line 2 - ' + i + '"', { cwd: tempDir });
+    }
+
+    // Now there should be 10+ commits modifying line 2
+    // Get all commits first to verify we have enough
+    const allHistory = await getSelectionHistory(testFile, 2, 2, tempDir);
+    assert.ok(allHistory.length >= 10, 'Should have at least 10 commits for line 2');
+
+    // Now test with maxCommits=5 by setting configuration
+    const vscode = require('vscode');
+    const originalMaxCommits = vscode.workspace.getConfiguration('gitHistory').get('maxCommits');
+    vscode.workspace.getConfiguration('gitHistory').update('maxCommits', 5, true);
+
+    try {
+      const limitedHistory = await getSelectionHistory(testFile, 2, 2, tempDir);
+      assert.ok(limitedHistory.length <= 5, 'Should return at most 5 commits with maxCommits=5');
+    } finally {
+      // Restore original setting
+      if (originalMaxCommits !== undefined) {
+        vscode.workspace.getConfiguration('gitHistory').update('maxCommits', originalMaxCommits, true);
+      }
+    }
+  });
+
+  test('getSelectionHistory should use default maxCommits value', async () => {
+    const { execSync } = require('child_process');
+
+    // Create enough commits to test default limit
+    const initialCount = (await getSelectionHistory(testFile, 2, 2, tempDir)).length;
+    const targetCommits = 10;
+    const needed = Math.max(0, targetCommits - initialCount);
+
+    for (let i = 0; i < needed; i++) {
+      fs.writeFileSync(testFile, 'Line 1\nLine 2 final ' + i + '\nLine 3\n');
+      execSync('git add .', { cwd: tempDir });
+      execSync('git commit -m "Final modification ' + i + '"', { cwd: tempDir });
+    }
+
+    // Default maxCommits is 500 - should return all commits
+    const history = await getSelectionHistory(testFile, 2, 2, tempDir);
+    assert.ok(history.length >= 10, 'Should return at least 10 commits with default limit');
+  });
+
   test('getFileHistory commits should include email field for search', async () => {
     const commits = await getFileHistory(testFile, tempDir);
 

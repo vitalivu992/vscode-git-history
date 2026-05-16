@@ -88,9 +88,11 @@ export async function getSelectionHistory(
   cwd: string
 ): Promise<CommitInfo[]> {
   const relativePath = path.relative(cwd, filePath);
+  const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   const args = [
     'log',
+    '-n', maxCommits.toString(),
     `-L${startLine},${endLine}:${relativePath}`,
     '--format=%H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%d%x00%G?%x00%GS'
   ];
