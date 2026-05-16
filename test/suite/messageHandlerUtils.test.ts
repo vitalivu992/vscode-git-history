@@ -5,6 +5,7 @@ import {
 	escapeCsvField,
 	formatCommitsAsCsv,
 	formatCommitsAsMarkdown,
+	formatCommitsAsText,
 	formatCommitAsMarkdown,
 	extractCoAuthors,
 	validatePresetName
@@ -325,6 +326,76 @@ suite('messageHandlerUtils - formatCommitsAsMarkdown', () => {
 	test('handles commits with full body', () => {
 		const result = formatCommitsAsMarkdown([sampleCommits[0]]);
 		assert.ok(result.includes('This is the first commit'));
+	});
+});
+
+suite('messageHandlerUtils - formatCommitsAsText', () => {
+	test('formats single commit correctly', () => {
+		const result = formatCommitsAsText([sampleCommits[0]]);
+		assert.ok(result.includes('abc123d'));
+		assert.ok(result.includes('Initial commit'));
+		assert.ok(result.includes('Alice Cooper'));
+		assert.ok(result.includes('alice@example.com'));
+	});
+
+	test('handles multiple commits', () => {
+		const result = formatCommitsAsText(sampleCommits);
+		const lines = result.split('\n');
+		assert.strictEqual(lines.length, 3);
+	});
+
+	test('includes stats when available', () => {
+		const result = formatCommitsAsText([sampleCommits[0]]);
+		assert.ok(result.includes('[+150, -0, 3 files]'));
+	});
+
+	test('handles missing stats', () => {
+		const result = formatCommitsAsText([sampleCommits[2]]);
+		assert.ok(!result.includes('['));
+		assert.ok(result.includes('123abc4'));
+		assert.ok(result.includes('Fix bug in parser'));
+	});
+
+	test('handles empty commits array', () => {
+		const result = formatCommitsAsText([]);
+		assert.strictEqual(result, '');
+	});
+
+	test('handles special characters in message', () => {
+		const commit: CommitInfo = {
+			...sampleCommits[0],
+			message: 'Fix "critical" bug'
+		};
+		const result = formatCommitsAsText([commit]);
+		assert.ok(result.includes('Fix "critical" bug'));
+	});
+
+	test('formats with correct structure: hash - message (author <email>)', () => {
+		const result = formatCommitsAsText([sampleCommits[0]]);
+		assert.ok(result.match(/^abc123d - Initial commit \(Alice Cooper <alice@example\.com>\)/));
+	});
+
+	test('formats stats correctly: [+insertions, -deletions, filesChanged files]', () => {
+		const result = formatCommitsAsText([sampleCommits[1]]);
+		assert.ok(result.includes('[+200, -50, 5 files]'));
+	});
+
+	test('handles commit with single file change', () => {
+		const commit: CommitInfo = {
+			...sampleCommits[0],
+			stats: { filesChanged: 1, insertions: 10, deletions: 2 }
+		};
+		const result = formatCommitsAsText([commit]);
+		assert.ok(result.includes('[+10, -2, 1 files]'));
+	});
+
+	test('handles commit with no changes', () => {
+		const commit: CommitInfo = {
+			...sampleCommits[0],
+			stats: { filesChanged: 0, insertions: 0, deletions: 0 }
+		};
+		const result = formatCommitsAsText([commit]);
+		assert.ok(result.includes('[+0, -0, 0 files]'));
 	});
 });
 

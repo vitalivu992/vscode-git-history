@@ -4021,6 +4021,11 @@ function showExportFormatDialog(commitsToExport) {
             <span class="export-option-label">Markdown</span>
             <span class="export-option-desc">Changelog format for documentation</span>
           </button>
+          <button class="export-option-btn" data-format="text">
+            <span class="export-option-icon">📄</span>
+            <span class="export-option-label">Plain Text</span>
+            <span class="export-option-desc">Simple, readable commit list</span>
+          </button>
           <button class="export-option-btn${mboxDisabled ? ' disabled' : ''}" data-format="mbox" ${mboxDisabled ? 'disabled' : ''} title="${mboxDisabled ? 'Select 2+ commits to enable' : 'Export as mbox for email/git am'}">
             <span class="export-option-icon">📧</span>
             <span class="export-option-label">mbox${mboxDisabled ? ' (2+ commits)' : ''}</span>

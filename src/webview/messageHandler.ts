@@ -945,10 +945,31 @@ export function formatCommitsAsMarkdown(commits: CommitInfo[]): string {
 }
 
 /**
+ * Format commits as plain text
+ * One commit per line: hash - message (author <email>) [+stats]
+ */
+export function formatCommitsAsText(commits: CommitInfo[]): string {
+  const lines: string[] = [];
+
+  for (const commit of commits) {
+    const authorPart = `${commit.author} <${commit.email}>`;
+    let line = `${commit.shortHash} - ${commit.message} (${authorPart})`;
+
+    if (commit.stats) {
+      line += ` [+${commit.stats.insertions}, -${commit.stats.deletions}, ${commit.stats.filesChanged} files]`;
+    }
+
+    lines.push(line);
+  }
+
+  return lines.join('\n');
+}
+
+/**
  * Handle export commits to file
  */
 async function handleExportCommits(
-  format: 'json' | 'csv' | 'markdown',
+  format: 'json' | 'csv' | 'markdown' | 'text',
   commits: CommitInfo[],
   panel: GitHistoryPanel
 ): Promise<void> {
@@ -958,11 +979,13 @@ async function handleExportCommits(
       return;
     }
 
-    const fileExtension = format === 'json' ? 'json' : format === 'csv' ? 'csv' : 'md';
+    const fileExtension = format === 'json' ? 'json' : format === 'csv' ? 'csv' : format === 'text' ? 'txt' : 'md';
     const defaultFileName = `git-history-export.${fileExtension}`;
 
     const filters = format === 'markdown'
       ? { 'Markdown': ['md'] }
+      : format === 'text'
+      ? { 'Text': ['txt'] }
       : { [format.toUpperCase()]: [fileExtension] };
 
     const uri = await vscode.window.showSaveDialog({
@@ -978,6 +1001,8 @@ async function handleExportCommits(
       ? formatCommitsAsJson(commits)
       : format === 'csv'
       ? formatCommitsAsCsv(commits)
+      : format === 'text'
+      ? formatCommitsAsText(commits)
       : formatCommitsAsMarkdown(commits);
 
     await fs.promises.writeFile(uri.fsPath, content, 'utf-8');

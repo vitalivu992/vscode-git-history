@@ -275,7 +275,7 @@ export type WebviewToExtMessage =
   | { type: 'deleteTag'; hash: string }
   | { type: 'deleteBranch'; branch: string; force?: boolean }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
-  | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown'; commits: CommitInfo[] }
+  | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown' | 'text'; commits: CommitInfo[] }
   | { type: 'exportCommitsMbox'; fromHash: string; toHash: string }
   | { type: 'requestBranchHashes'; branches: string[] }
   | { type: 'checkoutBranch'; branch: string }
