@@ -103,6 +103,10 @@ Selection history (`git log -L`) uses the same null-separated format (without bo
 ```
 Each commit appears as a single header line; inline diff lines (no null chars) are skipped by the parser.
 
+### maxCommits Configuration
+
+Both `getFileHistory()` and `getSelectionHistory()` respect the `gitHistory.maxCommits` configuration setting (default: 500). This limit is applied at the git command level using the `-n` flag, ensuring efficient filtering even for repositories with extensive history. The limit can be configured in VS Code settings.
+
 ### Commit Graph
 
 The webview renders a per-row SVG graph column (like `git log --graph`) using a lane-based algorithm:
@@ -168,6 +172,8 @@ The extension detects and displays the current git branch in the history panel:
 - **Tag Navigation**: Press `Ctrl+]` / `Cmd+]` to jump to the next tagged commit, or `Ctrl+[` / `Cmd+[` to jump to the previous tagged commit. The navigation works within the current filtered view, respecting all active filters. The function wraps around when reaching the first or last tag. If no tagged commits are found in the current view, an error message is displayed. If no commit is currently focused, next jumps to the first tag and previous jumps to the last tag. Implemented in `src/webview/panel/main.js` (`getTaggedCommits`, `jumpToNextTag`, `jumpToPreviousTag` functions). The `jumpToNextTag` and `jumpToPreviousTag` webview actions are defined in `src/types.ts`.
 
 - **Jump to Parent Commit**: Press `Ctrl+P` / `Cmd+P` to jump to the first parent of the currently focused commit. This is different from "Quick compare with parent" which shows a diff - this navigates to and selects the parent commit. For root commits (no parent), an error message is shown. The parent must be in the current filtered view; if not, an error suggests clearing filters. Implemented in `src/webview/panel/main.js` (`jumpToParent` function). The `jumpToParent` webview action is defined in `src/types.ts`.
+
+- **Jump to Next/Previous Commit with Stats**: Press `Ctrl+Alt+]` / `Cmd+Alt+]` to jump to the next commit that has file changes (filesChanged > 0), or `Ctrl+Alt+[` / `Cmd+Alt+[` to jump to the previous one. This effectively skips merge commits and commits with no file changes, letting users focus on commits that made actual code changes. The navigation wraps around and respects all active filters. If no commits with file changes exist in the current view, an error message is shown. Implemented in `src/webview/panel/main.js` (`getCommitsWithStats`, `jumpToNextCommitWithStats`, `jumpToPreviousCommitWithStats` functions). The `jumpToNextCommitWithStats` and `jumpToPreviousCommitWithStats` webview actions are defined in `src/types.ts`.
 
 - **Copy Commit Hash**: Press `Ctrl+Shift+H` / `Cmd+Shift+H` to copy the full commit hash of the focused or selected commit to clipboard. Hash chips in the commit list are also click-to-copy (using `navigator.clipboard`). The keyboard shortcut follows the same resolution pattern as copy message: `handleCopyHash` in `main.js` resolves the target commit via `getOrderedCommits(getFilteredCommits())` and sends a `copyCommitHash` message. The message is handled by `handleCopyCommitHash` in `messageHandler.ts` which writes `commit.hash` to `vscode.env.clipboard` and shows a confirmation with the short hash. The `copyCommitHash` message type is defined in `src/types.ts`.
 

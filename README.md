@@ -36,6 +36,7 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **Jump to Hash**: Press `Ctrl+G` / `Cmd+G` to open a dialog and quickly navigate to a specific commit by hash
 - **Tag Navigation**: Press `Ctrl+]` / `Cmd+]` to jump to the next tagged commit, or `Ctrl+[` / `Cmd+[` to jump to the previous tagged commit. Wraps around at the first/last tag. Respects active filters.
 - **Jump to Parent**: Press `Ctrl+P` / `Cmd+P` to jump to the first parent of the currently focused commit. Different from "Compare with parent" which shows a diff - this navigates to and selects the parent. For root commits, an error is shown.
+- **Jump to Commit with Changes**: Press `Ctrl+Alt+]` / `Cmd+Alt+]` to jump to the next commit with file changes, or `Ctrl+Alt+[` / `Cmd+Alt+[` to jump to the previous one. Skips merge commits and commits with no file changes. Wraps around and respects active filters.
 - **Refresh**: Reload commit history with the refresh button or `Ctrl+Shift+R` / `Cmd+Shift+R` keyboard shortcut
 - **Copy Commit Message**: Copy the commit message, author, email, and date to clipboard with the copy button or `Ctrl+Shift+C` / `Cmd+Shift+C` keyboard shortcut
 - **Copy Commit Hash**: Copy the full commit hash to clipboard with `Ctrl+Shift+H` / `Cmd+Shift+H` keyboard shortcut, or click any hash chip
@@ -391,6 +392,8 @@ These preferences are saved automatically when you change them in the UI, and re
 | Jump to next tag | `Ctrl+]` / `Cmd+]` |
 | Jump to previous tag | `Ctrl+[` / `Cmd+[` |
 | Jump to parent | `Ctrl+P` / `Cmd+P` |
+| Jump to next commit with changes | `Ctrl+Alt+]` / `Cmd+Alt+]` |
+| Jump to previous commit with changes | `Ctrl+Alt+[` / `Cmd+Alt+[` |
 
 ## License
 
