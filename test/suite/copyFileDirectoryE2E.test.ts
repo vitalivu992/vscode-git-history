@@ -181,7 +181,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('package.json command registration', async () => {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
     const content = fs.readFileSync(packageJsonPath, 'utf-8');
 
     assert.ok(content.includes('"gitHistory.copyFileDirectory"'),
@@ -191,7 +191,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('package.json keybinding registration', async () => {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
     const content = fs.readFileSync(packageJsonPath, 'utf-8');
 
     // Find keybinding for copyFileDirectory
@@ -223,7 +223,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('README.md should document copy file directory feature', async () => {
-    const readmePath = path.resolve(__dirname, '../../README.md');
+    const readmePath = path.resolve(__dirname, '../../../README.md');
     const source = fs.readFileSync(readmePath, 'utf-8');
 
     assert.ok(source.includes('Copy file directory'),
@@ -231,7 +231,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('README.md should have keyboard shortcut for copy file directory', async () => {
-    const readmePath = path.resolve(__dirname, '../../README.md');
+    const readmePath = path.resolve(__dirname, '../../../README.md');
     const source = fs.readFileSync(readmePath, 'utf-8');
 
     assert.ok(source.includes('Ctrl+Alt+K') || source.includes('Cmd+Alt+K'),

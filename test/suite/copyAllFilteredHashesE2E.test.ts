@@ -112,7 +112,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('package.json command and keybinding registration', async () => {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
     const content = fs.readFileSync(packageJsonPath, 'utf-8');
 
     assert.ok(content.includes('"gitHistory.copyAllFilteredHashes"'),

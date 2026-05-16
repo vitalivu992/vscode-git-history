@@ -142,7 +142,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('package.json command registration', async () => {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
     const content = fs.readFileSync(packageJsonPath, 'utf-8');
 
     assert.ok(content.includes('"gitHistory.copyCommitDate"'),

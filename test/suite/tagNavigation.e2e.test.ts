@@ -111,7 +111,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('package.json registers jumpToNextTag command and keybinding', async () => {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
     const content = fs.readFileSync(packageJsonPath, 'utf-8');
     const json = JSON.parse(content);
 
@@ -128,7 +128,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('package.json registers jumpToPreviousTag command and keybinding', async () => {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
     const content = fs.readFileSync(packageJsonPath, 'utf-8');
     const json = JSON.parse(content);
 

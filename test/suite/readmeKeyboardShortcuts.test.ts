@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 suite('README Keyboard Shortcuts Documentation', () => {
-  const packageJsonPath = path.resolve(__dirname, '../../package.json');
-  const readmePath = path.resolve(__dirname, '../../README.md');
+  const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+  const readmePath = path.resolve(__dirname, '../../../README.md');
 
   test('every keyboard shortcut in package.json should be documented in README', () => {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));

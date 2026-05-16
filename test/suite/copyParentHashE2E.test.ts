@@ -183,7 +183,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('package.json registers gitHistory.copyParentHash command', async () => {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
     const content = fs.readFileSync(packageJsonPath, 'utf-8');
 
     assert.ok(content.includes('"gitHistory.copyParentHash"'),
@@ -191,7 +191,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('package.json has correct keybinding for copyParentHash', async () => {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
     const content = fs.readFileSync(packageJsonPath, 'utf-8');
     const json = JSON.parse(content);
 

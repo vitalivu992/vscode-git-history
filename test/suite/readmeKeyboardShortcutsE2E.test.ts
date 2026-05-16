@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 suite('README Keyboard Shortcuts E2E Tests', () => {
-  const readmePath = path.resolve(__dirname, '../../README.md');
+  const readmePath = path.resolve(__dirname, '../../../README.md');
   const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
-  const packageJsonPath = path.resolve(__dirname, '../../package.json');
+  const packageJsonPath = path.resolve(__dirname, '../../../package.json');
 
   test('keyboard help dialog shows all shortcuts documented in README', () => {
     const readme = fs.readFileSync(readmePath, 'utf-8');

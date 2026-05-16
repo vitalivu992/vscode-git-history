@@ -93,7 +93,7 @@ suite('Jump to Parent E2E Tests', () => {
   });
 
   test('package.json registers command and keybinding', async () => {
-    const packagePath = path.resolve(__dirname, '../../package.json');
+    const packagePath = path.resolve(__dirname, '../../../package.json');
     const source = fs.readFileSync(packagePath, 'utf-8');
     const json = JSON.parse(source);
 
