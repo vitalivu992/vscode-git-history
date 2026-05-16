@@ -3,8 +3,6 @@ name: CI
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
 
 jobs:
   test:
@@ -35,16 +33,22 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Get timestamp
+        id: timestamp
+        run: |
+          TIMESTAMP=$(date +%y.%m.%d.%H%M)
+          echo "timestamp=$TIMESTAMP" >> "$GITHUB_OUTPUT"
+
       - run: npx @vscode/vsce package --no-dependencies
 
       - uses: actions/upload-artifact@v4
         with:
-          name: screenshots-v${{ steps.version.outputs.version }}-${{ github.sha }}
+          name: screenshots-v${{ steps.version.outputs.version }}-${{ steps.timestamp.outputs.timestamp }}
           path: screenshots/
           retention-days: 7
 
       - uses: actions/upload-artifact@v4
         with:
-          name: vsix-v${{ steps.version.outputs.version }}-${{ github.sha }}
+          name: vsix-v${{ steps.version.outputs.version }}-${{ steps.timestamp.outputs.timestamp }}
           path: "*.vsix"
           retention-days: 7
