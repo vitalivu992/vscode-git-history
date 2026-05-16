@@ -205,6 +205,8 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.jumpToNextTag', action: 'jumpToNextTag' },
     { command: 'gitHistory.jumpToPreviousTag', action: 'jumpToPreviousTag' },
     { command: 'gitHistory.jumpToParent', action: 'jumpToParent' },
+    { command: 'gitHistory.jumpToNextCommitWithStats', action: 'jumpToNextCommitWithStats' },
+    { command: 'gitHistory.jumpToPreviousCommitWithStats', action: 'jumpToPreviousCommitWithStats' },
     { command: 'gitHistory.focusSearch', action: 'focusSearch' },
     { command: 'gitHistory.showKeyboardHelp', action: 'showKeyboardHelp' },
     { command: 'gitHistory.cycleDiffContextLines', action: 'cycleDiffContextLines' },

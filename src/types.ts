@@ -168,7 +168,9 @@ export type WebviewAction =
   | 'copyShowCommand'
   | 'jumpToNextTag'
   | 'jumpToPreviousTag'
-  | 'jumpToParent';
+  | 'jumpToParent'
+  | 'jumpToNextCommitWithStats'
+  | 'jumpToPreviousCommitWithStats';
 
 /**
  * Filter state for copy filter query feature
@@ -281,7 +283,6 @@ export type WebviewToExtMessage =
   | { type: 'dismissFirstRunTip' }
   | { type: 'copyFilterQuery'; filterState: FilterQueryState }
   | { type: 'pasteFilterQuery' }
-  | { type: 'clearAllFilters' }
   | { type: 'copyCombinedDiff'; hashes: string[] }
   | { type: 'copyRangeDiff'; fromHash: string; toHash: string }
   | { type: 'copyCommitMention'; hash: string }

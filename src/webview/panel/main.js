@@ -1990,6 +1990,8 @@ function handleMessage(event) {
         case 'jumpToNextTag': jumpToNextTag(); break;
         case 'jumpToPreviousTag': jumpToPreviousTag(); break;
         case 'jumpToParent': jumpToParent(); break;
+        case 'jumpToNextCommitWithStats': jumpToNextCommitWithStats(); break;
+        case 'jumpToPreviousCommitWithStats': jumpToPreviousCommitWithStats(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
         case 'cycleDiffContextLines': handleDiffContextLinesCycle(); break;
@@ -4281,6 +4283,73 @@ function jumpToParent() {
   setFocusedRow(parentHash);
 }
 
+function getCommitsWithStats() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  return displayCommits.filter(c => c.stats && c.stats.filesChanged > 0);
+}
+
+function jumpToNextCommitWithStats() {
+  const commitsWithStats = getCommitsWithStats();
+  if (commitsWithStats.length === 0) {
+    showError('No commits with file changes found');
+    return;
+  }
+
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  const currentHash = focusedIndex >= 0 && focusedIndex < displayCommits.length
+    ? displayCommits[focusedIndex].hash
+    : null;
+
+  let currentIndex = -1;
+  if (currentHash) {
+    currentIndex = commitsWithStats.findIndex(c => c.hash === currentHash);
+  }
+
+  let nextIndex;
+  if (currentIndex < 0) {
+    nextIndex = 0;
+  } else if (currentIndex < commitsWithStats.length - 1) {
+    nextIndex = currentIndex + 1;
+  } else {
+    nextIndex = 0;
+  }
+
+  const targetCommit = commitsWithStats[nextIndex];
+  scrollToCommitByHash(targetCommit.hash);
+  setFocusedRow(targetCommit.hash);
+}
+
+function jumpToPreviousCommitWithStats() {
+  const commitsWithStats = getCommitsWithStats();
+  if (commitsWithStats.length === 0) {
+    showError('No commits with file changes found');
+    return;
+  }
+
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  const currentHash = focusedIndex >= 0 && focusedIndex < displayCommits.length
+    ? displayCommits[focusedIndex].hash
+    : null;
+
+  let currentIndex = -1;
+  if (currentHash) {
+    currentIndex = commitsWithStats.findIndex(c => c.hash === currentHash);
+  }
+
+  let prevIndex;
+  if (currentIndex < 0) {
+    prevIndex = commitsWithStats.length - 1;
+  } else if (currentIndex > 0) {
+    prevIndex = currentIndex - 1;
+  } else {
+    prevIndex = commitsWithStats.length - 1;
+  }
+
+  const targetCommit = commitsWithStats[prevIndex];
+  scrollToCommitByHash(targetCommit.hash);
+  setFocusedRow(targetCommit.hash);
+}
+
 // ─── Keyboard Help Dialog ────────────────────────────────────────────────────
 
 /**
@@ -4322,6 +4391,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'P'], description: 'Jump to parent commit' },
         { keys: [cmdKey, ']'], description: 'Jump to next tagged commit' },
         { keys: [cmdKey, '['], description: 'Jump to previous tagged commit' },
+        { keys: [cmdKey, altKey, ']'], description: 'Jump to next commit with changes' },
+        { keys: [cmdKey, altKey, '['], description: 'Jump to previous commit with changes' },
         { keys: [cmdKey, 'Shift', 'Q'], description: 'Toggle hide merge commits' },
         { keys: [cmdKey, 'Alt', 'S'], description: 'Show branch picker' }
       ]
