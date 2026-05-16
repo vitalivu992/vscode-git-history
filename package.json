@@ -397,6 +397,16 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.jumpToNextCommitWithStats",
+        "title": "Git History: Jump to Next Commit with Stats",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToPreviousCommitWithStats",
+        "title": "Git History: Jump to Previous Commit with Stats",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.focusSearch",
         "title": "Git History: Focus Search",
         "category": "Git History"
@@ -868,6 +878,18 @@
         "command": "gitHistory.jumpToParent",
         "key": "ctrl+p",
         "mac": "cmd+p",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToNextCommitWithStats",
+        "key": "ctrl+alt+]",
+        "mac": "cmd+alt+]",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToPreviousCommitWithStats",
+        "key": "ctrl+alt+[",
+        "mac": "cmd+alt+[",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
