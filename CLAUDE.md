@@ -137,7 +137,7 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Git Tag Badges**: Tags parsed from the `%d` decorations field are rendered as colored badges next to commit messages. Lightweight and annotated tags are both supported. Badge styling is defined in `src/webview/panel/styles.css`.
 
-- **Blame Annotations**: The extension provides line-by-line blame annotations via the `toggleBlame` and `showBlameCommit` commands. Blame information is displayed as inline decorations showing commit hash, author, and date for each line. Date format is configurable via `gitHistory.blame.dateFormat` (relative, short, or iso).
+- **Blame Annotations**: The extension provides line-by-line blame annotations via the `toggleBlame` and `showBlameCommit` commands. Blame information is displayed as inline decorations showing commit hash, author, and date for each line. Date format is configurable via `gitHistory.blame.dateFormat` (relative, short, or iso). Error handling is implemented: if `getGitRoot` or `getFileBlame` fails (git not installed, file not in a git repo, or git command timeout), an error message is shown to the user with details about the failure.
 
   The `showBlameCommit` command (triggered by clicking on blame decorations) displays a warning message "No active editor found" when there is no active text editor, consistent with other commands like `showFileHistory` and `showSelectionHistory`.
 

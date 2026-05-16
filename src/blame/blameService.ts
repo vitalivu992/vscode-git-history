@@ -85,12 +85,17 @@ export class BlameService implements vscode.Disposable {
     await vscode.window.withProgress(
       { location: vscode.ProgressLocation.Window, title: 'Loading git blame...' },
       async () => {
-        const cwd = await getGitRoot(filePath);
-        const lines = await getFileBlame(filePath, cwd);
-        const blameResult: BlameResult = { filePath, lines };
-        this._activeBlames.set(key, blameResult);
-        this._applyDecorations(editor, lines);
-        this._updateStatusBar(editor);
+        try {
+          const cwd = await getGitRoot(filePath);
+          const lines = await getFileBlame(filePath, cwd);
+          const blameResult: BlameResult = { filePath, lines };
+          this._activeBlames.set(key, blameResult);
+          this._applyDecorations(editor, lines);
+          this._updateStatusBar(editor);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          vscode.window.showErrorMessage(`Git blame failed: ${message}`);
+        }
       }
     );
   }
