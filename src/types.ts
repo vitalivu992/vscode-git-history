@@ -95,6 +95,7 @@ export interface BlameResult {
 export type WebviewAction =
   | 'refresh'
   | 'copyCommitMessage'
+  | 'copySelectedCherryPickCommands'
   | 'copyCommitHash'
   | 'copyCommitInfo'
   | 'copyCherryPick'
@@ -132,6 +133,7 @@ export type WebviewAction =
   | 'copyFileDirectory'
   | 'copyRelativePath'
   | 'copyFileDiff'
+  | 'copyFilePath'
   | 'exportCommits'
   | 'exportCommitsMbox'
   | 'quickCompare'
@@ -166,11 +168,14 @@ export type WebviewAction =
   | 'copyCommitterEmail'
   | 'copyCommitterName'
   | 'copyShowCommand'
+  | 'copyFileShowCommand'
   | 'jumpToNextTag'
   | 'jumpToPreviousTag'
   | 'jumpToParent'
   | 'jumpToNextCommitWithStats'
-  | 'jumpToPreviousCommitWithStats';
+  | 'jumpToPreviousCommitWithStats'
+  | 'cycleDiffContextLines'
+  | 'cycleSortMode';
 
 /**
  * Filter state for copy filter query feature
@@ -248,11 +253,13 @@ export type WebviewToExtMessage =
   | { type: 'copyRemoteUrl' }
   | { type: 'copyTags'; hash: string }
   | { type: 'copySelectedHashes'; hashes: string[] }
+  | { type: 'copySelectedCherryPickCommands'; hashes: string[] }
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyAuthorName'; hash: string }
   | { type: 'copyCommitterEmail'; hash: string }
   | { type: 'copyCommitterName'; hash: string }
   | { type: 'copyShowCommand'; hash: string }
+  | { type: 'copyFileShowCommand'; hash: string; filePath: string }
   | { type: 'copyParentHash'; hash: string }
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }

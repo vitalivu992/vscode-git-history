@@ -1929,6 +1929,7 @@ function handleMessage(event) {
         case 'copyCherryPick': handleCopyCherryPick(); break;
         case 'copyRevert': handleCopyRevert(); break;
         case 'copyShowCommand': handleCopyShowCommand(); break;
+        case 'copyFileShowCommand': handleCopyFileShowCommand(); break;
         case 'copyCommitFiles': handleCopyFiles(); break;
         case 'copyCommitDiff': handleCopyDiff(); break;
         case 'copyCombinedDiff': handleCopyCombinedDiff(); break;
@@ -1961,6 +1962,7 @@ function handleMessage(event) {
         case 'copyRelativeDate': handleCopyRelativeDate(); break;
         case 'copyCommitTimestamp': handleCopyCommitTimestamp(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
+        case 'copySelectedCherryPickCommands': handleCopySelectedCherryPickCommands(); break;
         case 'copyAllFilteredHashes': handleCopyAllFilteredHashes(); break;
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFileExtension': handleCopyExtension(); break;
@@ -2475,6 +2477,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy file content</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-show-command">
+      <span class="context-menu-icon">👁️</span>
+      <span class="context-menu-label">Copy git show command</span>
+    </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" data-action="copy-file-path">
       <span class="context-menu-icon">📋</span>
@@ -2537,6 +2543,12 @@ function showFileContextMenu(event, filePath, commitHash) {
       } else if (action === 'copy-file-content') {
         vscode.postMessage({
           type: 'copyFileContent',
+          hash: commitHash,
+          filePath: filePath
+        });
+      } else if (action === 'copy-file-show-command') {
+        vscode.postMessage({
+          type: 'copyFileShowCommand',
           hash: commitHash,
           filePath: filePath
         });
@@ -2773,6 +2785,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy selected hashes</span>
     </div>
+    <div class="context-menu-item" data-action="copy-selected-cherry-pick-commands" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
+      <span class="context-menu-icon">🍒</span>
+      <span class="context-menu-label">Copy cherry-pick commands (selected)</span>
+    </div>
     <div class="context-menu-item" data-action="copy-all-filtered-hashes">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy all filtered hashes (${getOrderedCommits(getFilteredCommits()).length})</span>
@@ -2882,6 +2898,8 @@ function showCommitContextMenu(event, commit) {
         handleDeleteTag();
       } else if (action === 'copy-selected-hashes') {
         handleCopySelectedHashes();
+      } else if (action === 'copy-selected-cherry-pick-commands') {
+        handleCopySelectedCherryPickCommands();
       } else if (action === 'copy-all-filtered-hashes') {
         handleCopyAllFilteredHashes();
       } else if (action === 'copy-combined-diff') {
@@ -3125,6 +3143,19 @@ function handleCopyShowCommand() {
     vscode.postMessage({ type: 'copyShowCommand', hash });
   } else {
     showError('Select a commit to copy git show command');
+  }
+}
+
+function handleCopyFileShowCommand() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'copyFileShowCommand', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'copyFileShowCommand', hash });
+  } else {
+    showError('Select a commit to copy git show command for a file');
   }
 }
 
@@ -3934,6 +3965,30 @@ function handleCopySelectedHashes() {
   }
 }
 
+function handleCopySelectedCherryPickCommands() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+
+  // Get hashes from selected commits
+  const selectedHashes = [...selectedCommits];
+
+  if (selectedHashes.length === 0) {
+    // Fall back to single-commit cherry-pick behavior (uses focused commit)
+    handleCopyCherryPick();
+  } else if (selectedHashes.length === 1) {
+    // Fall back to single-commit cherry-pick behavior
+    vscode.postMessage({ type: 'copyCherryPickCommand', hash: selectedHashes[0] });
+  } else {
+    // Copy cherry-pick commands for all selected commits
+    // Reorder to match display order (newest first)
+    const orderedHashes = selectedHashes
+      .map(hash => displayCommits.find(c => c.hash === hash))
+      .filter(Boolean)
+      .map(c => c.hash);
+
+    vscode.postMessage({ type: 'copySelectedCherryPickCommands', hashes: orderedHashes });
+  }
+}
+
 function handleCopyAllFilteredHashes() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   if (displayCommits.length === 0) {
@@ -4411,7 +4466,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'J'], description: 'Toggle ignore whitespace' },
         { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' },
         { keys: [cmdKey, 'Shift', '3'], description: 'Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A)' },
-        { keys: [cmdKey, altKey, 'T'], description: 'Toggle commit graph' }
+        { keys: [cmdKey, altKey, 'T'], description: 'Toggle commit graph' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'S'], description: 'Toggle GPG signatures' }
       ]
     },
     {

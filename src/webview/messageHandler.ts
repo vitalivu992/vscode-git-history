@@ -74,6 +74,10 @@ export async function handleMessage(
       handleCopyShowCommand(message.hash, panel);
       break;
 
+    case 'copyFileShowCommand':
+      handleCopyFileShowCommand(message.hash, message.filePath, panel);
+      break;
+
     case 'copyCommitFiles':
       handleCopyCommitFiles(message.hash, panel);
       break;
@@ -183,6 +187,10 @@ export async function handleMessage(
 
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
+      break;
+
+    case 'copySelectedCherryPickCommands':
+      handleCopySelectedCherryPickCommands(message.hashes, panel);
       break;
 
     case 'copyAllFilteredHashes':
@@ -565,6 +573,20 @@ function handleCopyShowCommand(hash: string, panel: GitHistoryPanel): void {
   void vscode.env.clipboard.writeText(showCommand).then(() => {
     void vscode.window.showInformationMessage(`Copied git show command for ${commit.shortHash}`);
   });
+}
+
+async function handleCopyFileShowCommand(hash: string, filePath: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const quotedPath = filePath.includes(' ') ? `'${filePath}'` : filePath;
+  const showCommand = `git show ${commit.hash}:${quotedPath}`;
+
+  await vscode.env.clipboard.writeText(showCommand);
+  void vscode.window.showInformationMessage(`Copied git show command for ${path.basename(filePath)}`);
 }
 
 async function handleCopyCommitFiles(hash: string, panel: GitHistoryPanel): Promise<void> {
@@ -1665,6 +1687,21 @@ function handleCopySelectedHashes(hashes: string[], panel: GitHistoryPanel): voi
   const hashText = hashes.join('\n');
   void vscode.env.clipboard.writeText(hashText).then(() => {
     void vscode.window.showInformationMessage(`Copied ${hashes.length} commit hash${hashes.length > 1 ? 'es' : ''}`);
+  });
+}
+
+/**
+ * Handle copy selected cherry-pick commands to clipboard
+ */
+function handleCopySelectedCherryPickCommands(hashes: string[], panel: GitHistoryPanel): void {
+  if (hashes.length === 0) {
+    void vscode.window.showInformationMessage('No commits selected');
+    return;
+  }
+
+  const cherryPickCommands = hashes.map(hash => `git cherry-pick ${hash}`).join('\n');
+  void vscode.env.clipboard.writeText(cherryPickCommands).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${hashes.length} cherry-pick command${hashes.length > 1 ? 's' : ''}`);
   });
 }
 
