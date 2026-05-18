@@ -343,8 +343,11 @@ Unit tests for pure parsing functions are located in:
 - `test/suite/gitStatsParser.test.ts` - Tests for `parseCommitStats`, `extractStatsFromCommitBlock`, `parseMultipleCommitStats`
 - `test/suite/messageHandlerUtils.test.ts` - Tests for utility functions in `messageHandler.ts`
 - `test/suite/formatRelativeTime.test.ts` - Tests for `formatRelativeTime` function in `blameService.ts`
+- `test/suite/toggleGraph.test.ts` - Tests for graph toggle webview action
+- `test/suite/toggleSignatures.test.ts` - Tests for GPG signature toggle webview action
+- `test/suite/toggleRegex.test.ts` - Tests for regex search mode toggle webview action
 
-These tests validate edge cases in git output parsing without requiring actual git operations.
+These tests validate edge cases in git output parsing and webview action wiring without requiring actual git operations.
 
 ### Testing messageHandlerUtils
 
@@ -491,3 +494,19 @@ The `test/suite/formatRelativeTime.test.ts` file contains comprehensive unit tes
 - Tests fractional minute boundaries
 
 These tests ensure the relative time formatting is correct for all time ranges, which is important for the blame annotations feature that displays commit dates in a user-friendly format.
+
+### Testing gitParser Utilities
+
+The `test/suite/gitParser.test.ts` file contains comprehensive unit tests for pure parsing functions in `src/git/gitParser.ts`:
+
+**isBinaryFile()** - Tests detect binary file indicators:
+- Standard git output ("Binary files", "GIT binary patch")
+- Edge cases (empty string, case variations, partial matches)
+- Validates that only exact git-formatted strings match
+
+**parseNameStatus()** - Tests parse git name-status output:
+- All standard status codes (A, M, D, R, C)
+- Various similarity percentages (R001, R050, R075, C099)
+- Edge case status codes (T for type change, U for unmerged)
+- Malformed input handling (missing tabs, incomplete lines)
+- Special characters in file paths

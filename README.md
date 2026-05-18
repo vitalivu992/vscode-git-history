@@ -60,6 +60,7 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **Copy Selected Hashes**: Copy all selected commit hashes as a newline-separated list with `Ctrl+Shift+;` / `Cmd+Shift+;` keyboard shortcut (when 2+ commits are selected), or right-click context menu (shown when multiple commits are selected). Falls back to single hash copy when 0 or 1 commit is selected.
 - **Copy Commit Info**: Copy the full commit information (hash, author, date, message) to clipboard with `Ctrl+Shift+I` / `Cmd+Shift+I` keyboard shortcut
 - **Copy Cherry-Pick Command**: Copy a pre-formatted `git cherry-pick <hash>` command to the clipboard with `Ctrl+Shift+P` / `Cmd+Shift+P` keyboard shortcut, or right-click on any commit
+- **Copy Cherry-Pick Commands (Selected)**: Copy cherry-pick commands for multiple selected commits as newline-separated list. Use the right-click context menu (shown when 2+ commits are selected). Falls back to single commit cherry-pick command when 0 or 1 commit is selected. Output format: `git cherry-pick hash1`, `git cherry-pick hash2`, etc.
 - **Copy Revert Command**: Copy a pre-formatted `git revert <hash>` command to the clipboard with `Ctrl+Shift+U` / `Cmd+Shift+U` keyboard shortcut, or right-click on any commit
 - **Copy Commit as Patch**: Copy the commit as a unified diff patch (with git headers) suitable for `git apply` or `git am` with `Ctrl+Shift+E` / `Cmd+Shift+E` keyboard shortcut, or right-click on any commit
 - **Copy Commit URL**: Copy the web URL for a commit to share with others. Automatically detects GitHub, GitLab, Bitbucket, and Azure DevOps remotes (including self-hosted instances). Use `Ctrl+Shift+L` / `Cmd+Shift+L` or right-click on any commit
@@ -163,6 +164,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy commit message** | Copy the commit message to clipboard |
 | **Copy commit info** | Copy full commit information (hash, author, date, message) |
 | **Copy cherry-pick command** | Copy a pre-formatted `git cherry-pick <hash>` command |
+| **Copy cherry-pick commands** | Copy cherry-pick commands for multiple selected commits (2+ commits selected) |
 | **Copy revert command** | Copy a pre-formatted `git revert <hash>` command |
 | **Copy changed files** | Copy the list of changed files to clipboard |
 | **Copy commit diff** | Copy the full diff output to clipboard |
@@ -195,6 +197,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy message with stats** | Copy the commit message together with diff stat summary |
 | **Copy selected hashes** | Copy all selected commit hashes (2+ commits selected) |
 | **Copy combined diff** | Copy combined diff of all selected commits |
+| **Copy git show command** | Copy a pre-formatted `git show <hash>` command to the clipboard |
 | **Copy range diff** | Copy diff between two commits (range selected) |
 | **Compare with parent** | Compare this commit with its parent |
 | **Create branch from commit** | Create a new branch at the selected commit |
@@ -243,6 +246,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+]` / `Cmd+Shift+]` | Copy commit reference (`refs/commit/<hash>`) |
 | `Ctrl+Shift+M` / `Cmd+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
+| `Ctrl+Shift+3` / `Cmd+Shift+3` | Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A) |
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Copy branch name to clipboard |
 | `Ctrl+Alt+D` / `Cmd+Alt+D` | Copy combined diff to clipboard (2+ commits selected) |
 | `Ctrl+Alt+F` / `Cmd+Alt+F` | Copy file diff to clipboard (for focused file in changed files list) |
@@ -278,6 +282,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+4` / `Cmd+Shift+4` | Paste/import filter query from clipboard |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Alt+S` / `Cmd+Alt+S` | Show branch switcher |
+| `Ctrl+Shift+Alt+S` / `Cmd+Shift+Alt+S` | Toggle GPG signature verification badges |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
 | `Ctrl+Shift+X` / `Cmd+Shift+X` | Toggle regex search mode |
@@ -360,6 +365,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Toggle my commits filter | `Ctrl+Shift+M` / `Cmd+Shift+M` |
 | Toggle regex search mode | `Ctrl+Shift+X` / `Cmd+Shift+X` |
 | Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A) | `Ctrl+Shift+3` / `Cmd+Shift+3` |
+| Cycle diff context lines (1-10) | `Ctrl+Shift+/` / `Cmd+Shift+/` |
 | Copy commit hash | `Ctrl+Shift+H` / `Cmd+Shift+H` |
 | Copy commit subject | `Ctrl+Shift+6` / `Cmd+Shift+6` |
 | Copy diff stat summary | `Ctrl+Shift+9` / `Cmd+Shift+9` |
@@ -381,6 +387,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy range diff | `Ctrl+Alt+R` / `Cmd+Alt+R` (range selected) |
 | Copy file diff | `Ctrl+Alt+F` / `Cmd+Alt+F` |
 | Copy file content | `Ctrl+Alt+C` / `Cmd+Alt+C` |
+| Copy git show command | `Ctrl+Alt+V` / `Cmd+Alt+V` |
 | Copy git describe | `Ctrl+Alt+G` / `Cmd+Alt+G` |
 | Copy selected hashes | `Ctrl+Shift+;` / `Cmd+Shift+;` (when 2+ selected) |
 | Clear selection | `Escape` |
