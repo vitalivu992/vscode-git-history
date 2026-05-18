@@ -77,6 +77,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFileShowCommand",
+        "title": "Git History: Copy File Show Command",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitFiles",
         "title": "Git History: Copy Changed Files",
         "category": "Git History"
@@ -294,6 +299,11 @@
       {
         "command": "gitHistory.copySelectedHashes",
         "title": "Git History: Copy Selected Hashes",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copySelectedCherryPickCommands",
+        "title": "Git History: Copy Cherry-Pick Commands (Selected)",
         "category": "Git History"
       },
       {
@@ -518,6 +528,12 @@
         "command": "gitHistory.copyShowCommand",
         "key": "ctrl+alt+v",
         "mac": "cmd+alt+v",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFileShowCommand",
+        "key": "ctrl+alt+shift+v",
+        "mac": "cmd+alt+shift+v",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
