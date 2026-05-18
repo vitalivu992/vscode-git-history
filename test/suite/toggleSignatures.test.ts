@@ -232,5 +232,33 @@ suite('Toggle Signatures Unit Tests', () => {
       assert.ok(source.includes('GPG signature verification'),
         'README should describe GPG signature verification');
     });
+
+    test('README should document toggle signatures keyboard shortcut', () => {
+      const fs = require('fs');
+      const readmePath = path.resolve(__dirname, '../../../README.md');
+      const source = fs.readFileSync(readmePath, 'utf-8');
+
+      assert.ok(source.includes('Toggle GPG signature verification badges'),
+        'README should document toggle signatures shortcut description');
+      assert.ok(source.includes('Ctrl+Shift+Alt+S'), 'README should list Ctrl+Shift+Alt+S shortcut');
+      assert.ok(source.includes('Cmd+Shift+Alt+S'), 'README should list Cmd+Shift+Alt+S shortcut');
+    });
+  });
+
+  suite('Keyboard Help Dialog Verification', () => {
+    test('showKeyboardHelpDialog should include toggle signatures shortcut', () => {
+      const fs = require('fs');
+      const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+      const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+      const helpStart = source.indexOf('function showKeyboardHelpDialog');
+      const helpEnd = source.indexOf('\nfunction', helpStart + 1);
+      const helpFn = source.substring(helpStart, helpEnd > helpStart ? helpEnd : undefined);
+
+      assert.ok(helpFn.includes('Toggle GPG signatures'),
+        'Keyboard help dialog should include "Toggle GPG signatures" in View Options');
+      assert.ok(helpFn.includes("'Alt', 'S'"),
+        'Keyboard help dialog should include Alt+S key combination for toggle signatures');
+    });
   });
 });

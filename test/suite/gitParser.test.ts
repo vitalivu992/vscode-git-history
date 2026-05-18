@@ -340,4 +340,129 @@ suite('Git Parser Tests', () => {
     assert.strictEqual(commits[0].signature?.verified, false);
     assert.strictEqual(commits[0].signature?.signer, null);
   });
+
+  // isBinaryFile edge case tests
+  test('isBinaryFile should return false for empty string', () => {
+    assert.strictEqual(isBinaryFile(''), false);
+  });
+
+  test('isBinaryFile should return false for whitespace only', () => {
+    assert.strictEqual(isBinaryFile('   \n\t  '), false);
+  });
+
+  test('isBinaryFile should return false for lowercase binary files', () => {
+    assert.strictEqual(isBinaryFile('binary files a.png and b.png differ'), false);
+  });
+
+  test('isBinaryFile should return false for all caps BINARY FILES', () => {
+    assert.strictEqual(isBinaryFile('BINARY FILES a.png and b.png differ'), false);
+  });
+
+  test('isBinaryFile should return false for singular binary file', () => {
+    assert.strictEqual(isBinaryFile('Binary file a.png and b.png differ'), false);
+  });
+
+  test('isBinaryFile should return false for GIT BINARY PATCH (case variation)', () => {
+    assert.strictEqual(isBinaryFile('GIT binary PATCH'), false);
+  });
+
+  test('isBinaryFile should return false for all lowercase git binary patch', () => {
+    assert.strictEqual(isBinaryFile('git binary patch'), false);
+  });
+
+  test('isBinaryFile should return true for string containing both indicators', () => {
+    assert.strictEqual(isBinaryFile('Binary files a.png\nGIT binary patch'), true);
+  });
+
+  // parseNameStatus edge case tests
+  test('parseNameStatus should parse low similarity rename (R001)', () => {
+    const input = 'R001\told.txt\tnew.txt';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.deepStrictEqual(result.get('new.txt'), { status: 'R', previousPath: 'old.txt' });
+  });
+
+  test('parseNameStatus should parse medium similarity rename (R050)', () => {
+    const input = 'R050\tfoo.ts\tbar.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.deepStrictEqual(result.get('bar.ts'), { status: 'R', previousPath: 'foo.ts' });
+  });
+
+  test('parseNameStatus should parse high similarity rename (R075)', () => {
+    const input = 'R075\toriginal.ts\tmodified.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.deepStrictEqual(result.get('modified.ts'), { status: 'R', previousPath: 'original.ts' });
+  });
+
+  test('parseNameStatus should parse high similarity copy (C099)', () => {
+    const input = 'C099\tsource.ts\tdestination.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.deepStrictEqual(result.get('destination.ts'), { status: 'C', previousPath: 'source.ts' });
+  });
+
+  test('parseNameStatus should parse type change (T)', () => {
+    const input = 'T\tscript.ext';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.deepStrictEqual(result.get('script.ext'), { status: 'T' });
+  });
+
+  test('parseNameStatus should parse unmerged (U)', () => {
+    const input = 'U\tconflicted.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.deepStrictEqual(result.get('conflicted.ts'), { status: 'U' });
+  });
+
+  test('parseNameStatus should skip malformed input without tab', () => {
+    const input = 'M file.ts\nA\ttest.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.ok(result.has('test.ts'));
+  });
+
+  test('parseNameStatus should skip malformed input with only status code', () => {
+    const input = 'M\nA\tvalid.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.ok(result.has('valid.ts'));
+  });
+
+  test('parseNameStatus should handle renamed file with spaces in path', () => {
+    const input = 'R100\tpath with spaces/old.ts\tpath with spaces/new.ts';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    assert.deepStrictEqual(result.get('path with spaces/new.ts'), { status: 'R', previousPath: 'path with spaces/old.ts' });
+  });
+
+  test('parseNameStatus should handle extra tabs by using parts 1 and 2', () => {
+    const input = 'R100\told\tmiddle\tnew';
+
+    const result = parseNameStatus(input);
+
+    assert.strictEqual(result.size, 1);
+    // The parser uses parts[1] and parts[2], so old->middle, new path is "middle"
+    assert.deepStrictEqual(result.get('middle'), { status: 'R', previousPath: 'old' });
+  });
 });
