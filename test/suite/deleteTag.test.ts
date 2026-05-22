@@ -123,4 +123,16 @@ suite('Delete Tag Test Suite', () => {
     assert.ok(source.includes('Delete tag from commit') || source.includes('delete a tag'),
       'README.md should document delete tag feature');
   });
+
+  test('package.json should have deleteTag keybinding', () => {
+    const source = fs.readFileSync(packagePath, 'utf-8');
+    assert.ok(source.includes('ctrl+alt+.'),
+      'package.json should have keybinding for deleteTag');
+  });
+
+  test('README.md should document deleteTag keyboard shortcut', () => {
+    const source = fs.readFileSync(readmePath, 'utf-8');
+    assert.ok(source.includes('Ctrl+Alt+.'),
+      'README.md should document the deleteTag keyboard shortcut (Ctrl+Alt+.)');
+  });
 });

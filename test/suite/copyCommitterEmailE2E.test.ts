@@ -138,4 +138,18 @@ suite('Copy Committer Email E2E Tests', () => {
     assert.ok(content.includes('"gitHistory.copyCommitterEmail"'),
       'package.json should register copyCommitterEmail command');
   });
+
+  test('README.md should document Ctrl+Alt+A for Copy Committer Email', async () => {
+    const readmePath = path.resolve(__dirname, '../../../README.md');
+    const readme = fs.readFileSync(readmePath, 'utf-8');
+
+    assert.ok(
+      readme.includes('Ctrl+Alt+A') || readme.includes('Cmd+Alt+A'),
+      'README should document Ctrl+Alt+A / Cmd+Alt+A for Copy Committer Email'
+    );
+    assert.ok(
+      readme.toLowerCase().includes('copy committer email'),
+      'README should mention Copy Committer Email feature'
+    );
+  });
 });

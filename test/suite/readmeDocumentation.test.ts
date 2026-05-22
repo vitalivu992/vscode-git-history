@@ -176,6 +176,14 @@ suite('README Documentation Comprehensive Tests', () => {
         section.includes('Copy message with stats') || section.includes('Copy commit message with stats'),
         'Commit Row Context Menu should include Copy message with stats'
       );
+      assert.ok(
+        section.includes('Copy commit reference'),
+        'Commit Row Context Menu should include Copy commit reference'
+      );
+      assert.ok(
+        section.includes('Copy git describe'),
+        'Commit Row Context Menu should include Copy git describe'
+      );
     });
 
     test('README should reference context menu actions in features section', () => {
@@ -282,6 +290,20 @@ suite('README Documentation Comprehensive Tests', () => {
           `README should reference ${feature} feature`
         );
       }
+    });
+
+    test('README.md should document Copy Committer Email keyboard shortcut', () => {
+      assert.ok(
+        readmeContent.includes('Ctrl+Alt+A') && readmeContent.toLowerCase().includes('copy committer email'),
+        'README should document Copy Committer Email shortcut with Ctrl+Alt+A'
+      );
+    });
+
+    test('README.md should document Copy Committer Name keyboard shortcut', () => {
+      assert.ok(
+        readmeContent.includes('Ctrl+Alt+N') && readmeContent.toLowerCase().includes('copy committer name'),
+        'README should document Copy Committer Name shortcut with Ctrl+Alt+N'
+      );
     });
   });
 });

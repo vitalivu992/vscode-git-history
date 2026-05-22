@@ -7,8 +7,10 @@ import {
 	formatCommitsAsMarkdown,
 	formatCommitsAsText,
 	formatCommitAsMarkdown,
+	formatCommitAsHtml,
 	extractCoAuthors,
-	validatePresetName
+	validatePresetName,
+	formatCommitsAsPrDescription,
 } from '../../src/webview/messageHandler';
 import { PRESET_NAME_MAX_LENGTH, MAX_SAVED_PRESETS } from '../../src/settings/settingsTypes';
 
@@ -326,6 +328,95 @@ suite('messageHandlerUtils - formatCommitsAsMarkdown', () => {
 	test('handles commits with full body', () => {
 		const result = formatCommitsAsMarkdown([sampleCommits[0]]);
 		assert.ok(result.includes('This is the first commit'));
+	});
+});
+
+suite('messageHandlerUtils - formatCommitsAsPrDescription', () => {
+	test('generates Summary section with single commit', () => {
+		const result = formatCommitsAsPrDescription([sampleCommits[0]]);
+		assert.ok(result.includes('## Summary'));
+		assert.ok(result.includes('This PR introduces Initial commit.'));
+	});
+
+	test('generates Summary section with multiple commits', () => {
+		const result = formatCommitsAsPrDescription(sampleCommits);
+		assert.ok(result.includes('## Summary'));
+		assert.ok(result.includes('This PR introduces 3 changes.'));
+	});
+
+	test('generates Changes checklist with commit hashes', () => {
+		const result = formatCommitsAsPrDescription([sampleCommits[0]]);
+		assert.ok(result.includes('## Changes'));
+		assert.ok(result.includes('- Initial commit'));
+		assert.ok(result.includes('`abc123d`'));
+	});
+
+	test('generates Statistics section with correct totals', () => {
+		const result = formatCommitsAsPrDescription(sampleCommits);
+		assert.ok(result.includes('## Statistics'));
+		assert.ok(result.includes('3 commits'));
+		assert.ok(result.includes('8 files changed')); // 3 + 5 + 0
+		assert.ok(result.includes('350 insertion')); // 150 + 200 + 0
+		assert.ok(result.includes('50 deletion')); // 0 + 50 + 0
+	});
+
+	test('generates Commits detail section with author and date', () => {
+		const result = formatCommitsAsPrDescription([sampleCommits[0]]);
+		assert.ok(result.includes('## Commits'));
+		assert.ok(result.includes('### Initial commit'));
+		assert.ok(result.includes('**Author:** Alice Cooper <alice@example.com>'));
+		assert.ok(result.includes('**Date:**'));
+	});
+
+	test('includes commit body in detail section', () => {
+		const commit: CommitInfo = {
+			...sampleCommits[0],
+			fullMessage: 'Initial commit\n\nDetailed description of the initial project setup.'
+		};
+		const result = formatCommitsAsPrDescription([commit]);
+		assert.ok(result.includes('Detailed description of the initial project setup.'));
+	});
+
+	test('handles empty commits array', () => {
+		const result = formatCommitsAsPrDescription([]);
+		assert.ok(result.includes('## Summary'));
+		assert.ok(result.includes('This PR introduces 0 changes.'));
+		assert.ok(result.includes('## Statistics'));
+	});
+
+	test('handles singular forms for single items', () => {
+		const singleCommit = [{
+			...sampleCommits[0],
+			stats: { filesChanged: 1, insertions: 10, deletions: 5 }
+		}];
+		const result = formatCommitsAsPrDescription(singleCommit);
+		assert.ok(result.includes('1 commit'));
+		assert.ok(result.includes('1 file changed'));
+		assert.ok(result.includes('10 insertions(+)'));
+		assert.ok(result.includes('5 deletions(-)'));
+	});
+
+	test('handles commits with no stats', () => {
+		const result = formatCommitsAsPrDescription([sampleCommits[2]]);
+		assert.ok(result.includes('## Statistics'));
+		assert.ok(result.includes('0 files changed'));
+		assert.ok(result.includes('0 insertions(+)'));
+		assert.ok(result.includes('0 deletions(-)'));
+	});
+
+	test('outputs valid Markdown structure', () => {
+		const result = formatCommitsAsPrDescription(sampleCommits);
+		// Check section headers
+		assert.ok(result.match(/^## Summary$/m));
+		assert.ok(result.match(/^## Changes$/m));
+		assert.ok(result.match(/^## Statistics$/m));
+		assert.ok(result.match(/^## Commits$/m));
+		// Check commit headings
+		assert.ok(result.match(/^### Initial commit/m));
+		assert.ok(result.match(/^### Bug fix/m));
+		assert.ok(result.match(/^### Fix bug in parser/m));
+		// Check separator
+		assert.ok(result.includes('---'));
 	});
 });
 
@@ -813,5 +904,134 @@ suite('messageHandlerUtils - validatePresetName', () => {
 
 		const result = validatePresetName('Preset 9', presets);
 		assert.strictEqual(result.valid, true);
+	});
+});
+
+suite('messageHandlerUtils - formatCommitAsHtml', () => {
+	test('produces valid HTML structure', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.startsWith('<div'));
+		assert.ok(result.endsWith('</div>'));
+		assert.ok(result.includes('<h2'));
+		assert.ok(result.includes('<p'));
+	});
+
+	test('includes commit subject in h2', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.includes('Initial commit'));
+	});
+
+	test('includes short hash in code element', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.includes('abc123d'));
+		assert.ok(result.includes('<code'));
+	});
+
+	test('includes author and email', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.includes('Alice Cooper'));
+		assert.ok(result.includes('alice@example.com'));
+	});
+
+	test('includes date', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.includes('Date'));
+	});
+
+	test('includes stats when available', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.includes('Stats'));
+		assert.ok(result.includes('+150'));
+		assert.ok(result.includes('-0'));
+		assert.ok(result.includes('3'));
+	});
+
+	test('omits stats when not available', () => {
+		const result = formatCommitAsHtml(sampleCommits[2]);
+		assert.ok(!result.includes('Stats'));
+	});
+
+	test('includes tags as badge spans when available', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.includes('v1.0.0'));
+		assert.ok(result.includes('Tags'));
+	});
+
+	test('includes multiple tags', () => {
+		const result = formatCommitAsHtml(sampleCommits[1]);
+		assert.ok(result.includes('v1.1.0'));
+		assert.ok(result.includes('release'));
+	});
+
+	test('omits tags when not available', () => {
+		const result = formatCommitAsHtml(sampleCommits[2]);
+		assert.ok(!result.includes('Tags'));
+	});
+
+	test('includes body when present', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.includes('This is the first commit'));
+		assert.ok(result.includes('<hr'));
+	});
+
+	test('omits body when not present', () => {
+		const result = formatCommitAsHtml(sampleCommits[1]);
+		assert.ok(!result.includes('<hr'));
+	});
+
+	test('escapes HTML entities in subject', () => {
+		const commit: CommitInfo = {
+			hash: 'aaa111bbb222ccc333ddd444eee555fff6667778',
+			shortHash: 'aaa111b',
+			parentHashes: [],
+			author: 'Test',
+			email: 'test@test.com',
+			date: new Date().toISOString(),
+			message: 'Fix <bug> & "issue"',
+			fullMessage: 'Fix <bug> & "issue"',
+		};
+		const result = formatCommitAsHtml(commit);
+		assert.ok(result.includes('&lt;bug&gt;'));
+		assert.ok(result.includes('&amp;'));
+		assert.ok(result.includes('&quot;'));
+		assert.ok(!result.includes('<bug>'));
+	});
+
+	test('escapes HTML entities in body', () => {
+		const commit: CommitInfo = {
+			hash: 'bbb222ccc333ddd444eee555fff6667778889',
+			shortHash: 'bbb222c',
+			parentHashes: [],
+			author: 'Test',
+			email: 'test@test.com',
+			date: new Date().toISOString(),
+			message: 'Fix bug',
+			fullMessage: 'Fix bug\n\nDetails: <script>alert(1)</script>',
+		};
+		const result = formatCommitAsHtml(commit);
+		assert.ok(result.includes('&lt;script&gt;'));
+		assert.ok(!result.includes('<script>'));
+	});
+
+	test('handles root commit with empty parentHashes', () => {
+		const commit: CommitInfo = {
+			hash: 'ccc333ddd444eee555fff6667778889990001aaa',
+			shortHash: 'ccc333d',
+			parentHashes: [],
+			author: 'Test',
+			email: 'test@test.com',
+			date: new Date().toISOString(),
+			message: 'Root commit',
+			fullMessage: 'Root commit',
+		};
+		const result = formatCommitAsHtml(commit);
+		assert.ok(result.includes('Root commit'));
+	});
+
+	test('uses inline CSS styles', () => {
+		const result = formatCommitAsHtml(sampleCommits[0]);
+		assert.ok(result.includes('style="'));
+		assert.ok(result.includes('font-family'));
+		assert.ok(result.includes('border-radius'));
 	});
 });

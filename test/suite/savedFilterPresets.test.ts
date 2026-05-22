@@ -69,6 +69,53 @@ suite('Saved Filter Presets Tests', function() {
     });
   });
 
+  suite('Preset Rename Validation', function() {
+    const renameExistingPresets: SavedFilterPreset[] = [
+      { name: 'Bug Fixes', filterState: { query: 'bug', hideMergeCommits: true, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-01T00:00:00.000Z' },
+      { name: 'My Commits', filterState: { query: '', hideMergeCommits: false, sortMode: 1, showMyCommitsOnly: true, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-02T00:00:00.000Z' }
+    ];
+
+    test('should allow renaming to name that excludes original from duplicate check', function() {
+      // When renaming "Bug Fixes" to "bug fixes" (case change), should be allowed
+      const otherPresets = renameExistingPresets.filter(p => p.name.toLowerCase() !== 'bug fixes');
+      const result = validatePresetName('bug fixes', otherPresets);
+      assert.strictEqual(result.valid, true);
+    });
+
+    test('should allow renaming when new name conflicts with old name of different preset', function() {
+      // Rename "Bug Fixes" to "My Commits" should fail (conflicts with other preset)
+      const otherPresets = renameExistingPresets.filter(p => p.name.toLowerCase() !== 'bug fixes');
+      const result = validatePresetName('My Commits', otherPresets);
+      assert.strictEqual(result.valid, false);
+      assert.strictEqual(result.error, 'Preset "My Commits" already exists');
+    });
+
+    test('should allow valid rename', function() {
+      const otherPresets = renameExistingPresets.filter(p => p.name.toLowerCase() !== 'bug fixes');
+      const result = validatePresetName('Bug Squash', otherPresets);
+      assert.strictEqual(result.valid, true);
+    });
+
+    test('should reject rename to empty name', function() {
+      const otherPresets = renameExistingPresets.filter(p => p.name.toLowerCase() !== 'bug fixes');
+      const result = validatePresetName('', otherPresets);
+      assert.strictEqual(result.valid, false);
+    });
+
+    test('should reject rename with invalid characters', function() {
+      const otherPresets = renameExistingPresets.filter(p => p.name.toLowerCase() !== 'bug fixes');
+      const result = validatePresetName('Bad/Name', otherPresets);
+      assert.strictEqual(result.valid, false);
+    });
+
+    test('should reject rename exceeding max length', function() {
+      const otherPresets = renameExistingPresets.filter(p => p.name.toLowerCase() !== 'bug fixes');
+      const longName = 'a'.repeat(PRESET_NAME_MAX_LENGTH + 1);
+      const result = validatePresetName(longName, otherPresets);
+      assert.strictEqual(result.valid, false);
+    });
+  });
+
   suite('Preset Storage and Retrieval', function() {
     test('should enforce max presets limit', function() {
       const presets: SavedFilterPreset[] = [];

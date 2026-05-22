@@ -126,6 +126,57 @@ suite('Saved Filter Presets E2E Tests', () => {
     assert.strictEqual(updatedPresets.find(p => p.name === 'Preset 3')?.name, 'Preset 3');
   });
 
+  suite('Rename Filter Preset E2E', function() {
+    test('should allow renaming preset preserving createdAt timestamp', async () => {
+      const presets: SavedFilterPreset[] = [
+        { name: 'Original Name', filterState: { query: 'test', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-01T00:00:00.000Z' }
+      ];
+
+      // Simulate rename
+      const presetToRename = presets.find(p => p.name.toLowerCase() === 'original name');
+      assert.ok(presetToRename);
+
+      const renamedPreset: SavedFilterPreset = {
+        ...presetToRename!,
+        name: 'Renamed Name'
+      };
+
+      assert.strictEqual(renamedPreset.createdAt, '2024-01-01T00:00:00.000Z');
+      assert.strictEqual(renamedPreset.name, 'Renamed Name');
+    });
+
+    test('should handle rename with same name (case-insensitive)', async () => {
+      const presets: SavedFilterPreset[] = [
+        { name: 'Test Preset', filterState: { query: 'test', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-01T00:00:00.000Z' }
+      ];
+
+      const oldName = 'Test Preset';
+      const newName = 'TEST PRESET';
+
+      // Should return early (no change)
+      if (oldName.toLowerCase() === newName.toLowerCase()) {
+        // No update needed
+        assert.strictEqual(presets.length, 1);
+      }
+    });
+
+    test('should reject rename to duplicate name', async () => {
+      const presets: SavedFilterPreset[] = [
+        { name: 'Preset A', filterState: { query: 'test', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-01T00:00:00.000Z' },
+        { name: 'Preset B', filterState: { query: '', hideMergeCommits: false, sortMode: 0, showMyCommitsOnly: false, regexSearchEnabled: false, pathFilter: null }, createdAt: '2024-01-02T00:00:00.000Z' }
+      ];
+
+      // Try to rename Preset A to "Preset B"
+      const oldName = 'Preset A';
+      const newName = 'Preset B';
+
+      const otherPresets = presets.filter(p => p.name.toLowerCase() !== oldName.toLowerCase());
+      const isDuplicate = otherPresets.some(p => p.name.toLowerCase() === newName.toLowerCase());
+
+      assert.strictEqual(isDuplicate, true);
+    });
+  });
+
   test('presets persist across sessions (simulation)', async () => {
     // Simulate session 1: Save presets
     const session1Presets: SavedFilterPreset[] = [

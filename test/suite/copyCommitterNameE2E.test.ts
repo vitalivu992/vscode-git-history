@@ -138,4 +138,18 @@ suite('Copy Committer Name E2E Tests', () => {
     assert.ok(content.includes('"gitHistory.copyCommitterName"'),
       'package.json should register copyCommitterName command');
   });
+
+  test('README.md should document Ctrl+Alt+N for Copy Committer Name', async () => {
+    const readmePath = path.resolve(__dirname, '../../../README.md');
+    const readme = fs.readFileSync(readmePath, 'utf-8');
+
+    assert.ok(
+      readme.includes('Ctrl+Alt+N') || readme.includes('Cmd+Alt+N'),
+      'README should document Ctrl+Alt+N / Cmd+Alt+N for Copy Committer Name'
+    );
+    assert.ok(
+      readme.toLowerCase().includes('copy committer name'),
+      'README should mention Copy Committer Name feature'
+    );
+  });
 });

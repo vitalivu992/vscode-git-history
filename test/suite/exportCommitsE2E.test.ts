@@ -426,6 +426,136 @@ suite('Export Commits E2E Tests', () => {
     assert.ok(text.includes('Initial commit'));
     assert.ok(text.includes('Add feature X'));
   });
+
+  // ─── PR Description E2E Tests ───────────────────────────────────────────────
+
+  function formatCommitsAsPrDescription(commits: TestCommitInfo[]): string {
+    let totalFilesChanged = 0;
+    let totalInsertions = 0;
+    let totalDeletions = 0;
+    for (const commit of commits) {
+      if (commit.stats) {
+        totalFilesChanged += commit.stats.filesChanged;
+        totalInsertions += commit.stats.insertions;
+        totalDeletions += commit.stats.deletions;
+      }
+    }
+
+    const lines: string[] = [];
+    lines.push('## Summary');
+    if (commits.length === 1) {
+      lines.push(`This PR introduces ${commits[0].message}.`);
+    } else {
+      lines.push(`This PR introduces ${commits.length} changes.`);
+    }
+    lines.push('');
+
+    lines.push('## Changes');
+    for (const commit of commits) {
+      lines.push(`- ${commit.message} (\`${commit.shortHash}\`)`);
+    }
+    lines.push('');
+
+    lines.push('## Statistics');
+    lines.push(`- ${commits.length} commit${commits.length !== 1 ? 's' : ''}`);
+    lines.push(`- ${totalFilesChanged} file${totalFilesChanged !== 1 ? 's' : ''} changed`);
+    lines.push(`- ${totalInsertions} insertion${totalInsertions !== 1 ? 's' : ''}(+), ${totalDeletions} deletion${totalDeletions !== 1 ? 's' : ''}(-)`);
+    lines.push('');
+
+    lines.push('## Commits');
+    for (const commit of commits) {
+      lines.push(`### ${commit.message} (\`${commit.shortHash}\`)`);
+      lines.push('');
+      lines.push(`**Author:** ${commit.author} <${commit.email}>`);
+      lines.push(`**Date:** ${commit.date}`);
+      lines.push('');
+
+      if (commit.fullMessage && commit.fullMessage !== commit.message) {
+        const body = commit.fullMessage.replace(commit.message, '').trim();
+        lines.push(body);
+        lines.push('');
+      }
+
+      lines.push('---');
+      lines.push('');
+    }
+
+    return lines.join('\n');
+  }
+
+  test('export all commits as PR Description includes Summary section', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const prd = formatCommitsAsPrDescription(filtered);
+    assert.ok(prd.includes('## Summary'));
+    assert.ok(prd.includes('This PR introduces 3 changes.'));
+  });
+
+  test('export single commit as PR Description has singular summary', () => {
+    const filtered = getFilteredCommits(testCommits, 'Alice', false);
+    const prd = formatCommitsAsPrDescription(filtered);
+    assert.ok(prd.includes('This PR introduces Initial commit.'));
+  });
+
+  test('export as PR Description includes Changes checklist', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const prd = formatCommitsAsPrDescription(filtered);
+    assert.ok(prd.includes('## Changes'));
+    assert.ok(prd.includes('- Initial commit'));
+    assert.ok(prd.includes('- Add feature X'));
+    assert.ok(prd.includes('- Merge pull request'));
+    assert.ok(prd.includes('`abc123d`'));
+    assert.ok(prd.includes('`def456a`'));
+  });
+
+  test('export as PR Description includes Statistics with correct totals', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const prd = formatCommitsAsPrDescription(filtered);
+    assert.ok(prd.includes('## Statistics'));
+    assert.ok(prd.includes('3 commits'));
+    assert.ok(prd.includes('9 files changed')); // 3 + 5 + 1
+    assert.ok(prd.includes('350 insertions(+)'));
+    assert.ok(prd.includes('50 deletions(-)'));
+  });
+
+  test('export as PR Description includes Commits detail section', () => {
+    const filtered = getFilteredCommits(testCommits, '', false);
+    const prd = formatCommitsAsPrDescription(filtered);
+    assert.ok(prd.includes('## Commits'));
+    assert.ok(prd.includes('### Initial commit'));
+    assert.ok(prd.includes('**Author:** Alice Cooper <alice@example.com>'));
+    assert.ok(prd.includes('**Date:**'));
+    assert.ok(prd.includes('---'));
+  });
+
+  test('export as PR Description includes commit body', () => {
+    const prd = formatCommitsAsPrDescription([testCommits[0]]);
+    assert.ok(prd.includes('This is the first commit'));
+  });
+
+  test('export filtered PR Description respects search filter', () => {
+    const filtered = getFilteredCommits(testCommits, 'feature', false);
+    const prd = formatCommitsAsPrDescription(filtered);
+    assert.ok(prd.includes('This PR introduces 1 changes.'));
+    assert.ok(prd.includes('Add feature X'));
+    assert.ok(!prd.includes('Initial commit'));
+  });
+
+  test('export as PR Description respects hideMergeCommits', () => {
+    const filtered = getFilteredCommits(testCommits, '', true);
+    const prd = formatCommitsAsPrDescription(filtered);
+    assert.ok(!prd.includes('Merge pull request'));
+    assert.ok(prd.includes('### Initial commit'));
+    assert.ok(prd.includes('### Add feature X'));
+  });
+
+  test('export empty commits as PR Description produces valid output', () => {
+    const prd = formatCommitsAsPrDescription([]);
+    assert.ok(prd.includes('## Summary'));
+    assert.ok(prd.includes('This PR introduces 0 changes.'));
+    assert.ok(prd.includes('## Changes'));
+    assert.ok(prd.includes('## Statistics'));
+    assert.ok(prd.includes('## Commits'));
+  });
 });
 
 suite('Export Commits Source Verification', () => {
@@ -503,8 +633,8 @@ suite('Export Commits Source Verification', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
     assert.ok(source.includes("type: 'exportCommits'"),
       'types.ts should define exportCommits message type');
-    assert.ok(source.includes("format: 'json' | 'csv' | 'markdown'"),
-      'exportCommits should accept json, csv, or markdown format');
+    assert.ok(source.includes("format: 'json' | 'csv' | 'markdown' | 'text' | 'prdescription'"),
+      'exportCommits should accept json, csv, markdown, text, or prdescription format');
   });
 
   test('messageHandler.ts should define formatCommitsAsMarkdown function', () => {
@@ -557,15 +687,21 @@ suite('Export Commits Source Verification', () => {
       'main.js should send exportCommitsMbox message');
   });
 
-  test('main.js triggerAction switch should handle exportCommitsMbox', () => {
+  test('main.js should include prdescription option in export dialog', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
-    // Find the triggerAction switch statement
-    const triggerStart = source.indexOf("case 'triggerAction'");
-    assert.ok(triggerStart > -1, 'main.js should have triggerAction handler');
-    const triggerEnd = source.indexOf('default:', triggerStart);
-    const triggerBody = source.substring(triggerStart, triggerEnd > triggerStart ? triggerEnd : undefined);
+    assert.ok(source.includes('data-format="prdescription"'),
+      'main.js export dialog should include prdescription format option');
+  });
 
-    assert.ok(triggerBody.includes("case 'exportCommitsMbox'"),
-      'triggerAction switch should handle exportCommitsMbox action');
+  test('messageHandler.ts should define formatCommitsAsPrDescription function', () => {
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+    assert.ok(source.includes('function formatCommitsAsPrDescription'),
+      'messageHandler.ts should define formatCommitsAsPrDescription function');
+  });
+
+  test('messageHandler.ts should call formatCommitsAsPrDescription for prdescription format', () => {
+    const source = fs.readFileSync(handlerPath, 'utf-8');
+    assert.ok(source.includes('formatCommitsAsPrDescription(commits)'),
+      'handleExportCommits should call formatCommitsAsPrDescription for prdescription format');
   });
 });
