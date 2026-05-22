@@ -17,7 +17,7 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **File History**: Right-click anywhere in an editor to view the complete git history of that file
 - **Selection History**: Select lines of code and view only commits that affected those specific lines
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
-- **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions)
+- **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions). Toggle visibility with the "Stats" button or `Ctrl+Shift+Alt+T` / `Cmd+Shift+Alt+T`.
 - **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter. Supports tag filter: `tag:name` or click any tag badge to filter by tag. Supports regex mode with the .* button for advanced pattern matching like `bug(fix|patch)|hotfix` or `^feat:.*`.
 - **Quick Date Range Filters**: Three buttons ("Today", "Week", "Month") next to the search input provide one-click access to common date ranges. Click to apply, click again to remove.
 - **Sort Toggle**: Cycle through four sort modes with the sort button in the toolbar: Newest first, Oldest first, Author A-Z, and Author Z-A. Also accessible via `Ctrl+Shift+3` / `Cmd+Shift+3`
@@ -42,8 +42,8 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **Copy Commit Hash**: Copy the full commit hash to clipboard with `Ctrl+Shift+H` / `Cmd+Shift+H` keyboard shortcut, or click any hash chip
 - **Copy Author Email**: Copy the author email address to clipboard with `Ctrl+Shift+A` / `Cmd+Shift+A` keyboard shortcut, or right-click context menu
 - **Copy Author Name**: Copy the author name to clipboard with `Ctrl+Shift+N` / `Cmd+Shift+N` keyboard shortcut, or right-click context menu
-- **Copy Committer Email**: Copy the committer email address to clipboard via right-click context menu. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author email if committer information is not available.
-- **Copy Committer Name**: Copy the committer name to clipboard via right-click context menu. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author name if committer information is not available.
+- **Copy Committer Email**: Copy the committer email address to clipboard with `Ctrl+Alt+A` / `Cmd+Alt+A` or right-click context menu. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author email if committer information is not available.
+- **Copy Committer Name**: Copy the committer name to clipboard with `Ctrl+Alt+N` / `Cmd+Alt+N` or right-click context menu. The committer is the person who applied the commit (may differ from the author who wrote the code). Falls back to author name if committer information is not available.
 
 > **Note**: Git distinguishes between **author** (who wrote the code) and **committer** (who applied the commit). These are often the same person, but can differ when maintainers apply patches from contributors, cherry-pick commits, or merge pull requests.
 
@@ -55,6 +55,7 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **📄 Copy Commit Body**: Copy just the commit body (the multi-line description after the subject line) to clipboard with `Ctrl+Shift+Z` / `Cmd+Shift+Z` keyboard shortcut, or right-click context menu. Shows "Commit has no body" for single-line commits.
 - **📜 Copy as Markdown**: Copy commit information formatted as Markdown for use in changelogs, release notes, and documentation. Press `Ctrl+Alt+M` / `Cmd+Alt+M` or use the right-click context menu. The format includes commit message with heading, author, date (relative + absolute), stats, tags, and body.
 - **{} Copy as JSON**: Copy the focused or selected commit as formatted JSON with all available commit data. Press `Ctrl+Alt+J` / `Cmd+Alt+J` or use the right-click context menu. The JSON includes hash, shortHash, author (name, email), date (ISO 8601), message, body (or null), parentHashes (empty array for root commits), tags (empty array if none), and stats (or null). Useful for programmatic access, API integrations, and automation workflows.
+- **🌐 Copy as HTML**: Copy the focused or selected commit as styled HTML with inline CSS for portability. Press `Ctrl+Alt+H` / `Cmd+Alt+H` or use the right-click context menu. The HTML includes the commit subject, hash, author, date, stats (with colored insertions/deletions), tags (as badges), and commit body. Useful for sharing commits in emails, wikis, and HTML documentation.
 - **👥 Copy Co-Authors**: Copy co-authors from commit message to clipboard with `Ctrl+Shift+K` / `Cmd+Shift+K` keyboard shortcut, or right-click context menu. Extracts "Co-authored-by:" trailers in the format "Name <email>" separated by newlines.
 - **🕐 Copy Commit Date**: Copy the commit date in ISO 8601 format to clipboard with `Ctrl+Shift+T` / `Cmd+Shift+T` keyboard shortcut, or right-click context menu
 - **Copy Selected Hashes**: Copy all selected commit hashes as a newline-separated list with `Ctrl+Shift+;` / `Cmd+Shift+;` keyboard shortcut (when 2+ commits are selected), or right-click context menu (shown when multiple commits are selected). Falls back to single hash copy when 0 or 1 commit is selected.
@@ -68,15 +69,16 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **🔗 Copy Commit Reference**: Copy the commit in canonical Git reference format (`refs/commit/<hash>`) to clipboard. Useful for Git submodule configurations, Git notes references, portable commit references in scripts, and Git blame references. Use `Ctrl+Shift+]` / `Cmd+Shift+]` or right-click on any commit
 - **Copy Commit Stats**: Copy commit statistics (files changed, insertions, deletions) to clipboard with `Ctrl+Shift+S` / `Cmd+Shift+S` keyboard shortcut, or right-click on any commit
 - **Quick Compare with Parent**: Instantly compare the selected commit with its parent to see what changed in that specific commit. Use the "Compare" button or press `Ctrl+Alt+P` / `Cmd+Alt+P`. For root commits (first commit), an error is shown since there's no parent.
-- **Create Branch from Commit**: Right-click on any commit to create a new branch at that point in history. You'll be prompted for a branch name, and the branch will be created at the selected commit using `git branch <name> <hash>`.
-- **Create Tag from Commit**: Right-click on any commit to create a new git tag at that point in history. Supports both lightweight tags (enter tag name only) and annotated tags (enter a message when prompted). The tag will be created using `git tag <name> <hash>` or `git tag -a <name> -m <message> <hash>`.
-- **Delete Tag from Commit**: Right-click on any commit with tags to delete them. If the commit has only one tag, it will be deleted immediately with confirmation. If the commit has multiple tags, a picker lets you choose which one to delete. The tag is deleted using `git tag -d <tagname>`.
+- **Create Branch from Commit**: Press `Ctrl+Shift+Alt+B` / `Cmd+Shift+Alt+B` or right-click on any commit to create a new branch at that point in history. You'll be prompted for a branch name, and the branch will be created at the selected commit using `git branch <name> <hash>`.
+- **Create Tag from Commit**: Press `Ctrl+Alt+I` / `Cmd+Alt+I` or right-click on any commit to create a new git tag at that point in history. Supports both lightweight tags (enter tag name only) and annotated tags (enter a message when prompted). The tag will be created using `git tag <name> <hash>` or `git tag -a <name> -m <message> <hash>`.
+- **Delete Tag from Commit**: Press `Ctrl+Alt+.` / `Cmd+Alt+.` or right-click on any commit with tags to delete them. If the commit has only one tag, it will be deleted immediately with confirmation. If the commit has multiple tags, a picker lets you choose which one to delete. The tag is deleted using `git tag -d <tagname>`.
 - **Branch Switching**: Right-click on the branch badge or press `Ctrl+Alt+S` / `Cmd+Alt+S` to switch between branches. A searchable picker dialog shows all local and remote branches. The panel automatically refreshes after successful checkout.
+- **Delete Branch**: Press `Ctrl+Alt+X` / `Cmd+Alt+X` to open a modal dialog to select and delete local branches. The current branch is marked and cannot be deleted. For unmerged branches, git will offer a force delete option.
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
 - **Copy Commit Diff**: Copy the full diff output for a commit to clipboard with `Ctrl+Shift+D` / `Cmd+Shift+D` keyboard shortcut, or right-click on any commit
 - **Copy File Path**: Right-click on any file in the changed files list to copy its full path to clipboard
 - **Open File at Commit**: Right-click on any file in the changed files list to view the file content as it was at that specific commit
-- **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to JSON, CSV, Markdown, Plain Text, or mbox format. The Markdown format generates a changelog-style output with commit hashes, authors, dates, messages, tags, and statistics—perfect for release notes and documentation. The Plain Text format provides a simple, readable commit list with one commit per line in the format: `hash - message (author <email>) [+stats]`. The mbox format (available when 2+ commits are selected) exports RFC 822 compliant patches suitable for email clients and `git am`.
+- **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to JSON, CSV, Markdown, Plain Text, PR Description, or mbox format. The Markdown format generates a changelog-style output with commit hashes, authors, dates, messages, tags, and statistics—perfect for release notes and documentation. The Plain Text format provides a simple, readable commit list with one commit per line in the format: `hash - message (author <email>) [+stats]`. The PR Description format generates a structured Markdown output with Summary, Changes checklist, Statistics, and Commits detail sections—ideal for pull request descriptions. The mbox format (available when 2+ commits are selected, also accessible via `Ctrl+Shift+Alt+E` / `Cmd+Shift+Alt+E`) exports RFC 822 compliant patches suitable for email clients and `git am`.
 - **Import Filter Query**: Press `Ctrl+Shift+4` / `Cmd+Shift+4` or click the "Paste Filter" button to restore a previously copied filter query from clipboard. This allows you to share reproducible commit views with team members.
 - **Clear All Filters**: Press `Ctrl+Alt+Q` / `Cmd+Alt+Q` or click the "Clear All" button to remove all active filters at once. Useful when you have multiple filters applied and want to quickly reset to the full commit list.
 - **Select All Commits**: Press `Ctrl+A` / `Cmd+A` to quickly select all visible commits for bulk operations like export or copy
@@ -171,6 +173,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy as patch** | Copy the commit as a unified diff patch (for `git apply` or `git am`) |
 | **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket) for the commit |
 | **Copy as platform mention** | Copy in `owner/repo@hash` format for issues and discussions |
+| **Copy commit reference** | Copy the commit in canonical Git reference format (`refs/commit/<hash>`) |
 | **Copy stats** | Copy commit statistics (files changed, insertions, deletions) to clipboard |
 | **Copy author email** | Copy the author email address |
 | **Copy author name** | Copy the author name |
@@ -180,6 +183,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy short hash** | Copy the 7-character short hash |
 | **Copy subject** | Copy only the commit subject (first line) |
 | **Copy diff stat summary** | Copy the diff stat (e.g., "3 files changed, 45 insertions(+), 12 deletions(-)") |
+| **Copy files changed count** | Copy just the number of files changed (e.g., "3 files") |
 | **Copy as oneline** | Copy in `git log --oneline` format |
 | **Copy commit body** | Copy the commit body (description after subject) |
 | **Copy as Markdown** | Copy formatted as Markdown |
@@ -198,6 +202,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy selected hashes** | Copy all selected commit hashes (2+ commits selected) |
 | **Copy combined diff** | Copy combined diff of all selected commits |
 | **Copy git show command** | Copy a pre-formatted `git show <hash>` command to the clipboard |
+| **Copy git describe** | Copy git describe output showing nearest tag and commit count (e.g., `v1.2.3-45-gabcdef1`) |
 | **Copy range diff** | Copy diff between two commits (range selected) |
 | **Compare with parent** | Compare this commit with its parent |
 | **Create branch from commit** | Create a new branch at the selected commit |
@@ -214,10 +219,13 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy file content** | Copy the full content of a file at the selected commit to clipboard |
 | **Copy file path** | Copy the full file path to clipboard |
 | **Copy file name only** | Copy just the filename (e.g., `main.js`) to clipboard |
+| **Copy file basename (without extension)** | Copy the filename without path or extension (e.g., `main.js` → `main`) |
 | **Copy file extension** | Copy just the file extension (e.g., `ts` from `main.ts`) to clipboard |
 | **Copy file directory** | Copy the directory path containing the file (with trailing separator, e.g., `src/webview/panel/`) |
 | **Copy relative path** | Copy the file path relative to the git repository root (e.g., `src/webview/panel/main.js`) |
+| **Copy git show command** | Copy a pre-formatted `git show <hash>:<file>` command for the file to clipboard |
 | **Copy file permalink** | Copy permanent web URL for the file at the selected commit (GitHub/GitLab/Bitbucket) |
+| **Copy all file permalinks** | Copy newline-separated permanent web URLs for all files changed in the commit |
 
 #### Keyboard Navigation
 
@@ -247,20 +255,24 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+M` / `Cmd+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Copy commit stats to clipboard |
 | `Ctrl+Shift+3` / `Cmd+Shift+3` | Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A) |
+| `Ctrl+Alt+A` / `Cmd+Alt+A` | Copy committer email to clipboard |
 | `Ctrl+Alt+B` / `Cmd+Alt+B` | Copy branch name to clipboard |
 | `Ctrl+Alt+D` / `Cmd+Alt+D` | Copy combined diff to clipboard (2+ commits selected) |
 | `Ctrl+Alt+F` / `Cmd+Alt+F` | Copy file diff to clipboard (for focused file in changed files list) |
 | `Ctrl+Alt+C` / `Cmd+Alt+C` | Copy file content at commit to clipboard (for focused file in changed files list) |
 | `Ctrl+Alt+G` / `Cmd+Alt+G` | Copy git describe to clipboard |
 | `Ctrl+Alt+K` / `Cmd+Alt+K` | Copy file directory to clipboard (for focused file in changed files list) |
+| `Ctrl+Alt+E` / `Cmd+Alt+E` | Copy file extension to clipboard (for focused file in changed files list) |
 | `Ctrl+Alt+L` / `Cmd+Alt+L` | Copy relative file path to clipboard |
 | `Ctrl+Alt+W` / `Cmd+Alt+W` | Copy commit message with stats to clipboard |
+| `Ctrl+Alt+N` / `Cmd+Alt+N` | Copy committer name to clipboard |
 | `Ctrl+Alt+O` / `Cmd+Alt+O` | Copy remote URL to clipboard |
 | `Ctrl+Alt+Q` / `Cmd+Alt+Q` | Clear all filters |
 | `Ctrl+Alt+R` / `Cmd+Alt+R` | Copy range diff to clipboard (range selected) |
 | `Ctrl+Alt+S` / `Cmd+Alt+S` | Show branch switcher |
 | `Ctrl+Alt+U` / `Cmd+Alt+U` | Copy branch URL to clipboard |
 | `Ctrl+Alt+Shift+U` / `Cmd+Alt+Shift+U` | Copy file permalink to clipboard |
+| `Ctrl+Shift+Alt+U` / `Cmd+Shift+Alt+U` | Copy all file permalinks to clipboard (newline-separated) |
 | `Ctrl+Shift+G` / `Cmd+Shift+G` | Copy tags to clipboard |
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email to clipboard |
 | `Ctrl+Shift+N` / `Cmd+Shift+N` | Copy author name to clipboard |
@@ -276,13 +288,21 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+Alt+F` / `Cmd+Shift+Alt+F` | Copy file stats (per-file insertions/deletions) to clipboard |
 | `Ctrl+Shift+;` / `Cmd+Shift+;` | Copy selected hashes to clipboard (2+ commits) |
 | `Ctrl+Shift+,` / `Cmd+Shift+,` | Copy file name only to clipboard |
+| `Ctrl+Shift+Alt+N` / `Cmd+Shift+Alt+N` | Copy file basename without extension to clipboard |
 | `Ctrl+Shift+.` / `Cmd+Shift+.` | Copy file path to clipboard (for focused file in changed files list) |
 | `Ctrl+Shift+O` / `Cmd+Shift+O` | Export filtered commits to file |
 | `Ctrl+Shift+5` / `Cmd+Shift+5` | Copy filter query state to clipboard (includes search query and all toggle states as JSON) |
 | `Ctrl+Shift+4` / `Cmd+Shift+4` | Paste/import filter query from clipboard |
+| `Ctrl+Alt+Shift+L` / `Cmd+Alt+Shift+L` | Copy current filter as equivalent `git log` command |
 | `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent |
 | `Ctrl+Alt+S` / `Cmd+Alt+S` | Show branch switcher |
+| `Ctrl+Alt+X` / `Cmd+Alt+X` | Delete local branch |
+| `Ctrl+Shift+Alt+B` / `Cmd+Shift+Alt+B` | Create branch at selected commit |
+| `Ctrl+Alt+I` / `Cmd+Alt+I` | Create tag at selected commit |
+| `Ctrl+Alt+.` / `Cmd+Alt+.` | Delete tag from selected commit |
+| `Ctrl+Shift+Alt+E` / `Cmd+Shift+Alt+E` | Export commits as mbox format |
 | `Ctrl+Shift+Alt+S` / `Cmd+Shift+Alt+S` | Toggle GPG signature verification badges |
+| `Ctrl+Shift+Alt+T` / `Cmd+Shift+Alt+T` | Toggle stats column visibility |
 | `Ctrl+Shift+F` / `Cmd+Shift+F` | Copy changed files to clipboard |
 | `Ctrl+Shift+D` / `Cmd+Shift+D` | Copy commit diff to clipboard |
 | `Ctrl+Shift+X` / `Cmd+Shift+X` | Toggle regex search mode |
@@ -293,6 +313,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+K Ctrl+P` / `Cmd+K Cmd+P` | Open file URL in browser |
 | `Ctrl+Shift+0` / `Cmd+Shift+0` | Save filter preset |
 | `Ctrl+Shift+1` / `Cmd+Shift+1` | Load filter preset |
+| `F2` or ✎ button | Rename preset (in presets dropdown) |
 | `?` | Show keyboard shortcuts help |
 | `Escape` | Clear selection and search focus |
 
@@ -358,6 +379,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Last commit | `End` |
 | Select commit | `Enter` |
 | Multi-select toggle | `Ctrl+Enter` / `Cmd+Enter` |
+| Focus commit list | `Ctrl+L` / `Cmd+L` |
 | Focus search | `/` or `Ctrl+F` / `Cmd+F` |
 | Copy commit message | `Ctrl+Shift+C` / `Cmd+Shift+C` |
 | Toggle word wrap | `Ctrl+Shift+W` / `Cmd+Shift+W` |
@@ -376,9 +398,11 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy commit body | `Ctrl+Shift+Z` / `Cmd+Shift+Z` |
 | Copy as Markdown | `Ctrl+Alt+M` / `Cmd+Alt+M` |
 | Copy as JSON | `Ctrl+Alt+J` / `Cmd+Alt+J` |
+| Copy as HTML | `Ctrl+Alt+H` / `Cmd+Alt+H` |
 | Copy co-authors | `Ctrl+Shift+K` / `Cmd+Shift+K` |
 | Copy file path | `Ctrl+Shift+.` / `Cmd+Shift+.` |
 | Copy file name | `Ctrl+Shift+,` / `Cmd+Shift+,` |
+| Copy file extension | `Ctrl+Alt+E` / `Cmd+Alt+E` |
 | Copy relative path | `Ctrl+Alt+L` / `Cmd+Alt+L` |
 | Copy branch URL | `Ctrl+Alt+U` / `Cmd+Alt+U` |
 | Copy file permalink | `Ctrl+Alt+Shift+U` / `Cmd+Alt+Shift+U` |
@@ -388,9 +412,18 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy file diff | `Ctrl+Alt+F` / `Cmd+Alt+F` |
 | Copy file content | `Ctrl+Alt+C` / `Cmd+Alt+C` |
 | Copy git show command | `Ctrl+Alt+V` / `Cmd+Alt+V` |
+| Copy file show command | `Ctrl+Alt+Shift+V` / `Cmd+Alt+Shift+V` |
 | Copy git describe | `Ctrl+Alt+G` / `Cmd+Alt+G` |
 | Copy selected hashes | `Ctrl+Shift+;` / `Cmd+Shift+;` (when 2+ selected) |
 | Clear selection | `Escape` |
+
+### Filter Presets
+
+| Command | Keybinding |
+|---------|------------|
+| Save filter preset | `Ctrl+Shift+0` / `Cmd+Shift+0` |
+| Load filter preset | `Ctrl+Shift+1` / `Cmd+Shift+1` |
+| Rename filter preset | `F2` (when dropdown is open) |
 
 ### Tag Navigation
 

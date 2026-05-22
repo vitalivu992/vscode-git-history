@@ -197,6 +197,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFilesChangedCount",
+        "title": "Git History: Copy Files Changed Count",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyOneline",
         "title": "Git History: Copy Commit as Oneline",
         "category": "Git History"
@@ -214,6 +219,11 @@
       {
         "command": "gitHistory.copyCommitJson",
         "title": "Git History: Copy Commit as JSON",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitHtml",
+        "title": "Git History: Copy Commit as HTML",
         "category": "Git History"
       },
       {
@@ -259,6 +269,11 @@
       {
         "command": "gitHistory.copyFileExtension",
         "title": "Git History: Copy File Extension",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyFileBasename",
+        "title": "Git History: Copy File Basename",
         "category": "Git History"
       },
       {
@@ -309,6 +324,16 @@
       {
         "command": "gitHistory.copyAllFilteredHashes",
         "title": "Git History: Copy All Filtered Hashes",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyAllFilePermalinks",
+        "title": "Git History: Copy All File Permalinks",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyFilterAsGitLogCommand",
+        "title": "Git History: Copy Filter as Git Log Command",
         "category": "Git History"
       },
       {
@@ -387,6 +412,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.toggleStats",
+        "title": "Git History: Toggle Stats Column",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.jumpToHash",
         "title": "Git History: Jump to Hash",
         "category": "Git History"
@@ -422,6 +452,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.focusCommitList",
+        "title": "Git History: Focus Commit List",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.showKeyboardHelp",
         "title": "Git History: Show Keyboard Shortcuts",
         "category": "Git History"
@@ -454,6 +489,11 @@
       {
         "command": "gitHistory.loadFilterPreset",
         "title": "Git History: Load Filter Preset",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.renameFilterPreset",
+        "title": "Git History: Rename Filter Preset",
         "category": "Git History"
       }
     ],
@@ -705,6 +745,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyCommitHtml",
+        "key": "ctrl+alt+h",
+        "mac": "cmd+alt+h",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copySelectedHashes",
         "key": "ctrl+shift+;",
         "mac": "cmd+shift+;",
@@ -717,6 +763,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyAllFilePermalinks",
+        "key": "ctrl+shift+alt+u",
+        "mac": "cmd+shift+alt+u",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyFileName",
         "key": "ctrl+shift+,",
         "mac": "cmd+shift+,",
@@ -726,6 +778,12 @@
         "command": "gitHistory.copyFileExtension",
         "key": "ctrl+alt+e",
         "mac": "cmd+alt+e",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFileBasename",
+        "key": "ctrl+shift+alt+n",
+        "mac": "cmd+shift+alt+n",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -750,6 +808,12 @@
         "command": "gitHistory.copyFilterQuery",
         "key": "ctrl+shift+5",
         "mac": "cmd+shift+5",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFilterAsGitLogCommand",
+        "key": "ctrl+alt+shift+l",
+        "mac": "cmd+alt+shift+l",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -873,6 +937,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.toggleStats",
+        "key": "ctrl+shift+alt+t",
+        "mac": "cmd+shift+alt+t",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.jumpToHash",
         "key": "ctrl+g",
         "mac": "cmd+g",
@@ -915,6 +985,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.focusCommitList",
+        "key": "ctrl+l",
+        "mac": "cmd+l",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.showKeyboardHelp",
         "key": "shift+/",
         "mac": "shift+/",
@@ -954,6 +1030,11 @@
         "command": "gitHistory.loadFilterPreset",
         "key": "ctrl+shift+1",
         "mac": "cmd+shift+1",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.renameFilterPreset",
+        "key": "f2",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
