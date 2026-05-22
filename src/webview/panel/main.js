@@ -30,7 +30,9 @@ let commitFilesMap = new Map(); // hash -> CommitFileChange[]
 let firstRunTipVisible = false; // First-run tip banner visibility state
 let savedPresets = []; // Saved filter presets
 let presetDropdownVisible = false; // Preset dropdown visibility state
+let focusedPresetIndex = -1; // Keyboard focus index for preset dropdown navigation
 let showSignatures = true; // Show GPG signature verification badges
+let showStats = true; // Show stats column
 
 /**
  * Parse filters from search query
@@ -698,6 +700,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Alt+H: Copy as HTML
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'h') {
+    e.preventDefault();
+    handleCopyHtml();
+    return;
+  }
+
   // Ctrl+Alt+O: Copy remote URL
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'o') {
     e.preventDefault();
@@ -1109,6 +1118,24 @@ function handleToggleSignatures() {
   vscode.postMessage({ type: 'saveSettings', settings: { showSignatures } });
 }
 
+function handleToggleStats() {
+  showStats = !showStats;
+  const statsToggleBtn = document.getElementById('stats-toggle-btn');
+  if (statsToggleBtn) {
+    if (showStats) {
+      statsToggleBtn.classList.add('active');
+      statsToggleBtn.title = 'Stats visible (click to hide)';
+    } else {
+      statsToggleBtn.classList.remove('active');
+      statsToggleBtn.title = 'Show stats column';
+    }
+  }
+  const statsTh = document.querySelector('th.stats-col');
+  if (statsTh) { statsTh.style.display = showStats ? '' : 'none'; }
+  renderCommits();
+  vscode.postMessage({ type: 'saveSettings', settings: { showStats } });
+}
+
 /**
  * Check if text matches the regex pattern
  * @param {string} text - Text to test
@@ -1467,6 +1494,17 @@ function scrollFocusedIntoView() {
   }
 }
 
+function handleFocusCommitList() {
+  const filteredCommits = getOrderedCommits(getFilteredCommits());
+  if (filteredCommits.length === 0) {
+    return;
+  }
+
+  focusedIndex = 0;
+  updateFocusedRow();
+  scrollFocusedIntoView();
+}
+
 // ─── Initialize ─────────────────────────────────────────────────────────────
 
 function init() {
@@ -1559,6 +1597,10 @@ function init() {
   const signaturesToggleBtn = document.getElementById('signatures-toggle-btn');
   if (signaturesToggleBtn) {
     signaturesToggleBtn.addEventListener('click', handleToggleSignatures);
+  }
+  const statsToggleBtn = document.getElementById('stats-toggle-btn');
+  if (statsToggleBtn) {
+    statsToggleBtn.addEventListener('click', handleToggleStats);
   }
 
   // Keyboard shortcuts
@@ -1790,6 +1832,24 @@ function handleMessage(event) {
           showSignatures = settings.showSignatures;
         }
 
+        // Apply stats column visibility from persisted settings
+        if (settings.showStats !== undefined) {
+          showStats = settings.showStats;
+        }
+        // Update stats toggle button state
+        const statsToggleBtnInit = document.getElementById('stats-toggle-btn');
+        if (statsToggleBtnInit) {
+          if (showStats) {
+            statsToggleBtnInit.classList.add('active');
+            statsToggleBtnInit.title = 'Stats visible (click to hide)';
+          } else {
+            statsToggleBtnInit.classList.remove('active');
+            statsToggleBtnInit.title = 'Show stats column';
+          }
+        }
+        const statsThInit = document.querySelector('th.stats-col');
+        if (statsThInit) { statsThInit.style.display = showStats ? '' : 'none'; }
+
         renderCommits();
         updateCommitCount();
 
@@ -1950,6 +2010,7 @@ function handleMessage(event) {
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
         case 'copyDiffStatSummary': handleCopyDiffStatSummary(); break;
+        case 'copyFilesChangedCount': handleCopyFilesChangedCount(); break;
         case 'copyCommitStats': handleCopyStats(); break;
         case 'copyFileStats': handleCopyFileStats(); break;
         case 'copyCommitWithStats': handleCopyCommitWithStats(); break;
@@ -1957,15 +2018,18 @@ function handleMessage(event) {
         case 'copyCommitBody': handleCopyCommitBody(); break;
         case 'copyCommitMarkdown': handleCopyMarkdown(); break;
         case 'copyCommitJson': handleCopyJson(); break;
+        case 'copyCommitHtml': handleCopyHtml(); break;
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
         case 'copyCommitDate': handleCopyCommitDate(); break;
         case 'copyRelativeDate': handleCopyRelativeDate(); break;
         case 'copyCommitTimestamp': handleCopyCommitTimestamp(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
         case 'copySelectedCherryPickCommands': handleCopySelectedCherryPickCommands(); break;
+        case 'copyAllFilePermalinks': handleCopyAllFilePermalinks(); break;
         case 'copyAllFilteredHashes': handleCopyAllFilteredHashes(); break;
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFileExtension': handleCopyExtension(); break;
+        case 'copyFileBasename': handleCopyFileBasename(); break;
         case 'copyFileDirectory': handleCopyFileDirectory(); break;
         case 'copyFilePath': handleCopyFilePath(); break;
         case 'copyRelativePath': handleCopyRelativePath(); break;
@@ -1988,6 +2052,7 @@ function handleMessage(event) {
         case 'toggleHideMergeCommits': handleMergeToggle(); break;
         case 'toggleGraph': handleToggleGraph(); break;
         case 'toggleSignatures': handleToggleSignatures(); break;
+        case 'toggleStats': handleToggleStats(); break;
         case 'jumpToHash': showJumpToHashDialog(); break;
         case 'jumpToNextTag': jumpToNextTag(); break;
         case 'jumpToPreviousTag': jumpToPreviousTag(); break;
@@ -1995,11 +2060,13 @@ function handleMessage(event) {
         case 'jumpToNextCommitWithStats': jumpToNextCommitWithStats(); break;
         case 'jumpToPreviousCommitWithStats': jumpToPreviousCommitWithStats(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
+        case 'focusCommitList': handleFocusCommitList(); break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
         case 'cycleDiffContextLines': handleDiffContextLinesCycle(); break;
         case 'cycleSortMode': handleSortToggle(); break;
         case 'copyFilterQuery': handleCopyFilterQuery(); break;
         case 'pasteFilterQuery': handlePasteFilterQuery(); break;
+        case 'copyFilterAsGitLogCommand': handleCopyFilterAsGitLogCommand(); break;
         case 'clearAllFilters': clearAllFilters(); break;
         case 'openCommitUrl': handleOpenUrl(); break;
         case 'openFileUrl': handleOpenFileUrl(); break;
@@ -2034,7 +2101,8 @@ function renderCommits() {
 
   // Graph is only shown in newest-first order
   const effectiveShowGraph = showGraph && sortMode < 2;
-  const colspan = effectiveShowGraph ? 6 : 5;
+  let colCount = 4 + (effectiveShowGraph ? 1 : 0) + (showStats ? 1 : 0);
+  const colspan = colCount;
 
   if (displayCommits.length === 0) {
     const hasFilters = hasActiveFilters();
@@ -2137,7 +2205,7 @@ function renderCommits() {
         </div>
       </td>
       <td class="date-col" title="${absoluteDate}">${date}</td>
-      <td class="stats-col" title="${commit.stats ? `${commit.stats.filesChanged} file${commit.stats.filesChanged !== 1 ? 's' : ''} changed, ${commit.stats.insertions} insertion${commit.stats.insertions !== 1 ? 's' : ''}(+), ${commit.stats.deletions} deletion${commit.stats.deletions !== 1 ? 's' : ''}(-)` : ''}">${statsHtml}</td>
+      ${showStats ? `<td class="stats-col" title="${commit.stats ? `${commit.stats.filesChanged} file${commit.stats.filesChanged !== 1 ? 's' : ''} changed, ${commit.stats.insertions} insertion${commit.stats.insertions !== 1 ? 's' : ''}(+), ${commit.stats.deletions} deletion${commit.stats.deletions !== 1 ? 's' : ''}(-)` : ''}">${statsHtml}</td>` : ''}
       <td class="message-col ${hasBody ? 'has-expand' : ''}">${messageHtml}</td>
     `;
 
@@ -2490,6 +2558,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy file name only</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-basename">
+      <span class="context-menu-icon">📄</span>
+      <span class="context-menu-label">Copy file basename (without extension)</span>
+    </div>
     <div class="context-menu-item" data-action="copy-file-extension">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy file extension</span>
@@ -2505,6 +2577,10 @@ function showFileContextMenu(event, filePath, commitHash) {
     <div class="context-menu-item" data-action="copy-file-url">
       <span class="context-menu-icon">🔗</span>
       <span class="context-menu-label">Copy file permalink</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-all-file-permalinks">
+      <span class="context-menu-icon">🔗</span>
+      <span class="context-menu-label">Copy all file permalinks</span>
     </div>
     <div class="context-menu-item" data-action="open-file-url">
       <span class="context-menu-icon">🌐</span>
@@ -2562,6 +2638,11 @@ function showFileContextMenu(event, filePath, commitHash) {
           type: 'copyFileName',
           filePath: filePath
         });
+      } else if (action === 'copy-file-basename') {
+        vscode.postMessage({
+          type: 'copyFileBasename',
+          filePath: filePath
+        });
       } else if (action === 'copy-file-extension') {
         vscode.postMessage({
           type: 'copyFileExtension',
@@ -2582,6 +2663,11 @@ function showFileContextMenu(event, filePath, commitHash) {
           type: 'copyFileUrl',
           hash: commitHash,
           filePath: filePath
+        });
+      } else if (action === 'copy-all-file-permalinks') {
+        vscode.postMessage({
+          type: 'copyAllFilePermalinks',
+          hash: commitHash
         });
       } else if (action === 'open-file-url') {
         vscode.postMessage({
@@ -2712,6 +2798,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📊</span>
       <span class="context-menu-label">Copy diff stat summary</span>
     </div>
+    <div class="context-menu-item" data-action="copy-files-changed-count">
+      <span class="context-menu-icon">📊</span>
+      <span class="context-menu-label">Copy files changed count</span>
+    </div>
     <div class="context-menu-item" data-action="copy-file-stats">
       <span class="context-menu-icon">📊</span>
       <span class="context-menu-label">Copy file stats</span>
@@ -2735,6 +2825,10 @@ function showCommitContextMenu(event, commit) {
     <div class="context-menu-item" data-action="copy-json">
       <span class="context-menu-icon">{}</span>
       <span class="context-menu-label">Copy as JSON</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-html">
+      <span class="context-menu-icon">🌐</span>
+      <span class="context-menu-label">Copy as HTML</span>
     </div>
     <div class="context-menu-item" data-action="copy-co-authors">
       <span class="context-menu-icon">👥</span>
@@ -2874,6 +2968,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitMarkdown', hash: commit.hash });
       } else if (action === 'copy-json') {
         vscode.postMessage({ type: 'copyCommitJson', hash: commit.hash });
+      } else if (action === 'copy-html') {
+        vscode.postMessage({ type: 'copyCommitHtml', hash: commit.hash });
       } else if (action === 'copy-co-authors') {
         vscode.postMessage({ type: 'copyCoAuthors', hash: commit.hash });
       } else if (action === 'copy-commit-date') {
@@ -3478,6 +3574,29 @@ function handleCopyDiffStatSummary() {
   });
 }
 
+function handleCopyFilesChangedCount() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy files changed count');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyFilesChangedCount',
+    hash: targetCommit.hash
+  });
+}
+
 function handleCopyCommitWithStats() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -3540,6 +3659,18 @@ function handleCopyFilterQuery() {
     pathFilter: pathFilter
   };
   vscode.postMessage({ type: 'copyFilterQuery', filterState });
+}
+
+function handleCopyFilterAsGitLogCommand() {
+  const filterState = {
+    query: searchInput.value,
+    hideMergeCommits: hideMergeCommits,
+    sortMode: sortMode,
+    showMyCommitsOnly: showMyCommitsOnly,
+    regexSearchEnabled: regexSearchEnabled,
+    pathFilter: pathFilter
+  };
+  vscode.postMessage({ type: 'copyFilterAsGitLogCommand', filterState });
 }
 
 function handlePasteFilterQuery() {
@@ -3688,6 +3819,29 @@ function handleCopyJson() {
 
   vscode.postMessage({
     type: 'copyCommitJson',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyHtml() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy as HTML');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitHtml',
     hash: targetCommit.hash
   });
 }
@@ -3989,6 +4143,30 @@ function handleCopySelectedCherryPickCommands() {
   }
 }
 
+function handleCopyAllFilePermalinks() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Get target commit from focused or selected
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  } else if (selectedCommits.size > 0) {
+    // Use first selected commit for multi-select
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy all file permalinks');
+    return;
+  }
+
+  vscode.postMessage({ type: 'copyAllFilePermalinks', hash: targetCommit.hash });
+}
+
 function handleCopyAllFilteredHashes() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   if (displayCommits.length === 0) {
@@ -4080,6 +4258,11 @@ function showExportFormatDialog(commitsToExport) {
             <span class="export-option-icon">📄</span>
             <span class="export-option-label">Plain Text</span>
             <span class="export-option-desc">Simple, readable commit list</span>
+          </button>
+          <button class="export-option-btn" data-format="prdescription">
+            <span class="export-option-icon">🔀</span>
+            <span class="export-option-label">PR Description</span>
+            <span class="export-option-desc">Pull request format with summary and checklist</span>
           </button>
           <button class="export-option-btn${mboxDisabled ? ' disabled' : ''}" data-format="mbox" ${mboxDisabled ? 'disabled' : ''} title="${mboxDisabled ? 'Select 2+ commits to enable' : 'Export as mbox for email/git am'}">
             <span class="export-option-icon">📧</span>
@@ -4430,6 +4613,7 @@ function showKeyboardHelpDialog() {
     {
       category: 'Navigation',
       items: [
+        { keys: [cmdKey, 'L'], description: 'Focus commit list for navigation' },
         { keys: ['↑', '↓'], description: 'Navigate up/down through commits' },
         { keys: ['Home'], description: 'Jump to first commit' },
         { keys: ['End'], description: 'Jump to last commit' },
@@ -4467,7 +4651,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' },
         { keys: [cmdKey, 'Shift', '3'], description: 'Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A)' },
         { keys: [cmdKey, altKey, 'T'], description: 'Toggle commit graph' },
-        { keys: [cmdKey, 'Shift', 'Alt', 'S'], description: 'Toggle GPG signatures' }
+        { keys: [cmdKey, 'Shift', 'Alt', 'S'], description: 'Toggle GPG signatures' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'T'], description: 'Toggle stats column' }
       ]
     },
     {
@@ -4510,15 +4695,24 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Alt', 'W'], description: 'Copy commit message with stats' },
         { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
         { keys: [cmdKey, 'Shift', '4'], description: 'Paste filter query from clipboard' },
+        { keys: [cmdKey, 'Alt', 'Shift', 'L'], description: 'Copy filter as git log command' },
         { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
         { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'N'], description: 'Copy file basename (without extension)' },
         { keys: [cmdKey, 'Alt', 'E'], description: 'Copy file extension' },
         { keys: [cmdKey, 'Alt', 'K'], description: 'Copy file directory' },
         { keys: [cmdKey, 'Alt', 'L'], description: 'Copy relative path' },
         { keys: [cmdKey, 'Shift', '@'], description: 'Copy as platform mention (owner/repo@hash)' },
         { keys: [cmdKey, 'Shift', ']'], description: 'Copy commit reference (refs/commit/<hash>)' },
         { keys: [cmdKey, 'Alt', 'Shift', 'U'], description: 'Copy file permalink' },
-        { keys: [cmdKey, 'Alt', 'G'], description: 'Copy as Git Describe' }
+        { keys: [cmdKey, 'Shift', 'Alt', 'U'], description: 'Copy all file permalinks' },
+        { keys: [cmdKey, 'Alt', 'G'], description: 'Copy as Git Describe' },
+        { keys: [cmdKey, 'Alt', 'Shift', 'V'], description: 'Copy git show command for file' },
+        { keys: [cmdKey, 'Alt', 'A'], description: 'Copy committer email' },
+        { keys: [cmdKey, 'Alt', 'N'], description: 'Copy committer name' },
+        { keys: [cmdKey, 'Alt', 'H'], description: 'Copy commit as HTML' },
+        { keys: [cmdKey, 'Alt', 'F'], description: 'Copy file diff' },
+        { keys: [cmdKey, 'Alt', 'C'], description: 'Copy file content' }
       ]
     },
     {
@@ -4531,7 +4725,11 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '1'], description: 'Load filter preset' },
         { keys: [cmdKey, 'K', cmdKey, 'O'], description: 'Open commit URL in browser' },
         { keys: [cmdKey, 'K', cmdKey, 'P'], description: 'Open file URL in browser' },
-        { keys: [cmdKey, 'Alt', 'X'], description: 'Delete local branch' }
+        { keys: [cmdKey, 'Alt', 'X'], description: 'Delete local branch' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'B'], description: 'Create branch' },
+        { keys: [cmdKey, 'Alt', 'I'], description: 'Create tag' },
+        { keys: [cmdKey, 'Alt', '.'], description: 'Delete tag' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'E'], description: 'Export commits as mbox' }
       ]
     }
   ];
@@ -4667,6 +4865,14 @@ function handleCopyFileName() {
     return;
   }
   vscode.postMessage({ type: 'copyFileName', filePath: selectedFile });
+}
+
+function handleCopyFileBasename() {
+  if (!selectedFile) {
+    showError('Select a file to copy its basename');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFileBasename', filePath: selectedFile });
 }
 
 function handleCopyExtension() {
@@ -4904,7 +5110,53 @@ function savePreset(name) {
 
 function showPresetDropdown() {
   presetDropdownVisible = !presetDropdownVisible;
+  if (presetDropdownVisible && savedPresets.length > 0) {
+    focusedPresetIndex = 0; // Focus first preset when dropdown opens
+  }
   renderPresetDropdown();
+  if (presetDropdownVisible) {
+    // Add keyboard navigation handler
+    document.addEventListener('keydown', handlePresetDropdownKeydown);
+  } else {
+    document.removeEventListener('keydown', handlePresetDropdownKeydown);
+  }
+}
+
+function handlePresetDropdownKeydown(e) {
+  if (!presetDropdownVisible || savedPresets.length === 0) {
+    return;
+  }
+
+  // Handle arrow key navigation
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    focusedPresetIndex = (focusedPresetIndex + 1) % savedPresets.length;
+    renderPresetDropdown();
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    focusedPresetIndex = (focusedPresetIndex - 1 + savedPresets.length) % savedPresets.length;
+    renderPresetDropdown();
+  } else if (e.key === 'Enter') {
+    // Load the focused preset
+    e.preventDefault();
+    if (focusedPresetIndex >= 0 && focusedPresetIndex < savedPresets.length) {
+      loadPreset(savedPresets[focusedPresetIndex]);
+      presetDropdownVisible = false;
+      renderPresetDropdown();
+      document.removeEventListener('keydown', handlePresetDropdownKeydown);
+    }
+  } else if (e.key === 'F2') {
+    // Rename the focused preset
+    e.preventDefault();
+    if (focusedPresetIndex >= 0 && focusedPresetIndex < savedPresets.length) {
+      renamePreset(savedPresets[focusedPresetIndex].name);
+    }
+  } else if (e.key === 'Escape') {
+    // Close dropdown
+    presetDropdownVisible = false;
+    renderPresetDropdown();
+    document.removeEventListener('keydown', handlePresetDropdownKeydown);
+  }
 }
 
 function loadPreset(preset) {
@@ -4920,6 +5172,69 @@ function deletePreset(name) {
   vscode.postMessage({
     type: 'deleteFilterPreset',
     name: name
+  });
+}
+
+function renamePreset(oldName) {
+  const modal = document.createElement('div');
+  modal.className = 'preset-save-modal';
+  modal.innerHTML = `
+    <div class="preset-save-content">
+      <h3>Rename Preset</h3>
+      <input type="text" id="rename-preset-input" class="preset-save-input" value="${escapeHtml(oldName)}" maxlength="50">
+      <div class="preset-save-buttons">
+        <button id="rename-preset-cancel" class="preset-save-btn preset-save-cancel">Cancel</button>
+        <button id="rename-preset-save" class="preset-save-btn preset-save-confirm">Rename</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const input = modal.querySelector('#rename-preset-input');
+  const cancelBtn = modal.querySelector('#rename-preset-cancel');
+  const saveBtn = modal.querySelector('#rename-preset-save');
+
+  // Select all text for easy replacement
+  input.focus();
+  input.select();
+
+  // Handle Enter key
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const newName = input.value.trim();
+      if (newName && newName !== oldName) {
+        vscode.postMessage({
+          type: 'renameFilterPreset',
+          oldName: oldName,
+          newName: newName
+        });
+      }
+      modal.remove();
+    } else if (e.key === 'Escape') {
+      modal.remove();
+    }
+  });
+
+  // Handle buttons
+  cancelBtn.addEventListener('click', () => modal.remove());
+  saveBtn.addEventListener('click', () => {
+    const newName = input.value.trim();
+    if (newName && newName !== oldName) {
+      vscode.postMessage({
+        type: 'renameFilterPreset',
+        oldName: oldName,
+        newName: newName
+      });
+    }
+    modal.remove();
+  });
+
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
   });
 }
 
@@ -4946,9 +5261,12 @@ function renderPresetDropdown() {
   if (savedPresets.length === 0) {
     dropdown.innerHTML = '<div class="preset-dropdown-empty">No saved presets</div>';
   } else {
-    savedPresets.forEach(preset => {
+    savedPresets.forEach((preset, index) => {
       const item = document.createElement('div');
       item.className = 'preset-dropdown-item';
+      if (index === focusedPresetIndex) {
+        item.classList.add('focused');
+      }
 
       const summary = getPresetSummary(preset);
       const content = document.createElement('div');
@@ -4967,7 +5285,17 @@ function renderPresetDropdown() {
         deletePreset(preset.name);
       });
 
+      const renameBtn = document.createElement('button');
+      renameBtn.className = 'preset-rename-btn';
+      renameBtn.innerHTML = '✎';
+      renameBtn.title = 'Rename preset';
+      renameBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renamePreset(preset.name);
+      });
+
       item.appendChild(content);
+      item.appendChild(renameBtn);
       item.appendChild(deleteBtn);
       item.addEventListener('click', () => loadPreset(preset));
 

@@ -280,6 +280,7 @@ export class GitHistoryPanel {
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
       <button id="graph-toggle-btn" class="graph-toggle-btn active" title="Graph visible (click to hide)">Graph</button>
       <button id="signatures-toggle-btn" class="signatures-toggle-btn active" title="GPG signatures visible (click to hide)">Signatures</button>
+      <button id="stats-toggle-btn" class="stats-toggle-btn active" title="Stats visible (click to hide)">Stats</button>
       <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>
       <button id="export-btn" class="export-btn" title="Export filtered commits (Ctrl+Shift+O)">Export</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>

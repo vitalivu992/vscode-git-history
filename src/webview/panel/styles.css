@@ -197,6 +197,29 @@ body {
   border-color: var(--vscode-button-background);
 }
 
+/* Stats column toggle button */
+.stats-toggle-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--vscode-border-color);
+  border-radius: 4px;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  transition: background-color 0.1s, border-color 0.1s;
+}
+
+.stats-toggle-btn:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.stats-toggle-btn.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--vscode-button-background);
+}
+
 /* My commits toggle button */
 .my-commits-btn {
   padding: 4px 10px;
@@ -2161,6 +2184,11 @@ body {
   background-color: var(--vscode-list-hoverBackground);
 }
 
+.preset-dropdown-item.focused {
+  background-color: var(--vscode-list-activeSelectionBackground);
+  outline: 1px solid var(--vscode-focusBorder);
+}
+
 .preset-item-content {
   flex: 1;
   min-width: 0;
@@ -2199,6 +2227,21 @@ body {
 
 .preset-delete-btn:hover {
   background-color: var(--vscode-errorBackground);
+}
+
+.preset-rename-btn {
+  background: transparent;
+  border: none;
+  color: var(--vscode-editor-foreground);
+  font-size: 14px;
+  padding: 2px 6px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.preset-rename-btn:hover {
+  opacity: 1;
 }
 
 /* ─── Quick Date Filter Buttons ────────────────────────────────────────────────── */
