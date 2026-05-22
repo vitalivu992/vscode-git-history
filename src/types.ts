@@ -106,6 +106,7 @@ export type WebviewAction =
   | 'copyCommitUrl'
   | 'copyCommitStats'
   | 'copyFileStats'
+  | 'copyFilesChangedCount'
   | 'copyBranchName'
   | 'copyBranchUrl'
   | 'copyRemoteUrl'
@@ -126,6 +127,7 @@ export type WebviewAction =
   | 'copyCommitBody'
   | 'copyCommitMarkdown'
   | 'copyCommitJson'
+  | 'copyCommitHtml'
   | 'copyFileContent'
   | 'copyDescribe'
   | 'copyFileName'
@@ -162,8 +164,10 @@ export type WebviewAction =
   | 'openFileUrl'
   | 'saveFilterPreset'
   | 'loadFilterPreset'
+  | 'renameFilterPreset'
   | 'toggleGraph'
   | 'toggleSignatures'
+  | 'toggleStats'
   | 'copyAllFilteredHashes'
   | 'copyCommitterEmail'
   | 'copyCommitterName'
@@ -175,7 +179,11 @@ export type WebviewAction =
   | 'jumpToNextCommitWithStats'
   | 'jumpToPreviousCommitWithStats'
   | 'cycleDiffContextLines'
-  | 'cycleSortMode';
+  | 'cycleSortMode'
+  | 'copyAllFilePermalinks'
+  | 'copyFilterAsGitLogCommand'
+  | 'copyFileBasename'
+  | 'focusCommitList';
 
 /**
  * Filter state for copy filter query feature
@@ -241,6 +249,7 @@ export type WebviewToExtMessage =
   | { type: 'copyFilePath'; filePath: string }
   | { type: 'copyFileName'; filePath: string }
   | { type: 'copyFileExtension'; filePath: string }
+  | { type: 'copyFileBasename'; filePath: string }
   | { type: 'copyFileDirectory'; filePath: string }
   | { type: 'copyRelativePath'; filePath: string }
   | { type: 'openFileAtCommit'; hash: string; filePath: string }
@@ -248,6 +257,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitUrl'; hash: string }
   | { type: 'copyCommitStats'; hash: string }
   | { type: 'copyFileStats'; hash: string }
+  | { type: 'copyFilesChangedCount'; hash: string }
   | { type: 'copyBranchName' }
   | { type: 'copyBranchUrl' }
   | { type: 'copyRemoteUrl' }
@@ -273,6 +283,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitBody'; hash: string }
   | { type: 'copyCommitMarkdown'; hash: string }
   | { type: 'copyCommitJson'; hash: string }
+  | { type: 'copyCommitHtml'; hash: string }
   | { type: 'copyFileContent'; hash: string; filePath: string }
   | { type: 'copyDescribe'; hash: string }
   | { type: 'copyFileDiff'; hash: string; filePath: string }
@@ -282,7 +293,7 @@ export type WebviewToExtMessage =
   | { type: 'deleteTag'; hash: string }
   | { type: 'deleteBranch'; branch: string; force?: boolean }
   | { type: 'saveSettings'; settings: Partial<UserSettings> }
-  | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown' | 'text'; commits: CommitInfo[] }
+  | { type: 'exportCommits'; format: 'json' | 'csv' | 'markdown' | 'text' | 'prdescription'; commits: CommitInfo[] }
   | { type: 'exportCommitsMbox'; fromHash: string; toHash: string }
   | { type: 'requestBranchHashes'; branches: string[] }
   | { type: 'checkoutBranch'; branch: string }
@@ -299,6 +310,10 @@ export type WebviewToExtMessage =
   | { type: 'openFileUrl'; hash: string; filePath: string }
   | { type: 'saveFilterPreset'; name: string; filterState: FilterQueryState }
   | { type: 'deleteFilterPreset'; name: string }
+  | { type: 'renameFilterPreset'; oldName: string; newName: string }
   | { type: 'getFilterPresets' }
   | { type: 'applyPreset'; presetName: string }
-  | { type: 'copyAllFilteredHashes'; hashes: string[] };
+  | { type: 'copyAllFilteredHashes'; hashes: string[] }
+  | { type: 'copyAllFilePermalinks'; hash: string }
+  | { type: 'copyFilterAsGitLogCommand'; filterState: FilterQueryState }
+  | { type: 'focusCommitList' };

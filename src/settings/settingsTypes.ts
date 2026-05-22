@@ -22,6 +22,8 @@ export interface UserSettings {
   showGraph: boolean;
   /** Whether to show GPG signature verification badges */
   showSignatures: boolean;
+  /** Whether to show the stats column */
+  showStats: boolean;
   /** Saved search query for persistence across sessions */
   searchQuery: string;
 }
@@ -40,6 +42,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   diffContextLines: 3,
   showGraph: true,
   showSignatures: true,
+  showStats: true,
   searchQuery: ''
 };
 
