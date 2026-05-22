@@ -153,6 +153,10 @@ export async function handleMessage(
       handleCopyDiffStatSummary(message.hash, panel);
       break;
 
+    case 'copyFilesChangedCount':
+      handleCopyFilesChangedCount(message.hash, panel);
+      break;
+
     case 'copyCoAuthors':
       handleCopyCoAuthors(message.hash, panel);
       break;
@@ -185,6 +189,10 @@ export async function handleMessage(
       handleCopyCommitJson(message.hash, panel);
       break;
 
+    case 'copyCommitHtml':
+      handleCopyCommitHtml(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -215,6 +223,10 @@ export async function handleMessage(
 
     case 'copyFileExtension':
       handleCopyFileExtension(message.filePath, panel);
+      break;
+
+    case 'copyFileBasename':
+      handleCopyFileBasename(message.filePath, panel);
       break;
 
     case 'copyFileDirectory':
@@ -326,12 +338,24 @@ export async function handleMessage(
       await handleDeleteFilterPreset(message.name, panel);
       break;
 
+    case 'renameFilterPreset':
+      await handleRenameFilterPreset(message.oldName, message.newName, panel);
+      break;
+
     case 'getFilterPresets':
       await handleGetFilterPresets(panel);
       break;
 
     case 'applyPreset':
       await handleApplyPreset(message.presetName, panel);
+      break;
+
+    case 'copyAllFilePermalinks':
+      await handleCopyAllFilePermalinks(message.hash, panel);
+      break;
+
+    case 'copyFilterAsGitLogCommand':
+      handleCopyFilterAsGitLogCommand(message.filterState, panel);
       break;
 
     default:
@@ -655,6 +679,17 @@ function handleCopyFileName(filePath: string, _panel: GitHistoryPanel): void {
   });
 }
 
+function handleCopyFileBasename(filePath: string, _panel: GitHistoryPanel): void {
+  const fileName = path.basename(filePath);
+  const ext = path.extname(filePath);
+  // Remove the extension from the filename if it exists
+  const basename = ext ? fileName.replace(new RegExp(ext.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'), '') : fileName;
+
+  void vscode.env.clipboard.writeText(basename).then(() => {
+    void vscode.window.showInformationMessage(`Copied basename: ${basename}`);
+  });
+}
+
 function handleCopyFileExtension(filePath: string, _panel: GitHistoryPanel): void {
   const ext = path.extname(filePath).replace(/^\./, ''); // Remove leading dot
   const displayExt = ext || 'no extension';
@@ -967,6 +1002,70 @@ export function formatCommitsAsMarkdown(commits: CommitInfo[]): string {
 }
 
 /**
+ * Format commits as PR description
+ * Structured Markdown suitable for pull request descriptions
+ */
+export function formatCommitsAsPrDescription(commits: CommitInfo[]): string {
+  const lines: string[] = [];
+
+  // Calculate aggregate stats
+  let totalFilesChanged = 0;
+  let totalInsertions = 0;
+  let totalDeletions = 0;
+  for (const commit of commits) {
+    if (commit.stats) {
+      totalFilesChanged += commit.stats.filesChanged;
+      totalInsertions += commit.stats.insertions;
+      totalDeletions += commit.stats.deletions;
+    }
+  }
+
+  // Summary section
+  lines.push('## Summary');
+  if (commits.length === 1) {
+    lines.push(`This PR introduces ${commits[0].message}.`);
+  } else {
+    lines.push(`This PR introduces ${commits.length} changes.`);
+  }
+  lines.push('');
+
+  // Changes checklist
+  lines.push('## Changes');
+  for (const commit of commits) {
+    lines.push(`- ${commit.message} (` + '`' + commit.shortHash + '`' + `)`);
+  }
+  lines.push('');
+
+  // Statistics
+  lines.push('## Statistics');
+  lines.push(`- ${commits.length} commit${commits.length !== 1 ? 's' : ''}`);
+  lines.push(`- ${totalFilesChanged} file${totalFilesChanged !== 1 ? 's' : ''} changed`);
+  lines.push(`- ${totalInsertions} insertion${totalInsertions !== 1 ? 's' : ''}(+), ${totalDeletions} deletion${totalDeletions !== 1 ? 's' : ''}(-)`);
+  lines.push('');
+
+  // Commits detail
+  lines.push('## Commits');
+  for (const commit of commits) {
+    lines.push(`### ${commit.message} (` + '`' + commit.shortHash + '`' + `)`);
+    lines.push('');
+    lines.push(`**Author:** ${commit.author} <${commit.email}>`);
+    lines.push(`**Date:** ${commit.date}`);
+    lines.push('');
+
+    if (commit.fullMessage && commit.fullMessage !== commit.message) {
+      const body = commit.fullMessage.replace(commit.message, '').trim();
+      lines.push(body);
+      lines.push('');
+    }
+
+    lines.push('---');
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+/**
  * Format commits as plain text
  * One commit per line: hash - message (author <email>) [+stats]
  */
@@ -991,7 +1090,7 @@ export function formatCommitsAsText(commits: CommitInfo[]): string {
  * Handle export commits to file
  */
 async function handleExportCommits(
-  format: 'json' | 'csv' | 'markdown' | 'text',
+  format: 'json' | 'csv' | 'markdown' | 'text' | 'prdescription',
   commits: CommitInfo[],
   panel: GitHistoryPanel
 ): Promise<void> {
@@ -1013,6 +1112,8 @@ async function handleExportCommits(
       filters = { 'JSON': ['json'] };
     } else if (format === 'csv') {
       filters = { 'CSV': ['csv'] };
+    } else if (format === 'prdescription') {
+      filters = { 'Markdown': ['md'] };
     }
 
     const uri = await vscode.window.showSaveDialog({
@@ -1030,6 +1131,8 @@ async function handleExportCommits(
       ? formatCommitsAsCsv(commits)
       : format === 'text'
       ? formatCommitsAsText(commits)
+      : format === 'prdescription'
+      ? formatCommitsAsPrDescription(commits)
       : formatCommitsAsMarkdown(commits);
 
     await fs.promises.writeFile(uri.fsPath, content, 'utf-8');
@@ -1211,6 +1314,27 @@ function handleCopyDiffStatSummary(hash: string, panel: GitHistoryPanel): void {
 
   void vscode.env.clipboard.writeText(copyText).then(() => {
     void vscode.window.showInformationMessage(`Diff stat summary copied: ${stats.filesChanged} ${filesWord}, +${stats.insertions}, -${stats.deletions}`);
+  });
+}
+
+function handleCopyFilesChangedCount(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  if (!commit.stats) {
+    void vscode.window.showInformationMessage('No statistics available for this commit');
+    return;
+  }
+
+  const { stats } = commit;
+  const filesWord = stats.filesChanged === 1 ? 'file' : 'files';
+  const copyText = `${stats.filesChanged} ${filesWord}`;
+
+  void vscode.env.clipboard.writeText(copyText).then(() => {
+    void vscode.window.showInformationMessage(`Files changed count copied: ${copyText}`);
   });
 }
 
@@ -1675,6 +1799,78 @@ function handleCopyCommitJson(hash: string, panel: GitHistoryPanel): void {
   });
 }
 
+export function formatCommitAsHtml(commit: CommitInfo): string {
+  const date = new Date(commit.date);
+  const isoDate = date.toISOString();
+  const localeDate = date.toLocaleString();
+  const escapedSubject = commit.message
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  const escapedAuthor = commit.author
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  let html = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; background: #f9f9f9;">\n`;
+  html += `  <h2 style="margin: 0 0 8px 0; color: #333;">${escapedSubject}</h2>\n`;
+  html += `  <p style="margin: 4px 0; color: #666; font-size: 14px;">\n`;
+  html += `    <strong>Hash:</strong> <code style="background: #e0e0e0; padding: 2px 6px; border-radius: 4px;">${commit.hash.substring(0, 7)}</code>\n`;
+  html += `  </p>\n`;
+  html += `  <p style="margin: 4px 0; color: #666; font-size: 14px;">\n`;
+  html += `    <strong>Author:</strong> ${escapedAuthor} <span style="color: #888;">&lt;${commit.email}&gt;</span>\n`;
+  html += `  </p>\n`;
+  html += `  <p style="margin: 4px 0; color: #666; font-size: 14px;" title="${isoDate}">\n`;
+  html += `    <strong>Date:</strong> ${localeDate}\n`;
+  html += `  </p>\n`;
+
+  if (commit.stats) {
+    const filesText = commit.stats.filesChanged === 1 ? 'file' : 'files';
+    html += `  <p style="margin: 8px 0; color: #666; font-size: 14px;">\n`;
+    html += `    <strong>Stats:</strong> ${commit.stats.filesChanged} ${filesText} changed, <span style="color: #2e7d32;">+${commit.stats.insertions}</span>, <span style="color: #c62828;">-${commit.stats.deletions}</span>\n`;
+    html += `  </p>\n`;
+  }
+
+  if (commit.tags && commit.tags.length > 0) {
+    html += `  <p style="margin: 4px 0; color: #666; font-size: 14px;">\n`;
+    html += `    <strong>Tags:</strong> ${commit.tags.map(t => `<span style="background: #e3f2fd; color: #1565c0; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${t}</span>`).join(' ')}\n`;
+    html += `  </p>\n`;
+  }
+
+  if (commit.fullMessage && commit.fullMessage !== commit.message) {
+    const body = commit.fullMessage.replace(commit.message, '').trim();
+    if (body) {
+      const escapedBody = body
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>\n');
+      html += `  <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 8px 0;">\n`;
+      html += `  <p style="margin: 8px 0 0 0; color: #444; font-size: 14px;">${escapedBody}</p>\n`;
+    }
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function handleCopyCommitHtml(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const html = formatCommitAsHtml(commit);
+  void vscode.env.clipboard.writeText(html).then(() => {
+    const shortMsg = commit.message.length > 30
+      ? commit.message.substring(0, 27) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied as HTML: ${commit.shortHash} ${shortMsg}`);
+  });
+}
+
 /**
  * Handle copy selected hashes to clipboard
  */
@@ -1727,6 +1923,114 @@ function handleCopyFilterQuery(filterState: FilterQueryState, panel: GitHistoryP
   const formatted = JSON.stringify(filterState);
   void vscode.env.clipboard.writeText(formatted).then(() => {
     void vscode.window.showInformationMessage('Filter query copied to clipboard');
+  });
+}
+
+/**
+ * Build a git log command from filter state.
+ * Maps UI filter state to equivalent git log arguments.
+ */
+export function buildGitLogCommand(filterState: FilterQueryState): string {
+  const parts = ['git log'];
+
+  parts.push('--format="%H %P %an %ae %cn %ce %at %s %b %d %G? %GS"');
+
+  // Parse the query for special filters
+  const query = filterState.query || '';
+  let textQuery = query;
+
+  // Extract date filters
+  const afterMatch = textQuery.match(/\bafter:(\S+)/i);
+  const beforeMatch = textQuery.match(/\bbefore:(\S+)/i);
+  const lastMatch = textQuery.match(/\blast:(\d+)(days?|weeks?|months?)/i);
+  const authorMatch = textQuery.match(/\bauthor:(\S+)/i);
+  const tagMatch = textQuery.match(/\btag:(\S+)/i);
+  const branchMatch = textQuery.match(/\bbranch:(\S+)/i);
+
+  // Remove special filters from text query
+  textQuery = textQuery
+    .replace(/\bafter:\S+/gi, '')
+    .replace(/\bbefore:\S+/gi, '')
+    .replace(/\blast:\S+/gi, '')
+    .replace(/\bauthor:\S+/gi, '')
+    .replace(/\btag:\S+/gi, '')
+    .replace(/\bbranch:\S+/gi, '')
+    .trim();
+
+  // Text search → --grep
+  if (textQuery) {
+    if (filterState.regexSearchEnabled) {
+      parts.push(`--grep="${textQuery}" -E`);
+    } else {
+      parts.push(`--grep="${textQuery}"`);
+    }
+  }
+
+  // Author filter → --author
+  if (authorMatch) {
+    parts.push(`--author="${authorMatch[1]}"`);
+  }
+
+  // Show my commits only → --author with current user (handled in webview, but include author info)
+  if (filterState.showMyCommitsOnly && !authorMatch) {
+    // The webview doesn't have the user info, but we add a comment
+    parts.push('--author="<your-email>"');
+  }
+
+  // Date filters
+  if (afterMatch) {
+    parts.push(`--after="${afterMatch[1]}"`);
+  }
+  if (beforeMatch) {
+    parts.push(`--before="${beforeMatch[1]}"`);
+  }
+  if (lastMatch) {
+    const count = parseInt(lastMatch[1], 10);
+    const unit = lastMatch[2].toLowerCase();
+    const unitMap: Record<string, string> = { day: 'days', days: 'days', week: 'weeks', weeks: 'weeks', month: 'months', months: 'months' };
+    const resolvedUnit = unitMap[unit] || unit;
+    parts.push(`--after="${count} ${resolvedUnit} ago"`);
+  }
+
+  // Tag filter → note: git log doesn't have a native tag filter, use --grep on tag
+  if (tagMatch) {
+    // git log can filter by tag with --decorate-refs but that's complex;
+    // best approximation is a note
+    parts.push(`# tag filter: ${tagMatch[1]} (use "git tag -l '*${tagMatch[1]}*'" to list matching tags)`);
+  }
+
+  // Branch filter → note about branch
+  if (branchMatch) {
+    parts.push(`# branch filter: ${branchMatch[1]}`);
+  }
+
+  // Hide merge commits → --no-merges
+  if (filterState.hideMergeCommits) {
+    parts.push('--no-merges');
+  }
+
+  // Path filter → -- <path>
+  if (filterState.pathFilter) {
+    parts.push(`-- "${filterState.pathFilter}"`);
+  }
+
+  // Sort mode
+  if (filterState.sortMode === 1) {
+    // Oldest first - reverse of default
+    parts.push('--reverse');
+  }
+  // sortMode 2 and 3 are author-based sorts which git log doesn't support natively
+
+  return parts.join(' ');
+}
+
+/**
+ * Handle copy filter as git log command to clipboard
+ */
+function handleCopyFilterAsGitLogCommand(filterState: FilterQueryState, _panel: GitHistoryPanel): void {
+  const command = buildGitLogCommand(filterState);
+  void vscode.env.clipboard.writeText(command).then(() => {
+    void vscode.window.showInformationMessage('Git log command copied to clipboard');
   });
 }
 
@@ -2219,6 +2523,62 @@ async function handleDeleteFilterPreset(name: string, panel: GitHistoryPanel): P
 }
 
 /**
+ * Handle rename filter preset
+ */
+async function handleRenameFilterPreset(oldName: string, newName: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const context = panel.getContext();
+    const existingPresets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
+
+    // Find the preset being renamed (case-insensitive)
+    const presetToRename = existingPresets.find(p => p.name.toLowerCase() === oldName.toLowerCase());
+    if (!presetToRename) {
+      void vscode.window.showInformationMessage(`Preset "${oldName}" not found`);
+      return;
+    }
+
+    // Check if new name is the same as old name (case-insensitive)
+    if (oldName.toLowerCase() === newName.toLowerCase()) {
+      // No change needed, silently return
+      return;
+    }
+
+    // Validate new name (excluding the preset being renamed from duplicate check)
+    const otherPresets = existingPresets.filter(p => p.name.toLowerCase() !== oldName.toLowerCase());
+    const validation = validatePresetName(newName, otherPresets);
+    if (!validation.valid) {
+      void vscode.window.showWarningMessage(validation.error || 'Invalid preset name');
+      return;
+    }
+
+    // Create updated preset with new name and original createdAt
+    const updatedPreset: SavedFilterPreset = {
+      ...presetToRename,
+      name: newName.trim()
+    };
+
+    // Update presets array
+    const updatedPresets = existingPresets.map(p =>
+      p.name.toLowerCase() === oldName.toLowerCase() ? updatedPreset : p
+    );
+
+    await context.globalState.update(SAVED_PRESETS_STORAGE_KEY, updatedPresets);
+
+    // Send updated presets to webview
+    panel.postMessage({
+      type: 'filterPresets',
+      presets: updatedPresets
+    });
+
+    void vscode.window.showInformationMessage(`Renamed preset "${oldName}" to "${newName}"`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to rename preset: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
  * Handle get filter presets
  */
 async function handleGetFilterPresets(panel: GitHistoryPanel): Promise<void> {
@@ -2261,6 +2621,50 @@ async function handleApplyPreset(presetName: string, panel: GitHistoryPanel): Pr
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to apply preset: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle copy all file permalinks to clipboard
+ * Copies newline-separated permalinks for all files changed in a commit
+ */
+async function handleCopyAllFilePermalinks(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const commit = panel.getCommits().find(c => c.hash === hash);
+    if (!commit) {
+      void vscode.window.showInformationMessage('Commit not found');
+      return;
+    }
+
+    const cwd = panel.getCwd();
+    const files = await getCommitFiles(hash, cwd);
+
+    if (files.length === 0) {
+      void vscode.window.showInformationMessage('No files changed in this commit');
+      return;
+    }
+
+    // Generate permalinks for each file
+    const permalinks: string[] = [];
+    for (const file of files) {
+      const fileUrl = await getFileUrl(file.path, hash, cwd);
+      if (fileUrl) {
+        permalinks.push(fileUrl);
+      }
+    }
+
+    if (permalinks.length === 0) {
+      void vscode.window.showInformationMessage('Unable to generate file permalinks. No remote configured?');
+      return;
+    }
+
+    const copyText = permalinks.join('\n');
+    await vscode.env.clipboard.writeText(copyText);
+    void vscode.window.showInformationMessage(`Copied ${permalinks.length} file permalink${permalinks.length > 1 ? 's' : ''}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy file permalinks: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
