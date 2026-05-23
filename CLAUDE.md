@@ -162,7 +162,7 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Sort Toggle**: The sort button in the toolbar cycles through four sort modes: newest-first (default), oldest-first, author A-Z, and author Z-A. The state is tracked as `sortMode` (0–3) in `src/webview/panel/main.js`. When toggled, `getOrderedCommits()` applies the appropriate sort: `slice()` for newest, `reverse()` for oldest, and `localeCompare` on `author` for A-Z/Z-A. The `updateSortButton()` helper updates the button label and active state. The commit graph is hidden for author-based modes (modes 2 and 3) because the graph layout algorithm assumes date-based ordering. The graph header visibility is controlled by `effectiveShowGraph` (true only when `showGraph` is enabled AND `sortMode < 2`). Also accessible via `Ctrl+Shift+3` / `Cmd+Shift+3` (registered as `gitHistory.cycleSortMode`). The `sortMode` setting is persisted in `UserSettings` (previously `sortOldestFirst: boolean`, migrated on load in `settingsService.ts`).
 
-- **Keyboard Navigation**: The commit list supports full keyboard navigation for accessibility and power users. Arrow keys (`↑`/`↓`) move focus between commits with wrapping support. `Home`/`End` jump to first/last commit. `Enter` selects the focused commit, while `Ctrl+Enter` toggles multi-selection. `Ctrl+A` / `Cmd+A` selects all visible commits in the current view, useful for bulk operations like exporting or copying all hashes. `/` or `Ctrl+F` focuses the search input. `Escape` clears selection and removes focus. The focused row has a distinct visual outline using the `focused` CSS class (separate from the `selected` class used for commit selection). Implementation spans `src/webview/panel/main.js` (`handleKeyDown`, `updateFocusedRow`, `scrollFocusedIntoView` functions) and `src/webview/panel/styles.css` (`.focused` class styling).
+- **Keyboard Navigation**: The commit list supports full keyboard navigation for accessibility and power users. Arrow keys (`↑`/`↓`) move focus between commits with wrapping support. `Home`/`End` jump to first/last commit. `PageUp`/`PageDown` navigate up or down by 10 commits at a time, providing faster navigation through large commit histories. The page size is fixed at 10 commits for consistent behavior, and PageUp/PageDown respects all active filters while stopping at boundaries (unlike arrow keys which wrap). `Enter` selects the focused commit, while `Ctrl+Enter` toggles multi-selection. `Ctrl+A` / `Cmd+A` selects all visible commits in the current view, useful for bulk operations like exporting or copying all hashes. `/` or `Ctrl+F` focuses the search input. `Escape` clears selection and removes focus. The focused row has a distinct visual outline using the `focused` CSS class (separate from the `selected` class used for commit selection). Implementation spans `src/webview/panel/main.js` (`handleKeyDown`, `updateFocusedRow`, `scrollFocusedIntoView` functions) and `src/webview/panel/styles.css` (`.focused` class styling).
 
 - **Focus Commit List**: Press `Ctrl+L` / `Cmd+L` to quickly focus the first visible commit in the list for keyboard navigation. This is useful when you want to start navigating commits with arrow keys without having to click on a commit first. The shortcut sets `focusedIndex` to 0, applies the `.focused` CSS class via `updateFocusedRow()`, and scrolls the focused commit into view via `scrollFocusedIntoView()`. Works with filters active - focuses the first *visible* commit in the filtered view. If no commits are visible, the function returns silently. The `focusCommitList` webview action is defined in `src/types.ts` and the command is registered in `src/extension.ts` as `gitHistory.focusCommitList`.
 
@@ -294,6 +294,10 @@ The extension detects and displays the current git branch in the history panel:
 
 - **Delete Tag from Commit**: Right-click on any commit that has tags to delete them. If the commit has only one tag, it will be deleted immediately with confirmation. If the commit has multiple tags, a QuickPick dialog appears to select which tag to delete. The extension executes `git tag -d <tagname>` and refreshes the panel to show updated tag badges. The `handleDeleteTag` function in `messageHandler.ts` finds the commit, checks for tags, handles the selection logic (single vs multiple tags), calls `deleteTagFromCommit` from `gitService.ts`, and refreshes the panel via `panel.loadData()`. The feature is available via the commit row right-click context menu with a 🗑️ icon and is only shown when the commit has tags.
 
+- **Cherry-pick Commit**: Right-click on any commit or press `Ctrl+Alt+K` / `Cmd+Alt+K` to cherry-pick it onto the current branch. A confirmation dialog shows the commit hash and message. The extension executes `git cherry-pick <hash>` via the `cherryPickCommit` function in `gitService.ts` and refreshes the panel on success. If conflicts occur, the error message from git is displayed. The `handleCherryPickCommit` function in `messageHandler.ts` manages the confirmation dialog and error handling. The feature is available via the commit row right-click context menu with a 🍒 icon. Also accessible via keyboard shortcut `Ctrl+Alt+K` / `Cmd+Alt+K` (registered as `gitHistory.cherryPickCommit`).
+
+- **Revert Commit**: Right-click on any commit or press `Ctrl+Alt+R` / `Cmd+Alt+R` to revert it. A confirmation dialog shows the commit hash and message. The extension executes `git revert <hash>` via the `revertCommit` function in `gitService.ts` and refreshes the panel on success. If conflicts occur, the error message from git is displayed. The `handleRevertCommit` function in `messageHandler.ts` manages the confirmation dialog and error handling. The feature is available via the commit row right-click context menu with a ↩️ icon. Also accessible via keyboard shortcut `Ctrl+Alt+R` / `Cmd+Alt+R` (registered as `gitHistory.revertCommit`).
+
 - **Export Filtered Commits**: Click the "Export" button or press `Ctrl+Shift+O` / `Cmd+Shift+O` to export the currently filtered commit list to JSON, CSV, Markdown, Plain Text, PR Description, or mbox format. The export dialog shows the number of commits to be exported and offers six format options: JSON (full commit data with stats and tags), CSV (tabular format for spreadsheet analysis), Markdown (changelog format for documentation and release notes), Plain Text (simple, readable commit list with one commit per line: `hash - message (author <email>) [+stats]`), PR Description (structured Markdown with Summary, Changes checklist, Statistics, and Commits detail sections—ideal for pull request descriptions), or mbox (RFC 822 patches for email clients and `git am`, only available when 2+ commits are selected). The export respects all active filters (search, author, tag, date, hide merge commits). The `handleExportCommits` function in `messageHandler.ts` uses `vscode.window.showSaveDialog` for file selection and `fs.promises.writeFile` to write the formatted data. CSV fields are properly escaped for commas, quotes, and newlines. The formatter functions `formatCommitsAsJson`, `formatCommitsAsCsv`, `formatCommitsAsMarkdown`, `formatCommitsAsText`, and `formatCommitsAsPrDescription` are pure functions that can be unit tested independently. The mbox export uses `getCommitsAsMbox` from `gitService.ts` which runs `git format-patch --stdout fromHash^..toHash` and is handled by `handleExportCommitsMbox` in `messageHandler.ts`. The `exportCommitsMbox` message type and webview action are defined in `src/types.ts`.
 
 - **Copy Filter Query**: Press `Ctrl+Shift+5` / `Cmd+Shift+5` or click the "Copy Filter" button next to the search input to copy the current filter state to clipboard. The filter is copied as a JSON string containing the search query and all toggle states (hide merge commits, sort mode, show my commits only, regex mode, path filter). This is useful for sharing search filters, documenting reproducible commit views, or saving filter configurations for later use. Example output: `{"query":"author:alice after:2024-01-01","hideMergeCommits":true,"sortMode":0,"showMyCommitsOnly":true,"regexSearchEnabled":false,"pathFilter":null}`. The `handleCopyFilterQuery` function in `main.js` captures the current filter state and sends a `copyFilterQuery` message. The message is handled by `handleCopyFilterQuery` in `messageHandler.ts` which formats the state as JSON and writes it to `vscode.env.clipboard`. The `copyFilterQuery` message type and `FilterQueryState` interface are defined in `src/types.ts`.
@@ -358,6 +362,7 @@ Unit tests for pure parsing functions are located in:
 - `test/suite/toggleSignatures.test.ts` - Tests for GPG signature toggle webview action
 - `test/suite/toggleRegex.test.ts` - Tests for regex search mode toggle webview action
 - `test/suite/authorAvatarUtils.test.ts` - Tests for `getAuthorColor` and `getAuthorInitials` utility functions in `main.js`
+- `test/suite/parseRemoteUrl.test.ts` - Tests for `parseRemoteUrl` and `detectPlatform` URL parsing functions in `gitService.ts`
 
 These tests validate edge cases in git output parsing and webview action wiring without requiring actual git operations.
 
@@ -397,6 +402,25 @@ The `test/suite/authorAvatarUtils.test.ts` file contains unit tests for author a
 - Case handling: always uppercased output
 
 These functions are reimplemented in TypeScript for testing, following the same pattern as `test/suite/regexSearch.test.ts`. Source verification tests ensure the functions exist in `main.js`.
+
+### Testing URL Parsing
+
+The `test/suite/parseRemoteUrl.test.ts` file contains comprehensive unit tests for URL parsing functions in `src/git/gitService.ts`:
+
+**detectPlatform()** - Detects the git hosting platform from a hostname:
+- All supported platforms (GitHub, GitLab, Bitbucket, Azure DevOps)
+- Self-hosted instances
+- Case insensitivity
+- Unknown platforms
+
+**parseRemoteUrl()** - Parses git remote URLs to extract platform information:
+- SSH format: `git@host:owner/repo.git`
+- SSH URL format: `ssh://git@host:port/owner/repo.git`
+- HTTPS format: `https://host/owner/repo.git`
+- Azure DevOps specific formats
+- Edge cases (invalid formats, empty strings)
+
+These tests ensure URL generation features work correctly across all supported git hosting platforms.
 
 ### Testing SettingsService
 
@@ -541,3 +565,28 @@ The `test/suite/gitParser.test.ts` file contains comprehensive unit tests for pu
 - Edge case status codes (T for type change, U for unmerged)
 - Malformed input handling (missing tabs, incomplete lines)
 - Special characters in file paths
+
+### Testing graphLayout
+
+The `test/suite/graphLayout.test.ts` file contains unit tests for graph visualization functions in `src/webview/panel/graphLayout.js`:
+
+**computeGraphLayout()** - Tests the lane-based algorithm that computes per-row layout data:
+- Empty input returns empty array
+- Single commit with no parents (root)
+- Linear history - single vertical line
+- Merge commits have two parents - produces merge segment
+- Multiple parallel branches
+- Max columns capped at 10
+- Commit with missing parentHashes field (backwards compat)
+- Filtered subset with broken parent chains - no ghost lanes
+
+**simplifyParentsForDisplay()** - Tests parent hash simplification for filtered commit lists:
+- Empty list returns empty array
+- Visible parents are kept as-is
+- Invisible parent replaced with next commit in list
+- Root commit (no original parents) stays a root
+- Last commit with invisible parent becomes a root
+- Partial visibility: keeps only visible parents
+- Does not mutate original commits
+
+These functions are reimplemented in TypeScript for testing, following the same pattern as `authorAvatarUtils.test.ts`. Source verification tests ensure the functions exist in the original JavaScript file.
