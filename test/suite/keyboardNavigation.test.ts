@@ -51,6 +51,22 @@ class KeyboardNavigator {
     this.focusedIndex = maxIndex;
   }
 
+  pageDown(maxIndex: number, pageSize: number = 10): void {
+    if (this.focusedIndex < maxIndex) {
+      this.focusedIndex = Math.min(this.focusedIndex + pageSize, maxIndex);
+    } else {
+      this.focusedIndex = maxIndex;
+    }
+  }
+
+  pageUp(maxIndex: number, pageSize: number = 10): void {
+    if (this.focusedIndex > 0) {
+      this.focusedIndex = Math.max(this.focusedIndex - pageSize, 0);
+    } else {
+      this.focusedIndex = 0;
+    }
+  }
+
   reset(): void {
     this.focusedIndex = -1;
   }
@@ -122,6 +138,68 @@ suite('Keyboard Navigation Logic Tests', () => {
     const navigator = new KeyboardNavigator();
     navigator.goToLast(commits.length - 1);
     assert.strictEqual(navigator.focusedIndex, commits.length - 1);
+  });
+
+  test('PageDown should move down by 10 commits', () => {
+    const navigator = new KeyboardNavigator();
+    navigator.focusedIndex = 0;
+    navigator.pageDown(20); // Assume 21 commits (0-20)
+    assert.strictEqual(navigator.focusedIndex, 10);
+  });
+
+  test('PageDown from last commit stays at last commit', () => {
+    const navigator = new KeyboardNavigator();
+    navigator.goToLast(20);
+    navigator.pageDown(20);
+    assert.strictEqual(navigator.focusedIndex, 20);
+  });
+
+  test('PageDown near end stops at last commit', () => {
+    const navigator = new KeyboardNavigator();
+    navigator.focusedIndex = 15;
+    navigator.pageDown(20); // Only 5 more commits to go
+    assert.strictEqual(navigator.focusedIndex, 20);
+  });
+
+  test('PageUp should move up by 10 commits', () => {
+    const navigator = new KeyboardNavigator();
+    navigator.focusedIndex = 15;
+    navigator.pageUp(20);
+    assert.strictEqual(navigator.focusedIndex, 5);
+  });
+
+  test('PageUp from first commit stays at first commit', () => {
+    const navigator = new KeyboardNavigator();
+    navigator.focusedIndex = 0;
+    navigator.pageUp(20);
+    assert.strictEqual(navigator.focusedIndex, 0);
+  });
+
+  test('PageUp near start stops at first commit', () => {
+    const navigator = new KeyboardNavigator();
+    navigator.focusedIndex = 5;
+    navigator.pageUp(20); // Only 5 commits above
+    assert.strictEqual(navigator.focusedIndex, 0);
+  });
+
+  test('PageUp/PageDown with less than 10 commits handles boundaries', () => {
+    const smallListMax = 3; // Only 4 commits (0-3)
+    const navigator = new KeyboardNavigator();
+    navigator.focusedIndex = 0;
+    navigator.pageDown(smallListMax);
+    assert.strictEqual(navigator.focusedIndex, 3); // Should stop at last
+    navigator.pageUp(smallListMax);
+    assert.strictEqual(navigator.focusedIndex, 0); // Should stop at first
+  });
+
+  test('PageUp/PageDown with filtered commits works correctly', () => {
+    const filtered = getFilteredCommits(commits, 'bob');
+    assert.strictEqual(filtered.length, 1);
+
+    const navigator = new KeyboardNavigator();
+    navigator.pageDown(filtered.length - 1);
+    assert.strictEqual(navigator.focusedIndex, 0);
+    assert.strictEqual(navigator.getFocusedCommit(filtered)?.author, 'Bob');
   });
 
   test('reset should set index to -1', () => {
@@ -291,6 +369,24 @@ suite('Keyboard Navigation Source Verification', () => {
 
     assert.ok(source.includes("case 'End':"),
       'main.js should handle End key');
+  });
+
+  test('main.js should handle PageDown key', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("case 'PageDown':"),
+      'main.js should handle PageDown key');
+  });
+
+  test('main.js should handle PageUp key', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes("case 'PageUp':"),
+      'main.js should handle PageUp key');
   });
 
   test('main.js should handle / key for search focus', () => {
