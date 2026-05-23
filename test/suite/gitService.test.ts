@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, getCommitDescribe, createBranchFromCommit, createTagFromCommit, checkoutBranch, getCommitUrl, getBranchUrl, getFileUrl, getCurrentGitUser, deleteTagFromCommit, getCommitsAsMbox } from '../../src/git/gitService';
+import { getFileHistory, getSelectionHistory, getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getGitRoot, getCurrentBranch, getFileContentAtCommit, getAllBranches, getBranchCommitHashes, parseRemoteUrl, getRemoteUrl, getCommitParentDiff, getCommitPatch, getCommitDescribe, createBranchFromCommit, createTagFromCommit, checkoutBranch, cherryPickCommit, revertCommit, getCommitUrl, getBranchUrl, getFileUrl, getCurrentGitUser, deleteTagFromCommit, getCommitsAsMbox } from '../../src/git/gitService';
 
 suite('Git Service Integration Tests', () => {
   let tempDir: string;
@@ -1608,6 +1608,106 @@ suite('Commit URL Generation Tests', () => {
 
       // Clean up
       execSync('git tag -d existing-tag', { cwd: tagTestDir });
+    });
+  });
+
+  suite('cherryPickCommit', () => {
+    const { execSync } = require('child_process');
+    let cherryPickTestDir: string;
+    let commitToCherryPick: string;
+
+    suiteSetup(() => {
+      cherryPickTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-cherry-pick-test-'));
+      execSync('git init', { cwd: cherryPickTestDir });
+      execSync('git config user.name "Test User"', { cwd: cherryPickTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: cherryPickTestDir });
+
+      // Create initial commit
+      const testFile = path.join(cherryPickTestDir, 'test.txt');
+      fs.writeFileSync(testFile, 'Initial content\n');
+      execSync('git add .', { cwd: cherryPickTestDir });
+      execSync('git commit -m "Initial commit"', { cwd: cherryPickTestDir });
+
+      // Create a feature branch with a commit
+      execSync('git checkout -b feature', { cwd: cherryPickTestDir });
+      fs.writeFileSync(testFile, 'Feature content\n');
+      execSync('git add .', { cwd: cherryPickTestDir });
+      execSync('git commit -m "Feature commit"', { cwd: cherryPickTestDir });
+      commitToCherryPick = execSync('git rev-parse HEAD', { cwd: cherryPickTestDir }).toString().trim();
+
+      // Switch back to main
+      execSync('git checkout main', { cwd: cherryPickTestDir });
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(cherryPickTestDir)) {
+        fs.rmSync(cherryPickTestDir, { recursive: true, force: true });
+      }
+    });
+
+    test('cherry-picks a commit onto current branch', async () => {
+      await cherryPickCommit(commitToCherryPick, cherryPickTestDir);
+
+      const testFile = path.join(cherryPickTestDir, 'test.txt');
+      const content = fs.readFileSync(testFile, 'utf-8');
+      assert.strictEqual(content.trim(), 'Feature content');
+    });
+
+    test('throws error for non-existent commit hash', async () => {
+      await assert.rejects(
+        async () => {
+          await cherryPickCommit('nonexistenthash123456', cherryPickTestDir);
+        },
+        /bad object|bad revision/
+      );
+    });
+  });
+
+  suite('revertCommit', () => {
+    const { execSync } = require('child_process');
+    let revertTestDir: string;
+    let commitToRevert: string;
+
+    suiteSetup(() => {
+      revertTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'git-revert-test-'));
+      execSync('git init', { cwd: revertTestDir });
+      execSync('git config user.name "Test User"', { cwd: revertTestDir });
+      execSync('git config user.email "test@example.com"', { cwd: revertTestDir });
+
+      // Create initial commit
+      const testFile = path.join(revertTestDir, 'test.txt');
+      fs.writeFileSync(testFile, 'Line 1\n');
+      execSync('git add .', { cwd: revertTestDir });
+      execSync('git commit -m "Initial commit"', { cwd: revertTestDir });
+
+      // Create a commit to revert
+      fs.writeFileSync(testFile, 'Line 1\nLine 2\n');
+      execSync('git add .', { cwd: revertTestDir });
+      execSync('git commit -m "Add line 2"', { cwd: revertTestDir });
+      commitToRevert = execSync('git rev-parse HEAD', { cwd: revertTestDir }).toString().trim();
+    });
+
+    suiteTeardown(() => {
+      if (fs.existsSync(revertTestDir)) {
+        fs.rmSync(revertTestDir, { recursive: true, force: true });
+      }
+    });
+
+    test('reverts a commit', async () => {
+      await revertCommit(commitToRevert, revertTestDir);
+
+      const testFile = path.join(revertTestDir, 'test.txt');
+      const content = fs.readFileSync(testFile, 'utf-8');
+      assert.strictEqual(content.trim(), 'Line 1');
+    });
+
+    test('throws error for non-existent commit hash', async () => {
+      await assert.rejects(
+        async () => {
+          await revertCommit('nonexistenthash123456', revertTestDir);
+        },
+        /bad object|bad revision/
+      );
     });
   });
 

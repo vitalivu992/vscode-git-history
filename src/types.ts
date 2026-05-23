@@ -144,6 +144,8 @@ export type WebviewAction =
   | 'deleteTag'
   | 'deleteBranch'
   | 'checkoutBranch'
+  | 'cherryPickCommit'
+  | 'revertCommit'
   | 'toggleMyCommits'
   | 'toggleWordWrap'
   | 'toggleRegex'
@@ -183,7 +185,8 @@ export type WebviewAction =
   | 'copyAllFilePermalinks'
   | 'copyFilterAsGitLogCommand'
   | 'copyFileBasename'
-  | 'focusCommitList';
+  | 'focusCommitList'
+  | 'revealFileInExplorer';
 
 /**
  * Filter state for copy filter query feature
@@ -297,6 +300,8 @@ export type WebviewToExtMessage =
   | { type: 'exportCommitsMbox'; fromHash: string; toHash: string }
   | { type: 'requestBranchHashes'; branches: string[] }
   | { type: 'checkoutBranch'; branch: string }
+  | { type: 'cherryPickCommit'; hash: string }
+  | { type: 'revertCommit'; hash: string }
   | { type: 'changeDiffContextLines'; value: number }
   | { type: 'dismissFirstRunTip' }
   | { type: 'copyFilterQuery'; filterState: FilterQueryState }
@@ -316,4 +321,5 @@ export type WebviewToExtMessage =
   | { type: 'copyAllFilteredHashes'; hashes: string[] }
   | { type: 'copyAllFilePermalinks'; hash: string }
   | { type: 'copyFilterAsGitLogCommand'; filterState: FilterQueryState }
-  | { type: 'focusCommitList' };
+  | { type: 'focusCommitList' }
+  | { type: 'revealFileInExplorer'; filePath: string };

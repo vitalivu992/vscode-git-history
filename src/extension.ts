@@ -201,6 +201,8 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.deleteTag', action: 'deleteTag' },
     { command: 'gitHistory.deleteBranch', action: 'deleteBranch' },
     { command: 'gitHistory.checkoutBranch', action: 'checkoutBranch' },
+    { command: 'gitHistory.cherryPickCommit', action: 'cherryPickCommit' },
+    { command: 'gitHistory.revertCommit', action: 'revertCommit' },
     { command: 'gitHistory.toggleMyCommits', action: 'toggleMyCommits' },
     { command: 'gitHistory.toggleWordWrap', action: 'toggleWordWrap' },
     { command: 'gitHistory.toggleRegex', action: 'toggleRegex' },
@@ -230,6 +232,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.toggleStats', action: 'toggleStats' },
     { command: 'gitHistory.copyAllFilePermalinks', action: 'copyAllFilePermalinks' },
     { command: 'gitHistory.copyFilterAsGitLogCommand', action: 'copyFilterAsGitLogCommand' },
+    { command: 'gitHistory.revealFileInExplorer', action: 'revealFileInExplorer' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

@@ -740,6 +740,24 @@ export async function checkoutBranch(branchName: string, cwd: string): Promise<v
 }
 
 /**
+ * Cherry-pick a commit onto the current branch
+ * @param commitHash The commit hash to cherry-pick
+ * @param cwd Working directory
+ */
+export async function cherryPickCommit(commitHash: string, cwd: string): Promise<void> {
+  await execGit(['cherry-pick', commitHash], cwd);
+}
+
+/**
+ * Revert a commit
+ * @param commitHash The commit hash to revert
+ * @param cwd Working directory
+ */
+export async function revertCommit(commitHash: string, cwd: string): Promise<void> {
+  await execGit(['revert', commitHash], cwd);
+}
+
+/**
  * Generate a web URL for browsing a file at a specific commit
  * Auto-detects the git remote and generates platform-specific file URLs
  * @param filePath The file path (absolute or relative to cwd)

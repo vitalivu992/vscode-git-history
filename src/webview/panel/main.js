@@ -872,6 +872,29 @@ function handleKeyDown(e) {
       scrollFocusedIntoView();
       break;
 
+    case 'PageDown':
+      e.preventDefault();
+      const PAGE_SIZE = 10;
+      if (focusedIndex < filteredCommits.length - 1) {
+        focusedIndex = Math.min(focusedIndex + PAGE_SIZE, filteredCommits.length - 1);
+      } else {
+        focusedIndex = filteredCommits.length - 1;
+      }
+      updateFocusedRow();
+      scrollFocusedIntoView();
+      break;
+
+    case 'PageUp':
+      e.preventDefault();
+      if (focusedIndex > 0) {
+        focusedIndex = Math.max(focusedIndex - PAGE_SIZE, 0);
+      } else {
+        focusedIndex = 0;
+      }
+      updateFocusedRow();
+      scrollFocusedIntoView();
+      break;
+
     case 'Enter':
       e.preventDefault();
       if (focusedIndex >= 0 && focusedIndex < filteredCommits.length) {
@@ -2045,6 +2068,8 @@ function handleMessage(event) {
         case 'deleteTag': handleDeleteTag(); break;
         case 'deleteBranch': handleDeleteBranch(); break;
         case 'checkoutBranch': showBranchPickerDialog(); break;
+        case 'cherryPickCommit': handleCherryPickCommit(); break;
+        case 'revertCommit': handleRevertCommit(); break;
         case 'toggleMyCommits': handleMyCommitsToggle(); break;
         case 'toggleWordWrap': handleWordWrapToggle(); break;
         case 'toggleRegex': handleRegexToggle(); break;
@@ -2061,6 +2086,7 @@ function handleMessage(event) {
         case 'jumpToPreviousCommitWithStats': jumpToPreviousCommitWithStats(); break;
         case 'focusSearch': if (searchInput) { searchInput.focus(); searchInput.select(); } break;
         case 'focusCommitList': handleFocusCommitList(); break;
+        case 'revealFileInExplorer': handleRevealFileInExplorer(); break;
         case 'showKeyboardHelp': showKeyboardHelpDialog(); break;
         case 'cycleDiffContextLines': handleDiffContextLinesCycle(); break;
         case 'cycleSortMode': handleSortToggle(); break;
@@ -2570,6 +2596,11 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📁</span>
       <span class="context-menu-label">Copy file directory</span>
     </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" data-action="reveal-file-explorer">
+      <span class="context-menu-icon">📂</span>
+      <span class="context-menu-label">Reveal in File Explorer</span>
+    </div>
     <div class="context-menu-item" data-action="copy-relative-path">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy relative path</span>
@@ -2653,6 +2684,12 @@ function showFileContextMenu(event, filePath, commitHash) {
           type: 'copyFileDirectory',
           filePath: filePath
         });
+      } else if (action === 'reveal-file-explorer') {
+        vscode.postMessage({
+          type: 'revealFileInExplorer',
+          filePath: filePath
+        });
+        hideContextMenu();
       } else if (action === 'copy-relative-path') {
         vscode.postMessage({
           type: 'copyRelativePath',
@@ -2725,6 +2762,14 @@ function showCommitContextMenu(event, commit) {
     <div class="context-menu-item" data-action="copy-revert">
       <span class="context-menu-icon">↩️</span>
       <span class="context-menu-label">Copy revert command</span>
+    </div>
+    <div class="context-menu-item" data-action="cherry-pick-commit">
+      <span class="context-menu-icon">🍒</span>
+      <span class="context-menu-label">Cherry-pick commit</span>
+    </div>
+    <div class="context-menu-item" data-action="revert-commit">
+      <span class="context-menu-icon">↩️</span>
+      <span class="context-menu-label">Revert commit</span>
     </div>
     <div class="context-menu-item" data-action="copy-show-command">
       <span class="context-menu-icon">👁️</span>
@@ -2920,6 +2965,10 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCherryPickCommand', hash: commit.hash });
       } else if (action === 'copy-revert') {
         vscode.postMessage({ type: 'copyRevertCommand', hash: commit.hash });
+      } else if (action === 'cherry-pick-commit') {
+        vscode.postMessage({ type: 'cherryPickCommit', hash: commit.hash });
+      } else if (action === 'revert-commit') {
+        vscode.postMessage({ type: 'revertCommit', hash: commit.hash });
       } else if (action === 'copy-show-command') {
         vscode.postMessage({ type: 'copyShowCommand', hash: commit.hash });
       } else if (action === 'copy-files') {
@@ -4090,6 +4139,46 @@ function handleDeleteBranch() {
   document.addEventListener('keydown', handleKeyDown);
 }
 
+function handleCherryPickCommit() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to cherry-pick');
+    return;
+  }
+
+  vscode.postMessage({ type: 'cherryPickCommit', hash: targetCommit.hash });
+}
+
+function handleRevertCommit() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to revert');
+    return;
+  }
+
+  vscode.postMessage({ type: 'revertCommit', hash: targetCommit.hash });
+}
+
 function handleCopySelectedHashes() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
 
@@ -4617,6 +4706,8 @@ function showKeyboardHelpDialog() {
         { keys: ['↑', '↓'], description: 'Navigate up/down through commits' },
         { keys: ['Home'], description: 'Jump to first commit' },
         { keys: ['End'], description: 'Jump to last commit' },
+        { keys: ['PageDown'], description: 'Jump down one page (10 commits)' },
+        { keys: ['PageUp'], description: 'Jump up one page (10 commits)' },
         { keys: ['Enter'], description: 'Select focused commit' },
         { keys: ['Shift', 'Enter'], description: 'Select range from anchor to focused' },
         { keys: [cmdKey, 'Enter'], description: 'Add/remove from multi-selection' },
@@ -4726,6 +4817,8 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'K', cmdKey, 'O'], description: 'Open commit URL in browser' },
         { keys: [cmdKey, 'K', cmdKey, 'P'], description: 'Open file URL in browser' },
         { keys: [cmdKey, 'Alt', 'X'], description: 'Delete local branch' },
+        { keys: [cmdKey, 'Alt', 'K'], description: 'Cherry-pick commit' },
+        { keys: [cmdKey, 'Alt', 'R'], description: 'Revert commit' },
         { keys: [cmdKey, 'Shift', 'Alt', 'B'], description: 'Create branch' },
         { keys: [cmdKey, 'Alt', 'I'], description: 'Create tag' },
         { keys: [cmdKey, 'Alt', '.'], description: 'Delete tag' },
@@ -4897,6 +4990,14 @@ function handleCopyFilePath() {
     return;
   }
   vscode.postMessage({ type: 'copyFilePath', filePath: selectedFile });
+}
+
+function handleRevealFileInExplorer() {
+  if (!selectedFile) {
+    showError('Select a file to reveal in file explorer');
+    return;
+  }
+  vscode.postMessage({ type: 'revealFileInExplorer', filePath: selectedFile });
 }
 
 function handleCopyRelativePath() {

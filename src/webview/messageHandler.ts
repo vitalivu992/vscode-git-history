@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, checkoutBranch, getFileContentAtCommit, getCommitDescribe, getFileUrl, getCommitsAsMbox, getFileStats } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, checkoutBranch, cherryPickCommit, revertCommit, getFileContentAtCommit, getCommitDescribe, getFileUrl, getCommitsAsMbox, getFileStats } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
 import { SettingsService, UserSettings, MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -285,6 +285,14 @@ export async function handleMessage(
       await handleCheckoutBranch(message.branch, panel);
       break;
 
+    case 'cherryPickCommit':
+      await handleCherryPickCommit(message.hash, panel);
+      break;
+
+    case 'revertCommit':
+      await handleRevertCommit(message.hash, panel);
+      break;
+
     case 'exportCommits':
       await handleExportCommits(message.format, message.commits, panel);
       break;
@@ -356,6 +364,10 @@ export async function handleMessage(
 
     case 'copyFilterAsGitLogCommand':
       handleCopyFilterAsGitLogCommand(message.filterState, panel);
+      break;
+
+    case 'revealFileInExplorer':
+      await handleRevealFileInExplorer(message.filePath, panel);
       break;
 
     default:
@@ -2244,6 +2256,68 @@ async function handleCheckoutBranch(branch: string, panel: GitHistoryPanel): Pro
 }
 
 /**
+ * Handle cherry-pick commit
+ */
+async function handleCherryPickCommit(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const confirm = await vscode.window.showWarningMessage(
+    `Cherry-pick commit "${commit.shortHash}" (${commit.message})?`,
+    { modal: true },
+    'Cherry-pick'
+  );
+
+  if (confirm !== 'Cherry-pick') {
+    return;
+  }
+
+  try {
+    await cherryPickCommit(hash, panel.getCwd());
+    void vscode.window.showInformationMessage(`Cherry-picked commit ${commit.shortHash}`);
+    await panel.loadData();
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to cherry-pick: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle revert commit
+ */
+async function handleRevertCommit(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const confirm = await vscode.window.showWarningMessage(
+    `Revert commit "${commit.shortHash}" (${commit.message})?`,
+    { modal: true },
+    'Revert'
+  );
+
+  if (confirm !== 'Revert') {
+    return;
+  }
+
+  try {
+    await revertCommit(hash, panel.getCwd());
+    void vscode.window.showInformationMessage(`Reverted commit ${commit.shortHash}`);
+    await panel.loadData();
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to revert: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
  * Handle dismiss first-run tip
  */
 async function handleDismissFirstRunTip(firstRunTipService: FirstRunTipService): Promise<void> {
@@ -2665,6 +2739,26 @@ async function handleCopyAllFilePermalinks(hash: string, panel: GitHistoryPanel)
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to copy file permalinks: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function handleRevealFileInExplorer(
+  filePath: string,
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    // filePath is relative to git root, construct absolute path
+    const absolutePath = path.join(cwd, filePath);
+    const fileUri = vscode.Uri.file(absolutePath);
+
+    await vscode.env.openExternal(fileUri);
+    const fileName = path.basename(filePath);
+    void vscode.window.showInformationMessage(`Revealed in file explorer: ${fileName}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to reveal in file explorer: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }

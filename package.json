@@ -287,6 +287,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.revealFileInExplorer",
+        "title": "Git History: Reveal File in Explorer",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyFileUrl",
         "title": "Git History: Copy File Permalink",
         "category": "Git History"
@@ -374,6 +379,16 @@
       {
         "command": "gitHistory.checkoutBranch",
         "title": "Git History: Checkout Branch",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.cherryPickCommit",
+        "title": "Git History: Cherry-pick Commit",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.revertCommit",
+        "title": "Git History: Revert Commit",
         "category": "Git History"
       },
       {
@@ -527,6 +542,18 @@
         "key": "ctrl+shift+b",
         "mac": "cmd+shift+b",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "gitHistory.showFileHistory",
+        "key": "ctrl+alt+h",
+        "mac": "cmd+alt+h",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "gitHistory.showSelectionHistory",
+        "key": "ctrl+alt+shift+h",
+        "mac": "cmd+alt+shift+h",
+        "when": "editorTextFocus && editorHasSelection"
       },
       {
         "command": "gitHistory.refresh",
@@ -799,6 +826,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.revealFileInExplorer",
+        "key": "ctrl+alt+shift+e",
+        "mac": "cmd+alt+shift+e",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyFileUrl",
         "key": "ctrl+alt+shift+u",
         "mac": "cmd+alt+shift+u",
@@ -892,6 +925,18 @@
         "command": "gitHistory.checkoutBranch",
         "key": "ctrl+alt+s",
         "mac": "cmd+alt+s",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.cherryPickCommit",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.revertCommit",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
