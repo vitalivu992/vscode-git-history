@@ -14,8 +14,8 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 
 ## Features
 
-- **File History**: Right-click anywhere in an editor to view the complete git history of that file
-- **Selection History**: Select lines of code and view only commits that affected those specific lines
+- **File History**: Right-click anywhere in an editor to view the complete git history of that file, or press `Ctrl+Alt+H` / `Cmd+Alt+H`
+- **Selection History**: Select lines of code and view only commits that affected those specific lines, or press `Ctrl+Alt+Shift+H` / `Cmd+Alt+Shift+H`
 - **Commit Graph**: Visual branch and merge graph (like `git log --graph`) rendered as inline SVG in the history table
 - **Commit Statistics**: See the number of files changed, insertions, and deletions for each commit directly in the commit list with color-coded indicators (green for additions, red for deletions). Toggle visibility with the "Stats" button or `Ctrl+Shift+Alt+T` / `Cmd+Shift+Alt+T`.
 - **Search Commits**: Filter commits in real time by message, author, email, hash, or tag name with count indicator. Supports date filters: `after:YYYY-MM-DD`, `before:YYYY-MM-DD`, `last:Ndays/weeks/months`. Supports author filter: `author:name` or click any author name to filter. Supports tag filter: `tag:name` or click any tag badge to filter by tag. Supports regex mode with the .* button for advanced pattern matching like `bug(fix|patch)|hotfix` or `^feat:.*`.
@@ -72,6 +72,8 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **Create Branch from Commit**: Press `Ctrl+Shift+Alt+B` / `Cmd+Shift+Alt+B` or right-click on any commit to create a new branch at that point in history. You'll be prompted for a branch name, and the branch will be created at the selected commit using `git branch <name> <hash>`.
 - **Create Tag from Commit**: Press `Ctrl+Alt+I` / `Cmd+Alt+I` or right-click on any commit to create a new git tag at that point in history. Supports both lightweight tags (enter tag name only) and annotated tags (enter a message when prompted). The tag will be created using `git tag <name> <hash>` or `git tag -a <name> -m <message> <hash>`.
 - **Delete Tag from Commit**: Press `Ctrl+Alt+.` / `Cmd+Alt+.` or right-click on any commit with tags to delete them. If the commit has only one tag, it will be deleted immediately with confirmation. If the commit has multiple tags, a picker lets you choose which one to delete. The tag is deleted using `git tag -d <tagname>`.
+- **Cherry-pick Commit**: Right-click on any commit or press `Ctrl+Alt+K` / `Cmd+Alt+K` to cherry-pick it onto the current branch. A confirmation dialog shows the commit hash and message. The extension executes `git cherry-pick <hash>` and refreshes the panel on success. If conflicts occur, the error message from git is displayed.
+- **Revert Commit**: Right-click on any commit or press `Ctrl+Alt+R` / `Cmd+Alt+R` to revert it. A confirmation dialog shows the commit hash and message. The extension executes `git revert <hash>` and refreshes the panel on success. If conflicts occur, the error message from git is displayed.
 - **Branch Switching**: Right-click on the branch badge or press `Ctrl+Alt+S` / `Cmd+Alt+S` to switch between branches. A searchable picker dialog shows all local and remote branches. The panel automatically refreshes after successful checkout.
 - **Delete Branch**: Press `Ctrl+Alt+X` / `Cmd+Alt+X` to open a modal dialog to select and delete local branches. The current branch is marked and cannot be deleted. For unmerged branches, git will offer a force delete option.
 - **Copy Changed Files**: Copy the list of changed files for a commit to clipboard with `Ctrl+Shift+F` / `Cmd+Shift+F` keyboard shortcut, or right-click on any commit
@@ -208,6 +210,8 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Create branch from commit** | Create a new branch at the selected commit |
 | **Create tag from commit** | Create a git tag at the selected commit |
 | **Delete tag from commit** | Delete a git tag from the selected commit (only shown when commit has tags) |
+| **Cherry-pick commit** | Cherry-pick this commit onto the current branch using `git cherry-pick` |
+| **Revert commit** | Revert this commit using `git revert` |
 
 **Changed Files Context Menu:**
 
@@ -300,6 +304,8 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+Alt+B` / `Cmd+Shift+Alt+B` | Create branch at selected commit |
 | `Ctrl+Alt+I` / `Cmd+Alt+I` | Create tag at selected commit |
 | `Ctrl+Alt+.` / `Cmd+Alt+.` | Delete tag from selected commit |
+| `Ctrl+Alt+K` / `Cmd+Alt+K` | Cherry-pick commit onto current branch |
+| `Ctrl+Alt+R` / `Cmd+Alt+R` | Revert commit |
 | `Ctrl+Shift+Alt+E` / `Cmd+Shift+Alt+E` | Export commits as mbox format |
 | `Ctrl+Shift+Alt+S` / `Cmd+Shift+Alt+S` | Toggle GPG signature verification badges |
 | `Ctrl+Shift+Alt+T` / `Cmd+Shift+Alt+T` | Toggle stats column visibility |
@@ -365,8 +371,8 @@ These preferences are saved automatically when you change them in the UI, and re
 
 | Command | Keybinding |
 |---------|------------|
-| Git History (File) | (none - customize as desired) |
-| Git History for Selection | (none - customize as desired) |
+| Git History (File) | `Ctrl+Alt+H` / `Cmd+Alt+H` |
+| Git History for Selection | `Ctrl+Alt+Shift+H` / `Cmd+Alt+Shift+H` |
 | Toggle Blame Annotations | `Ctrl+Shift+B` / `Cmd+Shift+B` |
 | Refresh History | `Ctrl+Shift+R` / `Cmd+Shift+R` |
 
