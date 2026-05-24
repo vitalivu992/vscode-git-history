@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitPatch, getCommitParentDiff, getBranchCommitHashes, getCommitUrl, getBranchUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, checkoutBranch, cherryPickCommit, revertCommit, getFileContentAtCommit, getCommitDescribe, getFileUrl, getCommitsAsMbox, getFileStats } from '../git/gitService';
-import { ExtToWebviewMessage, CommitInfo, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
+import { ExtToWebviewMessage, CommitInfo, FileStats, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
 import { SettingsService, UserSettings, MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
 
@@ -106,6 +106,10 @@ export async function handleMessage(
       await handleCopyCommitWithStats(message.hash, panel);
       break;
 
+    case 'copyFullCommitInfoWithFileStats':
+      await handleCopyFullCommitInfoWithFileStats(message.hash, panel);
+      break;
+
     case 'copyBranchName':
       handleCopyBranchName(panel);
       break;
@@ -129,12 +133,20 @@ export async function handleMessage(
       handleCopyAuthorName(message.hash, panel);
       break;
 
+    case 'copyAuthorGitFormat':
+      await handleCopyAuthorGitFormat(message.hash, panel);
+      break;
+
     case 'copyCommitterEmail':
       handleCopyCommitterEmail(message.hash, panel);
       break;
 
     case 'copyCommitterName':
       handleCopyCommitterName(message.hash, panel);
+      break;
+
+    case 'copySignatureInfo':
+      handleCopySignatureInfo(message.hash, panel);
       break;
 
     case 'copyParentHash':
@@ -203,6 +215,14 @@ export async function handleMessage(
 
     case 'copyAllFilteredHashes':
       handleCopyAllFilteredHashes(message.hashes, panel);
+      break;
+
+    case 'copySelectedMessagesChecklist':
+      handleCopySelectedMessagesChecklist(message.hashes, panel);
+      break;
+
+    case 'copySelectedMessagesNumbered':
+      handleCopySelectedMessagesNumbered(message.hashes, panel);
       break;
 
     case 'copyFilterQuery':
@@ -1383,6 +1403,50 @@ async function handleCopyCommitWithStats(hash: string, panel: GitHistoryPanel): 
   void vscode.window.showInformationMessage(`Commit message with stats copied: ${shortHash}`);
 }
 
+export function formatFullInfoWithStats(commit: CommitInfo, files: FileStats[]): string {
+  const messageText = commit.fullMessage || commit.message;
+  const dateStr = new Date(commit.date).toLocaleString();
+  let result = `commit ${commit.hash}\nAuthor: ${commit.author} <${commit.email}>\nDate: ${dateStr}\n\n    ${messageText.split('\n').join('\n    ')}`;
+
+  if (commit.stats) {
+    const filesWord = commit.stats.filesChanged === 1 ? 'file' : 'files';
+    result += `\n\n${commit.stats.filesChanged} ${filesWord} changed, ${commit.stats.insertions} insertions(+), ${commit.stats.deletions} deletions(-)`;
+  }
+
+  if (files.length > 0) {
+    result += '\n';
+    for (const f of files) {
+      if (f.isBinary) {
+        result += `\n${f.path} | Binary`;
+      } else {
+        result += `\n${f.path} | +${f.insertions}, -${f.deletions}`;
+      }
+    }
+  }
+
+  return result;
+}
+
+async function handleCopyFullCommitInfoWithFileStats(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  try {
+    const cwd = panel.getCwd();
+    const files = await getFileStats(hash, cwd);
+    const copyText = formatFullInfoWithStats(commit, files);
+    await vscode.env.clipboard.writeText(copyText);
+    void vscode.window.showInformationMessage(`Full commit info with file stats copied: ${commit.shortHash}`);
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy full commit info: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
 function handleCopyBranchName(panel: GitHistoryPanel): void {
   const branch = panel.getBranch();
   if (!branch) {
@@ -1472,6 +1536,18 @@ function handleCopyAuthorName(hash: string, panel: GitHistoryPanel): void {
   });
 }
 
+async function handleCopyAuthorGitFormat(hash: string, panel: GitHistoryPanel): Promise<void> {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const gitFormat = `${commit.author} <${commit.email}>`;
+  await vscode.env.clipboard.writeText(gitFormat);
+  void vscode.window.showInformationMessage(`Copied author: ${gitFormat}`);
+}
+
 function handleCopyCommitterEmail(hash: string, panel: GitHistoryPanel): void {
   const commit = panel.getCommits().find(c => c.hash === hash);
   if (!commit) {
@@ -1495,6 +1571,28 @@ function handleCopyCommitterName(hash: string, panel: GitHistoryPanel): void {
   const nameToCopy = commit.committer || commit.author;
   void vscode.env.clipboard.writeText(nameToCopy).then(() => {
     void vscode.window.showInformationMessage(`Committer name copied: ${nameToCopy}`);
+  });
+}
+
+function handleCopySignatureInfo(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  let signatureInfo: string;
+  if (commit.signature?.verified) {
+    signatureInfo = 'Signature: Verified';
+    if (commit.signature.signer) {
+      signatureInfo += `\nSigner: ${commit.signature.signer}`;
+    }
+  } else {
+    signatureInfo = 'Signature: Not Verified';
+  }
+
+  void vscode.env.clipboard.writeText(signatureInfo).then(() => {
+    void vscode.window.showInformationMessage('Copied signature info');
   });
 }
 
@@ -1895,6 +1993,34 @@ function handleCopySelectedHashes(hashes: string[], panel: GitHistoryPanel): voi
   const hashText = hashes.join('\n');
   void vscode.env.clipboard.writeText(hashText).then(() => {
     void vscode.window.showInformationMessage(`Copied ${hashes.length} commit hash${hashes.length > 1 ? 'es' : ''}`);
+  });
+}
+
+function handleCopySelectedMessagesChecklist(hashes: string[], panel: GitHistoryPanel): void {
+  const commits = panel.getCommits();
+  const selected = commits.filter(c => hashes.includes(c.hash));
+  if (selected.length === 0) {
+    void vscode.window.showInformationMessage('No commits selected');
+    return;
+  }
+
+  const checklist = selected.map(c => `- [ ] ${c.message}`).join('\n');
+  void vscode.env.clipboard.writeText(checklist).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${selected.length} message${selected.length > 1 ? 's' : ''} as checklist`);
+  });
+}
+
+function handleCopySelectedMessagesNumbered(hashes: string[], panel: GitHistoryPanel): void {
+  const commits = panel.getCommits();
+  const selected = commits.filter(c => hashes.includes(c.hash));
+  if (selected.length === 0) {
+    void vscode.window.showInformationMessage('No commits selected');
+    return;
+  }
+
+  const numbered = selected.map((c, index) => `${index + 1}. ${c.message}`).join('\n');
+  void vscode.env.clipboard.writeText(numbered).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${selected.length} message${selected.length > 1 ? 's' : ''} as numbered list`);
   });
 }
 
@@ -2521,7 +2647,7 @@ export function validatePresetName(name: string, existingPresets: SavedFilterPre
 /**
  * Handle save filter preset
  */
-async function handleSaveFilterPreset(name: string, filterState: FilterQueryState, panel: GitHistoryPanel): Promise<void> {
+export async function handleSaveFilterPreset(name: string, filterState: FilterQueryState, panel: GitHistoryPanel): Promise<void> {
   try {
     const context = panel.getContext();
     const existingPresets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
@@ -2567,7 +2693,7 @@ async function handleSaveFilterPreset(name: string, filterState: FilterQueryStat
 /**
  * Handle delete filter preset
  */
-async function handleDeleteFilterPreset(name: string, panel: GitHistoryPanel): Promise<void> {
+export async function handleDeleteFilterPreset(name: string, panel: GitHistoryPanel): Promise<void> {
   try {
     const context = panel.getContext();
     const existingPresets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
@@ -2599,7 +2725,7 @@ async function handleDeleteFilterPreset(name: string, panel: GitHistoryPanel): P
 /**
  * Handle rename filter preset
  */
-async function handleRenameFilterPreset(oldName: string, newName: string, panel: GitHistoryPanel): Promise<void> {
+export async function handleRenameFilterPreset(oldName: string, newName: string, panel: GitHistoryPanel): Promise<void> {
   try {
     const context = panel.getContext();
     const existingPresets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
@@ -2655,7 +2781,7 @@ async function handleRenameFilterPreset(oldName: string, newName: string, panel:
 /**
  * Handle get filter presets
  */
-async function handleGetFilterPresets(panel: GitHistoryPanel): Promise<void> {
+export async function handleGetFilterPresets(panel: GitHistoryPanel): Promise<void> {
   try {
     const context = panel.getContext();
     const presets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
@@ -2674,7 +2800,7 @@ async function handleGetFilterPresets(panel: GitHistoryPanel): Promise<void> {
 /**
  * Handle apply preset
  */
-async function handleApplyPreset(presetName: string, panel: GitHistoryPanel): Promise<void> {
+export async function handleApplyPreset(presetName: string, panel: GitHistoryPanel): Promise<void> {
   try {
     const context = panel.getContext();
     const presets = context.globalState.get<SavedFilterPreset[]>(SAVED_PRESETS_STORAGE_KEY, []);
