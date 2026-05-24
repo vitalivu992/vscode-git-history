@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { CommitInfo, SavedFilterPreset } from '../../src/types';
+import { CommitInfo, FileStats, SavedFilterPreset } from '../../src/types';
 import {
 	formatCommitsAsJson,
 	escapeCsvField,
@@ -11,6 +11,7 @@ import {
 	extractCoAuthors,
 	validatePresetName,
 	formatCommitsAsPrDescription,
+	formatFullInfoWithStats,
 } from '../../src/webview/messageHandler';
 import { PRESET_NAME_MAX_LENGTH, MAX_SAVED_PRESETS } from '../../src/settings/settingsTypes';
 
@@ -1033,5 +1034,81 @@ suite('messageHandlerUtils - formatCommitAsHtml', () => {
 		assert.ok(result.includes('style="'));
 		assert.ok(result.includes('font-family'));
 		assert.ok(result.includes('border-radius'));
+	});
+});
+
+suite('messageHandlerUtils - formatFullInfoWithStats', () => {
+	test('formats commit info with file stats', () => {
+		const files: FileStats[] = [
+			{ path: 'src/auth/login.ts', insertions: 12, deletions: 3, isBinary: false },
+			{ path: 'src/auth/session.ts', insertions: 2, deletions: 1, isBinary: false },
+		];
+		const result = formatFullInfoWithStats(sampleCommits[0], files);
+		assert.ok(result.includes('commit abc123def456'));
+		assert.ok(result.includes('Author: Alice Cooper <alice@example.com>'));
+		assert.ok(result.includes('Date:'));
+		assert.ok(result.includes('Initial commit'));
+		assert.ok(result.includes('3 files changed, 150 insertions(+), 0 deletions(-)'));
+		assert.ok(result.includes('src/auth/login.ts | +12, -3'));
+		assert.ok(result.includes('src/auth/session.ts | +2, -1'));
+	});
+
+	test('formats commit with multi-line message', () => {
+		const files: FileStats[] = [];
+		const result = formatFullInfoWithStats(sampleCommits[0], files);
+		assert.ok(result.includes('    Initial commit'));
+		assert.ok(result.includes('    This is the first commit'));
+	});
+
+	test('handles binary files', () => {
+		const files: FileStats[] = [
+			{ path: 'image.png', insertions: 0, deletions: 0, isBinary: true },
+		];
+		const result = formatFullInfoWithStats(sampleCommits[0], files);
+		assert.ok(result.includes('image.png | Binary'));
+	});
+
+	test('handles commit without stats', () => {
+		const commit: CommitInfo = {
+			hash: 'abc123',
+			shortHash: 'abc1234',
+			parentHashes: [],
+			author: 'Test',
+			email: 'test@test.com',
+			date: new Date().toISOString(),
+			message: 'No stats commit',
+			fullMessage: 'No stats commit',
+		};
+		const files: FileStats[] = [
+			{ path: 'file.ts', insertions: 5, deletions: 2, isBinary: false },
+		];
+		const result = formatFullInfoWithStats(commit, files);
+		assert.ok(result.includes('commit abc123'));
+		assert.ok(result.includes('file.ts | +5, -2'));
+		assert.ok(!result.includes('files changed'));
+	});
+
+	test('handles empty file list', () => {
+		const result = formatFullInfoWithStats(sampleCommits[0], []);
+		assert.ok(result.includes('commit abc123def456'));
+		assert.ok(result.includes('3 files changed'));
+		assert.ok(!result.includes(' | '));
+	});
+
+	test('uses singular form for single file stats', () => {
+		const commit: CommitInfo = {
+			hash: 'abc123',
+			shortHash: 'abc1234',
+			parentHashes: [],
+			author: 'Test',
+			email: 'test@test.com',
+			date: new Date().toISOString(),
+			message: 'Single file',
+			fullMessage: 'Single file',
+			stats: { filesChanged: 1, insertions: 5, deletions: 1 },
+		};
+		const result = formatFullInfoWithStats(commit, []);
+		assert.ok(result.includes('1 file changed'));
+		assert.ok(!result.includes('1 files changed'));
 	});
 });

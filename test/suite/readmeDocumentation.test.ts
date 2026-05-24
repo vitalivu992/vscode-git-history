@@ -306,4 +306,29 @@ suite('README Documentation Comprehensive Tests', () => {
       );
     });
   });
+
+  suite('FilterPresets Documentation', () => {
+    test('README should document Filter Presets feature in Features section', () => {
+      const featuresSection = readmeContent.match(/## Features[\s\S]*?(?=\n##)/);
+      assert.ok(featuresSection, 'README should have Features section');
+
+      const section = featuresSection![0];
+
+      assert.ok(
+        section.includes('Filter Presets') || section.toLowerCase().includes('filter preset'),
+        'README Features section should mention Filter Presets feature'
+      );
+
+      // Check for keyboard shortcuts
+      assert.ok(
+        section.includes('Ctrl+Shift+0') || section.includes('Cmd+Shift+0'),
+        'README should document save preset shortcut'
+      );
+
+      assert.ok(
+        section.includes('Ctrl+Shift+1') || section.includes('Cmd+Shift+1'),
+        'README should document load preset shortcut'
+      );
+    });
+  });
 });
