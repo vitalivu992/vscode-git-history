@@ -137,6 +137,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFullCommitInfoWithFileStats",
+        "title": "Git History: Copy Full Commit Info with File Stats",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyBranchName",
         "title": "Git History: Copy Branch Name",
         "category": "Git History"
@@ -167,6 +172,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyAuthorGitFormat",
+        "title": "Git History: Copy Author in Git Format",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitterEmail",
         "title": "Git History: Copy Committer Email",
         "category": "Git History"
@@ -174,6 +184,11 @@
       {
         "command": "gitHistory.copyCommitterName",
         "title": "Git History: Copy Committer Name",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copySignatureInfo",
+        "title": "Git History: Copy Signature Info",
         "category": "Git History"
       },
       {
@@ -319,6 +334,16 @@
       {
         "command": "gitHistory.copySelectedHashes",
         "title": "Git History: Copy Selected Hashes",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copySelectedMessagesChecklist",
+        "title": "Git History: Copy Selected Messages as Checklist",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copySelectedMessagesNumbered",
+        "title": "Git History: Copy Selected Messages as Numbered List",
         "category": "Git History"
       },
       {
@@ -670,6 +695,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyFullCommitInfoWithFileStats",
+        "key": "ctrl+shift+alt+i",
+        "mac": "cmd+shift+alt+i",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyBranchName",
         "key": "ctrl+alt+b",
         "mac": "cmd+alt+b",
@@ -703,6 +734,12 @@
         "command": "gitHistory.copyAuthorName",
         "key": "ctrl+shift+n",
         "mac": "cmd+shift+n",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyAuthorGitFormat",
+        "key": "ctrl+alt+shift+a",
+        "mac": "cmd+alt+shift+a",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -781,6 +818,18 @@
         "command": "gitHistory.copySelectedHashes",
         "key": "ctrl+shift+;",
         "mac": "cmd+shift+;",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySelectedMessagesChecklist",
+        "key": "ctrl+alt+z",
+        "mac": "cmd+alt+z",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySelectedMessagesNumbered",
+        "key": "ctrl+alt+shift+z",
+        "mac": "cmd+alt+shift+z",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -877,6 +926,12 @@
         "command": "gitHistory.copyDescribe",
         "key": "ctrl+alt+g",
         "mac": "cmd+alt+g",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySignatureInfo",
+        "key": "ctrl+shift+alt+g",
+        "mac": "cmd+shift+alt+g",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

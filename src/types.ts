@@ -114,6 +114,7 @@ export type WebviewAction =
   | 'copySelectedHashes'
   | 'copyAuthorEmail'
   | 'copyAuthorName'
+  | 'copyAuthorGitFormat'
   | 'copyParentHash'
   | 'copyShortHash'
   | 'copySubject'
@@ -171,6 +172,8 @@ export type WebviewAction =
   | 'toggleSignatures'
   | 'toggleStats'
   | 'copyAllFilteredHashes'
+  | 'copySelectedMessagesChecklist'
+  | 'copySelectedMessagesNumbered'
   | 'copyCommitterEmail'
   | 'copyCommitterName'
   | 'copyShowCommand'
@@ -186,7 +189,9 @@ export type WebviewAction =
   | 'copyFilterAsGitLogCommand'
   | 'copyFileBasename'
   | 'focusCommitList'
-  | 'revealFileInExplorer';
+  | 'revealFileInExplorer'
+  | 'copySignatureInfo'
+  | 'copyFullCommitInfoWithFileStats';
 
 /**
  * Filter state for copy filter query feature
@@ -269,6 +274,7 @@ export type WebviewToExtMessage =
   | { type: 'copySelectedCherryPickCommands'; hashes: string[] }
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyAuthorName'; hash: string }
+  | { type: 'copyAuthorGitFormat'; hash: string }
   | { type: 'copyCommitterEmail'; hash: string }
   | { type: 'copyCommitterName'; hash: string }
   | { type: 'copyShowCommand'; hash: string }
@@ -319,7 +325,11 @@ export type WebviewToExtMessage =
   | { type: 'getFilterPresets' }
   | { type: 'applyPreset'; presetName: string }
   | { type: 'copyAllFilteredHashes'; hashes: string[] }
+  | { type: 'copySelectedMessagesChecklist'; hashes: string[] }
+  | { type: 'copySelectedMessagesNumbered'; hashes: string[] }
   | { type: 'copyAllFilePermalinks'; hash: string }
   | { type: 'copyFilterAsGitLogCommand'; filterState: FilterQueryState }
   | { type: 'focusCommitList' }
-  | { type: 'revealFileInExplorer'; filePath: string };
+  | { type: 'revealFileInExplorer'; filePath: string }
+  | { type: 'copySignatureInfo'; hash: string }
+  | { type: 'copyFullCommitInfoWithFileStats'; hash: string };
