@@ -502,6 +502,20 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Alt+Shift+C: Copy selected messages as checklist with author
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.shiftKey && e.key === 'c') {
+    e.preventDefault();
+    handleCopySelectedMessagesChecklistWithAuthor();
+    return;
+  }
+
+  // Ctrl+Alt+Shift+N: Copy selected messages as numbered list with author
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.shiftKey && e.key === 'n') {
+    e.preventDefault();
+    handleCopySelectedMessagesNumberedWithAuthor();
+    return;
+  }
+
   // Ctrl+Shift+E: Copy commit as patch
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'e') {
     e.preventDefault();
@@ -642,6 +656,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+Alt+Y: Copy all filtered as oneline
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && (e.key === 'y' || e.key === 'Y')) {
+    e.preventDefault();
+    handleCopyAllFilteredAsOneline();
+    return;
+  }
+
   // Ctrl+Shift+S: Copy commit stats
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
     e.preventDefault();
@@ -718,6 +739,20 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'h') {
     e.preventDefault();
     handleCopyHtml();
+    return;
+  }
+
+  // Ctrl+Alt+Y: Copy as reStructuredText
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'y') {
+    e.preventDefault();
+    handleCopyRest();
+    return;
+  }
+
+  // Ctrl+Alt+Shift+J: Copy as Jira Format
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.shiftKey && e.key === 'J') {
+    e.preventDefault();
+    handleCopyJira();
     return;
   }
 
@@ -1041,22 +1076,22 @@ function updateSortButton() {
   switch (sortMode) {
     case 0:
       sortBtn.innerHTML = '&#x2193; Newest';
-      sortBtn.title = 'Sort: Newest first (click to cycle)';
+      sortBtn.title = 'Sort: Newest first (Ctrl+Shift+3 to cycle)';
       sortBtn.classList.remove('sort-active');
       break;
     case 1:
       sortBtn.innerHTML = '&#x2191; Oldest';
-      sortBtn.title = 'Sort: Oldest first (click to cycle)';
+      sortBtn.title = 'Sort: Oldest first (Ctrl+Shift+3 to cycle)';
       sortBtn.classList.add('sort-active');
       break;
     case 2:
       sortBtn.innerHTML = 'A&#x2192;Z Author';
-      sortBtn.title = 'Sort: Author A-Z (click to cycle)';
+      sortBtn.title = 'Sort: Author A-Z (Ctrl+Shift+3 to cycle)';
       sortBtn.classList.add('sort-active');
       break;
     case 3:
       sortBtn.innerHTML = 'Z&#x2192;A Author';
-      sortBtn.title = 'Sort: Author Z-A (click to cycle)';
+      sortBtn.title = 'Sort: Author Z-A (Ctrl+Shift+3 to cycle)';
       sortBtn.classList.add('sort-active');
       break;
   }
@@ -1079,10 +1114,10 @@ function handleMergeToggle() {
   if (mergeToggleBtn) {
     if (hideMergeCommits) {
       mergeToggleBtn.classList.add('active');
-      mergeToggleBtn.title = 'Merge commits hidden (click to show)';
+      mergeToggleBtn.title = 'Merge commits hidden (Ctrl+Shift+Q to toggle)';
     } else {
       mergeToggleBtn.classList.remove('active');
-      mergeToggleBtn.title = 'Hide merge commits';
+      mergeToggleBtn.title = 'Hide merge commits (Ctrl+Shift+Q)';
     }
   }
   focusedIndex = -1;
@@ -1122,10 +1157,10 @@ function handleToggleGraph() {
   if (graphToggleBtn) {
     if (showGraph) {
       graphToggleBtn.classList.add('active');
-      graphToggleBtn.title = 'Graph visible (click to hide)';
+      graphToggleBtn.title = 'Graph visible (Ctrl+Alt+T to toggle)';
     } else {
       graphToggleBtn.classList.remove('active');
-      graphToggleBtn.title = 'Show graph';
+      graphToggleBtn.title = 'Show graph (Ctrl+Alt+T)';
     }
   }
   const graphTh = document.querySelector('th.graph-col');
@@ -1144,10 +1179,10 @@ function handleToggleSignatures() {
   if (signaturesToggleBtn) {
     if (showSignatures) {
       signaturesToggleBtn.classList.add('active');
-      signaturesToggleBtn.title = 'GPG signatures visible (click to hide)';
+      signaturesToggleBtn.title = 'GPG signatures visible (Ctrl+Shift+Alt+S to toggle)';
     } else {
       signaturesToggleBtn.classList.remove('active');
-      signaturesToggleBtn.title = 'Show GPG signatures';
+      signaturesToggleBtn.title = 'Show GPG signatures (Ctrl+Shift+Alt+S)';
     }
   }
   renderCommits();
@@ -1161,10 +1196,10 @@ function handleToggleStats() {
   if (statsToggleBtn) {
     if (showStats) {
       statsToggleBtn.classList.add('active');
-      statsToggleBtn.title = 'Stats visible (click to hide)';
+      statsToggleBtn.title = 'Stats visible (Ctrl+Shift+Alt+T to toggle)';
     } else {
       statsToggleBtn.classList.remove('active');
-      statsToggleBtn.title = 'Show stats column';
+      statsToggleBtn.title = 'Show stats column (Ctrl+Shift+Alt+T)';
     }
   }
   const statsTh = document.querySelector('th.stats-col');
@@ -2054,10 +2089,12 @@ function handleMessage(event) {
         case 'copyCommitWithStats': handleCopyCommitWithStats(); break;
         case 'copyFullCommitInfoWithFileStats': handleCopyFullCommitInfoWithFileStats(); break;
         case 'copyOneline': handleCopyOneline(); break;
+        case 'copyCompact': handleCopyCompact(); break;
         case 'copyCommitBody': handleCopyCommitBody(); break;
         case 'copyCommitMarkdown': handleCopyMarkdown(); break;
         case 'copyCommitJson': handleCopyJson(); break;
         case 'copyCommitHtml': handleCopyHtml(); break;
+        case 'copyCommitJira': handleCopyJira(); break;
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
         case 'copyCommitDate': handleCopyCommitDate(); break;
         case 'copyRelativeDate': handleCopyRelativeDate(); break;
@@ -2065,9 +2102,12 @@ function handleMessage(event) {
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
         case 'copySelectedMessagesChecklist': handleCopySelectedMessagesChecklist(); break;
         case 'copySelectedMessagesNumbered': handleCopySelectedMessagesNumbered(); break;
+        case 'copySelectedMessagesChecklistWithAuthor': handleCopySelectedMessagesChecklistWithAuthor(); break;
+        case 'copySelectedMessagesNumberedWithAuthor': handleCopySelectedMessagesNumberedWithAuthor(); break;
         case 'copySelectedCherryPickCommands': handleCopySelectedCherryPickCommands(); break;
         case 'copyAllFilePermalinks': handleCopyAllFilePermalinks(); break;
         case 'copyAllFilteredHashes': handleCopyAllFilteredHashes(); break;
+        case 'copyAllFilteredAsOneline': handleCopyAllFilteredAsOneline(); break;
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFileExtension': handleCopyExtension(); break;
         case 'copyFileBasename': handleCopyFileBasename(); break;
@@ -2885,6 +2925,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">≡</span>
       <span class="context-menu-label">Copy as oneline</span>
     </div>
+    <div class="context-menu-item" data-action="copy-compact">
+      <span class="context-menu-icon">📝</span>
+      <span class="context-menu-label">Copy as compact</span>
+    </div>
     <div class="context-menu-item" data-action="copy-commit-body">
       <span class="context-menu-icon">📄</span>
       <span class="context-menu-label">Copy commit body</span>
@@ -2900,6 +2944,14 @@ function showCommitContextMenu(event, commit) {
     <div class="context-menu-item" data-action="copy-html">
       <span class="context-menu-icon">🌐</span>
       <span class="context-menu-label">Copy as HTML</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-rest">
+      <span class="context-menu-icon">📜</span>
+      <span class="context-menu-label">Copy as reStructuredText</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-jira">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-label">Copy as Jira Format</span>
     </div>
     <div class="context-menu-item" data-action="copy-co-authors">
       <span class="context-menu-icon">👥</span>
@@ -2962,6 +3014,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy all filtered hashes (${getOrderedCommits(getFilteredCommits()).length})</span>
     </div>
+    <div class="context-menu-item" data-action="copy-all-filtered-as-oneline">
+      <span class="context-menu-icon">≡</span>
+      <span class="context-menu-label">Copy all filtered as oneline (${getOrderedCommits(getFilteredCommits()).length})</span>
+    </div>
     <div class="context-menu-item" data-action="copy-combined-diff" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy combined diff</span>
@@ -2977,6 +3033,14 @@ function showCommitContextMenu(event, commit) {
     <div class="context-menu-item" data-action="copy-selected-messages-numbered" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">🔢</span>
       <span class="context-menu-label">Copy messages as numbered list</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-selected-messages-checklist-with-author" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
+      <span class="context-menu-icon">☑️</span>
+      <span class="context-menu-label">Copy messages as checklist with author</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-selected-messages-numbered-with-author" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
+      <span class="context-menu-icon">🔢</span>
+      <span class="context-menu-label">Copy messages as numbered list with author</span>
     </div>
     <div class="context-menu-item" data-action="compare-parent">
       <span class="context-menu-icon">⧁</span>
@@ -3053,6 +3117,8 @@ function showCommitContextMenu(event, commit) {
         handleCopyFullCommitInfoWithFileStats();
       } else if (action === 'copy-oneline') {
         vscode.postMessage({ type: 'copyOneline', hash: commit.hash });
+      } else if (action === 'copy-compact') {
+        vscode.postMessage({ type: 'copyCommitCompact', hash: commit.hash });
       } else if (action === 'copy-commit-body') {
         vscode.postMessage({ type: 'copyCommitBody', hash: commit.hash });
       } else if (action === 'copy-markdown') {
@@ -3061,6 +3127,10 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitJson', hash: commit.hash });
       } else if (action === 'copy-html') {
         vscode.postMessage({ type: 'copyCommitHtml', hash: commit.hash });
+      } else if (action === 'copy-rest') {
+        vscode.postMessage({ type: 'copyCommitRest', hash: commit.hash });
+      } else if (action === 'copy-jira') {
+        vscode.postMessage({ type: 'copyCommitJira', hash: commit.hash });
       } else if (action === 'copy-co-authors') {
         vscode.postMessage({ type: 'copyCoAuthors', hash: commit.hash });
       } else if (action === 'copy-commit-date') {
@@ -3091,6 +3161,8 @@ function showCommitContextMenu(event, commit) {
         handleCopySelectedCherryPickCommands();
       } else if (action === 'copy-all-filtered-hashes') {
         handleCopyAllFilteredHashes();
+      } else if (action === 'copy-all-filtered-as-oneline') {
+        handleCopyAllFilteredAsOneline();
       } else if (action === 'copy-combined-diff') {
         handleCopyCombinedDiff();
       } else if (action === 'copy-range-diff') {
@@ -3099,6 +3171,10 @@ function showCommitContextMenu(event, commit) {
         handleCopySelectedMessagesChecklist();
       } else if (action === 'copy-selected-messages-numbered') {
         handleCopySelectedMessagesNumbered();
+      } else if (action === 'copy-selected-messages-checklist-with-author') {
+        handleCopySelectedMessagesChecklistWithAuthor();
+      } else if (action === 'copy-selected-messages-numbered-with-author') {
+        handleCopySelectedMessagesNumberedWithAuthor();
       } else if (action === 'compare-parent') {
         vscode.postMessage({ type: 'quickCompare', hash: commit.hash });
       }
@@ -3900,6 +3976,28 @@ function handleCopyOneline() {
   });
 }
 
+function handleCopyCompact() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy as compact');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitCompact',
+    hash: targetCommit.hash
+  });
+}
+
 function handleCopyCommitBody() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -3988,6 +4086,52 @@ function handleCopyHtml() {
 
   vscode.postMessage({
     type: 'copyCommitHtml',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyRest() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy as reStructuredText');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitRest',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyJira() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy as Jira format');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitJira',
     hash: targetCommit.hash
   });
 }
@@ -4355,6 +4499,56 @@ function handleCopySelectedMessagesNumbered() {
   }
 }
 
+function handleCopySelectedMessagesChecklistWithAuthor() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+
+  // Get hashes from selected commits
+  const selectedHashes = [...selectedCommits];
+
+  if (selectedHashes.length === 0) {
+    // Fall back to focused commit
+    if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+      const commit = displayCommits[focusedIndex];
+      vscode.postMessage({ type: 'copySelectedMessagesChecklistWithAuthor', hashes: [commit.hash] });
+    } else {
+      showError('Select a commit to copy as checklist with author');
+    }
+  } else {
+    // Reorder to match display order (newest first)
+    const orderedHashes = selectedHashes
+      .map(hash => displayCommits.find(c => c.hash === hash))
+      .filter(Boolean)
+      .map(c => c.hash);
+
+    vscode.postMessage({ type: 'copySelectedMessagesChecklistWithAuthor', hashes: orderedHashes });
+  }
+}
+
+function handleCopySelectedMessagesNumberedWithAuthor() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+
+  // Get hashes from selected commits
+  const selectedHashes = [...selectedCommits];
+
+  if (selectedHashes.length === 0) {
+    // Fall back to focused commit
+    if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+      const commit = displayCommits[focusedIndex];
+      vscode.postMessage({ type: 'copySelectedMessagesNumberedWithAuthor', hashes: [commit.hash] });
+    } else {
+      showError('Select a commit to copy as numbered list with author');
+    }
+  } else {
+    // Reorder to match display order (newest first)
+    const orderedHashes = selectedHashes
+      .map(hash => displayCommits.find(c => c.hash === hash))
+      .filter(Boolean)
+      .map(c => c.hash);
+
+    vscode.postMessage({ type: 'copySelectedMessagesNumberedWithAuthor', hashes: orderedHashes });
+  }
+}
+
 function handleCopySelectedCherryPickCommands() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
 
@@ -4411,6 +4605,15 @@ function handleCopyAllFilteredHashes() {
   }
   const allHashes = displayCommits.map(commit => commit.hash);
   vscode.postMessage({ type: 'copyAllFilteredHashes', hashes: allHashes });
+}
+
+function handleCopyAllFilteredAsOneline() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (displayCommits.length === 0) {
+    showError('No commits visible in current view');
+    return;
+  }
+  vscode.postMessage({ type: 'copyAllFilteredAsOneline', hashes: displayCommits.map(commit => commit.hash) });
 }
 
 function handleCopyStats() {
@@ -4924,8 +5127,10 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'Alt', 'H'], description: 'Copy all filtered hashes' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'Y'], description: 'Copy all filtered as oneline' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
         { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
+        { keys: [cmdKey, 'Shift', '.'], description: 'Copy as compact' },
         { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
         { keys: [cmdKey, 'Alt', 'M'], description: 'Copy as Markdown' },
         { keys: [cmdKey, 'Alt', 'J'], description: 'Copy as JSON' },
@@ -4951,11 +5156,15 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Alt', 'A'], description: 'Copy committer email' },
         { keys: [cmdKey, 'Alt', 'N'], description: 'Copy committer name' },
         { keys: [cmdKey, 'Alt', 'H'], description: 'Copy commit as HTML' },
+        { keys: [cmdKey, 'Alt', 'Y'], description: 'Copy as reStructuredText' },
+        { keys: [cmdKey, altKey, 'Shift', 'J'], description: 'Copy as Jira Format' },
         { keys: [cmdKey, 'Alt', 'F'], description: 'Copy file diff' },
         { keys: [cmdKey, 'Alt', 'C'], description: 'Copy file content' },
         { keys: [cmdKey, 'Alt', 'Shift', 'E'], description: 'Reveal file in explorer' },
-        { keys: [cmdKey, 'Alt', 'Z'], description: 'Copy selected messages as checklist' },
-        { keys: [cmdKey, 'Alt', 'Shift', 'Z'], description: 'Copy selected messages as numbered list' }
+        { keys: [cmdKey, altKey, 'Z'], description: 'Copy selected messages as checklist' },
+        { keys: [cmdKey, altKey, 'Shift', 'Z'], description: 'Copy selected messages as numbered list' },
+        { keys: [cmdKey, altKey, 'Shift', 'C'], description: 'Copy selected messages as checklist with author' },
+        { keys: [cmdKey, altKey, 'Shift', 'N'], description: 'Copy selected messages as numbered list with author' }
       ]
     },
     {

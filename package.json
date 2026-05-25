@@ -222,6 +222,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyCompact",
+        "title": "Git History: Copy Commit as Compact",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitBody",
         "title": "Git History: Copy Commit Body",
         "category": "Git History"
@@ -239,6 +244,16 @@
       {
         "command": "gitHistory.copyCommitHtml",
         "title": "Git History: Copy Commit as HTML",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitRest",
+        "title": "Git History: Copy Commit as reStructuredText",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitJira",
+        "title": "Git History: Copy Commit as Jira Format",
         "category": "Git History"
       },
       {
@@ -347,6 +362,16 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copySelectedMessagesChecklistWithAuthor",
+        "title": "Git History: Copy Selected Messages as Checklist with Author",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copySelectedMessagesNumberedWithAuthor",
+        "title": "Git History: Copy Selected Messages as Numbered List with Author",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copySelectedCherryPickCommands",
         "title": "Git History: Copy Cherry-Pick Commands (Selected)",
         "category": "Git History"
@@ -354,6 +379,11 @@
       {
         "command": "gitHistory.copyAllFilteredHashes",
         "title": "Git History: Copy All Filtered Hashes",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyAllFilteredAsOneline",
+        "title": "Git History: Copy All Filtered as Oneline",
         "category": "Git History"
       },
       {
@@ -791,6 +821,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyCompact",
+        "key": "ctrl+shift+.",
+        "mac": "cmd+shift+.",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyCommitBody",
         "key": "ctrl+shift+z",
         "mac": "cmd+shift+z",
@@ -815,6 +851,18 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyCommitRest",
+        "key": "ctrl+alt+y",
+        "mac": "cmd+alt+y",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitJira",
+        "key": "ctrl+alt+shift+j",
+        "mac": "cmd+alt+shift+j",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copySelectedHashes",
         "key": "ctrl+shift+;",
         "mac": "cmd+shift+;",
@@ -833,9 +881,27 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copySelectedMessagesChecklistWithAuthor",
+        "key": "ctrl+alt+shift+c",
+        "mac": "cmd+alt+shift+c",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySelectedMessagesNumberedWithAuthor",
+        "key": "ctrl+alt+shift+n",
+        "mac": "cmd+alt+shift+n",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyAllFilteredHashes",
         "key": "ctrl+shift+alt+h",
         "mac": "cmd+shift+alt+h",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyAllFilteredAsOneline",
+        "key": "ctrl+shift+alt+y",
+        "mac": "cmd+shift+alt+y",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {

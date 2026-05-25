@@ -125,10 +125,13 @@ export type WebviewAction =
   | 'copyRelativeDate'
   | 'copyCommitTimestamp'
   | 'copyOneline'
+  | 'copyCompact'
   | 'copyCommitBody'
   | 'copyCommitMarkdown'
   | 'copyCommitJson'
   | 'copyCommitHtml'
+  | 'copyCommitRest'
+  | 'copyCommitJira'
   | 'copyFileContent'
   | 'copyDescribe'
   | 'copyFileName'
@@ -172,8 +175,11 @@ export type WebviewAction =
   | 'toggleSignatures'
   | 'toggleStats'
   | 'copyAllFilteredHashes'
+  | 'copyAllFilteredAsOneline'
   | 'copySelectedMessagesChecklist'
   | 'copySelectedMessagesNumbered'
+  | 'copySelectedMessagesChecklistWithAuthor'
+  | 'copySelectedMessagesNumberedWithAuthor'
   | 'copyCommitterEmail'
   | 'copyCommitterName'
   | 'copyShowCommand'
@@ -289,10 +295,13 @@ export type WebviewToExtMessage =
   | { type: 'copyRelativeDate'; hash: string }
   | { type: 'copyCommitTimestamp'; hash: string }
   | { type: 'copyOneline'; hash: string }
+  | { type: 'copyCommitCompact'; hash: string }
   | { type: 'copyCommitBody'; hash: string }
   | { type: 'copyCommitMarkdown'; hash: string }
   | { type: 'copyCommitJson'; hash: string }
   | { type: 'copyCommitHtml'; hash: string }
+  | { type: 'copyCommitRest'; hash: string }
+  | { type: 'copyCommitJira'; hash: string }
   | { type: 'copyFileContent'; hash: string; filePath: string }
   | { type: 'copyDescribe'; hash: string }
   | { type: 'copyFileDiff'; hash: string; filePath: string }
@@ -325,8 +334,11 @@ export type WebviewToExtMessage =
   | { type: 'getFilterPresets' }
   | { type: 'applyPreset'; presetName: string }
   | { type: 'copyAllFilteredHashes'; hashes: string[] }
+  | { type: 'copyAllFilteredAsOneline'; hashes: string[] }
   | { type: 'copySelectedMessagesChecklist'; hashes: string[] }
   | { type: 'copySelectedMessagesNumbered'; hashes: string[] }
+  | { type: 'copySelectedMessagesChecklistWithAuthor'; hashes: string[] }
+  | { type: 'copySelectedMessagesNumberedWithAuthor'; hashes: string[] }
   | { type: 'copyAllFilePermalinks'; hash: string }
   | { type: 'copyFilterAsGitLogCommand'; filterState: FilterQueryState }
   | { type: 'focusCommitList' }

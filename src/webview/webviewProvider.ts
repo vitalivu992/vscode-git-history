@@ -276,11 +276,11 @@ export class GitHistoryPanel {
       <button id="context-lines-btn" class="context-lines-btn" title="Diff context lines (Ctrl+Shift+/)">
         <span id="context-lines-value">3</span>
       </button>
-      <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
-      <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
-      <button id="graph-toggle-btn" class="graph-toggle-btn active" title="Graph visible (click to hide)">Graph</button>
-      <button id="signatures-toggle-btn" class="signatures-toggle-btn active" title="GPG signatures visible (click to hide)">Signatures</button>
-      <button id="stats-toggle-btn" class="stats-toggle-btn active" title="Stats visible (click to hide)">Stats</button>
+      <button id="sort-btn" class="sort-btn" title="Sort: Newest first (Ctrl+Shift+3 to cycle)">&#x2193; Newest</button>
+      <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits (Ctrl+Shift+Q)">No Merge</button>
+      <button id="graph-toggle-btn" class="graph-toggle-btn active" title="Graph visible (Ctrl+Alt+T to toggle)">Graph</button>
+      <button id="signatures-toggle-btn" class="signatures-toggle-btn active" title="GPG signatures visible (Ctrl+Shift+Alt+S to toggle)">Signatures</button>
+      <button id="stats-toggle-btn" class="stats-toggle-btn active" title="Stats visible (Ctrl+Shift+Alt+T to toggle)">Stats</button>
       <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>
       <button id="export-btn" class="export-btn" title="Export filtered commits (Ctrl+Shift+O)">Export</button>
       <button id="refresh-btn" title="Refresh (Ctrl+Shift+R)">&#x21bb;</button>

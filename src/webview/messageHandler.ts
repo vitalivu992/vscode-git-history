@@ -6,6 +6,7 @@ import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, get
 import { ExtToWebviewMessage, CommitInfo, FileStats, FilterQueryState, SavedFilterPreset, SAVED_PRESETS_STORAGE_KEY } from '../types';
 import { SettingsService, UserSettings, MAX_SAVED_PRESETS, PRESET_NAME_MAX_LENGTH } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
+import { formatRelativeTime } from '../blame/blameService';
 
 /**
  * Handle messages from webview
@@ -189,6 +190,10 @@ export async function handleMessage(
       handleCopyOneline(message.hash, panel);
       break;
 
+    case 'copyCommitCompact':
+      handleCopyCompact(message.hash, panel);
+      break;
+
     case 'copyCommitBody':
       handleCopyCommitBody(message.hash, panel);
       break;
@@ -205,6 +210,14 @@ export async function handleMessage(
       handleCopyCommitHtml(message.hash, panel);
       break;
 
+    case 'copyCommitRest':
+      handleCopyCommitRest(message.hash, panel);
+      break;
+
+    case 'copyCommitJira':
+      handleCopyCommitJira(message.hash, panel);
+      break;
+
     case 'copySelectedHashes':
       handleCopySelectedHashes(message.hashes, panel);
       break;
@@ -217,12 +230,24 @@ export async function handleMessage(
       handleCopyAllFilteredHashes(message.hashes, panel);
       break;
 
+    case 'copyAllFilteredAsOneline':
+      handleCopyAllFilteredAsOneline(message.hashes, panel);
+      break;
+
     case 'copySelectedMessagesChecklist':
       handleCopySelectedMessagesChecklist(message.hashes, panel);
       break;
 
     case 'copySelectedMessagesNumbered':
       handleCopySelectedMessagesNumbered(message.hashes, panel);
+      break;
+
+    case 'copySelectedMessagesChecklistWithAuthor':
+      handleCopySelectedMessagesChecklistWithAuthor(message.hashes, panel);
+      break;
+
+    case 'copySelectedMessagesNumberedWithAuthor':
+      handleCopySelectedMessagesNumberedWithAuthor(message.hashes, panel);
       break;
 
     case 'copyFilterQuery':
@@ -1756,6 +1781,23 @@ function handleCopyOneline(hash: string, panel: GitHistoryPanel): void {
   });
 }
 
+function handleCopyCompact(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const relativeDate = formatRelativeTime(Math.floor(new Date(commit.date).getTime() / 1000));
+  const compact = `${commit.shortHash} - ${commit.message} (${commit.author}, ${relativeDate})`;
+  void vscode.env.clipboard.writeText(compact).then(() => {
+    const shortMsg = commit.message.length > 50
+      ? commit.message.substring(0, 47) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied: ${commit.shortHash} - ${shortMsg}`);
+  });
+}
+
 function handleCopyCommitBody(hash: string, panel: GitHistoryPanel): void {
   const commit = panel.getCommits().find(c => c.hash === hash);
   if (!commit) {
@@ -1981,6 +2023,110 @@ function handleCopyCommitHtml(hash: string, panel: GitHistoryPanel): void {
   });
 }
 
+export function formatCommitAsRest(commit: CommitInfo): string {
+  const date = new Date(commit.date).toISOString();
+  const author = `${commit.author} <${commit.email}>`;
+  const underline = '='.repeat(commit.message.length);
+
+  let rest = `${commit.message}\n`;
+  rest += `${underline}\n\n`;
+  rest += `:Author: ${author}\n`;
+  rest += `:Date: ${date}\n`;
+  rest += `:Hash: ${commit.shortHash}\n`;
+
+  if (commit.stats) {
+    const filesText = commit.stats.filesChanged === 1 ? 'file' : 'files';
+    rest += `\n**Statistics:** ${commit.stats.filesChanged} ${filesText} changed, ${commit.stats.insertions} insertions(+), ${commit.stats.deletions} deletions(-)\n`;
+  }
+
+  if (commit.tags && commit.tags.length > 0) {
+    rest += `\nTags: ${commit.tags.join(', ')}\n`;
+  }
+
+  if (commit.fullMessage && commit.fullMessage !== commit.message) {
+    const body = commit.fullMessage.replace(commit.message, '').trim();
+    if (body) {
+      const bodyUnderline = '-'.repeat(commit.message.length);
+      rest += `\nCommit Body\n`;
+      rest += `${bodyUnderline}\n\n`;
+      rest += `${body}\n`;
+    }
+  }
+
+  return rest;
+}
+
+function handleCopyCommitRest(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const rest = formatCommitAsRest(commit);
+  void vscode.env.clipboard.writeText(rest).then(() => {
+    const shortMsg = commit.message.length > 30
+      ? commit.message.substring(0, 27) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied as ReST: ${commit.shortHash} ${shortMsg}`);
+  });
+}
+
+export function formatCommitAsJira(commit: CommitInfo): string {
+  const lines: string[] = [];
+
+  // Header with short hash and subject
+  lines.push(`h4. ${commit.shortHash} - ${commit.message}`);
+  lines.push('');
+
+  // Author info table
+  const dateStr = new Date(commit.date).toLocaleString();
+  lines.push('|| Author || Date || Email ||');
+  lines.push(`| ${commit.author} | ${dateStr} | ${commit.email} |`);
+  lines.push('');
+
+  // Stats if available
+  if (commit.stats) {
+    const filesWord = commit.stats.filesChanged === 1 ? 'file' : 'files';
+    lines.push(`*Stats:* ${commit.stats.filesChanged} ${filesWord} changed, +${commit.stats.insertions}, -${commit.stats.deletions}`);
+    lines.push('');
+  }
+
+  // Tags if available
+  if (commit.tags && commit.tags.length > 0) {
+    lines.push(`*Tags:* ${commit.tags.join(', ')}`);
+    lines.push('');
+  }
+
+  // Body if exists and different from subject
+  if (commit.fullMessage && commit.fullMessage !== commit.message) {
+    const body = commit.fullMessage.replace(commit.message, '').trim();
+    if (body) {
+      lines.push('h5. Commit Message');
+      lines.push(body);
+      lines.push('');
+    }
+  }
+
+  return lines.join('\n');
+}
+
+function handleCopyCommitJira(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const jira = formatCommitAsJira(commit);
+  void vscode.env.clipboard.writeText(jira).then(() => {
+    const shortMsg = commit.message.length > 30
+      ? commit.message.substring(0, 27) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied as Jira: ${commit.shortHash} ${shortMsg}`);
+  });
+}
+
 /**
  * Handle copy selected hashes to clipboard
  */
@@ -2024,6 +2170,34 @@ function handleCopySelectedMessagesNumbered(hashes: string[], panel: GitHistoryP
   });
 }
 
+function handleCopySelectedMessagesChecklistWithAuthor(hashes: string[], panel: GitHistoryPanel): void {
+  const commits = panel.getCommits();
+  const selected = commits.filter(c => hashes.includes(c.hash));
+  if (selected.length === 0) {
+    void vscode.window.showInformationMessage('No commits selected');
+    return;
+  }
+
+  const checklist = selected.map(c => `- [ ] ${c.author} - ${c.message}`).join('\n');
+  void vscode.env.clipboard.writeText(checklist).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${selected.length} message${selected.length > 1 ? 's' : ''} as checklist with author`);
+  });
+}
+
+function handleCopySelectedMessagesNumberedWithAuthor(hashes: string[], panel: GitHistoryPanel): void {
+  const commits = panel.getCommits();
+  const selected = commits.filter(c => hashes.includes(c.hash));
+  if (selected.length === 0) {
+    void vscode.window.showInformationMessage('No commits selected');
+    return;
+  }
+
+  const numbered = selected.map((c, index) => `${index + 1}. ${c.author} - ${c.message}`).join('\n');
+  void vscode.env.clipboard.writeText(numbered).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${selected.length} message${selected.length > 1 ? 's' : ''} as numbered list with author`);
+  });
+}
+
 /**
  * Handle copy selected cherry-pick commands to clipboard
  */
@@ -2051,6 +2225,27 @@ function handleCopyAllFilteredHashes(hashes: string[], _panel: GitHistoryPanel):
   const hashText = hashes.join('\n');
   void vscode.env.clipboard.writeText(hashText).then(() => {
     void vscode.window.showInformationMessage(`Copied ${hashes.length} filtered commit hash${hashes.length > 1 ? 'es' : ''}`);
+  });
+}
+
+/**
+ * Handle copy all filtered as oneline to clipboard
+ */
+function handleCopyAllFilteredAsOneline(hashes: string[], panel: GitHistoryPanel): void {
+  if (hashes.length === 0) {
+    void vscode.window.showInformationMessage('No commits visible in current view');
+    return;
+  }
+
+  const commits = panel.getCommits();
+  const onelineCommits = hashes
+    .map(hash => commits.find(c => c.hash === hash))
+    .filter((commit): commit is CommitInfo => commit !== undefined)
+    .map(commit => `${commit.shortHash} ${commit.message}`);
+
+  const onelineText = onelineCommits.join('\n');
+  void vscode.env.clipboard.writeText(onelineText).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${onelineCommits.length} commit${onelineCommits.length > 1 ? 's' : ''} as oneline`);
   });
 }
 
