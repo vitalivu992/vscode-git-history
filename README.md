@@ -53,14 +53,24 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **📌 Copy Subject**: Copy only the commit subject (first line of the commit message) to clipboard with `Ctrl+Shift+6` / `Cmd+Shift+6` keyboard shortcut, or right-click context menu
 - **📊 Copy Diff Stat Summary**: Copy just the diff stat summary (e.g., "3 files changed, 45 insertions(+), 12 deletions(-)") to clipboard with `Ctrl+Shift+9` / `Cmd+Shift+9` keyboard shortcut, or right-click context menu. Uses singular forms when counts are 1 (e.g., "1 file changed, 1 insertion(+), 1 deletion(-)").
 - **≡ Copy as Oneline**: Copy the commit in `git log --oneline` format (`{shortHash} {subject}`) to clipboard with `Ctrl+Shift+Y` / `Cmd+Shift+Y` keyboard shortcut, or right-click context menu. Example: `a1b2c3d Fix authentication bug`
+- **📝 Copy as Compact**: Copy the commit in a compact single-line format (`{shortHash} - {subject} ({author}, {relativeDate})`) to clipboard with `Ctrl+Shift+.` / `Cmd+Shift+.` keyboard shortcut, or right-click context menu. Useful for quick sharing in team chat, code review summaries, and release note snippets. Example: `a1b2c3d - Fix authentication bug (John Doe, 2 days ago)`
 - **📄 Copy Commit Body**: Copy just the commit body (the multi-line description after the subject line) to clipboard with `Ctrl+Shift+Z` / `Cmd+Shift+Z` keyboard shortcut, or right-click context menu. Shows "Commit has no body" for single-line commits.
 - **📜 Copy as Markdown**: Copy commit information formatted as Markdown for use in changelogs, release notes, and documentation. Press `Ctrl+Alt+M` / `Cmd+Alt+M` or use the right-click context menu. The format includes commit message with heading, author, date (relative + absolute), stats, tags, and body.
 - **{} Copy as JSON**: Copy the focused or selected commit as formatted JSON with all available commit data. Press `Ctrl+Alt+J` / `Cmd+Alt+J` or use the right-click context menu. The JSON includes hash, shortHash, author (name, email), date (ISO 8601), message, body (or null), parentHashes (empty array for root commits), tags (empty array if none), and stats (or null). Useful for programmatic access, API integrations, and automation workflows.
 - **🌐 Copy as HTML**: Copy the focused or selected commit as styled HTML with inline CSS for portability. Press `Ctrl+Alt+H` / `Cmd+Alt+H` or use the right-click context menu. The HTML includes the commit subject, hash, author, date, stats (with colored insertions/deletions), tags (as badges), and commit body. Useful for sharing commits in emails, wikis, and HTML documentation.
+- **📜 Copy as reStructuredText**: Copy the focused or selected commit as reStructuredText (ReST) format for Sphinx documentation. Press `Ctrl+Alt+Y` / `Cmd+Alt+Y` or use the right-click context menu. The format includes commit message with `=` underline, `:Author:`, `:Date:`, `:Hash:` field lists, statistics section with bold text, tags, and body section with `-` underline. Useful for Python projects using ReST-based documentation.
+- **📋 Copy as Jira Format**: Copy the focused or selected commit in Jira/Confluence markup format with `Ctrl+Alt+Shift+J` / `Cmd+Alt+Shift+J` keyboard shortcut, or use the right-click context menu. The format uses Jira's text formatting syntax (`h4.` headings, `||` table headers, `|` table cells) and includes commit hash and subject as heading, author info table (Author, Date, Email), statistics, tags, and commit body. Useful for pasting commit details into Jira tickets, Confluence pages, and other Atlassian products.
 - **👥 Copy Co-Authors**: Copy co-authors from commit message to clipboard with `Ctrl+Shift+K` / `Cmd+Shift+K` keyboard shortcut, or right-click context menu. Extracts "Co-authored-by:" trailers in the format "Name <email>" separated by newlines.
 - **🕐 Copy Commit Date**: Copy the commit date in ISO 8601 format to clipboard with `Ctrl+Shift+T` / `Cmd+Shift+T` keyboard shortcut, or right-click context menu
 - **Copy Selected Hashes**: Copy all selected commit hashes as a newline-separated list with `Ctrl+Shift+;` / `Cmd+Shift+;` keyboard shortcut (when 2+ commits are selected), or right-click context menu (shown when multiple commits are selected). Falls back to single hash copy when 0 or 1 commit is selected.
+- **Copy All Filtered Hashes**: Copy all currently visible commit hashes from the filtered view as a newline-separated list with `Ctrl+Shift+Alt+H` / `Cmd+Shift+Alt+H` keyboard shortcut. Unlike "Copy Selected Hashes", this copies all visible commits without requiring manual selection. Useful for batch cherry-pick operations, release notes generation, and bulk operations on filtered commit lists.
+- **Copy All Filtered as Oneline**: Copy all currently visible commits in oneline format (`{shortHash} {subject}`) to clipboard with `Ctrl+Shift+Alt+Y` / `Cmd+Shift+Alt+Y` keyboard shortcut. Unlike "Copy Selected Hashes", this copies all visible commits without requiring manual selection. Useful for changelogs, release notes, and sharing commit lists in a compact format.
 - **☑️ Copy Selected Messages as Checklist**: Copy selected commit messages as a Markdown checklist (`- [ ] message`) with `Ctrl+Alt+Z` / `Cmd+Alt+Z` keyboard shortcut. Falls back to the focused commit when none are selected. Context menu entry is shown when 2+ commits are selected. Useful for creating PR review checklists, release verification lists, and sprint planning notes.
+- **🔢 Copy Selected Messages as Numbered List**: Copy selected commit messages as a numbered Markdown list (`1. message`) with `Ctrl+Alt+Shift+Z` / `Cmd+Alt+Shift+Z` keyboard shortcut. Falls back to the focused commit when none are selected. Context menu entry is shown when 2+ commits are selected. Useful for numbered release notes, meeting agendas, and ordered changelogs.
+- **☑️ Copy Selected Messages with Author**: These variants include author names with commit messages, useful for team reports, code reviews, and meeting agendas. Use keyboard shortcuts or the right-click context menu (shown when 2+ commits are selected) to access these options:
+  - **Checklist with Author**: Copy selected commit messages as a Markdown checklist (`- [ ] Author - message`) with `Ctrl+Alt+Shift+C` / `Cmd+Alt+Shift+C` keyboard shortcut
+  - **Numbered with Author**: Copy selected commit messages as a numbered Markdown list (`1. Author - message`) with `Ctrl+Alt+Shift+N` / `Cmd+Alt+Shift+N` keyboard shortcut
+  Both fallback to the focused commit when 0 or 1 commit is selected.
 - **Copy Commit Info**: Copy the full commit information (hash, author, date, message) to clipboard with `Ctrl+Shift+I` / `Cmd+Shift+I` keyboard shortcut
 - **Copy Cherry-Pick Command**: Copy a pre-formatted `git cherry-pick <hash>` command to the clipboard with `Ctrl+Shift+P` / `Cmd+Shift+P` keyboard shortcut, or right-click on any commit
 - **Copy Cherry-Pick Commands (Selected)**: Copy cherry-pick commands for multiple selected commits as newline-separated list. Use the right-click context menu (shown when 2+ commits are selected). Falls back to single commit cherry-pick command when 0 or 1 commit is selected. Output format: `git cherry-pick hash1`, `git cherry-pick hash2`, etc.
@@ -196,6 +206,8 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy commit body** | Copy the commit body (description after subject) |
 | **Copy as Markdown** | Copy formatted as Markdown |
 | **Copy as JSON** | Copy as formatted JSON |
+| **Copy as reStructuredText** | Copy as reStructuredText (ReST) format for Sphinx documentation |
+| **Copy as Jira Format** | Copy in Jira/Confluence markup format for Atlassian products |
 | **Copy co-authors** | Copy co-authors from commit message |
 | **Copy commit date** | Copy date in ISO 8601 format |
 | **Copy relative date** | Copy date in relative format |
@@ -299,6 +311,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+6` / `Cmd+Shift+6` | Copy subject (commit title) to clipboard |
 | `Ctrl+Shift+9` / `Cmd+Shift+9` | Copy diff stat summary to clipboard |
 | `Ctrl+Shift+Y` / `Cmd+Shift+Y` | Copy as oneline (`shortHash subject`) to clipboard |
+| `Ctrl+Shift+.` / `Cmd+Shift+.` | Copy as compact (`shortHash - subject (author, relativeDate)`) to clipboard |
 | `Ctrl+Shift+K` / `Cmd+Shift+K` | Copy co-authors to clipboard |
 | `Ctrl+Shift+T` / `Cmd+Shift+T` | Copy commit date (ISO 8601 format) to clipboard |
 | `Ctrl+Shift+8` / `Cmd+Shift+8` | Copy relative date (e.g., "Today 2:30 PM", "3 days ago") to clipboard |
@@ -414,6 +427,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy commit subject | `Ctrl+Shift+6` / `Cmd+Shift+6` |
 | Copy diff stat summary | `Ctrl+Shift+9` / `Cmd+Shift+9` |
 | Copy as oneline | `Ctrl+Shift+Y` / `Cmd+Shift+Y` |
+| Copy as compact | `Ctrl+Shift+.` / `Cmd+Shift+.` |
 | Copy commit date | `Ctrl+Shift+T` / `Cmd+Shift+T` |
 | Copy relative date | `Ctrl+Shift+8` / `Cmd+Shift+8` |
 | Copy short hash | `Ctrl+Shift+7` / `Cmd+Shift+7` |
@@ -421,6 +435,8 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy as Markdown | `Ctrl+Alt+M` / `Cmd+Alt+M` |
 | Copy as JSON | `Ctrl+Alt+J` / `Cmd+Alt+J` |
 | Copy as HTML | `Ctrl+Alt+H` / `Cmd+Alt+H` |
+| Copy as reStructuredText | `Ctrl+Alt+Y` / `Cmd+Alt+Y` |
+| Copy as Jira Format | `Ctrl+Alt+Shift+J` / `Cmd+Alt+Shift+J` |
 | Copy co-authors | `Ctrl+Shift+K` / `Cmd+Shift+K` |
 | Copy file path | `Ctrl+Shift+.` / `Cmd+Shift+.` |
 | Copy file name | `Ctrl+Shift+,` / `Cmd+Shift+,` |
