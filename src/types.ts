@@ -118,10 +118,12 @@ export type WebviewAction =
   | 'copyParentHash'
   | 'copyShortHash'
   | 'copySubject'
+  | 'copySubjectWithAuthor'
   | 'copyDiffStatSummary'
   | 'copyCommitWithStats'
   | 'copyCoAuthors'
   | 'copyCommitDate'
+  | 'copyCommitShortDate'
   | 'copyRelativeDate'
   | 'copyCommitTimestamp'
   | 'copyOneline'
@@ -176,6 +178,7 @@ export type WebviewAction =
   | 'toggleStats'
   | 'copyAllFilteredHashes'
   | 'copyAllFilteredAsOneline'
+  | 'copyAllUniqueAuthors'
   | 'copySelectedMessagesChecklist'
   | 'copySelectedMessagesNumbered'
   | 'copySelectedMessagesChecklistWithAuthor'
@@ -194,10 +197,12 @@ export type WebviewAction =
   | 'copyAllFilePermalinks'
   | 'copyFilterAsGitLogCommand'
   | 'copyFileBasename'
+  | 'copyFilePathWithHash'
   | 'focusCommitList'
   | 'revealFileInExplorer'
   | 'copySignatureInfo'
-  | 'copyFullCommitInfoWithFileStats';
+  | 'copyFullCommitInfoWithFileStats'
+  | 'copyCommitYaml';
 
 /**
  * Filter state for copy filter query feature
@@ -266,6 +271,7 @@ export type WebviewToExtMessage =
   | { type: 'copyFileBasename'; filePath: string }
   | { type: 'copyFileDirectory'; filePath: string }
   | { type: 'copyRelativePath'; filePath: string }
+  | { type: 'copyFilePathWithHash'; hash: string; filePath: string }
   | { type: 'openFileAtCommit'; hash: string; filePath: string }
   | { type: 'copyCommitPatch'; hash: string }
   | { type: 'copyCommitUrl'; hash: string }
@@ -288,10 +294,12 @@ export type WebviewToExtMessage =
   | { type: 'copyParentHash'; hash: string }
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }
+  | { type: 'copySubjectWithAuthor'; hash: string }
   | { type: 'copyDiffStatSummary'; hash: string }
   | { type: 'copyCommitWithStats'; hash: string }
   | { type: 'copyCoAuthors'; hash: string }
   | { type: 'copyCommitDate'; hash: string }
+  | { type: 'copyCommitShortDate'; hash: string }
   | { type: 'copyRelativeDate'; hash: string }
   | { type: 'copyCommitTimestamp'; hash: string }
   | { type: 'copyOneline'; hash: string }
@@ -335,6 +343,7 @@ export type WebviewToExtMessage =
   | { type: 'applyPreset'; presetName: string }
   | { type: 'copyAllFilteredHashes'; hashes: string[] }
   | { type: 'copyAllFilteredAsOneline'; hashes: string[] }
+  | { type: 'copyAllUniqueAuthors'; hashes: string[] }
   | { type: 'copySelectedMessagesChecklist'; hashes: string[] }
   | { type: 'copySelectedMessagesNumbered'; hashes: string[] }
   | { type: 'copySelectedMessagesChecklistWithAuthor'; hashes: string[] }
@@ -344,4 +353,5 @@ export type WebviewToExtMessage =
   | { type: 'focusCommitList' }
   | { type: 'revealFileInExplorer'; filePath: string }
   | { type: 'copySignatureInfo'; hash: string }
-  | { type: 'copyFullCommitInfoWithFileStats'; hash: string };
+  | { type: 'copyFullCommitInfoWithFileStats'; hash: string }
+  | { type: 'copyCommitYaml'; hash: string };

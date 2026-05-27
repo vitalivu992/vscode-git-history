@@ -207,6 +207,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copySubjectWithAuthor",
+        "title": "Git History: Copy Subject with Author",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyDiffStatSummary",
         "title": "Git History: Copy Diff Stat Summary",
         "category": "Git History"
@@ -264,6 +269,11 @@
       {
         "command": "gitHistory.copyCommitDate",
         "title": "Git History: Copy Commit Date",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitShortDate",
+        "title": "Git History: Copy Commit Short Date",
         "category": "Git History"
       },
       {
@@ -347,6 +357,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFilePathWithHash",
+        "title": "Git History: Copy File Path with Hash",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copySelectedHashes",
         "title": "Git History: Copy Selected Hashes",
         "category": "Git History"
@@ -384,6 +399,11 @@
       {
         "command": "gitHistory.copyAllFilteredAsOneline",
         "title": "Git History: Copy All Filtered as Oneline",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyAllUniqueAuthors",
+        "title": "Git History: Copy All Unique Authors",
         "category": "Git History"
       },
       {
@@ -564,6 +584,11 @@
       {
         "command": "gitHistory.renameFilterPreset",
         "title": "Git History: Rename Filter Preset",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitYaml",
+        "title": "Git History: Copy Commit as YAML",
         "category": "Git History"
       }
     ],
@@ -809,6 +834,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyCommitShortDate",
+        "key": "ctrl+shift+j",
+        "mac": "cmd+shift+j",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyRelativeDate",
         "key": "ctrl+shift+8",
         "mac": "cmd+shift+8",
@@ -902,6 +933,12 @@
         "command": "gitHistory.copyAllFilteredAsOneline",
         "key": "ctrl+shift+alt+y",
         "mac": "cmd+shift+alt+y",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyAllUniqueAuthors",
+        "key": "ctrl+shift+alt+p",
+        "mac": "cmd+shift+alt+p",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -1016,6 +1053,30 @@
         "command": "gitHistory.copyCommitTimestamp",
         "key": "ctrl+shift+2",
         "mac": "cmd+shift+2",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFilesChangedCount",
+        "key": "f4",
+        "mac": "f4",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFilePathWithHash",
+        "key": "ctrl+alt+shift+b",
+        "mac": "cmd+alt+shift+b",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySubjectWithAuthor",
+        "key": "ctrl+alt+shift+m",
+        "mac": "cmd+alt+shift+m",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySelectedCherryPickCommands",
+        "key": "ctrl+alt+shift+k",
+        "mac": "cmd+alt+shift+k",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -1225,6 +1286,12 @@
         "command": "gitHistory.exportCommitsMbox",
         "key": "ctrl+shift+alt+e",
         "mac": "cmd+shift+alt+e",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitYaml",
+        "key": "ctrl+alt+shift+y",
+        "mac": "cmd+alt+shift+y",
         "when": "activeWebviewPanelId == gitHistory.webview"
       }
     ],

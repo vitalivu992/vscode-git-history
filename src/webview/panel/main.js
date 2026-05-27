@@ -20,6 +20,7 @@ let wordWrapEnabled = false; // Word wrap toggle for diff view
 let rangeSelectionAnchor = null; // Anchor commit for Shift+click range selection
 let rangeSelectionTarget = null; // Target commit for Shift+click range selection
 let regexSearchEnabled = false; // Regex search mode toggle
+let regexErrorMessage = null; // Error message when regex is invalid
 let branches = []; // All available branches from init message
 let branchCommitHashes = {}; // Map: branchName -> Set of commit hashes
 let currentUser = null; // Current git user from git config
@@ -663,6 +664,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+Alt+P: Copy all unique authors
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && (e.key === 'p' || e.key === 'P')) {
+    e.preventDefault();
+    handleCopyAllUniqueAuthors();
+    return;
+  }
+
   // Ctrl+Shift+S: Copy commit stats
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
     e.preventDefault();
@@ -753,6 +761,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.shiftKey && e.key === 'J') {
     e.preventDefault();
     handleCopyJira();
+    return;
+  }
+
+  // Ctrl+Alt+Shift+Y: Copy as YAML
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.shiftKey && e.key === 'Y') {
+    e.preventDefault();
+    handleCopyYaml();
     return;
   }
 
@@ -1229,18 +1244,27 @@ function isRegexMatch(text, pattern) {
 }
 
 /**
+ * Get the regex error message if the pattern is invalid
+ * @param {string} pattern - Regex pattern to validate
+ * @returns {string|null} Error message or null if valid
+ */
+function getRegexError(pattern) {
+  if (!regexSearchEnabled || !pattern) return null;
+  try {
+    new RegExp(pattern);
+    return null;
+  } catch (e) {
+    return e.message;
+  }
+}
+
+/**
  * Check if the current regex pattern is valid
  * @param {string} pattern - Regex pattern to validate
  * @returns {boolean} True if valid or not in regex mode
  */
 function isValidRegex(pattern) {
-  if (!regexSearchEnabled || !pattern) return true;
-  try {
-    new RegExp(pattern);
-    return true;
-  } catch (e) {
-    return false;
-  }
+  return !getRegexError(pattern);
 }
 
 /**
@@ -1251,18 +1275,16 @@ function handleRegexToggle() {
   if (regexToggleBtn) {
     if (regexSearchEnabled) {
       regexToggleBtn.classList.add('active');
-      regexToggleBtn.title = 'Regex mode enabled (Ctrl+Shift+X to toggle)';
     } else {
       regexToggleBtn.classList.remove('active');
       regexToggleBtn.classList.remove('invalid');
-      regexToggleBtn.title = 'Toggle regex search mode (Ctrl+Shift+X)';
     }
   }
   // Update search results with new mode
   focusedIndex = -1;
   renderCommits();
   updateCommitCount();
-  // Validate current pattern
+  // Validate current pattern and update tooltip
   updateRegexValidation();
 
   // Persist the setting
@@ -1363,10 +1385,18 @@ function handleMyCommitsToggle() {
 function updateRegexValidation() {
   if (!regexToggleBtn) return;
   const { textQuery } = parseDateFilter(searchQuery);
-  if (regexSearchEnabled && textQuery && !isValidRegex(textQuery)) {
+  const error = getRegexError(textQuery);
+
+  if (error) {
     regexToggleBtn.classList.add('invalid');
+    regexToggleBtn.title = `Invalid regex: ${error}`;
+    regexErrorMessage = error;
   } else {
     regexToggleBtn.classList.remove('invalid');
+    regexToggleBtn.title = regexSearchEnabled
+      ? 'Regex mode enabled (Ctrl+Shift+X to toggle)'
+      : 'Toggle regex search mode (Ctrl+Shift+X)';
+    regexErrorMessage = null;
   }
 }
 
@@ -2082,6 +2112,7 @@ function handleMessage(event) {
         case 'copyParentHash': handleCopyParentHash(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
+        case 'copySubjectWithAuthor': handleCopySubjectWithAuthor(); break;
         case 'copyDiffStatSummary': handleCopyDiffStatSummary(); break;
         case 'copyFilesChangedCount': handleCopyFilesChangedCount(); break;
         case 'copyCommitStats': handleCopyStats(); break;
@@ -2095,8 +2126,10 @@ function handleMessage(event) {
         case 'copyCommitJson': handleCopyJson(); break;
         case 'copyCommitHtml': handleCopyHtml(); break;
         case 'copyCommitJira': handleCopyJira(); break;
+        case 'copyCommitYaml': handleCopyYaml(); break;
         case 'copyCoAuthors': handleCopyCoAuthors(); break;
         case 'copyCommitDate': handleCopyCommitDate(); break;
+        case 'copyCommitShortDate': handleCopyCommitShortDate(); break;
         case 'copyRelativeDate': handleCopyRelativeDate(); break;
         case 'copyCommitTimestamp': handleCopyCommitTimestamp(); break;
         case 'copySelectedHashes': handleCopySelectedHashes(); break;
@@ -2108,12 +2141,14 @@ function handleMessage(event) {
         case 'copyAllFilePermalinks': handleCopyAllFilePermalinks(); break;
         case 'copyAllFilteredHashes': handleCopyAllFilteredHashes(); break;
         case 'copyAllFilteredAsOneline': handleCopyAllFilteredAsOneline(); break;
+        case 'copyAllUniqueAuthors': handleCopyAllUniqueAuthors(); break;
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFileExtension': handleCopyExtension(); break;
         case 'copyFileBasename': handleCopyFileBasename(); break;
         case 'copyFileDirectory': handleCopyFileDirectory(); break;
         case 'copyFilePath': handleCopyFilePath(); break;
         case 'copyRelativePath': handleCopyRelativePath(); break;
+        case 'copyFilePathWithHash': handleCopyFilePathWithHash(); break;
         case 'copyFileDiff': handleCopyFileDiff(); break;
         case 'copyFileContent': handleCopyFileContent(); break;
         case 'copyFileUrl': handleCopyFileUrl(); break;
@@ -2663,6 +2698,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy relative path</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-path-with-hash">
+      <span class="context-menu-icon">🔗</span>
+      <span class="context-menu-label">Copy path with hash</span>
+    </div>
     <div class="context-menu-item" data-action="copy-file-url">
       <span class="context-menu-icon">🔗</span>
       <span class="context-menu-label">Copy file permalink</span>
@@ -2751,6 +2790,12 @@ function showFileContextMenu(event, filePath, commitHash) {
       } else if (action === 'copy-relative-path') {
         vscode.postMessage({
           type: 'copyRelativePath',
+          filePath: filePath
+        });
+      } else if (action === 'copy-file-path-with-hash') {
+        vscode.postMessage({
+          type: 'copyFilePathWithHash',
+          hash: commitHash,
           filePath: filePath
         });
       } else if (action === 'copy-file-url') {
@@ -2901,6 +2946,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📌</span>
       <span class="context-menu-label">Copy subject</span>
     </div>
+    <div class="context-menu-item" data-action="copy-subject-with-author">
+      <span class="context-menu-icon">📝</span>
+      <span class="context-menu-label">Copy subject with author</span>
+    </div>
     <div class="context-menu-item" data-action="copy-diff-stat-summary">
       <span class="context-menu-icon">📊</span>
       <span class="context-menu-label">Copy diff stat summary</span>
@@ -2953,6 +3002,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy as Jira Format</span>
     </div>
+    <div class="context-menu-item" data-action="copy-yaml">
+      <span class="context-menu-icon">📄</span>
+      <span class="context-menu-label">Copy as YAML</span>
+    </div>
     <div class="context-menu-item" data-action="copy-co-authors">
       <span class="context-menu-icon">👥</span>
       <span class="context-menu-label">Copy co-authors</span>
@@ -2960,6 +3013,10 @@ function showCommitContextMenu(event, commit) {
     <div class="context-menu-item" data-action="copy-commit-date">
       <span class="context-menu-icon">🕐</span>
       <span class="context-menu-label">Copy commit date</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-commit-short-date">
+      <span class="context-menu-icon">📅</span>
+      <span class="context-menu-label">Copy short date</span>
     </div>
     <div class="context-menu-item" data-action="copy-relative-date">
       <span class="context-menu-icon">🕒</span>
@@ -3017,6 +3074,10 @@ function showCommitContextMenu(event, commit) {
     <div class="context-menu-item" data-action="copy-all-filtered-as-oneline">
       <span class="context-menu-icon">≡</span>
       <span class="context-menu-label">Copy all filtered as oneline (${getOrderedCommits(getFilteredCommits()).length})</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-all-unique-authors">
+      <span class="context-menu-icon">👥</span>
+      <span class="context-menu-label">Copy all unique authors (${new Set(getOrderedCommits(getFilteredCommits()).map(c => `${c.author} <${c.email}>`)).size})</span>
     </div>
     <div class="context-menu-item" data-action="copy-combined-diff" style="display: ${selectedCommits.size > 1 ? 'block' : 'none'}">
       <span class="context-menu-icon">📋</span>
@@ -3107,6 +3168,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyShortHash', hash: commit.hash });
       } else if (action === 'copy-subject') {
         vscode.postMessage({ type: 'copySubject', hash: commit.hash });
+      } else if (action === 'copy-subject-with-author') {
+        vscode.postMessage({ type: 'copySubjectWithAuthor', hash: commit.hash });
       } else if (action === 'copy-diff-stat-summary') {
         vscode.postMessage({ type: 'copyDiffStatSummary', hash: commit.hash });
       } else if (action === 'copy-file-stats') {
@@ -3131,10 +3194,14 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyCommitRest', hash: commit.hash });
       } else if (action === 'copy-jira') {
         vscode.postMessage({ type: 'copyCommitJira', hash: commit.hash });
+      } else if (action === 'copy-yaml') {
+        vscode.postMessage({ type: 'copyCommitYaml', hash: commit.hash });
       } else if (action === 'copy-co-authors') {
         vscode.postMessage({ type: 'copyCoAuthors', hash: commit.hash });
       } else if (action === 'copy-commit-date') {
         vscode.postMessage({ type: 'copyCommitDate', hash: commit.hash });
+      } else if (action === 'copy-commit-short-date') {
+        vscode.postMessage({ type: 'copyCommitShortDate', hash: commit.hash });
       } else if (action === 'copy-relative-date') {
         vscode.postMessage({ type: 'copyRelativeDate', hash: commit.hash });
       } else if (action === 'copy-timestamp') {
@@ -3163,6 +3230,8 @@ function showCommitContextMenu(event, commit) {
         handleCopyAllFilteredHashes();
       } else if (action === 'copy-all-filtered-as-oneline') {
         handleCopyAllFilteredAsOneline();
+      } else if (action === 'copy-all-unique-authors') {
+        handleCopyAllUniqueAuthors();
       } else if (action === 'copy-combined-diff') {
         handleCopyCombinedDiff();
       } else if (action === 'copy-range-diff') {
@@ -3747,6 +3816,29 @@ function handleCopySubject() {
   });
 }
 
+function handleCopySubjectWithAuthor() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy subject with author');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copySubjectWithAuthor',
+    hash: targetCommit.hash
+  });
+}
+
 function handleCopyDiffStatSummary() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -4136,6 +4228,29 @@ function handleCopyJira() {
   });
 }
 
+function handleCopyYaml() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy as YAML');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitYaml',
+    hash: targetCommit.hash
+  });
+}
+
 function handleCopyCoAuthors() {
   const displayCommits = getOrderedCommits(getFilteredCommits());
   let targetCommit = null;
@@ -4178,6 +4293,29 @@ function handleCopyCommitDate() {
 
   vscode.postMessage({
     type: 'copyCommitDate',
+    hash: targetCommit.hash
+  });
+}
+
+function handleCopyCommitShortDate() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy its short date');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyCommitShortDate',
     hash: targetCommit.hash
   });
 }
@@ -4614,6 +4752,15 @@ function handleCopyAllFilteredAsOneline() {
     return;
   }
   vscode.postMessage({ type: 'copyAllFilteredAsOneline', hashes: displayCommits.map(commit => commit.hash) });
+}
+
+function handleCopyAllUniqueAuthors() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (displayCommits.length === 0) {
+    showError('No commits visible in current view');
+    return;
+  }
+  vscode.postMessage({ type: 'copyAllUniqueAuthors', hashes: displayCommits.map(commit => commit.hash) });
 }
 
 function handleCopyStats() {
@@ -5103,6 +5250,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'H'], description: 'Copy commit hash' },
         { keys: [cmdKey, 'Shift', 'I'], description: 'Copy commit info' },
         { keys: [cmdKey, 'Shift', 'P'], description: 'Copy cherry-pick command' },
+        { keys: [cmdKey, altKey, 'Shift', 'K'], description: 'Copy cherry-pick commands (selected)' },
         { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
         { keys: [cmdKey, 'Alt', 'V'], description: 'Copy git show command' },
         { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
@@ -5121,13 +5269,16 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'V'], description: 'Copy parent hash' },
         { keys: [cmdKey, 'Shift', '7'], description: 'Copy short hash' },
         { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' },
+        { keys: [cmdKey, altKey, 'Shift', 'M'], description: 'Copy subject with author' },
         { keys: [cmdKey, 'Shift', 'T'], description: 'Copy commit date' },
+        { keys: [cmdKey, 'Shift', 'J'], description: 'Copy short date' },
         { keys: [cmdKey, 'Shift', '8'], description: 'Copy relative date' },
         { keys: [cmdKey, 'Shift', '2'], description: 'Copy Unix timestamp' },
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'Alt', 'H'], description: 'Copy all filtered hashes' },
         { keys: [cmdKey, 'Shift', 'Alt', 'Y'], description: 'Copy all filtered as oneline' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'P'], description: 'Copy all unique authors' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
         { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
         { keys: [cmdKey, 'Shift', '.'], description: 'Copy as compact' },
@@ -5135,6 +5286,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Alt', 'M'], description: 'Copy as Markdown' },
         { keys: [cmdKey, 'Alt', 'J'], description: 'Copy as JSON' },
         { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
+        { keys: ['F4'], description: 'Copy files changed count' },
         { keys: [cmdKey, 'Shift', 'Alt', 'F'], description: 'Copy file stats' },
         { keys: [cmdKey, 'Alt', 'W'], description: 'Copy commit message with stats' },
         { keys: [cmdKey, 'Shift', altKey, 'I'], description: 'Copy full commit info with file stats' },
@@ -5150,14 +5302,17 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', '@'], description: 'Copy as platform mention (owner/repo@hash)' },
         { keys: [cmdKey, 'Shift', ']'], description: 'Copy commit reference (refs/commit/<hash>)' },
         { keys: [cmdKey, 'Alt', 'Shift', 'U'], description: 'Copy file permalink' },
+        { keys: [cmdKey, altKey, 'Shift', 'B'], description: 'Copy file path with hash' },
         { keys: [cmdKey, 'Shift', 'Alt', 'U'], description: 'Copy all file permalinks' },
         { keys: [cmdKey, 'Alt', 'G'], description: 'Copy as Git Describe' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'G'], description: 'Copy signature info' },
         { keys: [cmdKey, 'Alt', 'Shift', 'V'], description: 'Copy git show command for file' },
         { keys: [cmdKey, 'Alt', 'A'], description: 'Copy committer email' },
         { keys: [cmdKey, 'Alt', 'N'], description: 'Copy committer name' },
         { keys: [cmdKey, 'Alt', 'H'], description: 'Copy commit as HTML' },
         { keys: [cmdKey, 'Alt', 'Y'], description: 'Copy as reStructuredText' },
         { keys: [cmdKey, altKey, 'Shift', 'J'], description: 'Copy as Jira Format' },
+        { keys: [cmdKey, altKey, 'Shift', 'Y'], description: 'Copy as YAML' },
         { keys: [cmdKey, 'Alt', 'F'], description: 'Copy file diff' },
         { keys: [cmdKey, 'Alt', 'C'], description: 'Copy file content' },
         { keys: [cmdKey, 'Alt', 'Shift', 'E'], description: 'Reveal file in explorer' },
@@ -5211,12 +5366,37 @@ function showKeyboardHelpDialog() {
     `;
   };
 
-  const sectionsHtml = shortcuts.map(section => `
-    <div class="keyboard-help-section">
-      <div class="keyboard-help-section-title">${escapeHtml(section.category)}</div>
-      ${section.items.map(formatShortcut).join('')}
-    </div>
-  `).join('');
+  function filterShortcutsBySearch(allShortcuts, query) {
+    if (!query || query.trim() === '') {
+      return allShortcuts;
+    }
+    const lowerQuery = query.toLowerCase().trim();
+    return allShortcuts
+      .map(category => ({
+        category: category.category,
+        items: category.items.filter(item =>
+          item.description.toLowerCase().includes(lowerQuery)
+        )
+      }))
+      .filter(category => category.items.length > 0);
+  }
+
+  function renderKeyboardHelpShortcuts(filteredShortcuts) {
+    const container = document.getElementById('keyboard-help-shortcuts-container');
+    if (!container) return;
+
+    if (filteredShortcuts.length === 0) {
+      container.innerHTML = '<div class="keyboard-help-no-results">No shortcuts match your search</div>';
+      return;
+    }
+
+    container.innerHTML = filteredShortcuts.map(section => `
+      <div class="keyboard-help-section">
+        <div class="keyboard-help-section-title">${escapeHtml(section.category)}</div>
+        ${section.items.map(formatShortcut).join('')}
+      </div>
+    `).join('');
+  }
 
   modal.innerHTML = `
     <div class="modal-overlay"></div>
@@ -5226,7 +5406,16 @@ function showKeyboardHelpDialog() {
         <button class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
-        ${sectionsHtml}
+        <div class="keyboard-help-search-container">
+          <input type="text"
+                 class="keyboard-help-search-input"
+                 placeholder="Filter shortcuts..."
+                 id="keyboard-help-search-input">
+          <button class="keyboard-help-search-clear"
+                  id="keyboard-help-search-clear"
+                  style="display: none;">&times;</button>
+        </div>
+        <div id="keyboard-help-shortcuts-container"></div>
         <div class="keyboard-help-footer">
           Tip: Right-click on commits and files for additional options
         </div>
@@ -5236,22 +5425,58 @@ function showKeyboardHelpDialog() {
 
   document.body.appendChild(modal);
 
-  const overlay = modal.querySelector('.modal-overlay');
-  const closeBtn = modal.querySelector('.modal-close');
+  renderKeyboardHelpShortcuts(shortcuts);
 
   const closeModal = () => modal.remove();
 
-  overlay.addEventListener('click', closeModal);
-  closeBtn.addEventListener('click', closeModal);
-
-  // Close on Escape
   const handleEscape = (e) => {
     if (e.key === 'Escape') {
       closeModal();
       document.removeEventListener('keydown', handleEscape);
     }
   };
+
+  const searchInput = modal.querySelector('#keyboard-help-search-input');
+  const searchClear = modal.querySelector('#keyboard-help-search-clear');
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value;
+    searchClear.style.display = query ? 'block' : 'none';
+    const filtered = filterShortcutsBySearch(shortcuts, query);
+    renderKeyboardHelpShortcuts(filtered);
+  });
+
+  searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    searchClear.style.display = 'none';
+    renderKeyboardHelpShortcuts(shortcuts);
+    searchInput.focus();
+  });
+
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (searchInput.value) {
+        e.stopPropagation();
+        searchInput.value = '';
+        searchClear.style.display = 'none';
+        renderKeyboardHelpShortcuts(shortcuts);
+      } else {
+        e.stopPropagation();
+        closeModal();
+        document.removeEventListener('keydown', handleEscape);
+      }
+    }
+  });
+
+  const overlay = modal.querySelector('.modal-overlay');
+  const closeBtn = modal.querySelector('.modal-close');
+
+  overlay.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+
   document.addEventListener('keydown', handleEscape);
+
+  searchInput.focus();
 }
 
 // ─── First-Run Tip Banner ────────────────────────────────────────────────────────
@@ -5367,6 +5592,26 @@ function handleCopyRelativePath() {
     return;
   }
   vscode.postMessage({ type: 'copyRelativePath', filePath: selectedFile });
+}
+
+function handleCopyFilePathWithHash() {
+  if (!selectedFile) {
+    showError('Select a file to copy its path with hash');
+    return;
+  }
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+  if (!targetCommit) {
+    showError('Select a commit to copy its file path with hash');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFilePathWithHash', hash: targetCommit.hash, filePath: selectedFile });
 }
 
 function handleCopyFileDiff() {

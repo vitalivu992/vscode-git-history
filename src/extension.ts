@@ -173,9 +173,11 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyParentHash', action: 'copyParentHash' },
     { command: 'gitHistory.copyShortHash', action: 'copyShortHash' },
     { command: 'gitHistory.copySubject', action: 'copySubject' },
+    { command: 'gitHistory.copySubjectWithAuthor', action: 'copySubjectWithAuthor' },
     { command: 'gitHistory.copyDiffStatSummary', action: 'copyDiffStatSummary' },
     { command: 'gitHistory.copyCoAuthors', action: 'copyCoAuthors' },
     { command: 'gitHistory.copyCommitDate', action: 'copyCommitDate' },
+    { command: 'gitHistory.copyCommitShortDate', action: 'copyCommitShortDate' },
     { command: 'gitHistory.copyRelativeDate', action: 'copyRelativeDate' },
     { command: 'gitHistory.copyOneline', action: 'copyOneline' },
     { command: 'gitHistory.copyCompact', action: 'copyCompact' },
@@ -195,11 +197,13 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyFileName', action: 'copyFileName' },
     { command: 'gitHistory.copyFilePath', action: 'copyFilePath' },
     { command: 'gitHistory.copyFileUrl', action: 'copyFileUrl' },
+    { command: 'gitHistory.copyFilePathWithHash', action: 'copyFilePathWithHash' },
     { command: 'gitHistory.copyRelativePath', action: 'copyRelativePath' },
     { command: 'gitHistory.copySelectedHashes', action: 'copySelectedHashes' },
     { command: 'gitHistory.copySelectedCherryPickCommands', action: 'copySelectedCherryPickCommands' },
     { command: 'gitHistory.copyAllFilteredHashes', action: 'copyAllFilteredHashes' },
     { command: 'gitHistory.copyAllFilteredAsOneline', action: 'copyAllFilteredAsOneline' },
+    { command: 'gitHistory.copyAllUniqueAuthors', action: 'copyAllUniqueAuthors' },
     { command: 'gitHistory.copySelectedMessagesChecklist', action: 'copySelectedMessagesChecklist' },
     { command: 'gitHistory.copySelectedMessagesNumbered', action: 'copySelectedMessagesNumbered' },
     { command: 'gitHistory.copySelectedMessagesChecklistWithAuthor', action: 'copySelectedMessagesChecklistWithAuthor' },
@@ -244,6 +248,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyAllFilePermalinks', action: 'copyAllFilePermalinks' },
     { command: 'gitHistory.copyFilterAsGitLogCommand', action: 'copyFilterAsGitLogCommand' },
     { command: 'gitHistory.revealFileInExplorer', action: 'revealFileInExplorer' },
+    { command: 'gitHistory.copyCommitYaml', action: 'copyCommitYaml' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

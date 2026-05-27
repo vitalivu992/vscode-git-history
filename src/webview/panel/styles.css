@@ -1924,6 +1924,57 @@ body {
   flex: 1;
 }
 
+/* Keyboard Help Search Input */
+.keyboard-help-search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0 12px 0;
+  border-bottom: 1px solid var(--vscode-border-color);
+  margin-bottom: 12px;
+}
+
+.keyboard-help-search-input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
+  background-color: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 4px;
+  color: var(--vscode-input-foreground);
+}
+
+.keyboard-help-search-input:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+.keyboard-help-search-input::placeholder {
+  color: var(--vscode-input-placeholderForeground);
+}
+
+.keyboard-help-search-clear {
+  padding: 4px 8px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--vscode-descriptionForeground);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.keyboard-help-search-clear:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.keyboard-help-no-results {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+}
+
 .keyboard-help-footer {
   margin-top: 16px;
   padding-top: 12px;
