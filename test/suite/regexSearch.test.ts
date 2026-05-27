@@ -42,6 +42,20 @@ function isValidRegex(pattern: string, regexEnabled: boolean): boolean {
 }
 
 /**
+ * Get the regex error message if the pattern is invalid
+ * (mirroring the logic in main.js)
+ */
+function getRegexError(pattern: string, regexEnabled: boolean): string | null {
+  if (!regexEnabled || !pattern) return null;
+  try {
+    new RegExp(pattern);
+    return null;
+  } catch (e: any) {
+    return e.message;
+  }
+}
+
+/**
  * Filter commits using regex or substring matching
  */
 function filterCommits(
@@ -170,6 +184,62 @@ suite('Regex Search Mode Tests', () => {
       assert.strictEqual(isValidRegex('(unclosed', true), false);
       assert.strictEqual(isValidRegex(')unexpected', true), false);
       assert.strictEqual(isValidRegex('(?<invalid)', true), false);
+    });
+  });
+
+  suite('getRegexError function', () => {
+    test('should return null when regex mode is disabled', () => {
+      assert.strictEqual(getRegexError('anything', false), null);
+      assert.strictEqual(getRegexError('[invalid', false), null);
+    });
+
+    test('should return null for empty pattern', () => {
+      assert.strictEqual(getRegexError('', true), null);
+    });
+
+    test('should return null for valid regex patterns', () => {
+      assert.strictEqual(getRegexError('hello', true), null);
+      assert.strictEqual(getRegexError('^feat:', true), null);
+      assert.strictEqual(getRegexError('bug|fix', true), null);
+      assert.strictEqual(getRegexError('[a-z]+', true), null);
+      assert.strictEqual(getRegexError('\\d{4}', true), null);
+    });
+
+    test('should return error message for unclosed group', () => {
+      const error = getRegexError('(test', true);
+      assert.ok(error !== null, 'Should return an error for unclosed group');
+      assert.ok(error!.length > 0, 'Error message should not be empty');
+    });
+
+    test('should return error message for unclosed character class', () => {
+      const error = getRegexError('[test', true);
+      assert.ok(error !== null, 'Should return an error for unclosed character class');
+    });
+
+    test('should return error message for invalid quantifier', () => {
+      const error = getRegexError('test**', true);
+      assert.ok(error !== null, 'Should return an error for invalid quantifier');
+    });
+
+    test('should return error message for invalid escape at end', () => {
+      const error = getRegexError('test\\', true);
+      assert.ok(error !== null, 'Should return an error for incomplete escape');
+    });
+
+    test('should return error message for invalid group syntax', () => {
+      const error = getRegexError('(?<', true);
+      assert.ok(error !== null, 'Should return an error for invalid group syntax');
+    });
+
+    test('error messages should be informative', () => {
+      const error = getRegexError('(unclosed', true);
+      assert.ok(error !== null);
+      assert.ok(
+        error!.toLowerCase().includes('group') ||
+        error!.toLowerCase().includes('parenthes') ||
+        error!.toLowerCase().includes('unterminated'),
+        `Error message should describe the issue: "${error}"`
+      );
     });
   });
 
@@ -337,6 +407,36 @@ suite('Regex Search Source Verification', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleRegexToggle'), 'main.js should have handleRegexToggle function');
+  });
+
+  test('main.js should have getRegexError function', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('function getRegexError'), 'main.js should have getRegexError function');
+  });
+
+  test('main.js should have regexErrorMessage state variable', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('regexErrorMessage'), 'main.js should have regexErrorMessage variable');
+  });
+
+  test('main.js updateRegexValidation should set tooltip with error message', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(
+      source.match(/Invalid regex:/),
+      'updateRegexValidation should include "Invalid regex:" in tooltip'
+    );
   });
 
   test('main.js should handle Ctrl+Shift+X keyboard shortcut', () => {

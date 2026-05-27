@@ -80,9 +80,11 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'G'], description: 'Copy signature info' },
         { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
         { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
         { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
+        { keys: ['F4'], description: 'Copy files changed count' },
         { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
         { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
         { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' }
@@ -345,6 +347,56 @@ suite('Keyboard Help Logic Tests', () => {
     assert.ok(copyFileName, 'Copy file name shortcut should exist');
     assert.deepStrictEqual(copyFileName!.keys, ['Cmd', 'Shift', ','], 'Should use Cmd+Shift+, on Mac');
   });
+
+  test('Copy Commands should include Copy files changed count', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyFilesChangedCount = copyCategory!.items.find(item => item.description === 'Copy files changed count');
+    assert.ok(copyFilesChangedCount, 'Copy files changed count shortcut should exist');
+    assert.deepStrictEqual(copyFilesChangedCount!.keys, ['F4'], 'Should use F4 key');
+  });
+
+  test('Copy Commands should include Copy signature info', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copySignatureInfo = copyCategory!.items.find(item => item.description === 'Copy signature info');
+    assert.ok(copySignatureInfo, 'Copy signature info shortcut should exist');
+    assert.deepStrictEqual(copySignatureInfo!.keys, ['Cmd', 'Shift', 'Alt', 'G'], 'Should use Cmd+Shift+Alt+G on Mac');
+  });
+
+  test('Copy Commands should include Copy subject with author', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copySubjectWithAuthor = copyCategory!.items.find(item => item.description === 'Copy subject with author');
+    assert.ok(copySubjectWithAuthor, 'Copy subject with author shortcut should exist');
+    assert.deepStrictEqual(copySubjectWithAuthor!.keys, ['Cmd', 'Option', 'Shift', 'M'], 'Should use Cmd+Option+Shift+M on Mac');
+  });
+
+  test('Copy Commands should include Copy cherry-pick commands (selected)', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyCherryPickCommands = copyCategory!.items.find(item => item.description === 'Copy cherry-pick commands (selected)');
+    assert.ok(copyCherryPickCommands, 'Copy cherry-pick commands (selected) shortcut should exist');
+    assert.deepStrictEqual(copyCherryPickCommands!.keys, ['Cmd', 'Option', 'Shift', 'K'], 'Should use Cmd+Option+Shift+K on Mac');
+  });
+
+  test('Copy Commands should include Copy file path with hash', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    assert.ok(copyCategory, 'Copy Commands category should exist');
+
+    const copyFilePathWithHash = copyCategory!.items.find(item => item.description === 'Copy file path with hash');
+    assert.ok(copyFilePathWithHash, 'Copy file path with hash shortcut should exist');
+    assert.deepStrictEqual(copyFilePathWithHash!.keys, ['Cmd', 'Option', 'Shift', 'B'], 'Should use Cmd+Option+Shift+B on Mac');
+  });
 });
 
 suite('Keyboard Help Source Verification', () => {
@@ -450,6 +502,30 @@ suite('Keyboard Help Source Verification', () => {
     assert.ok(source.includes('Copy commit hash'), 'Should include copy hash');
     assert.ok(source.includes('Toggle word wrap'), 'Should include word wrap');
     assert.ok(source.includes('Refresh history'), 'Should include refresh');
+  });
+
+  test('main.js should include Copy subject with author in help dialog', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('Copy subject with author'), 'Should include Copy subject with author in help dialog');
+  });
+
+  test('main.js should include Copy cherry-pick commands (selected) in help dialog', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('Copy cherry-pick commands (selected)'), 'Should include Copy cherry-pick commands (selected) in help dialog');
+  });
+
+  test('main.js should include Copy file path with hash in help dialog', () => {
+    const fs = require('fs');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    assert.ok(source.includes('Copy file path with hash'), 'Should include Copy file path with hash in help dialog');
   });
 });
 

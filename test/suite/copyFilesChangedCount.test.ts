@@ -199,4 +199,13 @@ suite('Copy Files Changed Count Test Suite', () => {
     assert.ok(source.includes('3 files') || source.includes('"3 files"') || source.includes('"3 file(s)"'),
       'README.md should show output format example');
   });
+
+  test('package.json defines keybinding for copyFilesChangedCount', () => {
+    const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+    const keybindings = packageJson.contributes.keybindings || [];
+    const keybinding = keybindings.find((k: any) => k.command === 'gitHistory.copyFilesChangedCount');
+    assert.ok(keybinding, 'package.json should define keybinding for copyFilesChangedCount');
+    assert.strictEqual(keybinding.key, 'f4', 'Keybinding should be F4');
+    assert.strictEqual(keybinding.when, 'activeWebviewPanelId == gitHistory.webview', 'Keybinding should only work in Git History panel');
+  });
 });

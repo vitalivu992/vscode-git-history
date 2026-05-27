@@ -220,13 +220,13 @@ suite('Copy Files Changed Count E2E Source Integration Tests', () => {
     assert.strictEqual(command.category, 'Git History');
   });
 
-  test('package.json does not define keybinding for copyFilesChangedCount', () => {
+  test('package.json defines keybinding for copyFilesChangedCount', () => {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-
-    // Verify no keybinding is defined (feature is context menu only)
     const keybindings = packageJson.contributes.keybindings || [];
     const keybinding = keybindings.find((k: any) => k.command === 'gitHistory.copyFilesChangedCount');
-    assert.ok(!keybinding, 'package.json should NOT define keybinding for copyFilesChangedCount (context menu only)');
+    assert.ok(keybinding, 'package.json should define F4 keybinding for copyFilesChangedCount');
+    assert.strictEqual(keybinding.key, 'f4', 'Keybinding should be F4');
+    assert.strictEqual(keybinding.mac, 'f4', 'mac keybinding should also be F4');
   });
 
   test('README.md documents the feature', () => {

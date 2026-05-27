@@ -64,6 +64,7 @@ function getKeyboardShortcutsData(isMac: boolean): Array<{ category: string; ite
         { keys: [cmdKey, 'Shift', 'H'], description: 'Copy commit hash' },
         { keys: [cmdKey, 'Shift', 'I'], description: 'Copy commit info' },
         { keys: [cmdKey, 'Shift', 'P'], description: 'Copy cherry-pick command' },
+        { keys: [cmdKey, altKey, 'Shift', 'K'], description: 'Copy cherry-pick commands (selected)' },
         { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
         { keys: [cmdKey, 'Shift', 'F'], description: 'Copy changed files' },
         { keys: [cmdKey, 'Shift', 'D'], description: 'Copy commit diff' },
@@ -76,16 +77,21 @@ function getKeyboardShortcutsData(isMac: boolean): Array<{ category: string; ite
         { keys: [cmdKey, 'Shift', 'V'], description: 'Copy parent hash' },
         { keys: [cmdKey, 'Shift', '7'], description: 'Copy short hash' },
         { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' },
+        { keys: [cmdKey, altKey, 'Shift', 'M'], description: 'Copy subject with author' },
         { keys: [cmdKey, 'Shift', 'T'], description: 'Copy commit date' },
         { keys: [cmdKey, 'Shift', 'K'], description: 'Copy co-authors' },
         { keys: [cmdKey, 'Shift', ';'], description: 'Copy selected hashes' },
         { keys: [cmdKey, 'Shift', 'G'], description: 'Copy tags' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'G'], description: 'Copy signature info' },
         { keys: [cmdKey, 'Shift', 'Y'], description: 'Copy as oneline' },
         { keys: [cmdKey, 'Shift', 'Z'], description: 'Copy commit body' },
         { keys: [cmdKey, 'Shift', '9'], description: 'Copy diff stat summary' },
+        { keys: ['F4'], description: 'Copy files changed count' },
         { keys: [cmdKey, 'Shift', '5'], description: 'Copy filter query' },
         { keys: [cmdKey, 'Shift', '.'], description: 'Copy file path' },
-        { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' }
+        { keys: [cmdKey, 'Shift', ','], description: 'Copy file name' },
+        { keys: [cmdKey, altKey, 'Shift', 'U'], description: 'Copy file permalink' },
+        { keys: [cmdKey, altKey, 'Shift', 'B'], description: 'Copy file path with hash' }
       ]
     },
     {
@@ -230,10 +236,10 @@ suite('Keyboard Help E2E Tests', () => {
     assert.strictEqual(navCategory!.items.length, 9);
   });
 
-  test('Copy Commands category should have 25 shortcuts', () => {
+  test('Copy Commands category should have 30 shortcuts', () => {
     const shortcuts = getKeyboardShortcutsData(true);
     const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
-    assert.strictEqual(copyCategory!.items.length, 25);
+    assert.strictEqual(copyCategory!.items.length, 30);
   });
 
   test('Search & Filter category should have 6 shortcuts', () => {
@@ -453,6 +459,46 @@ suite('Keyboard Help E2E Tests', () => {
     const copyFileName = copyCategory!.items.find(item => item.description === 'Copy file name');
     assert.ok(copyFileName, 'Copy file name shortcut should exist');
   });
+
+  test('Copy Commands should include Copy files changed count', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copyFilesChangedCount = copyCategory!.items.find(item => item.description === 'Copy files changed count');
+    assert.ok(copyFilesChangedCount, 'Copy files changed count shortcut should exist');
+    assert.deepStrictEqual(copyFilesChangedCount!.keys, ['F4'], 'Should use F4 key');
+  });
+
+  test('Copy Commands should include Copy signature info', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copySignatureInfo = copyCategory!.items.find(item => item.description === 'Copy signature info');
+    assert.ok(copySignatureInfo, 'Copy signature info shortcut should exist');
+    assert.deepStrictEqual(copySignatureInfo!.keys, ['Cmd', 'Shift', 'Alt', 'G'], 'Should use Cmd+Shift+Alt+G on Mac');
+  });
+
+  test('Copy Commands should include Copy subject with author', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copySubjectWithAuthor = copyCategory!.items.find(item => item.description === 'Copy subject with author');
+    assert.ok(copySubjectWithAuthor, 'Copy subject with author shortcut should exist');
+    assert.deepStrictEqual(copySubjectWithAuthor!.keys, ['Cmd', 'Option', 'Shift', 'M'], 'Should use Cmd+Option+Shift+M on Mac');
+  });
+
+  test('Copy Commands should include Copy cherry-pick commands (selected)', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copyCherryPickCommands = copyCategory!.items.find(item => item.description === 'Copy cherry-pick commands (selected)');
+    assert.ok(copyCherryPickCommands, 'Copy cherry-pick commands (selected) shortcut should exist');
+    assert.deepStrictEqual(copyCherryPickCommands!.keys, ['Cmd', 'Option', 'Shift', 'K'], 'Should use Cmd+Option+Shift+K on Mac');
+  });
+
+  test('Copy Commands should include Copy file path with hash', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const copyCategory = shortcuts.find(s => s.category === 'Copy Commands');
+    const copyFilePathWithHash = copyCategory!.items.find(item => item.description === 'Copy file path with hash');
+    assert.ok(copyFilePathWithHash, 'Copy file path with hash shortcut should exist');
+    assert.deepStrictEqual(copyFilePathWithHash!.keys, ['Cmd', 'Option', 'Shift', 'B'], 'Should use Cmd+Option+Shift+B on Mac');
+  });
 });
 
 suite('Keyboard Help Source Verification', () => {
@@ -587,5 +633,23 @@ suite('Keyboard Help Source Verification', () => {
     const source = fs.readFileSync(claudePath, 'utf-8');
     assert.ok(source.includes('Keyboard Help') || source.includes('showKeyboardHelpDialog'),
       'CLAUDE.md should document keyboard help implementation');
+  });
+
+  test('main.js should include Copy subject with author in help dialog', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('Copy subject with author'),
+      'main.js should include Copy subject with author in keyboard help dialog');
+  });
+
+  test('main.js should include Copy cherry-pick commands (selected) in help dialog', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('Copy cherry-pick commands (selected)'),
+      'main.js should include Copy cherry-pick commands (selected) in keyboard help dialog');
+  });
+
+  test('main.js should include Copy file path with hash in help dialog', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('Copy file path with hash'),
+      'main.js should include Copy file path with hash in keyboard help dialog');
   });
 });

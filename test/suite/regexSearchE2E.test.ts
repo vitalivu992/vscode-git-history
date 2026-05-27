@@ -196,6 +196,61 @@ suite('Regex Search E2E Tests', () => {
       );
     });
 
+    test('main.js has getRegexError function for error capture', () => {
+      assert.ok(
+        mainJsSource.includes('function getRegexError'),
+        'main.js should implement getRegexError function'
+      );
+    });
+
+    test('getRegexError returns error message from RegExp exception', () => {
+      const funcMatch = mainJsSource.match(/function getRegexError[^{]*{[\s\S]*?^}/m);
+      assert.ok(funcMatch, 'getRegexError function should exist');
+      assert.ok(
+        funcMatch[0].includes('e.message'),
+        'getRegexError should return e.message from caught exception'
+      );
+    });
+
+    test('updateRegexValidation sets tooltip with error message', () => {
+      assert.ok(
+        mainJsSource.match(/regexToggleBtn\.title\s*=\s*`Invalid regex: \$\{error\}`/) ||
+        mainJsSource.match(/regexToggleBtn\.title\s*=\s*['"`]Invalid regex:\s*/),
+        'updateRegexValidation should set tooltip with "Invalid regex:" prefix'
+      );
+    });
+
+    test('updateRegexValidation stores error in regexErrorMessage', () => {
+      const funcMatch = mainJsSource.match(/function updateRegexValidation[^{]*{[\s\S]*?^}/m);
+      assert.ok(funcMatch, 'updateRegexValidation function should exist');
+      assert.ok(
+        funcMatch[0].includes('regexErrorMessage'),
+        'updateRegexValidation should update regexErrorMessage variable'
+      );
+    });
+
+    test('updateRegexValidation restores normal tooltip when valid', () => {
+      const funcMatch = mainJsSource.match(/function updateRegexValidation[^{]*{[\s\S]*?^}/m);
+      assert.ok(funcMatch, 'updateRegexValidation function should exist');
+      assert.ok(
+        funcMatch[0].includes('Regex mode enabled'),
+        'updateRegexValidation should restore normal tooltip for enabled state'
+      );
+      assert.ok(
+        funcMatch[0].includes('Toggle regex search mode'),
+        'updateRegexValidation should restore normal tooltip for disabled state'
+      );
+    });
+
+    test('handleRegexToggle delegates tooltip to updateRegexValidation', () => {
+      const toggleMatch = mainJsSource.match(/function handleRegexToggle[^{]*{[\s\S]*?^}/m);
+      assert.ok(toggleMatch, 'handleRegexToggle function should exist');
+      assert.ok(
+        toggleMatch[0].includes('updateRegexValidation()'),
+        'handleRegexToggle should call updateRegexValidation for tooltip management'
+      );
+    });
+
     test('main.js adds click event listener to regex toggle button', () => {
       assert.ok(
         mainJsSource.match(/regexToggleBtn[^]*addEventListener[^]*click[^]*handleRegexToggle/) ||
