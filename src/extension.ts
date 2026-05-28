@@ -167,6 +167,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyAuthorEmail', action: 'copyAuthorEmail' },
     { command: 'gitHistory.copyAuthorName', action: 'copyAuthorName' },
     { command: 'gitHistory.copyAuthorGitFormat', action: 'copyAuthorGitFormat' },
+    { command: 'gitHistory.copyAuthorInitials', action: 'copyAuthorInitials' },
     { command: 'gitHistory.copyCommitterEmail', action: 'copyCommitterEmail' },
     { command: 'gitHistory.copyCommitterName', action: 'copyCommitterName' },
     { command: 'gitHistory.copySignatureInfo', action: 'copySignatureInfo' },
@@ -176,6 +177,9 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copySubjectWithAuthor', action: 'copySubjectWithAuthor' },
     { command: 'gitHistory.copyDiffStatSummary', action: 'copyDiffStatSummary' },
     { command: 'gitHistory.copyCoAuthors', action: 'copyCoAuthors' },
+    { command: 'gitHistory.copyTrailers', action: 'copyTrailers' },
+    { command: 'gitHistory.copyFixesReferences', action: 'copyFixesReferences' },
+    { command: 'gitHistory.copyReviewedBy', action: 'copyReviewedBy' },
     { command: 'gitHistory.copyCommitDate', action: 'copyCommitDate' },
     { command: 'gitHistory.copyCommitShortDate', action: 'copyCommitShortDate' },
     { command: 'gitHistory.copyRelativeDate', action: 'copyRelativeDate' },
@@ -249,6 +253,8 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyFilterAsGitLogCommand', action: 'copyFilterAsGitLogCommand' },
     { command: 'gitHistory.revealFileInExplorer', action: 'revealFileInExplorer' },
     { command: 'gitHistory.copyCommitYaml', action: 'copyCommitYaml' },
+    { command: 'gitHistory.copyCommitBbcode', action: 'copyCommitBbcode' },
+    { command: 'gitHistory.copyCommitCsv', action: 'copyCommitCsv' },
   ] as const;
 
   for (const { command, action } of webviewActions) {
