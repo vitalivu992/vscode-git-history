@@ -115,6 +115,7 @@ export type WebviewAction =
   | 'copyAuthorEmail'
   | 'copyAuthorName'
   | 'copyAuthorGitFormat'
+  | 'copyAuthorInitials'
   | 'copyParentHash'
   | 'copyShortHash'
   | 'copySubject'
@@ -202,7 +203,12 @@ export type WebviewAction =
   | 'revealFileInExplorer'
   | 'copySignatureInfo'
   | 'copyFullCommitInfoWithFileStats'
-  | 'copyCommitYaml';
+  | 'copyCommitYaml'
+  | 'copyCommitBbcode'
+  | 'copyCommitCsv'
+  | 'copyTrailers'
+  | 'copyFixesReferences'
+  | 'copyReviewedBy';
 
 /**
  * Filter state for copy filter query feature
@@ -287,6 +293,7 @@ export type WebviewToExtMessage =
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyAuthorName'; hash: string }
   | { type: 'copyAuthorGitFormat'; hash: string }
+  | { type: 'copyAuthorInitials'; hash: string }
   | { type: 'copyCommitterEmail'; hash: string }
   | { type: 'copyCommitterName'; hash: string }
   | { type: 'copyShowCommand'; hash: string }
@@ -354,4 +361,9 @@ export type WebviewToExtMessage =
   | { type: 'revealFileInExplorer'; filePath: string }
   | { type: 'copySignatureInfo'; hash: string }
   | { type: 'copyFullCommitInfoWithFileStats'; hash: string }
-  | { type: 'copyCommitYaml'; hash: string };
+  | { type: 'copyCommitYaml'; hash: string }
+  | { type: 'copyCommitBbcode'; hash: string }
+  | { type: 'copyCommitCsv'; hash: string }
+  | { type: 'copyTrailers'; hash: string }
+  | { type: 'copyFixesReferences'; hash: string }
+  | { type: 'copyReviewedBy'; hash: string };
