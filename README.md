@@ -62,7 +62,12 @@ See [CHANGELOG](CHANGELOG.md) for version history.
 - **📜 Copy as reStructuredText**: Copy the focused or selected commit as reStructuredText (ReST) format for Sphinx documentation. Press `Ctrl+Alt+Y` / `Cmd+Alt+Y` or use the right-click context menu. The format includes commit message with `=` underline, `:Author:`, `:Date:`, `:Hash:` field lists, statistics section with bold text, tags, and body section with `-` underline. Useful for Python projects using ReST-based documentation.
 - **📋 Copy as Jira Format**: Copy the focused or selected commit in Jira/Confluence markup format with `Ctrl+Alt+Shift+J` / `Cmd+Alt+Shift+J` keyboard shortcut, or use the right-click context menu. The format uses Jira's text formatting syntax (`h4.` headings, `||` table headers, `|` table cells) and includes commit hash and subject as heading, author info table (Author, Date, Email), statistics, tags, and commit body. Useful for pasting commit details into Jira tickets, Confluence pages, and other Atlassian products.
 - **📄 Copy as YAML**: Copy the focused or selected commit as YAML format with `Ctrl+Alt+Shift+Y` / `Cmd+Alt+Shift+Y` keyboard shortcut, or use the right-click context menu. The YAML includes structured data for hash, shortHash, author (name, email), committer (when different from author), date (ISO 8601), message, body (literal block style), parentHashes (array), tags (array), and stats (object or null). Useful for CI/CD pipelines (GitHub Actions, GitLab CI), configuration files (Kubernetes, Docker Compose, Ansible), and DevOps automation workflows.
+- **📝 Copy as BBCode**: Copy the focused or selected commit as BBCode (Bulletin Board Code) format with `Ctrl+Alt+Shift+B` / `Cmd+Alt+Shift+B` keyboard shortcut, or use the right-click context menu. BBCode is used by many forum platforms including vBulletin, XenForo, phpBB, and Invision Community. The format includes commit hash, subject, author, email, date, statistics, tags, and body. Headers use `[b]bold[/b]` tags for visibility. Useful for sharing commit information on gaming forums, technical discussion boards, and community platforms that don't support Markdown.
+- **📊 Copy as CSV**: Copy the focused or selected commit as CSV (Comma-Separated Values) format with `Ctrl+Alt+Shift+C` / `Cmd+Alt+Shift+C` keyboard shortcut, or use the right-click context menu. The CSV includes a header row and one data row with fields: Hash, Short Hash, Author, Email, Date, Message, Tags, Files Changed, Insertions, Deletions. Fields containing commas, quotes, or newlines are properly escaped. Useful for pasting commit data into spreadsheets, databases, and data analysis tools.
 - **👥 Copy Co-Authors**: Copy co-authors from commit message to clipboard with `Ctrl+Shift+K` / `Cmd+Shift+K` keyboard shortcut, or right-click context menu. Extracts "Co-authored-by:" trailers in the format "Name <email>" separated by newlines.
+- **📋 Copy Commit Trailers**: Copy all commit trailers (structured metadata in "Key: Value" format) to clipboard with `Ctrl+Shift+Alt+3` / `Cmd+Shift+Alt+3` keyboard shortcut, or right-click context menu. Extracts all trailers including Fixes, Closes, Reviewed-by, Signed-off-by, etc. Each trailer is copied on its own line.
+- **🔗 Copy Issue References**: Copy issue/PR references from commit trailers to clipboard with `Ctrl+Shift+Alt+5` / `Cmd+Shift+Alt+5` keyboard shortcut, or right-click context menu. Extracts Fixes, Closes, Resolves, Related-to, and other issue reference trailers as a comma-separated list (e.g., `#123, #456`).
+- **✅ Copy Reviewers**: Copy reviewer information from commit trailers to clipboard with `Ctrl+Shift+Alt+4` / `Cmd+Shift+Alt+4` keyboard shortcut, or right-click context menu. Extracts Reviewed-by, Acked-by, Tested-by, and Signed-off-by trailers as a comma-separated list.
 - **🕐 Copy Commit Date**: Copy the commit date in ISO 8601 format to clipboard with `Ctrl+Shift+T` / `Cmd+Shift+T` keyboard shortcut, or right-click context menu
 - **Copy Selected Hashes**: Copy all selected commit hashes as a newline-separated list with `Ctrl+Shift+;` / `Cmd+Shift+;` keyboard shortcut (when 2+ commits are selected), or right-click context menu (shown when multiple commits are selected). Falls back to single hash copy when 0 or 1 commit is selected.
 - **Copy All Filtered Hashes**: Copy all currently visible commit hashes from the filtered view as a newline-separated list with `Ctrl+Shift+Alt+H` / `Cmd+Shift+Alt+H` keyboard shortcut. Unlike "Copy Selected Hashes", this copies all visible commits without requiring manual selection. Useful for batch cherry-pick operations, release notes generation, and bulk operations on filtered commit lists.
@@ -198,6 +203,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy author email** | Copy the author email address |
 | **Copy author name** | Copy the author name |
 | **Copy author (git format)** | Copy author in git format `Name <email>` - useful for Co-authored-by trailers |
+| **Copy author initials** | Copy the author's initials (e.g., "JD" for "John Doe") |
 | **Copy committer email** | Copy the committer email address (person who applied the commit) |
 | **Copy committer name** | Copy the committer name (person who applied the commit) |
 | **Copy parent hash** | Copy the first parent hash (error for root commits) |
@@ -212,7 +218,12 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy as reStructuredText** | Copy as reStructuredText (ReST) format for Sphinx documentation |
 | **Copy as Jira Format** | Copy in Jira/Confluence markup format for Atlassian products |
 | **Copy as YAML** | Copy as YAML format for CI/CD pipelines and DevOps automation |
+| **Copy as BBCode** | Copy as BBCode format for forum platforms |
+| **Copy as CSV** | Copy as CSV format with headers for spreadsheets and data analysis |
 | **Copy co-authors** | Copy co-authors from commit message |
+| **Copy trailers** | Copy all commit trailers (Fixes, Reviewed-by, Signed-off-by, etc.) |
+| **Copy issue references** | Copy issue/PR references from trailers (Fixes, Closes, Resolves, etc.) |
+| **Copy reviewers** | Copy reviewer information from trailers (Reviewed-by, Acked-by, etc.) |
 | **Copy commit date** | Copy date in ISO 8601 format |
 | **Copy relative date** | Copy date in relative format |
 | **Copy branch name** | Copy the current branch name |
@@ -276,7 +287,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+C` / `Cmd+Shift+C` | Copy commit message to clipboard |
 | `Ctrl+Shift+H` / `Cmd+Shift+H` | Copy commit hash to clipboard |
 | `Ctrl+Shift+I` / `Cmd+Shift+I` | Copy full commit info to clipboard |
-| `Ctrl+Shift+J` / `Cmd+Shift+J` | Toggle ignore whitespace in diffs |
+| `Ctrl+Shift+Alt+J` / `Cmd+Shift+Alt+J` | Toggle ignore whitespace in diffs |
 | `Ctrl+Shift+P` / `Cmd+Shift+P` | Copy cherry-pick command to clipboard |
 | `Ctrl+Shift+U` / `Cmd+Shift+U` | Copy revert command to clipboard |
 | `Ctrl+Shift+W` / `Cmd+Shift+W` | Toggle word wrap in diff viewer |
@@ -302,7 +313,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Alt+N` / `Cmd+Alt+N` | Copy committer name to clipboard |
 | `Ctrl+Alt+O` / `Cmd+Alt+O` | Copy remote URL to clipboard |
 | `Ctrl+Alt+Q` / `Cmd+Alt+Q` | Clear all filters |
-| `Ctrl+Alt+R` / `Cmd+Alt+R` | Copy range diff to clipboard (range selected) |
+| `Ctrl+Shift+Alt+R` / `Cmd+Shift+Alt+R` | Copy range diff to clipboard (range selected) |
 | `Ctrl+Alt+S` / `Cmd+Alt+S` | Show branch switcher |
 | `Ctrl+Alt+U` / `Cmd+Alt+U` | Copy branch URL to clipboard |
 | `Ctrl+Alt+Shift+U` / `Cmd+Alt+Shift+U` | Copy file permalink to clipboard |
@@ -311,6 +322,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email to clipboard |
 | `Ctrl+Shift+N` / `Cmd+Shift+N` | Copy author name to clipboard |
 | `Ctrl+Alt+Shift+A` / `Cmd+Alt+Shift+A` | Copy author in git format (`Name <email>`) |
+| `Ctrl+Alt+Shift+I` / `Cmd+Alt+Shift+I` | Copy author initials (e.g., "JD" for "John Doe") |
 | `Ctrl+Alt+Shift+B` / `Cmd+Alt+Shift+B` | Copy file path with hash to clipboard (`shortHash:filePath`) |
 | `Ctrl+Alt+Shift+K` / `Cmd+Alt+Shift+K` | Copy cherry-pick commands for selected commits to clipboard |
 | `Ctrl+Alt+Shift+M` / `Cmd+Alt+Shift+M` | Copy subject with author to clipboard |
@@ -321,6 +333,9 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+Y` / `Cmd+Shift+Y` | Copy as oneline (`shortHash subject`) to clipboard |
 | `Ctrl+Shift+.` / `Cmd+Shift+.` | Copy as compact (`shortHash - subject (author, relativeDate)`) to clipboard |
 | `Ctrl+Shift+K` / `Cmd+Shift+K` | Copy co-authors to clipboard |
+| `Ctrl+Shift+Alt+3` / `Cmd+Shift+Alt+3` | Copy all commit trailers to clipboard |
+| `Ctrl+Shift+Alt+5` / `Cmd+Shift+Alt+5` | Copy issue references from trailers to clipboard |
+| `Ctrl+Shift+Alt+4` / `Cmd+Shift+Alt+4` | Copy reviewers from trailers to clipboard |
 | `Ctrl+Shift+T` / `Cmd+Shift+T` | Copy commit date (ISO 8601 format) to clipboard |
 | `Ctrl+Shift+J` / `Cmd+Shift+J` | Copy short date (YYYY-MM-DD format) to clipboard |
 | `Ctrl+Shift+8` / `Cmd+Shift+8` | Copy relative date (e.g., "Today 2:30 PM", "3 days ago") to clipboard |
@@ -329,7 +344,7 @@ Navigate the commit list using keyboard shortcuts:
 | `Ctrl+Shift+;` / `Cmd+Shift+;` | Copy selected hashes to clipboard (2+ commits) |
 | `Ctrl+Shift+,` / `Cmd+Shift+,` | Copy file name only to clipboard |
 | `Ctrl+Shift+Alt+N` / `Cmd+Shift+Alt+N` | Copy file basename without extension to clipboard |
-| `Ctrl+Shift+.` / `Cmd+Shift+.` | Copy file path to clipboard (for focused file in changed files list) |
+| `F6` | Copy file path to clipboard (for focused file in changed files list) |
 | `Ctrl+Shift+O` / `Cmd+Shift+O` | Export filtered commits to file |
 | `Ctrl+Shift+5` / `Cmd+Shift+5` | Copy filter query state to clipboard (includes search query and all toggle states as JSON) |
 | `Ctrl+Shift+4` / `Cmd+Shift+4` | Paste/import filter query from clipboard |
@@ -412,6 +427,8 @@ These preferences are saved automatically when you change them in the UI, and re
 | Toggle Blame Annotations | `Ctrl+Shift+B` / `Cmd+Shift+B` |
 | Refresh History | `Ctrl+Shift+R` / `Cmd+Shift+R` |
 
+**Note**: These global shortcuts work from any text editor (not just within the Git History panel). They are also shown in the Keyboard Help dialog (`?` key) under the "Global Editor Shortcuts" section.
+
 ### History Panel Navigation
 
 | Command | Keybinding |
@@ -427,7 +444,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Focus search | `/` or `Ctrl+F` / `Cmd+F` |
 | Copy commit message | `Ctrl+Shift+C` / `Cmd+Shift+C` |
 | Toggle word wrap | `Ctrl+Shift+W` / `Cmd+Shift+W` |
-| Toggle ignore whitespace | `Ctrl+Shift+J` / `Cmd+Shift+J` |
+| Toggle ignore whitespace | `Ctrl+Shift+Alt+J` / `Cmd+Shift+Alt+J` |
 | Toggle my commits filter | `Ctrl+Shift+M` / `Cmd+Shift+M` |
 | Toggle regex search mode | `Ctrl+Shift+X` / `Cmd+Shift+X` |
 | Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A) | `Ctrl+Shift+3` / `Cmd+Shift+3` |
@@ -447,8 +464,13 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy as reStructuredText | `Ctrl+Alt+Y` / `Cmd+Alt+Y` |
 | Copy as Jira Format | `Ctrl+Alt+Shift+J` / `Cmd+Alt+Shift+J` |
 | Copy as YAML | `Ctrl+Alt+Shift+Y` / `Cmd+Alt+Shift+Y` |
+| Copy as BBCode | `Ctrl+Alt+Shift+B` / `Cmd+Alt+Shift+B` |
+| Copy as CSV | `Ctrl+Alt+Shift+C` / `Cmd+Alt+Shift+C` |
 | Copy co-authors | `Ctrl+Shift+K` / `Cmd+Shift+K` |
-| Copy file path | `Ctrl+Shift+.` / `Cmd+Shift+.` |
+| Copy trailers | `Ctrl+Shift+Alt+3` / `Cmd+Shift+Alt+3` |
+| Copy issue references | `Ctrl+Shift+Alt+5` / `Cmd+Shift+Alt+5` |
+| Copy reviewers | `Ctrl+Shift+Alt+4` / `Cmd+Shift+Alt+4` |
+| Copy file path | `F6` |
 | Copy file name | `Ctrl+Shift+,` / `Cmd+Shift+,` |
 | Copy file extension | `Ctrl+Alt+E` / `Cmd+Alt+E` |
 | Copy relative path | `Ctrl+Alt+L` / `Cmd+Alt+L` |
@@ -456,7 +478,7 @@ These preferences are saved automatically when you change them in the UI, and re
 | Copy file permalink | `Ctrl+Alt+Shift+U` / `Cmd+Alt+Shift+U` |
 | Copy remote URL | `Ctrl+Alt+O` / `Cmd+Alt+O` |
 | Copy combined diff | `Ctrl+Alt+D` / `Cmd+Alt+D` (2+ selected) |
-| Copy range diff | `Ctrl+Alt+R` / `Cmd+Alt+R` (range selected) |
+| Copy range diff | `Ctrl+Shift+Alt+R` / `Cmd+Shift+Alt+R` (range selected) |
 | Copy file diff | `Ctrl+Alt+F` / `Cmd+Alt+F` |
 | Copy file content | `Ctrl+Alt+C` / `Cmd+Alt+C` |
 | Copy git show command | `Ctrl+Alt+V` / `Cmd+Alt+V` |
