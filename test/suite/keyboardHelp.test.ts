@@ -94,7 +94,16 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
       category: 'Actions',
       items: [
         { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history' },
-        { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' }
+        { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' },
+        { keys: ['F2'], description: 'Rename filter preset (when dropdown is open)' }
+      ]
+    },
+    {
+      category: 'Global Editor Shortcuts',
+      items: [
+        { keys: [cmdKey, 'Shift', 'B'], description: 'Toggle blame annotations (works in editor)' },
+        { keys: [cmdKey, altKey, 'H'], description: 'Show file history (works in editor)' },
+        { keys: [cmdKey, altKey, 'Shift', 'H'], description: 'Show selection history (works in editor)' }
       ]
     }
   ];
@@ -157,6 +166,7 @@ suite('Keyboard Help Logic Tests', () => {
     assert.ok(categories.includes('View Options'), 'Should have View Options category');
     assert.ok(categories.includes('Copy Commands'), 'Should have Copy Commands category');
     assert.ok(categories.includes('Actions'), 'Should have Actions category');
+    assert.ok(categories.includes('Global Editor Shortcuts'), 'Should have Global Editor Shortcuts category');
   });
 
   test('Navigation shortcuts should include essential keys', () => {
@@ -456,6 +466,7 @@ suite('Keyboard Help Source Verification', () => {
     assert.ok(source.includes('View Options'), 'main.js should have View Options category');
     assert.ok(source.includes('Copy Commands'), 'main.js should have Copy Commands category');
     assert.ok(source.includes('Actions'), 'main.js should have Actions category');
+    assert.ok(source.includes('Global Editor Shortcuts'), 'main.js should have Global Editor Shortcuts category');
   });
 
   test('main.js should create keyboard-help-modal element', () => {
@@ -526,6 +537,66 @@ suite('Keyboard Help Source Verification', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy file path with hash'), 'Should include Copy file path with hash in help dialog');
+  });
+
+  test('Actions should include Rename filter preset (F2) shortcut', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const actionsCategory = shortcuts.find(s => s.category === 'Actions');
+    assert.ok(actionsCategory, 'Actions category should exist');
+
+    const renamePreset = actionsCategory!.items.find(item => item.description === 'Rename filter preset (when dropdown is open)');
+    assert.ok(renamePreset, 'Rename filter preset shortcut should exist');
+    assert.deepStrictEqual(renamePreset!.keys, ['F2'], 'Should use F2 key');
+  });
+
+  test('Actions category should have 3 shortcuts', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const actionsCategory = shortcuts.find(s => s.category === 'Actions');
+    assert.strictEqual(actionsCategory!.items.length, 3);
+  });
+
+  test('Global Editor Shortcuts category should exist', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    assert.ok(globalCategory, 'Global Editor Shortcuts category should exist');
+  });
+
+  test('Global Editor Shortcuts should include Toggle blame annotations', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    const toggleBlame = globalCategory!.items.find(item => item.description === 'Toggle blame annotations (works in editor)');
+    assert.ok(toggleBlame, 'Toggle blame annotations shortcut should exist');
+    assert.deepStrictEqual(toggleBlame!.keys, ['Cmd', 'Shift', 'B'], 'Should use Cmd+Shift+B on Mac');
+  });
+
+  test('Global Editor Shortcuts should include Show file history', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    const showHistory = globalCategory!.items.find(item => item.description === 'Show file history (works in editor)');
+    assert.ok(showHistory, 'Show file history shortcut should exist');
+    assert.deepStrictEqual(showHistory!.keys, ['Cmd', 'Option', 'H'], 'Should use Cmd+Option+H on Mac');
+  });
+
+  test('Global Editor Shortcuts should include Show selection history', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    const showHistory = globalCategory!.items.find(item => item.description === 'Show selection history (works in editor)');
+    assert.ok(showHistory, 'Show selection history shortcut should exist');
+    assert.deepStrictEqual(showHistory!.keys, ['Cmd', 'Option', 'Shift', 'H'], 'Should use Cmd+Option+Shift+H on Mac');
+  });
+
+  test('Global Editor Shortcuts should have 3 shortcuts', () => {
+    const shortcuts = getKeyboardShortcuts(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    assert.strictEqual(globalCategory!.items.length, 3);
+  });
+
+  test('Global Editor Shortcuts should use Ctrl on Windows', () => {
+    const shortcuts = getKeyboardShortcuts(false);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    const toggleBlame = globalCategory!.items.find(item => item.description === 'Toggle blame annotations (works in editor)');
+    assert.ok(toggleBlame, 'Toggle blame annotations shortcut should exist');
+    assert.ok(toggleBlame!.keys.includes('Ctrl'), 'Should use Ctrl on Windows');
   });
 });
 

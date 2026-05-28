@@ -98,7 +98,16 @@ function getKeyboardShortcutsData(isMac: boolean): Array<{ category: string; ite
       category: 'Actions',
       items: [
         { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history' },
-        { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' }
+        { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' },
+        { keys: ['F2'], description: 'Rename filter preset (when dropdown is open)' }
+      ]
+    },
+    {
+      category: 'Global Editor Shortcuts',
+      items: [
+        { keys: [cmdKey, 'Shift', 'B'], description: 'Toggle blame annotations (works in editor)' },
+        { keys: [cmdKey, altKey, 'H'], description: 'Show file history (works in editor)' },
+        { keys: [cmdKey, altKey, 'Shift', 'H'], description: 'Show selection history (works in editor)' }
       ]
     }
   ];
@@ -218,9 +227,9 @@ suite('Keyboard Help E2E Tests', () => {
     assert.ok(copyCategory!.items[0].keys.includes('Ctrl'), 'Windows copy shortcuts should use Ctrl');
   });
 
-  test('should have all 5 shortcut categories', () => {
+  test('should have all 6 shortcut categories', () => {
     const shortcuts = getKeyboardShortcutsData(true);
-    assert.strictEqual(shortcuts.length, 5);
+    assert.strictEqual(shortcuts.length, 6);
 
     const categories = shortcuts.map(s => s.category);
     assert.ok(categories.includes('Navigation'));
@@ -228,6 +237,7 @@ suite('Keyboard Help E2E Tests', () => {
     assert.ok(categories.includes('View Options'));
     assert.ok(categories.includes('Copy Commands'));
     assert.ok(categories.includes('Actions'));
+    assert.ok(categories.includes('Global Editor Shortcuts'));
   });
 
   test('Navigation category should have 9 shortcuts', () => {
@@ -254,10 +264,10 @@ suite('Keyboard Help E2E Tests', () => {
     assert.strictEqual(viewCategory!.items.length, 5);
   });
 
-  test('Actions category should have 2 shortcuts', () => {
+  test('Actions category should have 3 shortcuts', () => {
     const shortcuts = getKeyboardShortcutsData(true);
     const actionsCategory = shortcuts.find(s => s.category === 'Actions');
-    assert.strictEqual(actionsCategory!.items.length, 2);
+    assert.strictEqual(actionsCategory!.items.length, 3);
   });
 
   test('help dialog should open on ? key without modifiers', () => {
@@ -298,6 +308,7 @@ suite('Keyboard Help E2E Tests', () => {
     assert.ok(html.includes('View Options'), 'Should have View Options section');
     assert.ok(html.includes('Copy Commands'), 'Should have Copy Commands section');
     assert.ok(html.includes('Actions'), 'Should have Actions section');
+    assert.ok(html.includes('Global Editor Shortcuts'), 'Should have Global Editor Shortcuts section');
   });
 
   test('generated HTML should contain keyboard-help-key elements', () => {
@@ -549,6 +560,8 @@ suite('Keyboard Help Source Verification', () => {
       'main.js should have Copy Commands category');
     assert.ok(source.includes("category: 'Actions'"),
       'main.js should have Actions category');
+    assert.ok(source.includes("category: 'Global Editor Shortcuts'"),
+      'main.js should have Global Editor Shortcuts category');
   });
 
   test('main.js should create keyboard-help-modal element', () => {
@@ -651,5 +664,88 @@ suite('Keyboard Help Source Verification', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
     assert.ok(source.includes('Copy file path with hash'),
       'main.js should include Copy file path with hash in keyboard help dialog');
+  });
+
+  test('Actions should include Rename filter preset (F2) shortcut', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const actionsCategory = shortcuts.find(s => s.category === 'Actions');
+    assert.ok(actionsCategory, 'Actions category should exist');
+
+    const renamePreset = actionsCategory!.items.find(item => item.description === 'Rename filter preset (when dropdown is open)');
+    assert.ok(renamePreset, 'Rename filter preset shortcut should exist');
+    assert.deepStrictEqual(renamePreset!.keys, ['F2'], 'Should use F2 key');
+  });
+
+  test('main.js should include Rename filter preset (F2) in help dialog', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('Rename filter preset'),
+      'main.js should include Rename filter preset in keyboard help dialog');
+  });
+
+  test('Global Editor Shortcuts category should have 3 shortcuts', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    assert.strictEqual(globalCategory!.items.length, 3);
+  });
+
+  test('Global Editor Shortcuts should include Toggle blame annotations', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    const toggleBlame = globalCategory!.items.find(item => item.description === 'Toggle blame annotations (works in editor)');
+    assert.ok(toggleBlame, 'Toggle blame annotations shortcut should exist');
+    assert.deepStrictEqual(toggleBlame!.keys, ['Cmd', 'Shift', 'B'], 'Should use Cmd+Shift+B on Mac');
+  });
+
+  test('Global Editor Shortcuts should include Show file history', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    const showHistory = globalCategory!.items.find(item => item.description === 'Show file history (works in editor)');
+    assert.ok(showHistory, 'Show file history shortcut should exist');
+    assert.deepStrictEqual(showHistory!.keys, ['Cmd', 'Option', 'H'], 'Should use Cmd+Option+H on Mac');
+  });
+
+  test('Global Editor Shortcuts should include Show selection history', () => {
+    const shortcuts = getKeyboardShortcutsData(true);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    const showHistory = globalCategory!.items.find(item => item.description === 'Show selection history (works in editor)');
+    assert.ok(showHistory, 'Show selection history shortcut should exist');
+    assert.deepStrictEqual(showHistory!.keys, ['Cmd', 'Option', 'Shift', 'H'], 'Should use Cmd+Option+Shift+H on Mac');
+  });
+
+  test('Global Editor Shortcuts should use Ctrl on Windows', () => {
+    const shortcuts = getKeyboardShortcutsData(false);
+    const globalCategory = shortcuts.find(s => s.category === 'Global Editor Shortcuts');
+    const toggleBlame = globalCategory!.items.find(item => item.description === 'Toggle blame annotations (works in editor)');
+    assert.ok(toggleBlame, 'Toggle blame annotations shortcut should exist');
+    assert.ok(toggleBlame!.keys.includes('Ctrl'), 'Should use Ctrl on Windows');
+  });
+
+  test('generated HTML should contain Global Editor Shortcuts section', () => {
+    const html = createKeyboardHelpModalHtml(true);
+    assert.ok(html.includes('Global Editor Shortcuts'), 'Should have Global Editor Shortcuts section');
+  });
+
+  test('main.js should include Global Editor Shortcuts category', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('Global Editor Shortcuts'),
+      'main.js should include Global Editor Shortcuts category in help dialog');
+  });
+
+  test('main.js should include Toggle blame annotations (works in editor)', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('Toggle blame annotations (works in editor)'),
+      'main.js should include Toggle blame annotations in Global Editor Shortcuts');
+  });
+
+  test('main.js should include Show file history (works in editor)', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('Show file history (works in editor)'),
+      'main.js should include Show file history in Global Editor Shortcuts');
+  });
+
+  test('main.js should include Show selection history (works in editor)', () => {
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+    assert.ok(source.includes('Show selection history (works in editor)'),
+      'main.js should include Show selection history in Global Editor Shortcuts');
   });
 });
