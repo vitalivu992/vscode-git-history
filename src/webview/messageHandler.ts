@@ -138,6 +138,10 @@ export async function handleMessage(
       await handleCopyAuthorGitFormat(message.hash, panel);
       break;
 
+    case 'copyAuthorInitials':
+      handleCopyAuthorInitials(message.hash, panel);
+      break;
+
     case 'copyCommitterEmail':
       handleCopyCommitterEmail(message.hash, panel);
       break;
@@ -176,6 +180,18 @@ export async function handleMessage(
 
     case 'copyCoAuthors':
       handleCopyCoAuthors(message.hash, panel);
+      break;
+
+    case 'copyTrailers':
+      handleCopyTrailers(message.hash, panel);
+      break;
+
+    case 'copyFixesReferences':
+      handleCopyFixesReferences(message.hash, panel);
+      break;
+
+    case 'copyReviewedBy':
+      handleCopyReviewedBy(message.hash, panel);
       break;
 
     case 'copyCommitDate':
@@ -228,6 +244,14 @@ export async function handleMessage(
 
     case 'copyCommitYaml':
       handleCopyCommitYaml(message.hash, panel);
+      break;
+
+    case 'copyCommitBbcode':
+      handleCopyCommitBbcode(message.hash, panel);
+      break;
+
+    case 'copyCommitCsv':
+      handleCopyCommitCsv(message.hash, panel);
       break;
 
     case 'copySelectedHashes':
@@ -1593,6 +1617,26 @@ async function handleCopyAuthorGitFormat(hash: string, panel: GitHistoryPanel): 
   void vscode.window.showInformationMessage(`Copied author: ${gitFormat}`);
 }
 
+function handleCopyAuthorInitials(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const parts = commit.author.trim().split(/\s+/);
+  let initials: string;
+  if (parts.length >= 2) {
+    initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  } else {
+    initials = commit.author.substring(0, 2).toUpperCase();
+  }
+
+  void vscode.env.clipboard.writeText(initials).then(() => {
+    void vscode.window.showInformationMessage(`Copied author initials: ${initials}`);
+  });
+}
+
 function handleCopyCommitterEmail(hash: string, panel: GitHistoryPanel): void {
   const commit = panel.getCommits().find(c => c.hash === hash);
   if (!commit) {
@@ -1740,6 +1784,124 @@ export function extractCoAuthors(fullMessage: string): string[] {
   }
 
   return coAuthors;
+}
+
+/**
+ * Extract all trailers from commit message body.
+ * Trailers are structured metadata in "Key: Value" format at the end of commit messages.
+ * Returns a Map from trailer key to array of values.
+ */
+export function extractTrailers(fullMessage: string): Map<string, string[]> {
+  const trailers = new Map<string, string[]>();
+  if (!fullMessage) {
+    return trailers;
+  }
+
+  const lines = fullMessage.split('\n');
+  // Trailers appear at the end of the commit body, after the first blank line
+  const bodyStart = lines.indexOf('');
+  if (bodyStart === -1) {
+    return trailers;
+  }
+
+  for (let i = bodyStart + 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const trailerMatch = line.match(/^([A-Za-z][A-Za-z0-9_-]*):\s*(.+)$/);
+    if (trailerMatch) {
+      const key = trailerMatch[1];
+      const value = trailerMatch[2].trim();
+      if (!trailers.has(key)) {
+        trailers.set(key, []);
+      }
+      trailers.get(key)!.push(value);
+    }
+  }
+
+  return trailers;
+}
+
+const ISSUE_REFERENCE_KEYS = new Set([
+  'Fixes', 'Closes', 'Resolves', 'Related-to', 'Related',
+  'Refs', 'References', 'See', 'Issue'
+]);
+
+const REVIEW_KEYS = new Set([
+  'Reviewed-by', 'Acked-by', 'Tested-by', 'Signed-off-by'
+]);
+
+function handleCopyTrailers(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const trailers = extractTrailers(commit.fullMessage);
+  if (trailers.size === 0) {
+    void vscode.window.showInformationMessage('No trailers on commit');
+    return;
+  }
+
+  const lines: string[] = [];
+  for (const [key, values] of trailers) {
+    for (const value of values) {
+      lines.push(`${key}: ${value}`);
+    }
+  }
+
+  void vscode.env.clipboard.writeText(lines.join('\n')).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${lines.length} trailer${lines.length > 1 ? 's' : ''}`);
+  });
+}
+
+function handleCopyFixesReferences(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const trailers = extractTrailers(commit.fullMessage);
+  const refs: string[] = [];
+  for (const [key, values] of trailers) {
+    if (ISSUE_REFERENCE_KEYS.has(key)) {
+      refs.push(...values);
+    }
+  }
+
+  if (refs.length === 0) {
+    void vscode.window.showInformationMessage('No issue references found in trailers');
+    return;
+  }
+
+  void vscode.env.clipboard.writeText(refs.join(', ')).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${refs.length} issue reference${refs.length > 1 ? 's' : ''}`);
+  });
+}
+
+function handleCopyReviewedBy(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const trailers = extractTrailers(commit.fullMessage);
+  const reviewers: string[] = [];
+  for (const [key, values] of trailers) {
+    if (REVIEW_KEYS.has(key)) {
+      reviewers.push(...values);
+    }
+  }
+
+  if (reviewers.length === 0) {
+    void vscode.window.showInformationMessage('No review/acknowledgment trailers found');
+    return;
+  }
+
+  void vscode.env.clipboard.writeText(reviewers.join(', ')).then(() => {
+    void vscode.window.showInformationMessage(`Copied ${reviewers.length} reviewer${reviewers.length > 1 ? 's' : ''}`);
+  });
 }
 
 function handleCopyCommitDate(hash: string, panel: GitHistoryPanel): void {
@@ -2245,6 +2407,48 @@ export function formatCommitAsYaml(commit: CommitInfo): string {
   return lines.join('\n');
 }
 
+export function formatCommitAsBbcode(commit: CommitInfo): string {
+  const lines: string[] = [];
+
+  // Header with hash and subject
+  lines.push(`[b]Commit:[/b] ${commit.shortHash} - ${commit.message}`);
+  lines.push('');
+
+  // Author and email
+  lines.push(`[b]Author:[/b] ${commit.author} <${commit.email}>`);
+  lines.push('');
+
+  // Date
+  const dateStr = new Date(commit.date).toLocaleString();
+  lines.push(`[b]Date:[/b] ${dateStr}`);
+  lines.push('');
+
+  // Stats if available
+  if (commit.stats) {
+    const filesWord = commit.stats.filesChanged === 1 ? 'file' : 'files';
+    lines.push(`[b]Statistics:[/b] ${commit.stats.filesChanged} ${filesWord} changed, +${commit.stats.insertions}, -${commit.stats.deletions}`);
+    lines.push('');
+  }
+
+  // Tags if available
+  if (commit.tags && commit.tags.length > 0) {
+    lines.push(`[b]Tags:[/b] ${commit.tags.join(', ')}`);
+    lines.push('');
+  }
+
+  // Body if exists and different from subject
+  if (commit.fullMessage && commit.fullMessage !== commit.message) {
+    const body = commit.fullMessage.replace(commit.message, '').trim();
+    if (body) {
+      lines.push(`[b]Body:[/b]`);
+      lines.push(body);
+      lines.push('');
+    }
+  }
+
+  return lines.join('\n');
+}
+
 function handleCopyCommitYaml(hash: string, panel: GitHistoryPanel): void {
   const commit = panel.getCommits().find(c => c.hash === hash);
   if (!commit) {
@@ -2258,6 +2462,52 @@ function handleCopyCommitYaml(hash: string, panel: GitHistoryPanel): void {
       ? commit.message.substring(0, 27) + '...'
       : commit.message;
     void vscode.window.showInformationMessage(`Copied as YAML: ${commit.shortHash} ${shortMsg}`);
+  });
+}
+
+function handleCopyCommitBbcode(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const bbcode = formatCommitAsBbcode(commit);
+  void vscode.env.clipboard.writeText(bbcode).then(() => {
+    const shortMsg = commit.message.length > 30
+      ? commit.message.substring(0, 27) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied as BBCode: ${commit.shortHash} ${shortMsg}`);
+  });
+}
+
+function handleCopyCommitCsv(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const headers = ['Hash', 'Short Hash', 'Author', 'Email', 'Date', 'Message', 'Tags', 'Files Changed', 'Insertions', 'Deletions'];
+  const fields = [
+    commit.hash,
+    commit.shortHash,
+    escapeCsvField(commit.author),
+    commit.email,
+    commit.date,
+    escapeCsvField(commit.message),
+    commit.tags ? commit.tags.join(';') : '',
+    commit.stats?.filesChanged?.toString() || '0',
+    commit.stats?.insertions?.toString() || '0',
+    commit.stats?.deletions?.toString() || '0'
+  ];
+  const csv = headers.join(',') + '\n' + fields.join(',');
+
+  void vscode.env.clipboard.writeText(csv).then(() => {
+    const shortMsg = commit.message.length > 30
+      ? commit.message.substring(0, 27) + '...'
+      : commit.message;
+    void vscode.window.showInformationMessage(`Copied as CSV: ${commit.shortHash} ${shortMsg}`);
   });
 }
 
