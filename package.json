@@ -177,6 +177,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyAuthorInitials",
+        "title": "Git History: Copy Author Initials",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyCommitterEmail",
         "title": "Git History: Copy Committer Email",
         "category": "Git History"
@@ -264,6 +269,21 @@
       {
         "command": "gitHistory.copyCoAuthors",
         "title": "Git History: Copy Co-Authors",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyTrailers",
+        "title": "Git History: Copy Trailers",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyFixesReferences",
+        "title": "Git History: Copy Issue References",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyReviewedBy",
+        "title": "Git History: Copy Reviewers",
         "category": "Git History"
       },
       {
@@ -703,8 +723,8 @@
       },
       {
         "command": "gitHistory.copyRangeDiff",
-        "key": "ctrl+alt+r",
-        "mac": "cmd+alt+r",
+        "key": "ctrl+shift+alt+r",
+        "mac": "cmd+shift+alt+r",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -798,6 +818,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.copyAuthorInitials",
+        "key": "ctrl+alt+shift+i",
+        "mac": "cmd+alt+shift+i",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyParentHash",
         "key": "ctrl+shift+v",
         "mac": "cmd+shift+v",
@@ -825,6 +851,24 @@
         "command": "gitHistory.copyCoAuthors",
         "key": "ctrl+shift+k",
         "mac": "cmd+shift+k",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyTrailers",
+        "key": "ctrl+shift+alt+3",
+        "mac": "cmd+shift+alt+3",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFixesReferences",
+        "key": "ctrl+shift+alt+5",
+        "mac": "cmd+shift+alt+5",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyReviewedBy",
+        "key": "ctrl+shift+alt+4",
+        "mac": "cmd+shift+alt+4",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -1081,8 +1125,7 @@
       },
       {
         "command": "gitHistory.copyFilePath",
-        "key": "ctrl+shift+\\.",
-        "mac": "cmd+shift+.",
+        "key": "f6",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -1141,8 +1184,8 @@
       },
       {
         "command": "gitHistory.toggleIgnoreWhitespace",
-        "key": "ctrl+shift+j",
-        "mac": "cmd+shift+j",
+        "key": "ctrl+shift+alt+j",
+        "mac": "cmd+shift+alt+j",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
@@ -1292,6 +1335,18 @@
         "command": "gitHistory.copyCommitYaml",
         "key": "ctrl+alt+shift+y",
         "mac": "cmd+alt+shift+y",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitBbcode",
+        "key": "ctrl+alt+shift+b",
+        "mac": "cmd+alt+shift+b",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitCsv",
+        "key": "ctrl+alt+shift+c",
+        "mac": "cmd+alt+shift+c",
         "when": "activeWebviewPanelId == gitHistory.webview"
       }
     ],
