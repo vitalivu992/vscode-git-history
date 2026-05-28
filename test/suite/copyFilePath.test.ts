@@ -147,3 +147,62 @@ suite('Copy File Path Source Verification', () => {
       'File context menu should have copy-file-path action');
   });
 });
+
+suite('Copy File Path Keyboard Shortcut Tests', () => {
+  const claudePath = path.resolve(__dirname, '../../../CLAUDE.md');
+  const readmePath = path.resolve(__dirname, '../../../README.md');
+  const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+  const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+
+  test('package.json should have F6 keybinding for copyFilePath', () => {
+    const fs = require('fs');
+    const source = fs.readFileSync(packageJsonPath, 'utf-8');
+
+    // Find the copyFilePath command in the keybindings section
+    const copyFilePathKeybinding = source.match(
+      /\{\s*"command":\s*"gitHistory\.copyFilePath"[^}]*"key":\s*"f6"/i
+    );
+    assert.ok(copyFilePathKeybinding,
+      'package.json should have F6 keybinding for copyFilePath command');
+  });
+
+  test('CLAUDE.md should document F6 keyboard shortcut for copyFilePath', () => {
+    const fs = require('fs');
+    const source = fs.readFileSync(claudePath, 'utf-8');
+
+    // Find the File Context Menu section and verify F6 is documented
+    const fileContextMenuSection = source.match(
+      /File Context Menu.*?(?=- \*\*|$)/s
+    );
+    assert.ok(fileContextMenuSection, 'Should find File Context Menu section');
+
+    const sectionText = fileContextMenuSection[0];
+    assert.ok(sectionText.includes('F6') &&
+              sectionText.includes('file path'),
+      'CLAUDE.md should document F6 keyboard shortcut for copyFilePath');
+  });
+
+  test('README.md should document F6 keyboard shortcut for copyFilePath', () => {
+    const fs = require('fs');
+    const source = fs.readFileSync(readmePath, 'utf-8');
+
+    // README should document F6 for copy file path
+    const copyFilePathEntry = source.match(
+      /\|.*F6.*Copy file path/i
+    );
+    assert.ok(copyFilePathEntry,
+      'README.md should document F6 keyboard shortcut for copy file path');
+  });
+
+  test('main.js should have F6 keyboard help entry for copyFilePath', () => {
+    const fs = require('fs');
+    const source = fs.readFileSync(mainJsPath, 'utf-8');
+
+    // Find keyboard help section
+    const keyboardHelpMatch = source.match(
+      /\{ keys: \['F6'\], description: 'Copy file path' \}/
+    );
+    assert.ok(keyboardHelpMatch,
+      'main.js should have F6 keyboard help entry for Copy file path');
+  });
+});

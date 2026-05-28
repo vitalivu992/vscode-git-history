@@ -9,6 +9,7 @@ import {
 	formatCommitAsMarkdown,
 	formatCommitAsHtml,
 	extractCoAuthors,
+	extractTrailers,
 	validatePresetName,
 	formatCommitsAsPrDescription,
 	formatFullInfoWithStats,
@@ -1110,5 +1111,102 @@ suite('messageHandlerUtils - formatFullInfoWithStats', () => {
 		const result = formatFullInfoWithStats(commit, []);
 		assert.ok(result.includes('1 file changed'));
 		assert.ok(!result.includes('1 files changed'));
+	});
+});
+
+suite('messageHandlerUtils - extractTrailers', () => {
+	test('extracts single trailer from commit message', () => {
+		const message = `Fix bug
+
+Fixes: #123`;
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 1);
+		assert.deepStrictEqual(result.get('Fixes'), ['#123']);
+	});
+
+	test('extracts multiple trailers of different types', () => {
+		const message = `Fix critical bug
+
+Fixes: #123
+Reviewed-by: Alice <alice@example.com>
+Signed-off-by: Bob <bob@example.com>`;
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 3);
+		assert.deepStrictEqual(result.get('Fixes'), ['#123']);
+		assert.deepStrictEqual(result.get('Reviewed-by'), ['Alice <alice@example.com>']);
+		assert.deepStrictEqual(result.get('Signed-off-by'), ['Bob <bob@example.com>']);
+	});
+
+	test('extracts multiple values for same key', () => {
+		const message = `Fix bugs
+
+Fixes: #123
+Fixes: #456
+Closes: #789`;
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 2);
+		assert.deepStrictEqual(result.get('Fixes'), ['#123', '#456']);
+		assert.deepStrictEqual(result.get('Closes'), ['#789']);
+	});
+
+	test('returns empty map for message with no body', () => {
+		const message = 'Single line commit message';
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 0);
+	});
+
+	test('returns empty map for empty string', () => {
+		const result = extractTrailers('');
+		assert.strictEqual(result.size, 0);
+	});
+
+	test('returns empty map for body without trailers', () => {
+		const message = `Fix bug
+
+This is a regular body paragraph
+that explains the fix.`;
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 0);
+	});
+
+	test('extracts trailers with hyphens in key', () => {
+		const message = `Feature
+
+Co-authored-by: Alice <alice@example.com>
+Related-to: #100`;
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 2);
+		assert.deepStrictEqual(result.get('Co-authored-by'), ['Alice <alice@example.com>']);
+		assert.deepStrictEqual(result.get('Related-to'), ['#100']);
+	});
+
+	test('extracts Resolves trailer', () => {
+		const message = `Implement feature
+
+Resolves: #42`;
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 1);
+		assert.deepStrictEqual(result.get('Resolves'), ['#42']);
+	});
+
+	test('extracts trailers with underscores in key', () => {
+		const message = `Fix
+
+Bug_ID: 12345`;
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 1);
+		assert.deepStrictEqual(result.get('Bug_ID'), ['12345']);
+	});
+
+	test('ignores non-trailer lines mixed with trailers', () => {
+		const message = `Fix bug
+
+This is an explanation paragraph.
+It has multiple lines.
+
+Fixes: #100`;
+		const result = extractTrailers(message);
+		assert.strictEqual(result.size, 1);
+		assert.deepStrictEqual(result.get('Fixes'), ['#100']);
 	});
 });
