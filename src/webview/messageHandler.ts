@@ -310,6 +310,10 @@ export async function handleMessage(
       handleCopyFileExtension(message.filePath, panel);
       break;
 
+    case 'copyFileLineCount':
+      handleCopyFileLineCount(message.filePath, message.hash, panel);
+      break;
+
     case 'copyFileBasename':
       handleCopyFileBasename(message.filePath, panel);
       break;
@@ -798,6 +802,22 @@ function handleCopyFileExtension(filePath: string, _panel: GitHistoryPanel): voi
   void vscode.env.clipboard.writeText(displayExt).then(() => {
     void vscode.window.showInformationMessage(`Copied extension: ${displayExt}`);
   });
+}
+
+function handleCopyFileLineCount(filePath: string, hash: string, panel: GitHistoryPanel): void {
+  void getFileContentAtCommit(filePath, hash, panel.getCwd())
+    .then(content => {
+      const lineCount = content.trim() === '' ? 0 : content.split('\n').length;
+      const lineWord = lineCount === 1 ? 'line' : 'lines';
+      const copyText = `${lineCount} ${lineWord}`;
+
+      void vscode.env.clipboard.writeText(copyText).then(() => {
+        void vscode.window.showInformationMessage(`File line count copied: ${copyText}`);
+      });
+    })
+    .catch(() => {
+      void vscode.window.showInformationMessage('Unable to get file content');
+    });
 }
 
 function handleCopyFileDirectory(filePath: string, _panel: GitHistoryPanel): void {

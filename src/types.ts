@@ -139,6 +139,7 @@ export type WebviewAction =
   | 'copyDescribe'
   | 'copyFileName'
   | 'copyFileExtension'
+  | 'copyFileLineCount'
   | 'copyFileDirectory'
   | 'copyRelativePath'
   | 'copyFileDiff'
@@ -274,6 +275,7 @@ export type WebviewToExtMessage =
   | { type: 'copyFilePath'; filePath: string }
   | { type: 'copyFileName'; filePath: string }
   | { type: 'copyFileExtension'; filePath: string }
+  | { type: 'copyFileLineCount'; hash: string; filePath: string }
   | { type: 'copyFileBasename'; filePath: string }
   | { type: 'copyFileDirectory'; filePath: string }
   | { type: 'copyRelativePath'; filePath: string }

@@ -2192,6 +2192,7 @@ function handleMessage(event) {
         case 'copyAllUniqueAuthors': handleCopyAllUniqueAuthors(); break;
         case 'copyFileName': handleCopyFileName(); break;
         case 'copyFileExtension': handleCopyExtension(); break;
+        case 'copyFileLineCount': handleCopyFileLineCount(); break;
         case 'copyFileBasename': handleCopyFileBasename(); break;
         case 'copyFileDirectory': handleCopyFileDirectory(); break;
         case 'copyFilePath': handleCopyFilePath(); break;
@@ -2733,6 +2734,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">📋</span>
       <span class="context-menu-label">Copy file extension</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-line-count">
+      <span class="context-menu-icon">📊</span>
+      <span class="context-menu-label">Copy file line count</span>
+    </div>
     <div class="context-menu-item" data-action="copy-file-directory">
       <span class="context-menu-icon">📁</span>
       <span class="context-menu-label">Copy file directory</span>
@@ -2822,6 +2827,12 @@ function showFileContextMenu(event, filePath, commitHash) {
       } else if (action === 'copy-file-extension') {
         vscode.postMessage({
           type: 'copyFileExtension',
+          filePath: filePath
+        });
+      } else if (action === 'copy-file-line-count') {
+        vscode.postMessage({
+          type: 'copyFileLineCount',
+          hash: commitHash,
           filePath: filePath
         });
       } else if (action === 'copy-file-directory') {
@@ -5549,7 +5560,8 @@ function showKeyboardHelpDialog() {
     {
       category: 'Actions',
       items: [
-        { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history' },
+        { keys: ['F5'], description: 'Refresh history' },
+        { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history (alternative)' },
         { keys: [cmdKey, 'Alt', 'Q'], description: 'Clear all filters' },
         { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' },
         { keys: [cmdKey, 'Shift', '0'], description: 'Save filter preset' },
@@ -5793,6 +5805,14 @@ function handleCopyExtension() {
     return;
   }
   vscode.postMessage({ type: 'copyFileExtension', filePath: selectedFile });
+}
+
+function handleCopyFileLineCount() {
+  if (!selectedFile) {
+    showError('Select a file to copy its line count');
+    return;
+  }
+  vscode.postMessage({ type: 'copyFileLineCount', hash: selectedCommitHash, filePath: selectedFile });
 }
 
 function handleCopyFileDirectory() {

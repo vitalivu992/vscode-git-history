@@ -255,6 +255,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyCommitYaml', action: 'copyCommitYaml' },
     { command: 'gitHistory.copyCommitBbcode', action: 'copyCommitBbcode' },
     { command: 'gitHistory.copyCommitCsv', action: 'copyCommitCsv' },
+    { command: 'gitHistory.copyFileLineCount', action: 'copyFileLineCount' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

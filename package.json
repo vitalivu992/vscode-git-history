@@ -332,6 +332,11 @@
         "category": "Git History"
       },
       {
+        "command": "gitHistory.copyFileLineCount",
+        "title": "Git History: Copy File Line Count",
+        "category": "Git History"
+      },
+      {
         "command": "gitHistory.copyFileBasename",
         "title": "Git History: Copy File Basename",
         "category": "Git History"
@@ -654,6 +659,11 @@
         "key": "ctrl+alt+shift+h",
         "mac": "cmd+alt+shift+h",
         "when": "editorTextFocus && editorHasSelection"
+      },
+      {
+        "command": "gitHistory.refresh",
+        "key": "f5",
+        "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
         "command": "gitHistory.refresh",
@@ -1001,6 +1011,12 @@
         "command": "gitHistory.copyFileExtension",
         "key": "ctrl+alt+e",
         "mac": "cmd+alt+e",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyFileLineCount",
+        "key": "ctrl+shift+alt+l",
+        "mac": "cmd+shift+alt+l",
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
