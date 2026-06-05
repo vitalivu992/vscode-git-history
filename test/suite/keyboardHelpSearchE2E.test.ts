@@ -59,7 +59,8 @@ function getSampleShortcuts(): ShortcutCategory[] {
     {
       category: 'Actions',
       items: [
-        { keys: ['Ctrl', 'Shift', 'R'], description: 'Refresh history' },
+        { keys: ['F5'], description: 'Refresh history' },
+        { keys: ['Ctrl', 'Shift', 'R'], description: 'Refresh history (alternative)' },
         { keys: ['Ctrl', 'Alt', 'K'], description: 'Cherry-pick commit' }
       ]
     }

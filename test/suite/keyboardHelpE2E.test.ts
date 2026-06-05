@@ -97,7 +97,8 @@ function getKeyboardShortcutsData(isMac: boolean): Array<{ category: string; ite
     {
       category: 'Actions',
       items: [
-        { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history' },
+        { keys: ['F5'], description: 'Refresh history' },
+        { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history (alternative)' },
         { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' },
         { keys: ['F2'], description: 'Rename filter preset (when dropdown is open)' }
       ]
@@ -264,10 +265,10 @@ suite('Keyboard Help E2E Tests', () => {
     assert.strictEqual(viewCategory!.items.length, 5);
   });
 
-  test('Actions category should have 3 shortcuts', () => {
+  test('Actions category should have 4 shortcuts', () => {
     const shortcuts = getKeyboardShortcutsData(true);
     const actionsCategory = shortcuts.find(s => s.category === 'Actions');
-    assert.strictEqual(actionsCategory!.items.length, 3);
+    assert.strictEqual(actionsCategory!.items.length, 4);
   });
 
   test('help dialog should open on ? key without modifiers', () => {

@@ -93,7 +93,8 @@ function getKeyboardShortcuts(isMac: boolean): ShortcutCategory[] {
     {
       category: 'Actions',
       items: [
-        { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history' },
+        { keys: ['F5'], description: 'Refresh history' },
+        { keys: [cmdKey, 'Shift', 'R'], description: 'Refresh history (alternative)' },
         { keys: [cmdKey, 'Shift', 'O'], description: 'Export filtered commits' },
         { keys: ['F2'], description: 'Rename filter preset (when dropdown is open)' }
       ]
@@ -549,10 +550,10 @@ suite('Keyboard Help Source Verification', () => {
     assert.deepStrictEqual(renamePreset!.keys, ['F2'], 'Should use F2 key');
   });
 
-  test('Actions category should have 3 shortcuts', () => {
+  test('Actions category should have 4 shortcuts', () => {
     const shortcuts = getKeyboardShortcuts(true);
     const actionsCategory = shortcuts.find(s => s.category === 'Actions');
-    assert.strictEqual(actionsCategory!.items.length, 3);
+    assert.strictEqual(actionsCategory!.items.length, 4);
   });
 
   test('Global Editor Shortcuts category should exist', () => {
