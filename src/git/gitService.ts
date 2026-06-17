@@ -44,7 +44,10 @@ async function execGit(args: string[], cwd: string): Promise<string> {
  * Get git history for a file
  */
 export async function getFileHistory(filePath: string, cwd: string): Promise<CommitInfo[]> {
-  const relativePath = path.relative(cwd, filePath);
+  // Resolve filePath against cwd first: when filePath is relative, path.relative
+  // would otherwise resolve it against process.cwd() instead of the repo's cwd,
+  // producing a bogus path (only correct when process.cwd() === cwd).
+  const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
   const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   // Use %x00 as field separator for cleaner parsing
@@ -87,7 +90,10 @@ export async function getSelectionHistory(
   endLine: number,
   cwd: string
 ): Promise<CommitInfo[]> {
-  const relativePath = path.relative(cwd, filePath);
+  // Resolve filePath against cwd first: when filePath is relative, path.relative
+  // would otherwise resolve it against process.cwd() instead of the repo's cwd,
+  // producing a bogus path (only correct when process.cwd() === cwd).
+  const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
   const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   const args = [
@@ -264,7 +270,10 @@ export async function getCommitFiles(
  * Get blame information for a file
  */
 export async function getFileBlame(filePath: string, cwd: string): Promise<BlameLineInfo[]> {
-  const relativePath = path.relative(cwd, filePath);
+  // Resolve filePath against cwd first: when filePath is relative, path.relative
+  // would otherwise resolve it against process.cwd() instead of the repo's cwd,
+  // producing a bogus path (only correct when process.cwd() === cwd).
+  const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
   const output = await execGit(['blame', '--porcelain', '--', relativePath], cwd);
   return parseBlameOutput(output);
 }
@@ -369,7 +378,10 @@ export async function getFileContentAtCommit(
   commitHash: string,
   cwd: string
 ): Promise<string> {
-  const relativePath = path.relative(cwd, filePath);
+  // Resolve filePath against cwd first: when filePath is relative, path.relative
+  // would otherwise resolve it against process.cwd() instead of the repo's cwd,
+  // producing a bogus path (only correct when process.cwd() === cwd).
+  const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
   const output = await execGit(['show', `${commitHash}:${relativePath}`], cwd);
   return output;
 }

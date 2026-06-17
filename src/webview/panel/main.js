@@ -92,7 +92,7 @@ function parseDateFilter(query) {
   }
 
   // Parse last:Ndays/weeks/months (case-insensitive, singular/plural)
-  const lastMatch = query.match(/last:(\d+)\s*(day|days|week|weeks|month|months)/i);
+  const lastMatch = query.match(/last:(\d+)\s*(days?|weeks?|months?)/i);
   if (lastMatch) {
     const num = parseInt(lastMatch[1], 10);
     const unit = lastMatch[2].toLowerCase();
@@ -305,7 +305,7 @@ function renderFilterBadges() {
       } else if (filterToRemove === 'path') {
         newQuery = newQuery.replace(/path:[^\s]+/i, '').trim();
       } else if (filterToRemove === 'last') {
-        newQuery = newQuery.replace(/last:\d+\s*(day|days|week|weeks|month|months)/i, '').trim();
+        newQuery = newQuery.replace(/last:\d+\s*(days?|weeks?|months?)/i, '').trim();
       }
 
       searchInput.value = newQuery;
