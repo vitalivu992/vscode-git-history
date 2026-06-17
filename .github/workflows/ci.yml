@@ -22,32 +22,47 @@ jobs:
       - name: Run tests
         run: xvfb-run -a npm test
 
+      # The steps below run unconditionally (`if: always()`) so the .vsix build
+      # artifact is produced and uploaded even when the (still-being-repaired)
+      # test suite has failures. Remove `if: always()` once the suite is green.
+
       - run: sudo apt-get install -y scrot
+        if: always()
 
       - name: Capture screenshots
         run: xvfb-run -a --server-args="-screen 0 1920x1080x24" npm run screenshot
+        if: always()
 
       - name: Get version
         id: version
+        if: always()
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Get timestamp
         id: timestamp
+        if: always()
         run: |
           TIMESTAMP=$(date +%y.%m.%d.%H%M)
           echo "timestamp=$TIMESTAMP" >> "$GITHUB_OUTPUT"
 
-      - run: npx @vscode/vsce package --no-dependencies
+      - name: Package extension
+        if: always()
+        run: npx @vscode/vsce package --no-dependencies
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: screenshots-v${{ steps.version.outputs.version }}-${{ steps.timestamp.outputs.timestamp }}
           path: screenshots/
+          if-no-files-found: ignore
           retention-days: 7
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload vsix
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: vsix-v${{ steps.version.outputs.version }}-${{ steps.timestamp.outputs.timestamp }}
           path: "*.vsix"
