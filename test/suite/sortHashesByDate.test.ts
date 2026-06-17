@@ -131,7 +131,7 @@ suite('sortHashesByDate Tests', () => {
 });
 
 suite('sortHashesByDate Source Verification Tests', () => {
-  const srcPath = path.resolve(__dirname, '..', '..', '..', 'src', 'git', 'gitService.ts');
+  const srcPath = path.resolve(__dirname, '..', '..', '..', '..', 'src', 'git', 'gitService.ts');
 
   test('gitService should export getCombinedDiff', () => {
     const src = fs.readFileSync(srcPath, 'utf8');

@@ -29,7 +29,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('handleCopyCommitHash with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler exists
@@ -40,7 +40,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('handleCopyCommitHash writes full hash to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitHash');
@@ -55,7 +55,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('handleCopyCommitHash handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitHash');
@@ -67,7 +67,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyHash target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyHash');
@@ -84,7 +84,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyHash sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyHash');
@@ -96,7 +96,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyHash handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyHash');
@@ -108,7 +108,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyHash uses getFilteredCommits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyHash');
@@ -120,7 +120,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('context menu has copy-hash item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-hash"') ||
@@ -131,7 +131,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('context menu click handles copy-hash action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-hash'") ||
@@ -140,7 +140,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('Ctrl+Shift+H keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("e.key === 'h'") && source.includes('handleCopyHash'),
@@ -158,7 +158,7 @@ suite('Copy Commit Hash E2E Tests', () => {
   });
 
   test('full hash is 40 characters', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitHash');

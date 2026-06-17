@@ -29,7 +29,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('handleCopyAuthorName with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -42,7 +42,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('handleCopyAuthorName writes name to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write with commit.author
@@ -56,7 +56,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('handleCopyAuthorName handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -69,7 +69,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('main.js handleCopyAuthorName target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -87,7 +87,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('main.js handleCopyAuthorName sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAuthorName');
@@ -99,7 +99,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('main.js handleCopyAuthorName handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAuthorName');
@@ -111,7 +111,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('context menu has copy-author-name item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -122,7 +122,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('context menu click handles copy-author-name action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -132,7 +132,7 @@ suite('Copy Author Name E2E Tests', () => {
   });
 
   test('Ctrl+Shift+N keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler

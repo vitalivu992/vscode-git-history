@@ -29,7 +29,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('handleCopyFileContent should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileContent'),
@@ -37,7 +37,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('handleCopyFileContent should call getFileContentAtCommit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler imports and calls getFileContentAtCommit
@@ -51,7 +51,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('handleCopyFileContent writes content to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write
@@ -64,7 +64,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('handleCopyFileContent handles errors gracefully', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify error handling
@@ -79,7 +79,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('handleCopyFileContent shows confirmation with filename', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify confirmation message uses path.basename
@@ -94,7 +94,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyFileContent', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileContent':"),
@@ -104,7 +104,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('messageHandler imports getFileContentAtCommit from gitService', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Check import statement
@@ -114,7 +114,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('main.js file context menu has copy-file-content item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -125,7 +125,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('main.js context menu click handles copy-file-content action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -135,7 +135,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('main.js sends copyFileContent message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for correct message type
@@ -153,7 +153,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('types.ts has copyFileContent message type', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copyFileContent'"),
@@ -165,7 +165,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('types.ts has copyFileContent WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("'copyFileContent'"),
@@ -173,7 +173,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('extension.ts registers copyFileContent command', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("'copyFileContent'"),
@@ -193,7 +193,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('gitService getFileContentAtCommit exists and works', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     assert.ok(source.includes('export async function getFileContentAtCommit'),
@@ -205,7 +205,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('File context menu has divider before copy-file-path', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Find the file context menu (showFileContextMenu function)
@@ -227,7 +227,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('copyFileContent icon and label are correct', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Find the copy-file-content menu item
@@ -242,7 +242,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('main.js triggerAction should dispatch copyFileContent', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileContent': handleCopyFileContent()"),
@@ -250,7 +250,7 @@ suite('Copy File Content E2E Tests', () => {
   });
 
   test('main.js should have handleCopyFileContent function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileContent'),

@@ -38,7 +38,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson builds JSON with all required fields', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -86,7 +86,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson uses JSON.stringify with 2-space indentation', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -101,7 +101,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson handles commits without body', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -117,7 +117,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson handles root commits (empty parentHashes)', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -131,7 +131,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson handles commits without tags', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -145,7 +145,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson handles commits without stats', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -159,7 +159,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson writes JSON to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -173,7 +173,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson handles commit not found', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -185,7 +185,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('handleCopyCommitJson shows confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -199,7 +199,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('main.js handleCopyJson target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyJson');
@@ -216,7 +216,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('main.js handleCopyJson sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyJson');
@@ -228,7 +228,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('main.js handleCopyJson handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyJson');
@@ -240,7 +240,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('context menu has copy-json item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-json"'),
@@ -252,7 +252,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('context menu click handles copy-json action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-json'"),
@@ -262,7 +262,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('Ctrl+Alt+J keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("e.key === 'j'") &&
@@ -296,7 +296,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('keyboard help includes Copy as JSON', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy as JSON') || source.includes('copy-json'),
@@ -306,7 +306,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('JSON output format is valid and parseable', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');
@@ -327,7 +327,7 @@ suite('Copy Commit JSON E2E Tests', () => {
   });
 
   test('JSON structure matches expected schema', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJson');

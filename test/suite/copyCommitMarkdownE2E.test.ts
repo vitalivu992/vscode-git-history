@@ -38,7 +38,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('git commit with body can be formatted as markdown', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function formatCommitAsMarkdown'),
@@ -48,7 +48,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('formatCommitAsMarkdown includes all required fields', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsMarkdown');
@@ -90,7 +90,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('formatCommitAsMarkdown handles commits without body', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsMarkdown');
@@ -104,7 +104,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('formatCommitAsMarkdown handles commits without stats', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsMarkdown');
@@ -118,7 +118,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('formatCommitAsMarkdown handles commits without tags', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsMarkdown');
@@ -132,7 +132,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('handleCopyCommitMarkdown calls formatCommitAsMarkdown', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMarkdown');
@@ -147,7 +147,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('handleCopyCommitMarkdown handles commit not found', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMarkdown');
@@ -159,7 +159,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('handleCopyCommitMarkdown shows confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMarkdown');
@@ -173,7 +173,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('main.js handleCopyMarkdown target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyMarkdown');
@@ -190,7 +190,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('main.js handleCopyMarkdown sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyMarkdown');
@@ -202,7 +202,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('main.js handleCopyMarkdown handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyMarkdown');
@@ -214,7 +214,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('context menu has copy-markdown item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-markdown"'),
@@ -224,7 +224,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('context menu click handles copy-markdown action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-markdown'"),
@@ -234,7 +234,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('Ctrl+Alt+M keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("e.key === 'm'") &&
@@ -268,7 +268,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('keyboard help includes Copy as Markdown', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy as Markdown') || source.includes('copy-markdown'),
@@ -276,7 +276,7 @@ suite('Copy Commit Markdown E2E Tests', () => {
   });
 
   test('markdown format example matches specification', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsMarkdown');

@@ -30,7 +30,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('gitService getFileUrl exists and generates correct URLs', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     assert.ok(source.includes('export async function getFileUrl'),
@@ -47,7 +47,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('getFileUrl uses short hash for URLs', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export async function getFileUrl');
@@ -59,7 +59,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('getFileUrl normalizes file paths', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export async function getFileUrl');
@@ -71,7 +71,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('handleCopyFileUrl gets commit from panel', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileUrl'),
@@ -81,7 +81,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('handleCopyFileUrl calls getFileUrl with correct parameters', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileUrl');
@@ -93,7 +93,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('handleCopyFileUrl writes URL to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileUrl');
@@ -107,7 +107,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('handleCopyFileUrl handles commit not found', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileUrl');
@@ -119,7 +119,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('handleCopyFileUrl handles URL generation failure', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileUrl');
@@ -131,7 +131,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('main.js handleCopyFileUrl sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileUrl');
@@ -148,7 +148,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('main.js handleCopyFileUrl checks for selected file', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileUrl');
@@ -162,7 +162,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('main.js handleCopyFileUrl gets target commit correctly', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileUrl');
@@ -176,7 +176,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('context menu has copy-file-url item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-file-url"'),
@@ -186,7 +186,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('context menu click handles copy-file-url action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-file-url'"),
@@ -198,7 +198,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Shift+U keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('e.altKey') && source.includes('e.shiftKey') && source.includes("key === 'u'") && source.includes('handleCopyFileUrl'),
@@ -216,7 +216,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('extension.ts registers copyFileUrl action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'copyFileUrl'"),
@@ -224,7 +224,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('getFileUrl returns null for unknown platforms', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export async function getFileUrl');
@@ -236,7 +236,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('getFileUrl checks for remote URL', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export async function getFileUrl');
@@ -248,7 +248,7 @@ suite('Copy File URL E2E Tests', () => {
   });
 
   test('types.ts has copyFileUrl in WebviewToExtMessage', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("{ type: 'copyFileUrl'; hash: string; filePath: string }"),

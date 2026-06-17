@@ -29,7 +29,7 @@ suite('Copy File Name E2E Tests', () => {
   });
 
   test('handleCopyFileName should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileName'),
@@ -37,7 +37,7 @@ suite('Copy File Name E2E Tests', () => {
   });
 
   test('handleCopyFileName should use path.basename to extract filename', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler uses path.basename
@@ -51,7 +51,7 @@ suite('Copy File Name E2E Tests', () => {
   });
 
   test('handleCopyFileName writes filename to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write
@@ -64,7 +64,7 @@ suite('Copy File Name E2E Tests', () => {
   });
 
   test('handleCopyFileName shows confirmation with filename', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify confirmation message includes filename
@@ -79,7 +79,7 @@ suite('Copy File Name E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyFileName', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileName':"),
@@ -87,7 +87,7 @@ suite('Copy File Name E2E Tests', () => {
   });
 
   test('types.ts should define copyFileName message type', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| { type: 'copyFileName'; filePath: string }"),
@@ -95,7 +95,7 @@ suite('Copy File Name E2E Tests', () => {
   });
 
   test('main.js should have copy-file-name context menu item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-file-name"'),
@@ -103,7 +103,7 @@ suite('Copy File Name E2E Tests', () => {
   });
 
   test('main.js should send copyFileName message', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copyFileName'"),

@@ -16,10 +16,10 @@ suite('Toolbar Tooltips E2E', function () {
   });
 
   test('toolbar button HTML includes keyboard shortcuts in both index.html and webviewProvider.ts', function () {
-    const htmlPath = path.resolve(__dirname, '../../src/webview/panel/index.html');
+    const htmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
     const html = fs.readFileSync(htmlPath, 'utf-8');
 
-    const providerPath = path.resolve(__dirname, '../../src/webview/webviewProvider.ts');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const provider = fs.readFileSync(providerPath, 'utf-8');
 
     const buttons = [

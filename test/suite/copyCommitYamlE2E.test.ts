@@ -29,7 +29,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('formatCommitAsYaml produces valid YAML structure', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('export function formatCommitAsYaml');
@@ -46,7 +46,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('formatCommitAsYaml handles null body correctly', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('export function formatCommitAsYaml');
@@ -61,7 +61,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('formatCommitAsYaml handles empty parentHashes array', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('export function formatCommitAsYaml');
@@ -74,7 +74,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('formatCommitAsYaml handles empty tags array', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('export function formatCommitAsYaml');
@@ -87,7 +87,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('formatCommitAsYaml handles null stats', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('export function formatCommitAsYaml');
@@ -100,7 +100,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('formatCommitAsYaml uses ISO 8601 date format', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('export function formatCommitAsYaml');
@@ -113,7 +113,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('formatCommitAsYaml handles committer info', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('export function formatCommitAsYaml');
@@ -126,7 +126,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('handleCopyCommitYaml resolves commit from panel', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -137,7 +137,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('handleCopyCommitYaml writes YAML to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitYaml');
@@ -152,7 +152,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('handleCopyCommitYaml handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitYaml');
@@ -164,7 +164,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('main.js handleCopyYaml target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyYaml');
@@ -181,7 +181,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('main.js handleCopyYaml sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyYaml');
@@ -195,7 +195,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('context menu includes copy-yaml item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-yaml"'),
@@ -205,7 +205,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('package.json keybinding for Ctrl+Alt+Shift+Y', async () => {
-    const packagePath = path.resolve(__dirname, '../../package.json');
+    const packagePath = path.resolve(__dirname, '../../../package.json');
     const source = fs.readFileSync(packagePath, 'utf-8');
     const json = JSON.parse(source);
 
@@ -223,7 +223,7 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('extension.ts registers copyCommitYaml action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'copyCommitYaml'"),
@@ -231,8 +231,8 @@ suite('Copy Commit as YAML E2E Tests', () => {
   });
 
   test('full integration: message flow from main.js to messageHandler.ts', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
 
     const mainSource = fs.readFileSync(mainJsPath, 'utf-8');
     const handlerSource = fs.readFileSync(messageHandlerPath, 'utf-8');

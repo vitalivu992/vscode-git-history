@@ -46,21 +46,21 @@ suite('Copy Commit as HTML E2E Tests', () => {
   // ─── Source verification ─────────────────────────────────────────────────────
 
   test('formatCommitAsHtml function exists in messageHandler', () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
     assert.ok(source.includes('export function formatCommitAsHtml'),
       'formatCommitAsHtml should be defined and exported');
   });
 
   test('handleCopyCommitHtml function exists in messageHandler', () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
     assert.ok(source.includes('function handleCopyCommitHtml'),
       'handleCopyCommitHtml should be defined');
   });
 
   test('copyCommitHtml message type is handled in switch statement', () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
     assert.ok(source.includes("case 'copyCommitHtml'"),
       'copyCommitHtml case should exist in handleMessage switch');
@@ -69,21 +69,21 @@ suite('Copy Commit as HTML E2E Tests', () => {
   });
 
   test('copyCommitHtml is defined in WebviewAction type', () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
     assert.ok(source.includes("'copyCommitHtml'"),
       'copyCommitHtml should be in WebviewAction type');
   });
 
   test('copyCommitHtml message type is defined in WebviewToExtMessage', () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
     assert.ok(source.includes("type: 'copyCommitHtml'"),
       'copyCommitHtml message type should be in WebviewToExtMessage');
   });
 
   test('command is registered in extension.ts', () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
     assert.ok(source.includes("gitHistory.copyCommitHtml"),
       'gitHistory.copyCommitHtml command should be registered');
@@ -92,7 +92,7 @@ suite('Copy Commit as HTML E2E Tests', () => {
   });
 
   test('command and keybinding are defined in package.json', () => {
-    const packagePath = path.resolve(__dirname, '../../package.json');
+    const packagePath = path.resolve(__dirname, '../../../package.json');
     const source = fs.readFileSync(packagePath, 'utf-8');
     const pkg = JSON.parse(source);
 
@@ -187,7 +187,7 @@ suite('Copy Commit as HTML E2E Tests', () => {
   // ─── Webview integration ─────────────────────────────────────────────────────
 
   test('handleCopyHtml function exists in main.js', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
     assert.ok(source.includes('function handleCopyHtml()'),
       'handleCopyHtml function should exist in main.js');
@@ -196,14 +196,14 @@ suite('Copy Commit as HTML E2E Tests', () => {
   });
 
   test('Ctrl+Alt+H keyboard shortcut is handled in main.js', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
     assert.ok(source.includes("e.key === 'h'") && source.includes('handleCopyHtml'),
       'Ctrl+Alt+H should trigger handleCopyHtml');
   });
 
   test('copy-html context menu item exists in main.js', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
     assert.ok(source.includes('data-action="copy-html"'),
       'Context menu item with data-action="copy-html" should exist');
@@ -212,7 +212,7 @@ suite('Copy Commit as HTML E2E Tests', () => {
   });
 
   test('copyCommitHtml triggerAction case exists in main.js', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
     assert.ok(source.includes("case 'copyCommitHtml'"),
       'copyCommitHtml triggerAction case should exist');

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 suite('Context Lines Button in index.html', () => {
-  const indexHtmlPath = path.join(__dirname, '../../src/webview/panel/index.html');
+  const indexHtmlPath = path.join(__dirname, '../../../src/webview/panel/index.html');
 
   test('index.html should have context-lines-btn button', () => {
     const source = fs.readFileSync(indexHtmlPath, 'utf-8');

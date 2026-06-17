@@ -15,7 +15,7 @@ suite('Message Handler Switch Case Coverage', () => {
   });
 
   function extractMessageTypesFromTypes(): string[] {
-    const webviewMsgMatch = typesSource.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);/);
+    const webviewMsgMatch = typesSource.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(webviewMsgMatch, 'Should find WebviewToExtMessage type definition');
 
     const types: string[] = [];

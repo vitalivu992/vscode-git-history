@@ -90,7 +90,7 @@ suite('Author Sort E2E Tests', () => {
   });
 
   test('extension.ts registers cycleSortMode as webview action', () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(
@@ -122,14 +122,14 @@ suite('Author Sort E2E Tests', () => {
   });
 
   test('settingsTypes.ts defines sortMode with default value 0', () => {
-    const settingsTypesPath = path.resolve(__dirname, '../../src/settings/settingsTypes.ts');
+    const settingsTypesPath = path.resolve(__dirname, '../../../src/settings/settingsTypes.ts');
     const source = fs.readFileSync(settingsTypesPath, 'utf-8');
 
     assert.ok(source.includes('sortMode'), 'settingsTypes.ts should define sortMode');
   });
 
   test('settingsService.ts handles sortMode migration from sortOldestFirst', () => {
-    const settingsServicePath = path.resolve(__dirname, '../../src/settings/settingsService.ts');
+    const settingsServicePath = path.resolve(__dirname, '../../../src/settings/settingsService.ts');
     const source = fs.readFileSync(settingsServicePath, 'utf-8');
 
     assert.ok(

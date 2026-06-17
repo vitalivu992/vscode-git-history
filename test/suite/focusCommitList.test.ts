@@ -5,7 +5,7 @@ import * as path from 'path';
 suite('focusCommitList Unit Tests', function() {
 
   test('types.ts should have focusCommitList WebviewAction', function() {
-    const typesPath = path.join(__dirname, '..', '..', 'src', 'types.ts');
+    const typesPath = path.join(__dirname, '..', '..', '..', 'src', 'types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     // Check that focusCommitList is in WebviewAction type
@@ -14,7 +14,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('types.ts should have focusCommitList message type', function() {
-    const typesPath = path.join(__dirname, '..', '..', 'src', 'types.ts');
+    const typesPath = path.join(__dirname, '..', '..', '..', 'src', 'types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     // Check that focusCommitList message type is defined
@@ -22,7 +22,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('package.json should have gitHistory.focusCommitList command', function() {
-    const packagePath = path.join(__dirname, '..', '..', 'package.json');
+    const packagePath = path.join(__dirname, '..', '..', '..', 'package.json');
     const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
 
     // Check that command is defined
@@ -31,7 +31,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('package.json should have keybinding for focusCommitList', function() {
-    const packagePath = path.join(__dirname, '..', '..', 'package.json');
+    const packagePath = path.join(__dirname, '..', '..', '..', 'package.json');
     const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
 
     // Check that keybinding is defined
@@ -42,7 +42,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('extension.ts should register gitHistory.focusCommitList command', function() {
-    const extensionPath = path.join(__dirname, '..', '..', 'src', 'extension.ts');
+    const extensionPath = path.join(__dirname, '..', '..', '..', 'src', 'extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     // Check that command is registered
@@ -51,7 +51,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('main.js case focusCommitList should call handler', function() {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check that switch case calls handler
@@ -60,7 +60,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('main.js should have handleFocusCommitList function', function() {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check that handleFocusCommitList function exists
@@ -68,7 +68,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('main.js handleFocusCommitList should set focusedIndex to 0', function() {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check that the function sets focusedIndex = 0
@@ -78,7 +78,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('main.js handleFocusCommitList should call updateFocusedRow', function() {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check that the function calls updateFocusedRow
@@ -88,7 +88,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('main.js handleFocusCommitList should call scrollFocusedIntoView', function() {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check that the function calls scrollFocusedIntoView
@@ -98,7 +98,7 @@ suite('focusCommitList Unit Tests', function() {
   });
 
   test('main.js should have focusCommitList in keyboard help', function() {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check that keyboard help includes the shortcut

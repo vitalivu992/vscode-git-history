@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 suite('Copy File Diff Feature Tests', () => {
-  const typesPath = path.join(__dirname, '../../src/types.ts');
-  const messageHandlerPath = path.join(__dirname, '../../src/webview/messageHandler.ts');
-  const mainJsPath = path.join(__dirname, '../../src/webview/panel/main.js');
+  const typesPath = path.join(__dirname, '../../../src/types.ts');
+  const messageHandlerPath = path.join(__dirname, '../../../src/webview/messageHandler.ts');
+  const mainJsPath = path.join(__dirname, '../../../src/webview/panel/main.js');
 
   test('types.ts should have copyFileDiff in WebviewAction type', () => {
     const typesContent = fs.readFileSync(typesPath, 'utf-8');

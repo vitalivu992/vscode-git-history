@@ -4,7 +4,7 @@ import * as path from 'path';
 
 suite('pathFilterE2E Tests', () => {
   test('main.js should have pathFilter state variable', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for commitFilesMap state variable
@@ -12,7 +12,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should parse pathFilter in parseDateFilter', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for pathFilter in parseDateFilter
@@ -20,7 +20,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should return pathFilter in parseDateFilter result', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for pathFilter in return statement
@@ -28,7 +28,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should render path filter badge in renderFilterBadges', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for path filter badge rendering
@@ -37,7 +37,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should handle path filter clear in filter clear handler', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for path filter clear handler
@@ -46,7 +46,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should apply path filter in getFilteredCommits', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for path filter in getFilteredCommits
@@ -57,7 +57,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should cache commit files in commitFiles message handler', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for caching commit files
@@ -66,7 +66,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should include pathFilter in hasActiveFilters', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for pathFilter in hasActiveFilters
@@ -76,7 +76,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should request commit files when path filter needs them', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for requestCommitFiles when files not cached
@@ -84,7 +84,7 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('main.js should re-render commits after files are cached', () => {
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const content = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Find the commitFiles case handler
@@ -97,14 +97,14 @@ suite('pathFilterE2E Tests', () => {
   });
 
   test('index.html placeholder should show path:name syntax', () => {
-    const indexHtmlPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'index.html');
+    const indexHtmlPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'index.html');
     const content = fs.readFileSync(indexHtmlPath, 'utf-8');
     assert.ok(content.includes('path:name'),
       'index.html placeholder should show path:name syntax, not path:file');
   });
 
   test('webviewProvider placeholder should show path:name syntax', () => {
-    const providerPath = path.join(__dirname, '..', '..', 'src', 'webview', 'webviewProvider.ts');
+    const providerPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'webviewProvider.ts');
     const content = fs.readFileSync(providerPath, 'utf-8');
     assert.ok(content.includes('path:name'),
       'webviewProvider placeholder should show path:name syntax, not path:file');

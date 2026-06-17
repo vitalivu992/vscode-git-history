@@ -4,7 +4,7 @@ import * as path from 'path';
 
 suite('Toolbar Tooltips', function () {
   test('index.html has keyboard shortcuts in button tooltips', function () {
-    const htmlPath = path.resolve(__dirname, '../../src/webview/panel/index.html');
+    const htmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
     const html = fs.readFileSync(htmlPath, 'utf-8');
 
     assert.ok(html.includes('Ctrl+Alt+T'), 'Graph toggle should mention Ctrl+Alt+T');
@@ -15,7 +15,7 @@ suite('Toolbar Tooltips', function () {
   });
 
   test('main.js handleToggleGraph includes shortcut in title updates', function () {
-    const mainPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainPath, 'utf-8');
 
     assert.ok(source.includes("Ctrl+Alt+T to toggle"), 'handleToggleGraph should include Ctrl+Alt+T');
@@ -26,7 +26,7 @@ suite('Toolbar Tooltips', function () {
   });
 
   test('webviewProvider.ts has keyboard shortcuts in button tooltips', function () {
-    const providerPath = path.resolve(__dirname, '../../src/webview/webviewProvider.ts');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
     assert.ok(source.includes('Ctrl+Alt+T'), 'webviewProvider should mention Ctrl+Alt+T');
@@ -37,7 +37,7 @@ suite('Toolbar Tooltips', function () {
   });
 
   test('main.js hidden state tooltips include shortcuts', function () {
-    const mainPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainPath, 'utf-8');
 
     assert.ok(source.includes("'Show graph (Ctrl+Alt+T)'"), 'Hidden graph tooltip should include shortcut');

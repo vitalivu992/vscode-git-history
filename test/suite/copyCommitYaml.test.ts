@@ -19,7 +19,7 @@ suite('Copy Commit as YAML Test Suite', () => {
 
   test('types.ts should have copyCommitYaml in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'copyCommitYaml'"),
       'WebviewAction should include copyCommitYaml');

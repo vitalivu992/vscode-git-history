@@ -46,7 +46,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('handleCopyCommitBody with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyCommitBody'),
@@ -56,7 +56,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('handleCopyCommitBody extracts body from fullMessage', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -75,7 +75,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('handleCopyCommitBody writes body to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -87,7 +87,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('handleCopyCommitBody handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -99,7 +99,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('handleCopyCommitBody handles no body (single-line)', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -111,7 +111,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('handleCopyCommitBody handles empty body after newline', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -123,7 +123,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('handleCopyCommitBody shows confirmation with truncated body', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -137,7 +137,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('main.js handleCopyCommitBody target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -154,7 +154,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('main.js handleCopyCommitBody sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -166,7 +166,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('main.js handleCopyCommitBody handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitBody');
@@ -178,7 +178,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('context menu has copy-commit-body item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-commit-body"'),
@@ -188,7 +188,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('context menu copy-commit-body has 📄 icon', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('📄'),
@@ -196,7 +196,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('context menu click handles copy-commit-body action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-commit-body'"),
@@ -204,7 +204,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('Ctrl+Shift+Z keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("e.key === 'z'") && source.includes('handleCopyCommitBody'),
@@ -236,7 +236,7 @@ suite('Copy Commit Body E2E Tests', () => {
   });
 
   test('keyboard help includes Copy commit body', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy commit body'),

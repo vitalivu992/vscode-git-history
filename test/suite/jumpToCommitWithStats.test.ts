@@ -14,7 +14,7 @@ suite('Jump to Commit with Stats Test Suite', () => {
 
   test('types.ts should have jumpToNextCommitWithStats in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'jumpToNextCommitWithStats'"),
       'WebviewAction should include jumpToNextCommitWithStats');
@@ -22,7 +22,7 @@ suite('Jump to Commit with Stats Test Suite', () => {
 
   test('types.ts should have jumpToPreviousCommitWithStats in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'jumpToPreviousCommitWithStats'"),
       'WebviewAction should include jumpToPreviousCommitWithStats');

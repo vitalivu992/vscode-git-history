@@ -40,7 +40,7 @@ suite('focusCommitList E2E Tests', function() {
     // Read package.json to verify keybindings
     const fs = require('fs');
     const path = require('path');
-    const packagePath = path.join(__dirname, '..', '..', 'package.json');
+    const packagePath = path.join(__dirname, '..', '..', '..', 'package.json');
     const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
 
     const keybinding = pkg.contributes.keybindings.find((k: any) => k.command === 'gitHistory.focusCommitList');
@@ -55,7 +55,7 @@ suite('focusCommitList E2E Tests', function() {
     // Read main.js to verify keyboard help entry
     const fs = require('fs');
     const path = require('path');
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for keyboard help entry
@@ -70,7 +70,7 @@ suite('focusCommitList E2E Tests', function() {
 
     const fs = require('fs');
     const path = require('path');
-    const mainJsPath = path.join(__dirname, '..', '..', 'src', 'webview', 'panel', 'main.js');
+    const mainJsPath = path.join(__dirname, '..', '..', '..', 'src', 'webview', 'panel', 'main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify that handleFocusCommitList uses existing navigation infrastructure

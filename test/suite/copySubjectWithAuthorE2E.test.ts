@@ -29,7 +29,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('handleCopySubjectWithAuthor with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopySubjectWithAuthor'),
@@ -39,7 +39,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('handleCopySubjectWithAuthor formats as subject - author', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySubjectWithAuthor');
@@ -54,7 +54,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('handleCopySubjectWithAuthor truncates long output', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySubjectWithAuthor');
@@ -68,7 +68,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('handleCopySubjectWithAuthor handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySubjectWithAuthor');
@@ -80,7 +80,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('main.js handleCopySubjectWithAuthor target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySubjectWithAuthor');
@@ -97,7 +97,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('main.js handleCopySubjectWithAuthor sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySubjectWithAuthor');
@@ -111,7 +111,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('main.js triggerAction dispatches copySubjectWithAuthor', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copySubjectWithAuthor':"),
@@ -121,7 +121,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('context menu includes copy-subject-with-author item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('copy-subject-with-author'),
@@ -133,7 +133,7 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('extension.ts registers copySubjectWithAuthor action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'copySubjectWithAuthor'"),
@@ -148,8 +148,8 @@ suite('Copy Subject With Author E2E Tests', () => {
   });
 
   test('full integration: message flow from main.js to messageHandler.ts', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
 
     const mainSource = fs.readFileSync(mainJsPath, 'utf-8');
     const handlerSource = fs.readFileSync(messageHandlerPath, 'utf-8');

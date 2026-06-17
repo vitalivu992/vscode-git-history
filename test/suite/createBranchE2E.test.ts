@@ -32,7 +32,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('gitService.createBranchFromCommit exists', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     assert.ok(source.includes('export async function createBranchFromCommit'),
@@ -101,7 +101,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleCreateBranch exists', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCreateBranch'),
@@ -109,7 +109,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleCreateBranch prompts for branch name', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCreateBranch');
@@ -124,7 +124,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleCreateBranch shows confirmation', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCreateBranch');
@@ -139,7 +139,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleCreateBranch shows error on failure', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCreateBranch');
@@ -154,7 +154,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('main.js handleCreateBranch exists', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCreateBranch'),
@@ -162,7 +162,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('main.js handleCreateBranch sends createBranch message', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCreateBranch');
@@ -177,7 +177,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('context menu has create-branch item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="create-branch"'),
@@ -187,7 +187,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('context menu click handles create-branch action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'create-branch'"),
@@ -199,7 +199,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('triggerAction handles createBranch', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'createBranch':"),
@@ -219,7 +219,7 @@ suite('Create Branch E2E Tests', () => {
   });
 
   test('extension.ts registers createBranch webview action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'createBranch'"),

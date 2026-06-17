@@ -490,13 +490,13 @@ suite('parseRemoteUrl Tests', () => {
   suite('Source Verification Tests', () => {
 
     test('parseRemoteUrl function exists in gitService.ts', () => {
-      const servicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+      const servicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
       const source = fs.readFileSync(servicePath, 'utf-8');
       assert.ok(source.includes('export function parseRemoteUrl'), 'parseRemoteUrl function should exist in gitService.ts');
     });
 
     test('detectPlatform function exists in gitService.ts', () => {
-      const servicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+      const servicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
       const source = fs.readFileSync(servicePath, 'utf-8');
       assert.ok(source.includes('function detectPlatform'), 'detectPlatform function should exist in gitService.ts');
     });

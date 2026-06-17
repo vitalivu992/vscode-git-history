@@ -48,7 +48,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredAsOneline with valid commits', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyAllFilteredAsOneline'),
@@ -62,7 +62,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredAsOneline formats as {shortHash} {message}', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -78,7 +78,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredAsOneline writes formatted text to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -92,7 +92,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredAsOneline handles empty hashes', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -106,7 +106,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredAsOneline shows confirmation with singular/plural', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -120,7 +120,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredAsOneline maps hashes to commits', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -134,7 +134,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredAsOneline joins commits with newlines', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -146,7 +146,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('main.js handleCopyAllFilteredAsOneline gets filtered commits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -159,7 +159,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('main.js handleCopyAllFilteredAsOneline handles no commits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -173,7 +173,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('main.js handleCopyAllFilteredAsOneline sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -185,7 +185,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('main.js handleCopyAllFilteredAsOneline maps commits to hashes', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredAsOneline');
@@ -197,7 +197,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('context menu has copy-all-filtered-as-oneline item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-all-filtered-as-oneline"'),
@@ -207,7 +207,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('context menu copy-all-filtered-as-oneline has ≡ icon', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('≡'),
@@ -215,7 +215,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('context menu click handles copy-all-filtered-as-oneline action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-all-filtered-as-oneline'"),
@@ -223,7 +223,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('context menu shows commit count in label', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('getOrderedCommits(getFilteredCommits()).length'),
@@ -255,7 +255,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('keyboard help includes Copy all filtered as oneline', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy all filtered as oneline'),
@@ -263,7 +263,7 @@ suite('Copy All Filtered as Oneline E2E Tests', () => {
   });
 
   test('keyboard help shows Ctrl+Shift+Alt+Y keybinding', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Ctrl+Shift+Alt+Y') || source.includes('ctrl+shift+alt+y') ||

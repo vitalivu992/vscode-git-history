@@ -57,7 +57,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('handleCopyAllUniqueAuthors with valid commits', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyAllUniqueAuthors'),
@@ -71,7 +71,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('handleCopyAllUniqueAuthors formats as Name <email>', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -86,7 +86,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('handleCopyAllUniqueAuthors uses deduplication', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -98,7 +98,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('handleCopyAllUniqueAuthors sorts alphabetically', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -110,7 +110,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('handleCopyAllUniqueAuthors writes sorted unique authors to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -124,7 +124,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('handleCopyAllUniqueAuthors handles empty hashes', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -138,7 +138,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('handleCopyAllUniqueAuthors shows confirmation with singular/plural', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -154,7 +154,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('handleCopyAllUniqueAuthors deduplicates same author from different commits', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -169,7 +169,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('main.js handleCopyAllUniqueAuthors gets filtered commits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -182,7 +182,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('main.js handleCopyAllUniqueAuthors handles no commits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -196,7 +196,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('main.js handleCopyAllUniqueAuthors sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -208,7 +208,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('main.js handleCopyAllUniqueAuthors maps commits to hashes', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllUniqueAuthors');
@@ -220,7 +220,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('context menu has copy-all-unique-authors item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-all-unique-authors"'),
@@ -230,7 +230,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('context menu copy-all-unique-authors has 👥 icon', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('👥'),
@@ -238,7 +238,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('context menu click handles copy-all-unique-authors action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-all-unique-authors'"),
@@ -246,7 +246,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('context menu shows unique author count in label', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('new Set') && source.includes('map(c =>') &&
@@ -279,7 +279,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('keyboard help includes Copy all unique authors', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy all unique authors'),
@@ -287,7 +287,7 @@ suite('Copy All Unique Authors E2E Tests', () => {
   });
 
   test('keyboard help shows Ctrl+Shift+Alt+P keybinding', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Ctrl+Shift+Alt+P') || source.includes('ctrl+shift+alt+p') ||

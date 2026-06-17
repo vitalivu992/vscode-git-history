@@ -4,7 +4,7 @@ import * as path from 'path';
 
 suite('Tag Navigation E2E Tests', () => {
   test('jumpToNextTag function scrolls to target commit', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify function calls scrollToCommitByHash
@@ -20,7 +20,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('jumpToPreviousTag function scrolls to target commit', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify function calls scrollToCommitByHash
@@ -36,7 +36,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('jumpToNextTag handles no tagged commits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function jumpToNextTag()');
@@ -50,7 +50,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('jumpToPreviousTag handles no tagged commits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function jumpToPreviousTag()');
@@ -64,7 +64,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('jumpToNextTag wraps around from last to first tag', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function jumpToNextTag()');
@@ -76,7 +76,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('jumpToPreviousTag wraps around from first to last tag', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function jumpToPreviousTag()');
@@ -88,7 +88,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('getTaggedCommits filters commits with tags', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function getTaggedCommits()');
@@ -101,7 +101,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('keyboard help includes tag navigation shortcuts', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Jump to next tagged commit'),
@@ -145,7 +145,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('extension.ts registers webview action handlers', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'jumpToNextTag'"),
@@ -155,7 +155,7 @@ suite('Tag Navigation E2E Tests', () => {
   });
 
   test('main.js triggerAction dispatches tag navigation actions', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'jumpToNextTag':"),

@@ -40,7 +40,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('handleDiffContextLinesCycle function exists and cycles through values', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify the function exists
@@ -58,7 +58,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('context lines default to 3', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Default context lines should be 3
@@ -67,7 +67,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('context lines button click handler is attached', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify context lines button has click listener
@@ -77,7 +77,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('context lines button updates value display when cycled', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify button updates the value span
@@ -86,7 +86,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('context lines button updates title/tooltip when cycled', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify button title/tooltip is updated
@@ -96,7 +96,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('context lines change re-fetches diff when commit is selected', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify diff is re-fetched on context change
@@ -109,7 +109,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('context lines setting is persisted when cycled', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify setting is saved
@@ -122,7 +122,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('cycleDiffContextLines action is triggered via triggerAction', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // triggerAction should dispatch cycleDiffContextLines to handleDiffContextLinesCycle
@@ -131,7 +131,7 @@ suite('Cycle Diff Context Lines E2E Test Suite', () => {
   });
 
   test('cycleDiffContextLines is registered in WebviewAction type', () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     // Verify the action type exists

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 suite('Extension Commands Test Suite', () => {
-  const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+  const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
 
   test('extension.ts exists and is readable', () => {
     assert.ok(fs.existsSync(extensionPath), 'extension.ts should exist');

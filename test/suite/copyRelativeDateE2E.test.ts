@@ -29,7 +29,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('handleCopyRelativeDate with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -42,7 +42,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('handleCopyRelativeDate calculates relative date correctly', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify relative date calculation
@@ -60,7 +60,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('handleCopyRelativeDate writes relative date to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write with relative date
@@ -76,7 +76,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('handleCopyRelativeDate handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -89,7 +89,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('main.js handleCopyRelativeDate target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -107,7 +107,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('main.js handleCopyRelativeDate sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRelativeDate');
@@ -119,7 +119,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('main.js handleCopyRelativeDate handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRelativeDate');
@@ -131,7 +131,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('context menu has copy-relative-date item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -142,7 +142,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('context menu click handles copy-relative-date action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -151,7 +151,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('Ctrl+Shift+8 keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler
@@ -170,7 +170,7 @@ suite('Copy Relative Date E2E Tests', () => {
   });
 
   test('keyboard help includes Copy relative date', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("'8'") && source.includes('relative date'),

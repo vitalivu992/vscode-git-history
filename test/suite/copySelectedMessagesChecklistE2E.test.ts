@@ -39,7 +39,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('handleCopySelectedMessagesChecklist handles empty hashes array', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopySelectedMessagesChecklist'),
@@ -49,7 +49,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('handleCopySelectedMessagesChecklist formats as markdown checklist', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('- [ ]'),
@@ -59,7 +59,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('handleCopySelectedMessagesChecklist shows correct confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesChecklist');
@@ -71,7 +71,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedMessagesChecklist falls back to focused when 0 selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesChecklist');
@@ -85,7 +85,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedMessagesChecklist sends all hashes for 2+ selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesChecklist');
@@ -99,7 +99,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('context menu shows copy messages as checklist when multi-selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-selected-messages-checklist"'),
@@ -107,7 +107,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('context menu copy messages as checklist has conditional display', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const idx = source.indexOf('copy-selected-messages-checklist');
@@ -118,7 +118,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Z keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const kdStart = source.indexOf('function handleKeyDown');
@@ -130,7 +130,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('triggerAction handles copySelectedMessagesChecklist', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copySelectedMessagesChecklist': handleCopySelectedMessagesChecklist()"),
@@ -150,7 +150,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('keyboard help includes copy messages as checklist', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy selected messages as checklist'),
@@ -158,7 +158,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('types.ts has copySelectedMessagesChecklist in WebviewToExtMessage', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copySelectedMessagesChecklist'"),
@@ -168,7 +168,7 @@ suite('Copy Selected Messages Checklist E2E Tests', () => {
   });
 
   test('extension.ts registers webview action for copySelectedMessagesChecklist', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes('copySelectedMessagesChecklist'),

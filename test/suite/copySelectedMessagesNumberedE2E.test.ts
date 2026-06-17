@@ -39,7 +39,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('handleCopySelectedMessagesNumbered handles empty hashes array', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopySelectedMessagesNumbered'),
@@ -49,7 +49,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('handleCopySelectedMessagesNumbered formats as numbered markdown list', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('${index + 1}.') || source.includes('index + 1'),
@@ -59,7 +59,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('handleCopySelectedMessagesNumbered shows correct confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesNumbered');
@@ -71,7 +71,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedMessagesNumbered falls back to focused when 0 selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesNumbered');
@@ -85,7 +85,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedMessagesNumbered sends all hashes for 2+ selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesNumbered');
@@ -99,7 +99,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('context menu shows copy messages as numbered list when multi-selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-selected-messages-numbered"'),
@@ -107,7 +107,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('context menu copy messages as numbered list has conditional display', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const idx = source.indexOf('copy-selected-messages-numbered');
@@ -118,7 +118,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Shift+Z keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const triggerActionStart = source.indexOf("case 'copySelectedMessagesNumbered'");
@@ -127,7 +127,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('triggerAction handles copySelectedMessagesNumbered', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copySelectedMessagesNumbered': handleCopySelectedMessagesNumbered()"),
@@ -147,7 +147,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('keyboard help includes copy messages as numbered list', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy selected messages as numbered list'),
@@ -155,7 +155,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('types.ts has copySelectedMessagesNumbered in WebviewToExtMessage', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copySelectedMessagesNumbered'"),
@@ -165,7 +165,7 @@ suite('Copy Selected Messages Numbered E2E Tests', () => {
   });
 
   test('extension.ts registers webview action for copySelectedMessagesNumbered', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes('copySelectedMessagesNumbered'),

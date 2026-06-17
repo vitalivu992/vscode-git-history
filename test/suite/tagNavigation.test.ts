@@ -14,7 +14,7 @@ suite('Tag Navigation Test Suite', () => {
 
   test('types.ts should have jumpToNextTag in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'jumpToNextTag'"),
       'WebviewAction should include jumpToNextTag');
@@ -22,7 +22,7 @@ suite('Tag Navigation Test Suite', () => {
 
   test('types.ts should have jumpToPreviousTag in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'jumpToPreviousTag'"),
       'WebviewAction should include jumpToPreviousTag');

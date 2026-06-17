@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 suite('Paste Filter Query Tests', () => {
   test('pasteFilterQuery action is registered in extension.ts', () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(
@@ -14,7 +14,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('pasteFilterQuery is in WebviewAction type', () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(
@@ -24,7 +24,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('pasteFilterQuery message type is defined in WebviewToExtMessage', () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(
@@ -34,7 +34,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('applyFilterQuery message type is defined in ExtToWebviewMessage', () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(
@@ -44,7 +44,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('pasteFilterQuery case exists in messageHandler switch', () => {
-    const handlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(handlerPath, 'utf-8');
 
     assert.ok(
@@ -54,7 +54,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('handlePasteFilterQuery function exists', () => {
-    const handlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(handlerPath, 'utf-8');
 
     assert.ok(
@@ -64,7 +64,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('handlePasteFilterQuery reads from clipboard', () => {
-    const handlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(handlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handlePasteFilterQuery');
@@ -77,7 +77,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('handlePasteFilterQuery has error handling for invalid JSON', () => {
-    const handlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(handlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handlePasteFilterQuery');
@@ -89,7 +89,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('handlePasteFilterQuery validates filter state object', () => {
-    const handlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(handlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handlePasteFilterQuery');
@@ -125,7 +125,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('paste filter button exists in index.html', () => {
-    const htmlPath = path.resolve(__dirname, '../../src/webview/panel/index.html');
+    const htmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
     const source = fs.readFileSync(htmlPath, 'utf-8');
 
     assert.ok(
@@ -135,7 +135,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('paste filter button exists in webviewProvider.ts', () => {
-    const providerPath = path.resolve(__dirname, '../../src/webview/webviewProvider.ts');
+    const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
     assert.ok(
@@ -145,7 +145,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('paste filter button styling exists in styles.css', () => {
-    const cssPath = path.resolve(__dirname, '../../src/webview/panel/styles.css');
+    const cssPath = path.resolve(__dirname, '../../../src/webview/panel/styles.css');
     const source = fs.readFileSync(cssPath, 'utf-8');
 
     assert.ok(
@@ -155,7 +155,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('pasteFilterQuery handler exists in main.js triggerAction', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(
@@ -165,7 +165,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('applyFilterQuery message handler exists in main.js', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(
@@ -175,7 +175,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('applyFilterQuery function exists in main.js', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(
@@ -185,7 +185,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('handlePasteFilterQuery function exists in main.js', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(
@@ -195,7 +195,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('applyFilterQuery validates filter state fields', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function applyFilterQuery');
@@ -209,7 +209,7 @@ suite('Paste Filter Query Tests', () => {
   });
 
   test('applyFilterQuery refreshes the UI after applying', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function applyFilterQuery');

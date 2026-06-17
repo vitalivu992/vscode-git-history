@@ -38,7 +38,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('handleCopyFileStats should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('async function handleCopyFileStats'),
@@ -46,7 +46,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('handleCopyFileStats should call getFileStats', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler imports and calls getFileStats
@@ -60,7 +60,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('handleCopyFileStats formats output correctly', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify formatting
@@ -77,7 +77,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('handleCopyFileStats writes to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write
@@ -90,7 +90,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('handleCopyFileStats handles errors gracefully', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify error handling
@@ -105,7 +105,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('handleCopyFileStats shows confirmation with file count', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify confirmation message shows file count
@@ -120,7 +120,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('handleCopyFileStats handles empty commit gracefully', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handling of commits with no files changed
@@ -133,7 +133,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyFileStats', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileStats':"),
@@ -174,7 +174,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('main.js handleCopyFileStats should send correct message', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify the handler function exists and sends the correct message
@@ -185,7 +185,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('main.js should handle triggerAction for copyFileStats', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileStats':"),
@@ -195,7 +195,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('context menu should include copy-file-stats action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-file-stats"'),
@@ -205,7 +205,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('keyboard shortcut should trigger handleCopyFileStats', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify the action is wired up in triggerAction handler
@@ -218,7 +218,7 @@ suite('Copy File Stats E2E Tests', () => {
   });
 
   test('extension.ts should register copyFileStats command', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes('gitHistory.copyFileStats'),

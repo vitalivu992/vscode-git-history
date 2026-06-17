@@ -29,7 +29,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('handleCopyFileExtension should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileExtension'),
@@ -37,7 +37,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('handleCopyFileExtension should use path.extname to extract extension', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler uses path.extname
@@ -51,7 +51,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('handleCopyFileExtension should remove leading dot from extension', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler removes leading dot
@@ -64,7 +64,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('handleCopyFileExtension writes extension to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write
@@ -77,7 +77,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('handleCopyFileExtension shows confirmation with extension', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify confirmation message includes extension
@@ -92,7 +92,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('handleCopyFileExtension handles files with no extension', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler handles no extension case
@@ -105,7 +105,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyFileExtension', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileExtension':"),
@@ -113,7 +113,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('types.ts should define copyFileExtension message type', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| { type: 'copyFileExtension'; filePath: string }"),
@@ -121,7 +121,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('types.ts should have copyFileExtension in WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| 'copyFileExtension'"),
@@ -129,7 +129,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('main.js should have copy-file-extension context menu item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-file-extension"'),
@@ -137,7 +137,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('main.js should send copyFileExtension message', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copyFileExtension'"),
@@ -145,7 +145,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('main.js should have handleCopyExtension function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyExtension'),
@@ -153,7 +153,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('main.js should handle copyFileExtension action in triggerAction switch', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileExtension':"),
@@ -189,7 +189,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('extension.ts should register copyFileExtension command', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("'gitHistory.copyFileExtension'"),
@@ -199,7 +199,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('main.js keyboard shortcuts help should include copy file extension', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy file extension'),
@@ -209,7 +209,7 @@ suite('Copy File Extension E2E Tests', () => {
   });
 
   test('main.js should handle Ctrl+Alt+E keyboard shortcut', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Find handleKeyDown and verify Ctrl+Alt+E handler

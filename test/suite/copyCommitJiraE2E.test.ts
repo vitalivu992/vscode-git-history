@@ -38,7 +38,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('formatCommitAsJira function exists and is exported', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('export function formatCommitAsJira'),
@@ -46,7 +46,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('formatCommitAsJira includes all required fields', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsJira');
@@ -82,7 +82,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('formatCommitAsJira handles commits without body', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsJira');
@@ -96,7 +96,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('formatCommitAsJira handles commits without stats', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsJira');
@@ -108,7 +108,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('formatCommitAsJira handles commits without tags', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsJira');
@@ -122,7 +122,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('formatCommitAsJira uses Jira markup syntax', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsJira');
@@ -151,7 +151,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('handleCopyCommitJira calls formatCommitAsJira', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJira');
@@ -166,7 +166,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('handleCopyCommitJira handles commit not found', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJira');
@@ -178,7 +178,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('handleCopyCommitJira shows confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitJira');
@@ -192,7 +192,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('main.js handleCopyJira target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyJira');
@@ -209,7 +209,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('main.js handleCopyJira sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyJira');
@@ -221,7 +221,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('main.js handleCopyJira handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyJira');
@@ -233,7 +233,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('context menu has copy-jira item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-jira"'),
@@ -243,7 +243,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('context menu click handles copy-jira action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-jira'"),
@@ -253,7 +253,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Shift+J keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("e.key === 'J'") &&
@@ -288,7 +288,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('keyboard help includes Copy as Jira Format', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy as Jira Format') || source.includes('Jira'),
@@ -296,7 +296,7 @@ suite('Copy Commit Jira E2E Tests', () => {
   });
 
   test('Jira format example matches specification', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsJira');

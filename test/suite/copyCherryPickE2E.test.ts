@@ -29,7 +29,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('handleCopyCherryPickCommand writes git cherry-pick command to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler uses git cherry-pick format
@@ -42,7 +42,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('handleCopyCherryPickCommand gets commit from panel', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler gets commits from panel
@@ -56,7 +56,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('handleCopyCherryPickCommand handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -69,7 +69,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('main.js handleCopyCherryPick prioritizes focused over selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -87,7 +87,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('main.js handleCopyCherryPick sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCherryPick');
@@ -99,7 +99,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('main.js handleCopyCherryPick handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCherryPick');
@@ -111,7 +111,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('main.js handleCopyCherryPick uses getFilteredCommits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCherryPick');
@@ -123,7 +123,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('context menu has copy-cherry-pick item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -134,7 +134,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('context menu click handles copy-cherry-pick action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -143,7 +143,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('Ctrl+Shift+P keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler
@@ -162,7 +162,7 @@ suite('Copy Cherry-Pick Command E2E Tests', () => {
   });
 
   test('keyboard help includes Copy Cherry-Pick Command', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy cherry-pick') || source.includes('cherry-pick'),

@@ -11,7 +11,7 @@ suite('Cycle Sort Mode Shortcut Test Suite', () => {
 
   test('types.ts should have cycleSortMode in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'cycleSortMode'"),
       'WebviewAction should include cycleSortMode');

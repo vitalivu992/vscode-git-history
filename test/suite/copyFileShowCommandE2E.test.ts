@@ -29,7 +29,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('handleCopyFileShowCommand should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileShowCommand'),
@@ -37,7 +37,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('handleCopyFileShowCommand should format as git show hash:filePath', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileShowCommand');
@@ -54,7 +54,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('handleCopyFileShowCommand should quote file paths with spaces', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileShowCommand');
@@ -68,7 +68,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('handleCopyFileShowCommand writes command to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileShowCommand');
@@ -80,7 +80,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('handleCopyFileShowCommand shows confirmation with filename', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileShowCommand');
@@ -96,7 +96,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('handleCopyFileShowCommand handles commit not found', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileShowCommand');
@@ -108,7 +108,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyFileShowCommand', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileShowCommand':"),
@@ -116,7 +116,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('types.ts should define copyFileShowCommand message type', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copyFileShowCommand'"),
@@ -128,7 +128,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('types.ts should have copyFileShowCommand in WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("'copyFileShowCommand'"),
@@ -136,7 +136,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('main.js should have copy-file-show-command context menu item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-file-show-command"'),
@@ -144,7 +144,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('main.js should handle copy-file-show-command action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-file-show-command'"),
@@ -152,7 +152,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('main.js sends copyFileShowCommand message with hash and filePath', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const actionStart = source.indexOf("action === 'copy-file-show-command'");
@@ -168,7 +168,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('main.js should have handleCopyFileShowCommand function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileShowCommand'),
@@ -176,7 +176,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('main.js should handle copyFileShowCommand in message case', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileShowCommand':"),
@@ -184,7 +184,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('extension.ts should register copyFileShowCommand command', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes('gitHistory.copyFileShowCommand'),
@@ -221,7 +221,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('main.js keyboard shortcuts help should include copy file show command', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy git show command for file'),
@@ -231,7 +231,7 @@ suite('Copy File Show Command E2E Tests', () => {
   });
 
   test('copy-file-show-command context menu icon and label are correct', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const menuItemStart = source.indexOf('data-action="copy-file-show-command"');

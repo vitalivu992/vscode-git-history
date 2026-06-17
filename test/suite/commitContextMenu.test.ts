@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 suite('Commit Context Menu Unit Tests', () => {
-  const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+  const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
   let source: string;
 
   suiteSetup(() => {

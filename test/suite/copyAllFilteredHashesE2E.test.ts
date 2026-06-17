@@ -42,7 +42,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredHashes handles empty hashes array', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyAllFilteredHashes'),
@@ -54,7 +54,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredHashes joins hashes with newline', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("hashes.join('\\n')"),
@@ -62,7 +62,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('handleCopyAllFilteredHashes shows correct confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("Copied ${hashes.length} filtered commit hash"),
@@ -70,7 +70,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('main.js handleCopyAllFilteredHashes gets all filtered commits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAllFilteredHashes');
@@ -86,7 +86,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('context menu shows copy all filtered hashes with count', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-all-filtered-hashes"'),
@@ -96,7 +96,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('Ctrl+Shift+Alt+H keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const kdStart = source.indexOf('function handleKeyDown');
@@ -126,7 +126,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('types.ts defines copyAllFilteredHashes in WebviewAction and WebviewToExtMessage', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| 'copyAllFilteredHashes'"),
@@ -136,7 +136,7 @@ suite('Copy All Filtered Hashes E2E Tests', () => {
   });
 
   test('extension.ts registers copyAllFilteredHashes webview action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("gitHistory.copyAllFilteredHashes"),

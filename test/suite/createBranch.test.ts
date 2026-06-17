@@ -20,7 +20,7 @@ suite('Create Branch Test Suite', () => {
 
   test('types.ts should have createBranch in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'createBranch'"),
       'WebviewAction should include createBranch');
@@ -28,7 +28,7 @@ suite('Create Branch Test Suite', () => {
 
   test('types.ts should have createBranch in WebviewToExtMessage', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);/);
+    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(msgMatch, 'Should find WebviewToExtMessage type');
     assert.ok(msgMatch[1].includes("'createBranch'"),
       'WebviewToExtMessage should include createBranch');

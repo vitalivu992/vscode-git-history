@@ -38,7 +38,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('git commit with body can be formatted as reStructuredText', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function formatCommitAsRest'),
@@ -48,7 +48,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('formatCommitAsRest includes all required fields', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsRest');
@@ -94,7 +94,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('formatCommitAsRest handles commits without body', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsRest');
@@ -108,7 +108,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('formatCommitAsRest handles commits without stats', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsRest');
@@ -122,7 +122,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('formatCommitAsRest handles commits without tags', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsRest');
@@ -136,7 +136,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('formatCommitAsRest uses correct ReST underline characters', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsRest');
@@ -154,7 +154,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('formatCommitAsRest uses ReST field syntax', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsRest');
@@ -167,7 +167,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('handleCopyCommitRest calls formatCommitAsRest', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitRest');
@@ -182,7 +182,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('handleCopyCommitRest handles commit not found', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitRest');
@@ -194,7 +194,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('handleCopyCommitRest shows confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitRest');
@@ -208,7 +208,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('main.js handleCopyRest target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRest');
@@ -225,7 +225,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('main.js handleCopyRest sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRest');
@@ -237,7 +237,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('main.js handleCopyRest handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRest');
@@ -249,7 +249,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('context menu has copy-rest item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-rest"'),
@@ -259,7 +259,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('context menu click handles copy-rest action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-rest'"),
@@ -269,7 +269,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Y keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("e.key === 'y'") &&
@@ -303,7 +303,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('keyboard help includes Copy as reStructuredText', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy as reStructuredText') || source.includes('copy-rest'),
@@ -311,7 +311,7 @@ suite('Copy Commit ReST E2E Tests', () => {
   });
 
   test('ReST format example matches specification', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsRest');

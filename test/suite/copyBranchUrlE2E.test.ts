@@ -30,7 +30,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('gitService getBranchUrl exists and generates correct URLs', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     assert.ok(source.includes('export async function getBranchUrl'),
@@ -47,7 +47,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('handleCopyBranchUrl reads branch from panel', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyBranchUrl'),
@@ -57,7 +57,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('handleCopyBranchUrl writes URL to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchUrl');
@@ -72,7 +72,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('handleCopyBranchUrl handles missing branch', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchUrl');
@@ -84,7 +84,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('handleCopyBranchUrl handles URL generation failure', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchUrl');
@@ -96,7 +96,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('main.js handleCopyBranchUrl sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchUrl');
@@ -109,7 +109,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('main.js handleCopyBranchUrl handles no branch', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchUrl');
@@ -121,7 +121,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('context menu has copy-branch-url item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-branch-url"'),
@@ -131,7 +131,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('context menu click handles copy-branch-url action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-branch-url'"),
@@ -139,7 +139,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('Ctrl+Alt+U keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('e.altKey') && source.includes("e.key === 'u'") && source.includes('handleCopyBranchUrl'),
@@ -157,7 +157,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('keyboard help includes Copy branch URL', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy branch URL'),
@@ -165,7 +165,7 @@ suite('Copy Branch URL E2E Tests', () => {
   });
 
   test('extension.ts registers copyBranchUrl action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'copyBranchUrl'"),

@@ -29,7 +29,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('handleCopyFileDirectory should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileDirectory'),
@@ -37,7 +37,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('handleCopyFileDirectory should use path.dirname to extract directory', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileDirectory');
@@ -50,7 +50,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('handleCopyFileDirectory should add trailing separator to directory path', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileDirectory');
@@ -62,7 +62,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('handleCopyFileDirectory writes directory path to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileDirectory');
@@ -74,7 +74,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('handleCopyFileDirectory shows confirmation with directory name', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileDirectory');
@@ -88,7 +88,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('handleCopyFileDirectory extracts directory name for confirmation', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileDirectory');
@@ -100,7 +100,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyFileDirectory', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileDirectory':"),
@@ -108,7 +108,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('types.ts should define copyFileDirectory message type', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| { type: 'copyFileDirectory'; filePath: string }"),
@@ -116,7 +116,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('types.ts should have copyFileDirectory WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("'copyFileDirectory'"),
@@ -124,7 +124,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('main.js should have copy-file-directory context menu item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-file-directory"'),
@@ -132,7 +132,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('main.js should have folder icon for copy file directory', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Find the copy-file-directory menu item and check for icon
@@ -145,7 +145,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('main.js should send copyFileDirectory message', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copyFileDirectory'"),
@@ -153,7 +153,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('main.js should have handleCopyFileDirectory function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileDirectory'),
@@ -161,7 +161,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('main.js handleCopyFileDirectory should check selectedFile', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileDirectory');
@@ -173,7 +173,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('main.js should handle copyFileDirectory message in handleMessage', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileDirectory':"),
@@ -207,7 +207,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('extension.ts should register copyFileDirectory webview action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("'copyFileDirectory'"),
@@ -215,7 +215,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('main.js keyboard help should include copy file directory', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy file directory'),
@@ -239,7 +239,7 @@ suite('Copy File Directory E2E Tests', () => {
   });
 
   test('CHANGELOG.md should mention copy file directory feature', async () => {
-    const changelogPath = path.resolve(__dirname, '../../CHANGELOG.md');
+    const changelogPath = path.resolve(__dirname, '../../../CHANGELOG.md');
     const source = fs.readFileSync(changelogPath, 'utf-8');
 
     assert.ok(source.includes('Copy file directory') || source.includes('copy file directory'),

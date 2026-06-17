@@ -91,7 +91,7 @@ suite('Copy Commit URL Test Suite', () => {
 
   test('types.ts should have copyCommitUrl in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'copyCommitUrl'"),
       'WebviewAction should include copyCommitUrl');
@@ -99,7 +99,7 @@ suite('Copy Commit URL Test Suite', () => {
 
   test('types.ts should have copyCommitUrl in WebviewToExtMessage', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);/);
+    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(msgMatch, 'Should find WebviewToExtMessage type');
     assert.ok(msgMatch[1].includes("'copyCommitUrl'"),
       'WebviewToExtMessage should include copyCommitUrl');
@@ -132,7 +132,7 @@ suite('Copy Commit URL Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function handleCopyCommitUrl');
     assert.ok(fnStart >= 0, 'handleCopyCommitUrl function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart);
+    const fnEnd = source.indexOf('\n}', fnStart);
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('vscode.env.clipboard.writeText'),
@@ -145,7 +145,7 @@ suite('Copy Commit URL Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function handleCopyCommitUrl');
     assert.ok(fnStart >= 0, 'handleCopyCommitUrl function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart);
+    const fnEnd = source.indexOf('\n}', fnStart);
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('No git remote configured'),
@@ -156,7 +156,7 @@ suite('Copy Commit URL Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function handleCopyCommitUrl');
     assert.ok(fnStart >= 0, 'handleCopyCommitUrl function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart);
+    const fnEnd = source.indexOf('\n}', fnStart);
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('Unable to detect git platform'),
@@ -167,7 +167,7 @@ suite('Copy Commit URL Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function handleCopyCommitUrl');
     assert.ok(fnStart >= 0, 'handleCopyCommitUrl function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart);
+    const fnEnd = source.indexOf('\n}', fnStart);
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('Failed to generate commit URL'),
@@ -178,7 +178,7 @@ suite('Copy Commit URL Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function handleCopyCommitUrl');
     assert.ok(fnStart >= 0, 'handleCopyCommitUrl function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart);
+    const fnEnd = source.indexOf('\n}', fnStart);
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('substring(0, 7)'),

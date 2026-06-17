@@ -44,7 +44,7 @@ suite('Copy Selected Hashes E2E Tests', () => {
   test('handleCopySelectedHashes handles empty hashes array', async () => {
     // This tests the messageHandler function directly
     // We verify the logic through source code inspection in unit tests
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify the handler exists and handles empty array case
@@ -55,7 +55,7 @@ suite('Copy Selected Hashes E2E Tests', () => {
   });
 
   test('handleCopySelectedHashes joins hashes with newline', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify it joins hashes with newline character
@@ -64,7 +64,7 @@ suite('Copy Selected Hashes E2E Tests', () => {
   });
 
   test('handleCopySelectedHashes shows correct confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Check for singular/plural handling
@@ -74,7 +74,7 @@ suite('Copy Selected Hashes E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedHashes falls back to focused when 0 selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify fallback logic
@@ -89,7 +89,7 @@ suite('Copy Selected Hashes E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedHashes falls back to single when 1 selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedHashes');
@@ -101,7 +101,7 @@ suite('Copy Selected Hashes E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedHashes copies all when 2+ selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedHashes');
@@ -113,7 +113,7 @@ suite('Copy Selected Hashes E2E Tests', () => {
   });
 
   test('context menu shows copy selected hashes when multi-selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item with conditional display
@@ -122,7 +122,7 @@ suite('Copy Selected Hashes E2E Tests', () => {
   });
 
   test('Ctrl+Shift+; keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler

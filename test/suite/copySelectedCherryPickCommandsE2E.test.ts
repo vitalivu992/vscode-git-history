@@ -44,7 +44,7 @@ suite('Copy Selected Cherry-Pick Commands E2E Tests', () => {
   test('handleCopySelectedCherryPickCommands handles empty hashes array', async () => {
     // This tests the messageHandler function directly
     // We verify the logic through source code inspection in unit tests
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify the handler exists and handles empty array case
@@ -55,7 +55,7 @@ suite('Copy Selected Cherry-Pick Commands E2E Tests', () => {
   });
 
   test('handleCopySelectedCherryPickCommands formats as git cherry-pick commands', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify it generates cherry-pick commands
@@ -66,7 +66,7 @@ suite('Copy Selected Cherry-Pick Commands E2E Tests', () => {
   });
 
   test('handleCopySelectedCherryPickCommands shows correct confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Check for singular/plural handling
@@ -76,7 +76,7 @@ suite('Copy Selected Cherry-Pick Commands E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedCherryPickCommands falls back to single when 0-1 selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedCherryPickCommands');
@@ -90,7 +90,7 @@ suite('Copy Selected Cherry-Pick Commands E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedCherryPickCommands sends multi message for 2+ selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedCherryPickCommands');
@@ -102,7 +102,7 @@ suite('Copy Selected Cherry-Pick Commands E2E Tests', () => {
   });
 
   test('context menu shows copy-selected-cherry-pick-commands when 2+ commits selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item with conditional display
@@ -113,7 +113,7 @@ suite('Copy Selected Cherry-Pick Commands E2E Tests', () => {
   });
 
   test('context menu click handles copy-selected-cherry-pick-commands action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -132,7 +132,7 @@ suite('Copy Selected Cherry-Pick Commands E2E Tests', () => {
   });
 
   test('keyboard help includes Copy Cherry-Pick Commands (Selected)', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // The context menu should show this item when multiple commits are selected

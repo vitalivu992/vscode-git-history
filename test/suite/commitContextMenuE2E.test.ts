@@ -25,10 +25,10 @@ suite('Commit Context Menu E2E Tests', () => {
     commitHash = execSync('git log --format=%H -1', { cwd: tempDir, encoding: 'utf-8' }).trim();
 
     mainJsSource = fs.readFileSync(
-      path.resolve(__dirname, '../../src/webview/panel/main.js'), 'utf-8'
+      path.resolve(__dirname, '../../../src/webview/panel/main.js'), 'utf-8'
     );
     messageHandlerSource = fs.readFileSync(
-      path.resolve(__dirname, '../../src/webview/messageHandler.ts'), 'utf-8'
+      path.resolve(__dirname, '../../../src/webview/messageHandler.ts'), 'utf-8'
     );
   });
 

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 suite('Keyboard Shortcuts Conflicts Tests', () => {
-	const packageJsonPath = path.join(__dirname, '..', '..', '..', 'package.json');
+	const packageJsonPath = path.join(__dirname, '..', '..', '..', '..', 'package.json');
 
 	let packageJson: any;
 

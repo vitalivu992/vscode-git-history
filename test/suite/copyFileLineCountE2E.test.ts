@@ -29,7 +29,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('handleCopyFileLineCount should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileLineCount'),
@@ -37,7 +37,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('handleCopyFileLineCount should use getFileContentAtCommit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileLineCount');
@@ -50,7 +50,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('handleCopyFileLineCount should write line count to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileLineCount');
@@ -62,7 +62,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('handleCopyFileLineCount should show confirmation message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileLineCount');
@@ -76,7 +76,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('handleCopyFileLineCount should handle singular/plural forms', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileLineCount');
@@ -90,7 +90,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('handleCopyFileLineCount should handle empty files', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFileLineCount');
@@ -102,7 +102,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyFileLineCount', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileLineCount':"),
@@ -110,7 +110,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('types.ts should define copyFileLineCount message type', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| { type: 'copyFileLineCount'; hash: string; filePath: string }"),
@@ -118,7 +118,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('types.ts should have copyFileLineCount in WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| 'copyFileLineCount'"),
@@ -126,7 +126,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('main.js should have copy-file-line-count context menu item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-file-line-count"'),
@@ -134,7 +134,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('main.js should send copyFileLineCount message with hash and filePath', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copyFileLineCount'"),
@@ -142,7 +142,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('main.js should have handleCopyFileLineCount function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFileLineCount'),
@@ -150,7 +150,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('main.js should handle copyFileLineCount action in triggerAction switch', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFileLineCount':"),
@@ -185,7 +185,7 @@ suite('Copy File Line Count E2E Tests', () => {
   });
 
   test('extension.ts should register copyFileLineCount command', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("'gitHistory.copyFileLineCount'"),

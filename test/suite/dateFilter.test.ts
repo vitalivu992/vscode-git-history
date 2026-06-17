@@ -31,7 +31,7 @@ function parseDateFilter(query: string): { textQuery: string; dateFilters: { aft
   }
 
   // Parse last:Ndays/weeks/months (case-insensitive, singular/plural)
-  const lastMatch = query.match(/last:(\d+)\s*(day|days|week|weeks|month|months)/i);
+  const lastMatch = query.match(/last:(\d+)\s*(days?|weeks?|months?)/i);
   if (lastMatch) {
     const num = parseInt(lastMatch[1], 10);
     const unit = lastMatch[2].toLowerCase();

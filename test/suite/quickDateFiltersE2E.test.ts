@@ -209,7 +209,7 @@ suite('Quick Date Filters E2E Tests', () => {
 
     test('parseDateFilter parses last:Ndays/weeks/months pattern', () => {
       assert.ok(
-        mainJsSource.includes('/last:(\\d+)\\s*(day|days|week|weeks|month|months)/i'),
+        mainJsSource.includes('/last:(\\d+)\\s*(days?|weeks?|months?)/i'),
         'parseDateFilter should match last:N pattern with number and time unit'
       );
       assert.ok(

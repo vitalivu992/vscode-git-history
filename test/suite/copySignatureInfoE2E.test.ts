@@ -70,10 +70,10 @@ suite('Copy Signature Info E2E Logic Tests', () => {
 });
 
 suite('Copy Signature Info E2E Source Integration Tests', () => {
-  const typesPath = path.resolve(__dirname, '../../src/types.ts');
-  const handlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
-  const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
-  const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+  const typesPath = path.resolve(__dirname, '../../../src/types.ts');
+  const handlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+  const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+  const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
   const packageJsonPath = path.resolve(__dirname, '../../../package.json');
 
   test('types.ts defines copySignatureInfo in all required unions', () => {

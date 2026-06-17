@@ -38,7 +38,7 @@ function parseDateFilter(query: string): { textQuery: string; dateFilters: { aft
     textQuery = textQuery.replace(beforeMatch[0], '').trim();
   }
 
-  const lastMatch = query.match(/last:(\d+)\s*(day|days|week|weeks|month|months)/i);
+  const lastMatch = query.match(/last:(\d+)\s*(days?|weeks?|months?)/i);
   if (lastMatch) {
     const num = parseInt(lastMatch[1], 10);
     const unit = lastMatch[2].toLowerCase();

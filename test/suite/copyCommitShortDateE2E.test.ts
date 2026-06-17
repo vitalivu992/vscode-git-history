@@ -29,7 +29,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('handleCopyCommitShortDate with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -55,7 +55,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('handleCopyCommitShortDate writes YYYY-MM-DD to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write with short date format
@@ -71,7 +71,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('handleCopyCommitShortDate handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -84,7 +84,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('handleCopyCommitShortDate format validation', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitShortDate');
@@ -104,7 +104,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('main.js handleCopyCommitShortDate target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -122,7 +122,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('main.js handleCopyCommitShortDate sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitShortDate');
@@ -136,7 +136,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('main.js triggerAction dispatches copyCommitShortDate', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyCommitShortDate':"),
@@ -146,7 +146,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('context menu includes copy-commit-short-date item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('copy-commit-short-date'),
@@ -158,7 +158,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('package.json keybinding for Ctrl+Shift+J', async () => {
-    const packagePath = path.resolve(__dirname, '../../package.json');
+    const packagePath = path.resolve(__dirname, '../../../package.json');
     const source = fs.readFileSync(packagePath, 'utf-8');
     const json = JSON.parse(source);
 
@@ -176,7 +176,7 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('extension.ts registers copyCommitShortDate action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'copyCommitShortDate'"),
@@ -203,8 +203,8 @@ suite('Copy Commit Short Date E2E Tests', () => {
   });
 
   test('full integration: message flow from main.js to messageHandler.ts', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
 
     const mainSource = fs.readFileSync(mainJsPath, 'utf-8');
     const handlerSource = fs.readFileSync(messageHandlerPath, 'utf-8');

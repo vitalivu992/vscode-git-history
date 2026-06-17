@@ -19,7 +19,7 @@ suite('Copy Committer Email Test Suite', () => {
 
   test('types.ts should have copyCommitterEmail in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'copyCommitterEmail'"),
       'WebviewAction should include copyCommitterEmail');
@@ -27,7 +27,7 @@ suite('Copy Committer Email Test Suite', () => {
 
   test('types.ts should have copyCommitterEmail in WebviewToExtMessage', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);/);
+    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(msgMatch, 'Should find WebviewToExtMessage type');
     assert.ok(msgMatch[1].includes("'copyCommitterEmail'"),
       'WebviewToExtMessage should include copyCommitterEmail');

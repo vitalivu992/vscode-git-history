@@ -9,7 +9,7 @@ suite('Missing WebviewAction Types Test Suite', () => {
 
   test('types.ts should have copyFilePath in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'copyFilePath'"),
       'WebviewAction should include copyFilePath');
@@ -17,7 +17,7 @@ suite('Missing WebviewAction Types Test Suite', () => {
 
   test('types.ts should have cycleDiffContextLines in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'cycleDiffContextLines'"),
       'WebviewAction should include cycleDiffContextLines');
@@ -25,7 +25,7 @@ suite('Missing WebviewAction Types Test Suite', () => {
 
   test('types.ts should have cycleSortMode in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'cycleSortMode'"),
       'WebviewAction should include cycleSortMode');

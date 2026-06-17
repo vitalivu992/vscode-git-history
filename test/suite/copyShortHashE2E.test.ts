@@ -29,7 +29,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('handleCopyShortHash with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -42,7 +42,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('handleCopyShortHash writes short hash to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write with short hash
@@ -58,7 +58,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('handleCopyShortHash handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -71,7 +71,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyShortHash target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -89,7 +89,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyShortHash sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyShortHash');
@@ -101,7 +101,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyShortHash handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyShortHash');
@@ -113,7 +113,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('context menu has copy-short-hash item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -124,7 +124,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('context menu click handles copy-short-hash action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -134,7 +134,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('Ctrl+Shift+7 keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler
@@ -153,7 +153,7 @@ suite('Copy Short Hash E2E Tests', () => {
   });
 
   test('short hash is exactly 7 characters', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyShortHash');

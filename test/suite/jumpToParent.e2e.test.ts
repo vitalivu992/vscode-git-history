@@ -4,7 +4,7 @@ import * as path from 'path';
 
 suite('Jump to Parent E2E Tests', () => {
   test('jumpToParent function scrolls to parent commit', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify function calls scrollToCommitByHash
@@ -20,7 +20,7 @@ suite('Jump to Parent E2E Tests', () => {
   });
 
   test('jumpToParent handles no focused commit', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function jumpToParent()');
@@ -34,7 +34,7 @@ suite('Jump to Parent E2E Tests', () => {
   });
 
   test('jumpToParent handles root commit (no parent)', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function jumpToParent()');
@@ -48,7 +48,7 @@ suite('Jump to Parent E2E Tests', () => {
   });
 
   test('jumpToParent handles parent not in current view', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function jumpToParent()');
@@ -62,7 +62,7 @@ suite('Jump to Parent E2E Tests', () => {
   });
 
   test('jumpToParent gets first parent for merge commits', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function jumpToParent()');
@@ -75,7 +75,7 @@ suite('Jump to Parent E2E Tests', () => {
   });
 
   test('keyboard help includes jump to parent shortcut', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Find the keyboard help function
@@ -114,7 +114,7 @@ suite('Jump to Parent E2E Tests', () => {
   });
 
   test('extension.ts registers webview action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'jumpToParent'"),
@@ -124,7 +124,7 @@ suite('Jump to Parent E2E Tests', () => {
   });
 
   test('triggerAction dispatches jumpToParent', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Find the message handler switch

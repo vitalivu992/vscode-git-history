@@ -40,7 +40,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('handleCopyOneline with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -55,7 +55,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('handleCopyOneline formats as {shortHash} {message}', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify formatting
@@ -70,7 +70,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('handleCopyOneline writes formatted text to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write
@@ -84,7 +84,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('handleCopyOneline handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -97,7 +97,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('handleCopyOneline shows confirmation with truncated message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyOneline');
@@ -111,7 +111,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('main.js handleCopyOneline target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -129,7 +129,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('main.js handleCopyOneline sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyOneline');
@@ -141,7 +141,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('main.js handleCopyOneline handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyOneline');
@@ -153,7 +153,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('context menu has copy-oneline item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -164,7 +164,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('context menu copy-oneline has ≡ icon', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('≡'),
@@ -172,7 +172,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('context menu click handles copy-oneline action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -181,7 +181,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('Ctrl+Shift+Y keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler
@@ -214,7 +214,7 @@ suite('Copy Oneline E2E Tests', () => {
   });
 
   test('keyboard help includes Copy as oneline', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy as oneline'),

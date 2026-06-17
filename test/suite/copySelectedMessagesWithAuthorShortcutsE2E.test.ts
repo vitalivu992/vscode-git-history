@@ -35,7 +35,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
 
   // Checklist with author E2E tests
   test('handleCopySelectedMessagesChecklistWithAuthor formats with author prefix', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopySelectedMessagesChecklistWithAuthor'),
@@ -49,7 +49,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('handleCopySelectedMessagesChecklistWithAuthor shows confirmation', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesChecklistWithAuthor');
@@ -63,7 +63,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('main.js handleCopySelectedMessagesChecklistWithAuthor falls back to focused when 0 selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesChecklistWithAuthor');
@@ -77,7 +77,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Shift+C keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const kdStart = source.indexOf('function handleKeyDown');
@@ -95,7 +95,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('triggerAction handles copySelectedMessagesChecklistWithAuthor', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copySelectedMessagesChecklistWithAuthor': handleCopySelectedMessagesChecklistWithAuthor()"),
@@ -104,7 +104,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
 
   // Numbered list with author E2E tests
   test('handleCopySelectedMessagesNumberedWithAuthor formats with author prefix', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopySelectedMessagesNumberedWithAuthor'),
@@ -116,7 +116,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('handleCopySelectedMessagesNumberedWithAuthor shows confirmation', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopySelectedMessagesNumberedWithAuthor');
@@ -130,7 +130,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Shift+N keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const kdStart = source.indexOf('function handleKeyDown');
@@ -148,7 +148,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('triggerAction handles copySelectedMessagesNumberedWithAuthor', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copySelectedMessagesNumberedWithAuthor': handleCopySelectedMessagesNumberedWithAuthor()"),
@@ -210,7 +210,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
 
   // Context menu E2E tests
   test('context menu shows copy messages as checklist with author when multi-selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-selected-messages-checklist-with-author"'),
@@ -218,7 +218,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('context menu shows copy messages as numbered list with author when multi-selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-selected-messages-numbered-with-author"'),
@@ -227,7 +227,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
 
   // Keyboard help E2E tests
   test('keyboard help includes copy messages as checklist with author', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy selected messages as checklist with author'),
@@ -235,7 +235,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('keyboard help includes copy messages as numbered list with author', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy selected messages as numbered list with author'),
@@ -244,7 +244,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
 
   // Types and extension registration E2E tests
   test('types.ts has WithAuthor message types in WebviewToExtMessage', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copySelectedMessagesChecklistWithAuthor'"),
@@ -256,7 +256,7 @@ suite('Copy Selected Messages With Author Shortcuts E2E Tests', () => {
   });
 
   test('extension.ts registers webview actions for both WithAuthor commands', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes('copySelectedMessagesChecklistWithAuthor'),

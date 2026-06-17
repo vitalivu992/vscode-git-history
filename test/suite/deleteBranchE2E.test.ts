@@ -32,7 +32,7 @@ suite('Delete Branch E2E Tests', () => {
   });
 
   test('gitService.deleteBranch exists', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     assert.ok(source.includes('export async function deleteBranch'),
@@ -99,7 +99,7 @@ suite('Delete Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleDeleteBranch exists', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleDeleteBranch'),
@@ -107,7 +107,7 @@ suite('Delete Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleDeleteBranch checks for current branch', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleDeleteBranch');
@@ -120,7 +120,7 @@ suite('Delete Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleDeleteBranch shows confirmation', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleDeleteBranch');
@@ -135,7 +135,7 @@ suite('Delete Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleDeleteBranch calls deleteBranch', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleDeleteBranch');
@@ -148,7 +148,7 @@ suite('Delete Branch E2E Tests', () => {
   });
 
   test('messageHandler.handleDeleteBranch refreshes panel after deletion', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleDeleteBranch');
@@ -161,7 +161,7 @@ suite('Delete Branch E2E Tests', () => {
   });
 
   test('main.js handleDeleteBranch filters to local branches only', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleDeleteBranch');
@@ -174,7 +174,7 @@ suite('Delete Branch E2E Tests', () => {
   });
 
   test('main.js handleDeleteBranch prevents deleting current branch', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleDeleteBranch');

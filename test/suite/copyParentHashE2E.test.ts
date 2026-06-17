@@ -57,7 +57,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('handleCopyParentHash function exists and gets commits from panel', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyParentHash'),
@@ -67,7 +67,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('handleCopyParentHash copies parentHashes[0] to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyParentHash');
@@ -82,7 +82,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('handleCopyParentHash shows confirmation with short hash', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyParentHash');
@@ -98,7 +98,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('handleCopyParentHash handles root commit (no parent)', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyParentHash');
@@ -112,7 +112,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('handleCopyParentHash handles commit not found', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyParentHash');
@@ -124,7 +124,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyParentHash prioritizes focused row', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyParentHash');
@@ -141,7 +141,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyParentHash sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyParentHash');
@@ -155,7 +155,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('context menu has copy-parent-hash item with correct icon and label', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-parent-hash"'),
@@ -167,7 +167,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('context menu click handles copy-parent-hash action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-parent-hash'"),
@@ -175,7 +175,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('Ctrl+Shift+V keyboard shortcut triggers handleCopyParentHash', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("e.key === 'v'") && source.includes('handleCopyParentHash'),
@@ -205,7 +205,7 @@ suite('Copy Parent Hash E2E Tests', () => {
   });
 
   test('keyboard help includes Copy parent hash', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy parent hash'),

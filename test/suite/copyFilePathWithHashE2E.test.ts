@@ -31,7 +31,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('handleCopyFilePathWithHash should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFilePathWithHash'),
@@ -39,7 +39,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('handleCopyFilePathWithHash should format as hash:path', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler formats output as hash:path
@@ -53,7 +53,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('handleCopyFilePathWithHash writes hash:path to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write
@@ -66,7 +66,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('handleCopyFilePathWithHash truncates display message to 60 chars', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify truncation logic
@@ -79,7 +79,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('handleCopyFilePathWithHash gets commit from panel', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify it gets commit data from panel
@@ -92,7 +92,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyFilePathWithHash', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyFilePathWithHash':"),
@@ -100,7 +100,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('types.ts should define copyFilePathWithHash message type', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| { type: 'copyFilePathWithHash'; hash: string; filePath: string }"),
@@ -108,7 +108,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('types.ts should include copyFilePathWithHash in WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| 'copyFilePathWithHash'"),
@@ -116,7 +116,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('main.js should have copy-file-path-with-hash context menu item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-file-path-with-hash"'),
@@ -124,7 +124,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('main.js should send copyFilePathWithHash message with hash and filePath', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify the message is sent with both hash and filePath
@@ -137,7 +137,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('main.js should have handleCopyFilePathWithHash function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFilePathWithHash'),
@@ -145,7 +145,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyFilePathWithHash validates selected file', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFilePathWithHash');
@@ -158,7 +158,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('main.js handleCopyFilePathWithHash gets target commit', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFilePathWithHash');
@@ -172,7 +172,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('extension.ts should register copyFilePathWithHash command', async () => {
-    const extPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extPath, 'utf-8');
 
     assert.ok(source.includes("'copyFilePathWithHash'"),
@@ -191,9 +191,9 @@ suite('Copy File Path with Hash E2E Tests', () => {
 
   test('Integration: message flow from webview to extension', async () => {
     // This test verifies the complete message flow
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
 
     const mainJs = fs.readFileSync(mainJsPath, 'utf-8');
     const messageHandler = fs.readFileSync(messageHandlerPath, 'utf-8');
@@ -213,7 +213,7 @@ suite('Copy File Path with Hash E2E Tests', () => {
   });
 
   test('Output format validation: hash:path format', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify the format is exactly ${shortHash}:${filePath}

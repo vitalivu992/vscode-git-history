@@ -29,7 +29,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('handleCopyCommitDate with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -42,7 +42,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('handleCopyCommitDate writes ISO date to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write with ISO date
@@ -58,7 +58,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('handleCopyCommitDate handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -71,7 +71,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('main.js handleCopyCommitDate target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -89,7 +89,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('main.js handleCopyCommitDate sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitDate');
@@ -101,7 +101,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('main.js handleCopyCommitDate handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitDate');
@@ -113,7 +113,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('context menu has copy-commit-date item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -124,7 +124,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('context menu click handles copy-commit-date action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -133,7 +133,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('Ctrl+Shift+T keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler
@@ -152,7 +152,7 @@ suite('Copy Commit Date E2E Tests', () => {
   });
 
   test('keyboard help includes Copy commit date', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy commit date'),

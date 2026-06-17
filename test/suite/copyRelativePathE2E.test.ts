@@ -29,7 +29,7 @@ suite('Copy Relative Path E2E Tests', () => {
   });
 
   test('handleCopyRelativePath should be defined in messageHandler', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyRelativePath'),
@@ -37,7 +37,7 @@ suite('Copy Relative Path E2E Tests', () => {
   });
 
   test('handleCopyRelativePath should use path.relative to compute relative path', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRelativePath');
@@ -50,7 +50,7 @@ suite('Copy Relative Path E2E Tests', () => {
   });
 
   test('handleCopyRelativePath writes relative path to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRelativePath');
@@ -62,7 +62,7 @@ suite('Copy Relative Path E2E Tests', () => {
   });
 
   test('handleCopyRelativePath shows confirmation with filename', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRelativePath');
@@ -76,7 +76,7 @@ suite('Copy Relative Path E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyRelativePath', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyRelativePath':"),
@@ -84,7 +84,7 @@ suite('Copy Relative Path E2E Tests', () => {
   });
 
   test('types.ts should define copyRelativePath message type', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("| { type: 'copyRelativePath'; filePath: string }"),
@@ -92,7 +92,7 @@ suite('Copy Relative Path E2E Tests', () => {
   });
 
   test('main.js should have copy-relative-path context menu item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-relative-path"'),
@@ -100,7 +100,7 @@ suite('Copy Relative Path E2E Tests', () => {
   });
 
   test('main.js should send copyRelativePath message', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("type: 'copyRelativePath'"),

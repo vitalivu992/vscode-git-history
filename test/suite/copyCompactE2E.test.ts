@@ -41,7 +41,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('handleCopyCompact with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyCompact'),
@@ -57,7 +57,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('handleCopyCompact formats as {shortHash} - {message} ({author}, {relativeDate})', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCompact');
@@ -73,7 +73,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('handleCopyCompact writes formatted text to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCompact');
@@ -85,7 +85,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('handleCopyCompact handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCompact');
@@ -97,7 +97,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('handleCopyCompact shows confirmation with truncated message', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCompact');
@@ -111,7 +111,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('main.js handleCopyCompact target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCompact');
@@ -128,7 +128,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('main.js handleCopyCompact sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCompact');
@@ -140,7 +140,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('main.js handleCopyCompact handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCompact');
@@ -152,7 +152,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('context menu has copy-compact item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-compact"'),
@@ -162,7 +162,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('context menu copy-compact has 📝 icon', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('📝'),
@@ -170,7 +170,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('context menu click handles copy-compact action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-compact'"),
@@ -202,7 +202,7 @@ suite('Copy Compact E2E Tests', () => {
   });
 
   test('keyboard help includes Copy as compact', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy as compact'),

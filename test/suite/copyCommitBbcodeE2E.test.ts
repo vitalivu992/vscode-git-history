@@ -29,7 +29,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('handleCopyCommitBbcode with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -42,7 +42,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('handleCopyCommitBbcode writes BBCode to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write with BBCode format
@@ -58,7 +58,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('handleCopyCommitBbcode handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -71,13 +71,13 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('formatCommitAsBbcode generates valid BBCode format', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify BBCode format structure
     const fnStart = source.indexOf('function formatCommitAsBbcode');
     assert.ok(fnStart >= 0, 'formatCommitAsBbcode should exist');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('[b]Commit:[/b]'),
@@ -89,11 +89,11 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('formatCommitAsBbcode includes commit hash and subject', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsBbcode');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('commit.shortHash') && fnBody.includes('commit.message'),
@@ -101,11 +101,11 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('formatCommitAsBbcode includes statistics with singular/plural', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsBbcode');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('[b]Statistics:[/b]'),
@@ -115,11 +115,11 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('formatCommitAsBbcode includes tags when available', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsBbcode');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('[b]Tags:[/b]'),
@@ -129,11 +129,11 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('formatCommitAsBbcode includes body when different from subject', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function formatCommitAsBbcode');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('[b]Body:[/b]'),
@@ -143,7 +143,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('main.js handleCopyBbcode target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -161,7 +161,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('main.js handleCopyBbcode sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBbcode');
@@ -173,7 +173,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('main.js handleCopyBbcode handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBbcode');
@@ -185,7 +185,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('context menu has copy-bbcode item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -196,7 +196,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('context menu click handles copy-bbcode action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -205,7 +205,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Shift+B keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler
@@ -230,7 +230,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('extension.ts webview action registration', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("{ command: 'gitHistory.copyCommitBbcode', action: 'copyCommitBbcode' }"),
@@ -238,7 +238,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('types.ts includes copyCommitBbcode in WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("'copyCommitBbcode'"),
@@ -246,7 +246,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('types.ts includes copyCommitBbcode in WebviewToExtMessage', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("{ type: 'copyCommitBbcode'; hash: string }"),
@@ -254,7 +254,7 @@ suite('Copy Commit BBCode E2E Tests', () => {
   });
 
   test('triggerAction dispatches copyCommitBbcode', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyCommitBbcode': handleCopyBbcode()"),

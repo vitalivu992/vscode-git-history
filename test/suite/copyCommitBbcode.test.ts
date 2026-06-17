@@ -19,7 +19,7 @@ suite('Copy Commit BBCode Test Suite', () => {
 
   test('types.ts should have copyCommitBbcode in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'copyCommitBbcode'"),
       'WebviewAction should include copyCommitBbcode');
@@ -27,7 +27,7 @@ suite('Copy Commit BBCode Test Suite', () => {
 
   test('types.ts should have copyCommitBbcode in WebviewToExtMessage', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);/);
+    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(msgMatch, 'Should find WebviewToExtMessage type');
     assert.ok(msgMatch[1].includes("'copyCommitBbcode'"),
       'WebviewToExtMessage should include copyCommitBbcode');
@@ -43,7 +43,7 @@ suite('Copy Commit BBCode Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function formatCommitAsBbcode');
     assert.ok(fnStart >= 0, 'formatCommitAsBbcode function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('[b]Commit:[/b]'),
@@ -58,7 +58,7 @@ suite('Copy Commit BBCode Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function formatCommitAsBbcode');
     assert.ok(fnStart >= 0, 'formatCommitAsBbcode function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('commit.shortHash') && fnBody.includes('commit.message'),
@@ -69,7 +69,7 @@ suite('Copy Commit BBCode Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function formatCommitAsBbcode');
     assert.ok(fnStart >= 0, 'formatCommitAsBbcode function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('commit.author') && fnBody.includes('commit.email'),
@@ -82,7 +82,7 @@ suite('Copy Commit BBCode Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function formatCommitAsBbcode');
     assert.ok(fnStart >= 0, 'formatCommitAsBbcode function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('toLocaleString'),
@@ -93,7 +93,7 @@ suite('Copy Commit BBCode Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function formatCommitAsBbcode');
     assert.ok(fnStart >= 0, 'formatCommitAsBbcode function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('[b]Statistics:[/b]'),
@@ -108,7 +108,7 @@ suite('Copy Commit BBCode Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function formatCommitAsBbcode');
     assert.ok(fnStart >= 0, 'formatCommitAsBbcode function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('[b]Tags:[/b]'),
@@ -121,7 +121,7 @@ suite('Copy Commit BBCode Test Suite', () => {
     const source = fs.readFileSync(handlerPath, 'utf-8');
     const fnStart = source.indexOf('function formatCommitAsBbcode');
     assert.ok(fnStart >= 0, 'formatCommitAsBbcode function should exist');
-    const fnEnd = source.indexOf('}\n', fnStart) + 2;
+    const fnEnd = source.indexOf('\n}', fnStart) + 2;
     const fnBody = source.substring(fnStart, fnEnd);
 
     assert.ok(fnBody.includes('[b]Body:[/b]'),

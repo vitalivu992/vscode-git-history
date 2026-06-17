@@ -18,7 +18,7 @@ suite('Copy Commit Unix Timestamp Test Suite', () => {
 
   test('types.ts should have copyCommitTimestamp in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'copyCommitTimestamp'"),
       'WebviewAction should include copyCommitTimestamp');
@@ -26,7 +26,7 @@ suite('Copy Commit Unix Timestamp Test Suite', () => {
 
   test('types.ts should have copyCommitTimestamp in WebviewToExtMessage', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);/);
+    const msgMatch = source.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(msgMatch, 'Should find WebviewToExtMessage type');
     assert.ok(msgMatch[1].includes("'copyCommitTimestamp'"),
       'WebviewToExtMessage should include copyCommitTimestamp');

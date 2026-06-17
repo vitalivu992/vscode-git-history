@@ -112,13 +112,13 @@ suite('Copy Files Changed Count E2E Source Integration Tests', () => {
     const typesSource = fs.readFileSync(typesPath, 'utf-8');
 
     // Check WebviewAction
-    const actionMatch = typesSource.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = typesSource.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'copyFilesChangedCount'"),
       'WebviewAction should include copyFilesChangedCount');
 
     // Check WebviewToExtMessage
-    const msgMatch = typesSource.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);/);
+    const msgMatch = typesSource.match(/WebviewToExtMessage\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(msgMatch, 'Should find WebviewToExtMessage type');
     assert.ok(msgMatch[1].includes("'copyFilesChangedCount'"),
       'WebviewToExtMessage should include copyFilesChangedCount');

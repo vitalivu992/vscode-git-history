@@ -34,7 +34,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('gitService parseRemoteUrl extracts owner and repo for GitHub', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export function parseRemoteUrl');
@@ -47,7 +47,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('parseRemoteUrl handles SSH format for GitHub', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export function parseRemoteUrl');
@@ -59,7 +59,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('parseRemoteUrl handles HTTPS format', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export function parseRemoteUrl');
@@ -71,7 +71,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('handleCopyCommitMention formats mention as owner/repo@shortHash', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMention');
@@ -87,7 +87,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('handleCopyCommitMention writes mention to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMention');
@@ -102,7 +102,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('handleCopyCommitMention uses short hash (7 characters)', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMention');
@@ -115,7 +115,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('handleCopyCommitMention handles no remote case', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMention');
@@ -128,7 +128,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('handleCopyCommitMention handles unknown platform case', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMention');
@@ -141,7 +141,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('main.js handleCopyMention sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyMention');
@@ -154,7 +154,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('main.js handleCopyMention prioritizes focused row', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyMention');
@@ -169,7 +169,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('main.js handleCopyMention falls back to selected commit', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyMention');
@@ -182,7 +182,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('main.js handleCopyMention shows error when no commit selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyMention');
@@ -195,7 +195,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('context menu has copy-mention item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-mention"'),
@@ -205,7 +205,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('context menu click handles copy-mention action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-mention'"),
@@ -213,7 +213,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('Ctrl+Shift+@ keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const atIndex = source.indexOf("e.key === '@'");
@@ -225,7 +225,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('Ctrl+Shift+@ uses correct modifiers (ctrl/meta + shift)', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const atIndex = source.indexOf("e.key === '@'");
@@ -260,7 +260,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('extension.ts registers copyCommitMention action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'copyCommitMention'"),
@@ -268,7 +268,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('messageHandler switch case handles copyCommitMention', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyCommitMention':"),
@@ -278,7 +278,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('handleCopyCommitMention has error handling', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMention');
@@ -291,7 +291,7 @@ suite('Copy Commit Mention E2E Tests', () => {
   });
 
   test('mention format uses @ symbol between repo and hash', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitMention');

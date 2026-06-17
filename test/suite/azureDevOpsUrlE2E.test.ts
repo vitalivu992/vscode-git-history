@@ -4,7 +4,7 @@ import * as path from 'path';
 
 suite('Azure DevOps URL E2E Tests', () => {
   test('parseRemoteUrl handles Azure DevOps HTTPS URLs', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export function parseRemoteUrl');
@@ -19,7 +19,7 @@ suite('Azure DevOps URL E2E Tests', () => {
   });
 
   test('parseRemoteUrl handles Azure DevOps SSH URLs', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export function parseRemoteUrl');
@@ -31,7 +31,7 @@ suite('Azure DevOps URL E2E Tests', () => {
   });
 
   test('parseRemoteUrl handles Azure DevOps legacy visualstudio.com URLs', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export function parseRemoteUrl');
@@ -43,7 +43,7 @@ suite('Azure DevOps URL E2E Tests', () => {
   });
 
   test('GitRemoteInfo interface includes Azure platform and project field', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const interfaceStart = source.indexOf('interface GitRemoteInfo');
@@ -58,7 +58,7 @@ suite('Azure DevOps URL E2E Tests', () => {
   });
 
   test('detectPlatform identifies Azure DevOps hostnames', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('function detectPlatform');
@@ -77,7 +77,7 @@ suite('Azure DevOps URL E2E Tests', () => {
   });
 
   test('getCommitUrl handles Azure DevOps platform', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export async function getCommitUrl');
@@ -92,7 +92,7 @@ suite('Azure DevOps URL E2E Tests', () => {
   });
 
   test('getBranchUrl handles Azure DevOps platform', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export async function getBranchUrl');
@@ -107,7 +107,7 @@ suite('Azure DevOps URL E2E Tests', () => {
   });
 
   test('getFileUrl handles Azure DevOps platform', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     const fnStart = source.indexOf('export async function getFileUrl');
@@ -122,7 +122,7 @@ suite('Azure DevOps URL E2E Tests', () => {
   });
 
   test('messageHandler handles unknown platform message includes Azure DevOps', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // The error message for unknown platforms should NOT mention Azure since it's now supported

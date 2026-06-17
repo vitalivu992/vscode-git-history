@@ -40,7 +40,7 @@ suite('Cycle Sort Mode Shortcut E2E Test Suite', () => {
   });
 
   test('handleSortToggle function exists and cycles through modes', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify the function exists
@@ -59,7 +59,7 @@ suite('Cycle Sort Mode Shortcut E2E Test Suite', () => {
   });
 
   test('sort button click handler is attached', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify sort button has click listener
@@ -69,7 +69,7 @@ suite('Cycle Sort Mode Shortcut E2E Test Suite', () => {
   });
 
   test('sort button updates label based on sortMode', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify sort button label is updated
@@ -79,7 +79,7 @@ suite('Cycle Sort Mode Shortcut E2E Test Suite', () => {
   });
 
   test('sortMode 0 is Newest (default)', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Default sort mode should be 0 (Newest)
@@ -88,7 +88,7 @@ suite('Cycle Sort Mode Shortcut E2E Test Suite', () => {
   });
 
   test('sortMode affects getOrderedCommits behavior', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Should have different sort logic for different modes
@@ -98,7 +98,7 @@ suite('Cycle Sort Mode Shortcut E2E Test Suite', () => {
   });
 
   test('graph is hidden when sortMode >= 2 (author sort)', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // effectiveShowGraph should be false when sortMode >= 2
@@ -107,7 +107,7 @@ suite('Cycle Sort Mode Shortcut E2E Test Suite', () => {
   });
 
   test('cycleSortMode action is triggered via triggerAction', () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // triggerAction should dispatch cycleSortMode to handleSortToggle

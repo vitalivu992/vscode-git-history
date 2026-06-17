@@ -30,7 +30,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('gitService getRemoteUrl exists and retrieves remote URL', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     assert.ok(source.includes('export async function getRemoteUrl'),
@@ -45,7 +45,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('handleCopyRemoteUrl reads remote URL via getRemoteUrl', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyRemoteUrl'),
@@ -55,7 +55,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('handleCopyRemoteUrl writes URL to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRemoteUrl');
@@ -70,7 +70,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('handleCopyRemoteUrl handles missing remote', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRemoteUrl');
@@ -82,7 +82,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('main.js handleCopyRemoteUrl sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyRemoteUrl');
@@ -95,7 +95,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('context menu has copy-remote-url item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-remote-url"'),
@@ -105,7 +105,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('context menu click handles copy-remote-url action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-remote-url'"),
@@ -113,7 +113,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('Ctrl+Alt+O keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('e.altKey') && source.includes("e.key === 'o'") && source.includes('handleCopyRemoteUrl'),
@@ -131,7 +131,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('keyboard help includes Copy remote URL', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy remote URL'),
@@ -139,7 +139,7 @@ suite('Copy Remote URL E2E Tests', () => {
   });
 
   test('extension.ts registers copyRemoteUrl action', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("action: 'copyRemoteUrl'"),

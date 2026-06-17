@@ -111,7 +111,7 @@ suite('Copy Trailers E2E Tests', () => {
   // ─── Message handler ────────────────────────────────────────────────────────
 
   test('handleCopyTrailers function exists', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyTrailers'),
@@ -119,7 +119,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('handleCopyTrailers uses extractTrailers', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyTrailers');
@@ -134,7 +134,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('handleCopyTrailers handles no trailers', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyTrailers');
@@ -148,7 +148,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('handleCopyFixesReferences handles no issue refs', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyFixesReferences');
@@ -162,7 +162,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('handleCopyReviewedBy handles no reviewers', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyReviewedBy');
@@ -178,7 +178,7 @@ suite('Copy Trailers E2E Tests', () => {
   // ─── extractTrailers utility ───────────────────────────────────────────────
 
   test('extractTrailers function exists and is exported', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('export function extractTrailers'),
@@ -186,7 +186,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('extractTrailers returns Map type', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function extractTrailers');
@@ -202,7 +202,7 @@ suite('Copy Trailers E2E Tests', () => {
   // ─── Webview (main.js) ──────────────────────────────────────────────────────
 
   test('main.js has handleCopyTrailers function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyTrailers'),
@@ -210,7 +210,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('main.js has handleCopyFixesReferences function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyFixesReferences'),
@@ -218,7 +218,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('main.js has handleCopyReviewedBy function', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyReviewedBy'),
@@ -226,7 +226,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('context menu has copy-trailers item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-trailers"'),
@@ -236,7 +236,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('context menu has copy-fixes-references item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-fixes-references"'),
@@ -246,7 +246,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('context menu has copy-reviewed-by item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-reviewed-by"'),
@@ -256,7 +256,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('keyboard shortcuts trigger correct handlers', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('handleCopyTrailers()'),
@@ -268,7 +268,7 @@ suite('Copy Trailers E2E Tests', () => {
   });
 
   test('triggerAction dispatches all three trailer actions', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyTrailers': handleCopyTrailers()"),
@@ -320,7 +320,7 @@ suite('Copy Trailers E2E Tests', () => {
   // ─── Types ──────────────────────────────────────────────────────────────────
 
   test('types.ts has all three message types', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("'copyTrailers'"),

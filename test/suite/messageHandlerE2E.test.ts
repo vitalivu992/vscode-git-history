@@ -522,7 +522,7 @@ suite('Keybinding Registration E2E Tests', () => {
   });
 
   test('extension.ts registers all webview action commands', () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(
@@ -545,7 +545,7 @@ suite('Keybinding Registration E2E Tests', () => {
   });
 
   test('commands post triggerAction message with correct action type', () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(
@@ -577,7 +577,7 @@ suite('Keybinding Registration E2E Tests', () => {
   });
 
   test('webview action commands are registered with correct command names', () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const extensionSource = fs.readFileSync(extensionPath, 'utf-8');
 
     for (const { command } of expectedWebviewActions) {

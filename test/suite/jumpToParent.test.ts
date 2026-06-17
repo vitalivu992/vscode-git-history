@@ -14,7 +14,7 @@ suite('Jump to Parent Test Suite', () => {
 
   test('types.ts should have jumpToParent in WebviewAction', () => {
     const source = fs.readFileSync(typesPath, 'utf-8');
-    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);/);
+    const actionMatch = source.match(/WebviewAction\s*=\s*([\s\S]*?);\s*$/m);
     assert.ok(actionMatch, 'Should find WebviewAction type');
     assert.ok(actionMatch[1].includes("'jumpToParent'"),
       'WebviewAction should include jumpToParent');

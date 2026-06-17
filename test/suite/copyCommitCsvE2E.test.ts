@@ -29,7 +29,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('handleCopyCommitCsv with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -42,7 +42,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('handleCopyCommitCsv writes CSV to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write with CSV format
@@ -58,7 +58,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('handleCopyCommitCsv handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -71,7 +71,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('handleCopyCommitCsv generates CSV with header row', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitCsv');
@@ -88,7 +88,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('handleCopyCommitCsv includes all commit fields', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitCsv');
@@ -113,7 +113,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('handleCopyCommitCsv escapes author and message fields', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitCsv');
@@ -128,7 +128,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('handleCopyCommitCsv defaults stats to 0', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitCsv');
@@ -141,7 +141,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('handleCopyCommitCsv joins tags with semicolon', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCommitCsv');
@@ -154,7 +154,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('main.js handleCopyCsv target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -172,7 +172,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('main.js handleCopyCsv sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCsv');
@@ -184,7 +184,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('main.js handleCopyCsv handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCsv');
@@ -196,7 +196,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('context menu has copy-csv item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -207,7 +207,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('context menu click handles copy-csv action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -216,7 +216,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Shift+C keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard handler
@@ -241,7 +241,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('extension.ts webview action registration', async () => {
-    const extensionPath = path.resolve(__dirname, '../../src/extension.ts');
+    const extensionPath = path.resolve(__dirname, '../../../src/extension.ts');
     const source = fs.readFileSync(extensionPath, 'utf-8');
 
     assert.ok(source.includes("{ command: 'gitHistory.copyCommitCsv', action: 'copyCommitCsv' }"),
@@ -249,7 +249,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('types.ts includes copyCommitCsv in WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("'copyCommitCsv'"),
@@ -257,7 +257,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('types.ts includes copyCommitCsv in WebviewToExtMessage', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("{ type: 'copyCommitCsv'; hash: string }"),
@@ -265,7 +265,7 @@ suite('Copy Commit CSV E2E Tests', () => {
   });
 
   test('triggerAction dispatches copyCommitCsv', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyCommitCsv': handleCopyCsv()"),

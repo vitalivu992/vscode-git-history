@@ -9,34 +9,32 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
 suite('Diff Context Lines Configuration Tests', () => {
   test('package.json should have diffContextLines configuration', () => {
-    assert.ok(packageJson.contributes.configuration.properties.gitHistory,
-      'gitHistory configuration properties should exist');
-    assert.ok(packageJson.contributes.configuration.properties.gitHistory.diffContextLines,
+    assert.ok(packageJson.contributes.configuration.properties['gitHistory.diffContextLines'],
       'gitHistory.diffContextLines configuration should exist');
   });
 
   test('diffContextLines should have correct type (number)', () => {
-    const config = packageJson.contributes.configuration.properties.gitHistory.diffContextLines;
+    const config = packageJson.contributes.configuration.properties['gitHistory.diffContextLines'];
     assert.strictEqual(config.type, 'number', 'diffContextLines should be of type number');
   });
 
   test('diffContextLines should have correct default value (3)', () => {
-    const config = packageJson.contributes.configuration.properties.gitHistory.diffContextLines;
+    const config = packageJson.contributes.configuration.properties['gitHistory.diffContextLines'];
     assert.strictEqual(config.default, 3, 'diffContextLines should have default value of 3');
   });
 
   test('diffContextLines should have minimum value of 1', () => {
-    const config = packageJson.contributes.configuration.properties.gitHistory.diffContextLines;
+    const config = packageJson.contributes.configuration.properties['gitHistory.diffContextLines'];
     assert.strictEqual(config.minimum, 1, 'diffContextLines should have minimum value of 1');
   });
 
   test('diffContextLines should have maximum value of 10', () => {
-    const config = packageJson.contributes.configuration.properties.gitHistory.diffContextLines;
+    const config = packageJson.contributes.configuration.properties['gitHistory.diffContextLines'];
     assert.strictEqual(config.maximum, 10, 'diffContextLines should have maximum value of 10');
   });
 
   test('diffContextLines should have a description', () => {
-    const config = packageJson.contributes.configuration.properties.gitHistory.diffContextLines;
+    const config = packageJson.contributes.configuration.properties['gitHistory.diffContextLines'];
     assert.ok(config.description, 'diffContextLines should have a description');
     assert.strictEqual(typeof config.description, 'string', 'description should be a string');
     assert.ok(config.description.toLowerCase().includes('context'),

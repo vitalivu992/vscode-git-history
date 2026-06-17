@@ -27,7 +27,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('handleCopyBranchName reads branch from panel', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyBranchName'),
@@ -37,7 +37,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('handleCopyBranchName writes branch to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchName');
@@ -52,7 +52,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('handleCopyBranchName handles missing branch', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchName');
@@ -64,7 +64,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('main.js handleCopyBranchName sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchName');
@@ -77,7 +77,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('main.js handleCopyBranchName handles no branch', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyBranchName');
@@ -89,7 +89,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('context menu has copy-branch-name item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-branch-name"'),
@@ -99,7 +99,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('context menu click handles copy-branch-name action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-branch-name'"),
@@ -107,7 +107,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('Ctrl+Alt+B keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('e.altKey') && source.includes("e.key === 'b'") && source.includes('handleCopyBranchName'),
@@ -125,7 +125,7 @@ suite('Copy Branch Name E2E Tests', () => {
   });
 
   test('keyboard help includes Copy branch name', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy branch name'),

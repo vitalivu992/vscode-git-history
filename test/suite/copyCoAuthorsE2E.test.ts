@@ -73,7 +73,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   // ─── Message handler ────────────────────────────────────────────────────────
 
   test('handleCopyCoAuthors function exists and gets commits from panel', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCopyCoAuthors'),
@@ -83,7 +83,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('handleCopyCoAuthors calls extractCoAuthors with fullMessage', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCoAuthors');
@@ -98,7 +98,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('handleCopyCoAuthors handles no co-authors', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCoAuthors');
@@ -112,7 +112,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('handleCopyCoAuthors writes co-authors to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCoAuthors');
@@ -126,7 +126,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('handleCopyCoAuthors shows confirmation with count', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCoAuthors');
@@ -142,7 +142,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('handleCopyCoAuthors handles commit not found', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCoAuthors');
@@ -156,7 +156,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   // ─── extractCoAuthors utility ───────────────────────────────────────────────
 
   test('extractCoAuthors function exists and is exported', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('export function extractCoAuthors'),
@@ -164,7 +164,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('extractCoAuthors uses case-insensitive regex', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function extractCoAuthors');
@@ -178,7 +178,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('extractCoAuthors captures Name <email> format', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function extractCoAuthors');
@@ -194,7 +194,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   // ─── Webview (main.js) ──────────────────────────────────────────────────────
 
   test('main.js handleCopyCoAuthors prioritizes focused row', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCoAuthors');
@@ -211,7 +211,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('main.js handleCopyCoAuthors sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCoAuthors');
@@ -225,7 +225,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('main.js shows error when no commit is selected', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyCoAuthors');
@@ -237,7 +237,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('context menu has copy-co-authors item with correct icon and label', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('data-action="copy-co-authors"'),
@@ -249,7 +249,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('context menu click handles copy-co-authors action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("action === 'copy-co-authors'"),
@@ -257,7 +257,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('Ctrl+Shift+K keyboard shortcut triggers handleCopyCoAuthors', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("e.key === 'k'") && source.includes('handleCopyCoAuthors'),
@@ -265,7 +265,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('triggerAction dispatches copyCoAuthors', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes("case 'copyCoAuthors': handleCopyCoAuthors()"),
@@ -273,7 +273,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('keyboard help includes Copy co-authors', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     assert.ok(source.includes('Copy co-authors'),
@@ -307,7 +307,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   // ─── Types ──────────────────────────────────────────────────────────────────
 
   test('types.ts has copyCoAuthors in WebviewAction', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     assert.ok(source.includes("'copyCoAuthors'"),
@@ -315,7 +315,7 @@ suite('Copy Co-Authors E2E Tests', () => {
   });
 
   test('types.ts has copyCoAuthors message with hash field', async () => {
-    const typesPath = path.resolve(__dirname, '../../src/types.ts');
+    const typesPath = path.resolve(__dirname, '../../../src/types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
     const msgMatch = source.match(/type:\s*'copyCoAuthors'[^}]*hash:\s*string/);

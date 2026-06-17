@@ -29,7 +29,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('handleCopyAuthorGitFormat with valid commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify handler reads from commits array
@@ -42,7 +42,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('handleCopyAuthorGitFormat formats as Name <email>', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify git format output
@@ -56,7 +56,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('handleCopyAuthorGitFormat writes to clipboard', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify clipboard write with git format
@@ -72,7 +72,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('handleCopyAuthorGitFormat handles missing commit', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify missing commit handling
@@ -85,7 +85,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('handleCopyAuthorGitFormat handles special characters in email', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // The function should handle emails with special characters
@@ -98,7 +98,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('main.js handleCopyAuthorGitFormat target resolution prioritizes focused', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify focused prioritized over selected
@@ -116,7 +116,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('main.js handleCopyAuthorGitFormat sends correct message type', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAuthorGitFormat');
@@ -128,7 +128,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('main.js handleCopyAuthorGitFormat handles no target', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCopyAuthorGitFormat');
@@ -140,7 +140,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('context menu has copy-author-git-format item', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check for context menu item
@@ -151,7 +151,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('context menu click handles copy-author-git-format action', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Check handler for the action
@@ -160,7 +160,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('Ctrl+Alt+Shift+A keyboard shortcut integration', async () => {
-    const mainJsPath = path.resolve(__dirname, '../../src/webview/panel/main.js');
+    const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     // Verify keyboard help dialog includes the entry
@@ -179,7 +179,7 @@ suite('Copy Author Git Format E2E Tests', () => {
   });
 
   test('git format output is correct for Co-authored-by trailers', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     // Verify the format matches git's expected format

@@ -32,7 +32,7 @@ suite('Create Tag E2E Tests', () => {
   });
 
   test('gitService.createTagFromCommit exists', async () => {
-    const gitServicePath = path.resolve(__dirname, '../../src/git/gitService.ts');
+    const gitServicePath = path.resolve(__dirname, '../../../src/git/gitService.ts');
     const source = fs.readFileSync(gitServicePath, 'utf-8');
 
     assert.ok(source.includes('export async function createTagFromCommit'),
@@ -124,7 +124,7 @@ suite('Create Tag E2E Tests', () => {
   });
 
   test('messageHandler.handleCreateTag exists', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     assert.ok(source.includes('function handleCreateTag'),
@@ -132,7 +132,7 @@ suite('Create Tag E2E Tests', () => {
   });
 
   test('messageHandler.handleCreateTag prompts for tag name', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCreateTag');
@@ -147,7 +147,7 @@ suite('Create Tag E2E Tests', () => {
   });
 
   test('messageHandler.handleCreateTag shows confirmation', async () => {
-    const messageHandlerPath = path.resolve(__dirname, '../../src/webview/messageHandler.ts');
+    const messageHandlerPath = path.resolve(__dirname, '../../../src/webview/messageHandler.ts');
     const source = fs.readFileSync(messageHandlerPath, 'utf-8');
 
     const fnStart = source.indexOf('function handleCreateTag');
