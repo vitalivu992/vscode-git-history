@@ -1,0 +1,551 @@
+{
+  "name": "vscode-git-history",
+  "displayName": "Git History",
+  "description": "View git history for files and line selections with diff viewer",
+  "version": "1.1.6",
+  "publisher": "vitalivu992",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lvsoftwares/vscode-git-history"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:gitHistory.showFileHistory",
+    "onCommand:gitHistory.showSelectionHistory",
+    "onCommand:gitHistory.showRepositoryHistory",
+    "onCommand:gitHistory.toggleBlame",
+    "onCommand:gitHistory.showBlameCommit"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitHistory.showFileHistory",
+        "title": "Git History (File)",
+        "category": "Git"
+      },
+      {
+        "command": "gitHistory.showSelectionHistory",
+        "title": "Git History for Selection",
+        "category": "Git"
+      },
+      {
+        "command": "gitHistory.showRepositoryHistory",
+        "title": "Git History (Repository)",
+        "category": "Git"
+      },
+      {
+        "command": "gitHistory.toggleBlame",
+        "title": "Git: Toggle Blame Annotations"
+      },
+      {
+        "command": "gitHistory.showBlameCommit",
+        "title": "Git: Show Blame Commit"
+      },
+      {
+        "command": "gitHistory.refresh",
+        "title": "Git History: Refresh",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitHash",
+        "title": "Git History: Copy Commit Hash",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitInfo",
+        "title": "Git History: Copy Commit Info",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCherryPick",
+        "title": "Git History: Copy Cherry-Pick Command",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyRevert",
+        "title": "Git History: Copy Revert Command",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyCommitUrl",
+        "title": "Git History: Copy Commit URL",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyAuthorEmail",
+        "title": "Git History: Copy Author Email",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyAuthorName",
+        "title": "Git History: Copy Author Name",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyShortHash",
+        "title": "Git History: Copy Short Hash",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copySubject",
+        "title": "Git History: Copy Commit Subject",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.clearAllFilters",
+        "title": "Git History: Clear All Filters",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.createBranch",
+        "title": "Git History: Create Branch from Commit",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.createTag",
+        "title": "Git History: Create Tag from Commit",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.deleteTag",
+        "title": "Git History: Delete Tag from Commit",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.deleteBranch",
+        "title": "Git History: Delete Branch",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.renameBranch",
+        "title": "Git History: Rename Branch",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.checkoutBranch",
+        "title": "Git History: Checkout Branch",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.cherryPickCommit",
+        "title": "Git History: Cherry-pick Commit",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.revertCommit",
+        "title": "Git History: Revert Commit",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleMyCommits",
+        "title": "Git History: Toggle My Commits",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleWordWrap",
+        "title": "Git History: Toggle Word Wrap",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleRegex",
+        "title": "Git History: Toggle Regex Search",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleIgnoreWhitespace",
+        "title": "Git History: Toggle Ignore Whitespace",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleHideMergeCommits",
+        "title": "Git History: Toggle Hide Merge Commits",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.toggleSignatures",
+        "title": "Git History: Toggle Signatures",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToHash",
+        "title": "Git History: Jump to Hash",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToNextTag",
+        "title": "Git History: Jump to Next Tag",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToPreviousTag",
+        "title": "Git History: Jump to Previous Tag",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.jumpToParent",
+        "title": "Git History: Jump to Parent Commit",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.focusSearch",
+        "title": "Git History: Focus Search",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.focusCommitList",
+        "title": "Git History: Focus Commit List",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.showKeyboardHelp",
+        "title": "Git History: Show Keyboard Shortcuts",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.cycleDiffContextLines",
+        "title": "Git History: Cycle Diff Context Lines",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.cycleSortMode",
+        "title": "Git History: Cycle Sort Mode",
+        "category": "Git History"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "gitHistory.showFileHistory",
+          "group": "git",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gitHistory.showFileHistory",
+          "group": "git",
+          "when": "!editorHasSelection"
+        },
+        {
+          "command": "gitHistory.showSelectionHistory",
+          "group": "git",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gitHistory.toggleBlame",
+          "group": "git",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "gitHistory.toggleBlame",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "gitHistory.showFileHistory",
+        "key": "ctrl+alt+h",
+        "mac": "cmd+alt+h",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "gitHistory.showSelectionHistory",
+        "key": "ctrl+alt+shift+h",
+        "mac": "cmd+alt+shift+h",
+        "when": "editorTextFocus && editorHasSelection"
+      },
+      {
+        "command": "gitHistory.refresh",
+        "key": "f5",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.refresh",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitHash",
+        "key": "ctrl+shift+h",
+        "mac": "cmd+shift+h",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitInfo",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCherryPick",
+        "key": "ctrl+shift+p",
+        "mac": "cmd+shift+p",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyRevert",
+        "key": "ctrl+shift+u",
+        "mac": "cmd+shift+u",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyCommitUrl",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyAuthorEmail",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyAuthorName",
+        "key": "ctrl+shift+n",
+        "mac": "cmd+shift+n",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyShortHash",
+        "key": "ctrl+shift+7",
+        "mac": "cmd+shift+7",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copySubject",
+        "key": "ctrl+shift+6",
+        "mac": "cmd+shift+6",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.clearAllFilters",
+        "key": "ctrl+alt+q",
+        "mac": "cmd+alt+q",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.deleteBranch",
+        "key": "ctrl+alt+x",
+        "mac": "cmd+alt+x",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.checkoutBranch",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.cherryPickCommit",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.revertCommit",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleMyCommits",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleWordWrap",
+        "key": "ctrl+shift+w",
+        "mac": "cmd+shift+w",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleRegex",
+        "key": "ctrl+shift+x",
+        "mac": "cmd+shift+x",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleIgnoreWhitespace",
+        "key": "ctrl+shift+alt+j",
+        "mac": "cmd+shift+alt+j",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleHideMergeCommits",
+        "key": "ctrl+shift+q",
+        "mac": "cmd+shift+q",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.toggleSignatures",
+        "key": "ctrl+shift+alt+s",
+        "mac": "cmd+shift+alt+s",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToHash",
+        "key": "ctrl+g",
+        "mac": "cmd+g",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToNextTag",
+        "key": "ctrl+]",
+        "mac": "cmd+]",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToPreviousTag",
+        "key": "ctrl+[",
+        "mac": "cmd+[",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.jumpToParent",
+        "key": "ctrl+p",
+        "mac": "cmd+p",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.focusSearch",
+        "key": "ctrl+f",
+        "mac": "cmd+f",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.focusCommitList",
+        "key": "ctrl+l",
+        "mac": "cmd+l",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.showKeyboardHelp",
+        "key": "shift+/",
+        "mac": "shift+/",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.cycleDiffContextLines",
+        "key": "ctrl+shift+/",
+        "mac": "cmd+shift+/",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.cycleSortMode",
+        "key": "ctrl+shift+3",
+        "mac": "cmd+shift+3",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.createBranch",
+        "key": "ctrl+shift+alt+b",
+        "mac": "cmd+shift+alt+b",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.createTag",
+        "key": "ctrl+alt+i",
+        "mac": "cmd+alt+i",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.deleteTag",
+        "key": "ctrl+alt+.",
+        "mac": "cmd+alt+.",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      }
+    ],
+    "configuration": {
+      "title": "Git History",
+      "properties": {
+        "gitHistory.maxCommits": {
+          "type": "number",
+          "default": 500,
+          "description": "Maximum number of commits to display"
+        },
+        "gitHistory.blame.dateFormat": {
+          "type": "string",
+          "default": "relative",
+          "enum": [
+            "relative",
+            "short",
+            "iso"
+          ],
+          "description": "Date format for blame annotations"
+        },
+        "gitHistory.commitList.dateFormat": {
+          "type": "string",
+          "default": "relative",
+          "enum": [
+            "relative",
+            "short",
+            "iso"
+          ],
+          "description": "Date format for the commit list: relative (e.g., \"2 weeks ago\"), short (locale date), or iso (YYYY-MM-DD)"
+        },
+        "gitHistory.hideMergeCommits": {
+          "type": "boolean",
+          "default": false,
+          "description": "Hide merge commits in the history view"
+        },
+        "gitHistory.defaultDiffView": {
+          "type": "string",
+          "default": "unified",
+          "enum": [
+            "unified",
+            "side-by-side"
+          ],
+          "description": "Default diff view mode when opening Git History"
+        },
+        "gitHistory.diffContextLines": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Number of context lines to show in diffs (1-10)"
+        },
+        "gitHistory.showSignatures": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show GPG signature verification status for signed commits"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "webpack --mode production && npm run compile-tests",
+    "compile-tests": "tsc -p test/tsconfig.json",
+    "watch": "webpack --mode development --watch",
+    "test": "node ./out/test/runTest.js",
+    "screenshot": "npm run compile-tests && node ./out/test/runScreenshot.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.5",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.3.9",
+    "copy-webpack-plugin": "^12.0.2",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "diff2html": "^3.4.47"
+  }
+}

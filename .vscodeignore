@@ -1,0 +1,64 @@
+# Editor & workspace
+.vscode/**
+.vscode-test/**
+*.code-workspace
+
+# Source control & CI
+.git/**
+.github/**
+.gitea/**
+.claude/**
+
+# TypeScript sources (shipped as dist/)
+src/**
+test/**
+**/*.ts
+
+# Build & test output
+out/**
+webview-dist/**
+screenshots/**
+**/*.map
+
+# Dependencies
+node_modules/**
+.yarn/**
+package-lock.json
+npm-shrinkwrap.json
+yarn.lock
+.yarnrc
+.yarnrc.yml
+
+# Tooling & config
+.gitignore
+.gitattributes
+.cursorignore
+.editorconfig
+**/tsconfig.json
+**/.eslintrc.json
+**/.prettierrc*
+webpack.config.js
+Makefile
+
+# Internal / developer documentation
+ARCHITECTURE.md
+CLAUDE.md
+FEATURES.md
+USAGE.md
+CONFIGURATION.md
+PLAN*.md
+docs/superpowers/**
+
+# Artifacts & logs
+*.vsix
+*.log
+*.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Browser / screenshot tooling
+.playwright-cli/**
+.playwright-mcp/**
