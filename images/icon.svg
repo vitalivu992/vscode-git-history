@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#283041"/>
+      <stop offset="1" stop-color="#141925"/>
+    </linearGradient>
+    <linearGradient id="sel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="1024" height="1024" rx="180" fill="url(#bg)"/>
+
+  <!-- commit graph rail -->
+  <line x1="128" y1="190" x2="128" y2="858" stroke="#f05032" stroke-width="22" stroke-linecap="round"/>
+
+  <!-- connector from rail to the selection -->
+  <line x1="128" y1="574" x2="262" y2="574" stroke="#f05032" stroke-width="22" stroke-linecap="round"/>
+
+  <!-- commit dots: hollow = older/newer, solid = the commit that touched the selection -->
+  <circle cx="128" cy="206" r="46" fill="#141925" stroke="#f05032" stroke-width="22"/>
+  <circle cx="128" cy="574" r="52" fill="#f05032"/>
+  <circle cx="128" cy="842" r="46" fill="#141925" stroke="#f05032" stroke-width="22"/>
+
+  <!-- selection band -->
+  <rect x="262" y="428" width="638" height="292" rx="40" fill="url(#sel)"/>
+
+  <!-- code lines (unselected) -->
+  <rect x="302" y="180"  width="380" height="52" rx="26" fill="#4a5568"/>
+  <rect x="302" y="272"  width="540" height="52" rx="26" fill="#3d4756"/>
+  <rect x="302" y="364"  width="440" height="52" rx="26" fill="#3d4756"/>
+
+  <!-- code lines (selected) -->
+  <rect x="302" y="456" width="500" height="44" rx="22" fill="#dbeafe"/>
+  <rect x="302" y="548" width="360" height="44" rx="22" fill="#dbeafe"/>
+  <rect x="302" y="640" width="440" height="44" rx="22" fill="#dbeafe"/>
+
+  <!-- code lines (below selection) -->
+  <rect x="302" y="732"  width="560" height="52" rx="26" fill="#3d4756"/>
+  <rect x="302" y="824"  width="400" height="52" rx="26" fill="#4a5568"/>
+
+  <!-- text cursor at end of selection -->
+  <rect x="766" y="636" width="14" height="52" rx="7" fill="#ffffff"/>
+</svg>
