@@ -42,7 +42,7 @@ suite('WebviewProvider HTML Tests', () => {
         <button id="side-by-side-btn">Side by Side</button>
       </div>
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
-      <button id="sort-btn" class="sort-btn" title="Sort: Newest first (click to toggle)">&#x2193; Newest</button>
+      <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
       <button id="refresh-btn" title="Refresh (F5 or Ctrl+Shift+R)">&#x21bb;</button>
     </div>
@@ -332,17 +332,17 @@ suite('Word Wrap Button in WebviewProvider HTML Tests', () => {
     assert.ok(source.includes('id="word-wrap-btn"'), 'webviewProvider HTML should have word-wrap-btn');
   });
 
-  test('webviewProvider word-wrap-btn should come before sort-btn', () => {
+  test('webviewProvider word-wrap-btn comes before merge-toggle-btn', () => {
     const fs = require('fs');
     const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
     const wordWrapIdx = source.indexOf('id="word-wrap-btn"');
-    const sortBtnIdx = source.indexOf('id="sort-btn"');
+    const mergeToggleIdx = source.indexOf('id="merge-toggle-btn"');
 
     assert.ok(wordWrapIdx > 0, 'word-wrap-btn should exist');
-    assert.ok(sortBtnIdx > 0, 'sort-btn should exist');
-    assert.ok(wordWrapIdx < sortBtnIdx, 'word-wrap-btn should come before sort-btn');
+    assert.ok(mergeToggleIdx > 0, 'merge-toggle-btn should exist');
+    assert.ok(wordWrapIdx < mergeToggleIdx, 'word-wrap-btn should come before merge-toggle-btn');
   });
 
   test('webviewProvider and index.html should both have word-wrap-btn', () => {

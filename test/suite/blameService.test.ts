@@ -125,3 +125,26 @@ suite('formatRelativeTime Tests', () => {
     assert.strictEqual(formatRelativeTime(now - 63072000), '2 years ago');
   });
 });
+
+suite('Blame Decoration Label Tests', () => {
+  test('blame decoration label should include short hash', () => {
+    const blameServicePath = path.resolve(__dirname, '../../../src/blame/blameService.ts');
+    const source = fs.readFileSync(blameServicePath, 'utf-8');
+
+    const labelLine = source.split('\n').find(line => line.includes('label ='));
+    assert.ok(labelLine, 'Should find label assignment in blameService.ts');
+    assert.ok(labelLine.includes('shortHash'), 'Blame label should include shortHash');
+  });
+
+  test('blame decoration label should include author and date', () => {
+    const blameServicePath = path.resolve(__dirname, '../../../src/blame/blameService.ts');
+    const source = fs.readFileSync(blameServicePath, 'utf-8');
+
+    const labelSection = source.substring(
+      source.indexOf('const label ='),
+      source.indexOf('const range =')
+    );
+    assert.ok(labelSection.includes('author'), 'Blame label should include author');
+    assert.ok(labelSection.includes('dateStr'), 'Blame label should include dateStr');
+  });
+});

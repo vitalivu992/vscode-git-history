@@ -55,3 +55,6 @@ ehthumbs.db
 tmp/
 temp/
 public-repo/
+
+# Kilo AI config
+.kilo/

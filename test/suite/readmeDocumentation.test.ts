@@ -119,7 +119,7 @@ suite('README Documentation Comprehensive Tests', () => {
     });
 
     test('CONFIGURATION.md documents the surviving settings and not the removed graph setting', () => {
-      for (const setting of ['gitHistory.maxCommits', 'gitHistory.hideMergeCommits', 'gitHistory.showSignatures']) {
+      for (const setting of ['gitHistory.maxCommits', 'gitHistory.hideMergeCommits', 'gitHistory.sprintLengthWeeks']) {
         assert.ok(configurationContent.includes(setting),
           `CONFIGURATION.md should document ${setting}`);
       }

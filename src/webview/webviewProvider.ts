@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { getFileHistory, getSelectionHistory, getRepositoryHistory, getCurrentBranch, getAllBranches, getCurrentGitUser } from '../git/gitService';
-import { CommitInfo } from '../types';
+import { CommitInfo, ExtToWebviewMessage } from '../types';
 import { handleMessage } from './messageHandler';
 import { SettingsService } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -202,6 +202,9 @@ export class GitHistoryPanel {
         }
 
         this._commits = commits;
+        const pageSize = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
+        const hasMore = commits.length >= pageSize;
+        const sprintLengthWeeks = vscode.workspace.getConfiguration('gitHistory').get<number>('sprintLengthWeeks', 2);
         const hideMergeCommits = vscode.workspace.getConfiguration('gitHistory').get<boolean>('hideMergeCommits', false);
         const defaultDiffView = vscode.workspace.getConfiguration('gitHistory').get<string>('defaultDiffView', 'unified');
         const diffContextLines = vscode.workspace.getConfiguration('gitHistory').get<number>('diffContextLines', 3);
@@ -219,10 +222,13 @@ export class GitHistoryPanel {
         if (userSettings.ignoreWhitespace !== undefined) {
           this._ignoreWhitespace = userSettings.ignoreWhitespace;
         }
+        if (userSettings.diffContextLines !== undefined) {
+          this._diffContextLines = userSettings.diffContextLines;
+        }
 
         const showFirstRunTip = this._firstRunTipService.shouldShowTip();
 
-        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, commitListDateFormat, userSettings, currentUser, showFirstRunTip });
+        this.postMessage({ type: 'init', commits: this._commits, filePath: this._filePath, selection: this._selection, branch, branches, hideMergeCommits, defaultDiffView, commitListDateFormat, userSettings, currentUser, showFirstRunTip, sprintLengthWeeks, hasMore, pageSize });
       } catch (error) {
         this.postMessage({
           type: 'error',
@@ -238,6 +244,35 @@ export class GitHistoryPanel {
     }
   }
 
+  public async loadMoreCommits(): Promise<void> {
+    const pageSize = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
+    const skip = this._commits.length;
+    try {
+      let newCommits: CommitInfo[];
+      if (this._selection) {
+        newCommits = await getSelectionHistory(this._filePath, this._selection.startLine, this._selection.endLine, this._cwd, skip, pageSize);
+      } else if (this._filePath) {
+        newCommits = await getFileHistory(this._filePath, this._cwd, skip, pageSize);
+      } else {
+        newCommits = await getRepositoryHistory(this._cwd, undefined, skip, pageSize);
+      }
+      const existingHashes = new Set(this._commits.map(c => c.hash));
+      const deduped = newCommits.filter(c => !existingHashes.has(c.hash));
+      this._commits.push(...deduped);
+      this.postMessage({
+        type: 'commitsLoaded',
+        commits: deduped,
+        totalLoaded: this._commits.length,
+        hasMore: newCommits.length >= pageSize
+      });
+    } catch (error) {
+      this.postMessage({
+        type: 'error',
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
   public postMessage(message: any): void {
     void this._panel.webview.postMessage(message);
   }
@@ -250,6 +285,7 @@ export class GitHistoryPanel {
     const diff2htmlJsUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'diff2html-ui.min.js'));
     const mainJsUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'main.js'));
 
+    const sprintLengthWeeks = vscode.workspace.getConfiguration('gitHistory').get<number>('sprintLengthWeeks', 2);
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -268,13 +304,11 @@ export class GitHistoryPanel {
         <button id="side-by-side-btn">Side by Side</button>
       </div>
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
-      <button id="ignore-ws-btn" class="ignore-ws-btn" title="Toggle ignore whitespace (Ctrl+Shift+J)">W</button>
+      <button id="ignore-ws-btn" class="ignore-ws-btn" title="Toggle ignore whitespace (Ctrl+Shift+Alt+J)">W</button>
       <button id="context-lines-btn" class="context-lines-btn" title="Diff context lines (Ctrl+Shift+/)">
         <span id="context-lines-value">3</span>
       </button>
-      <button id="sort-btn" class="sort-btn" title="Sort: Newest first (Ctrl+Shift+3 to cycle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits (Ctrl+Shift+Q)">No Merge</button>
-      <button id="signatures-toggle-btn" class="signatures-toggle-btn active" title="GPG signatures visible (Ctrl+Shift+Alt+S to toggle)">Signatures</button>
       <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>
       <button id="refresh-btn" title="Refresh (F5 or Ctrl+Shift+R)">&#x21bb;</button>
     </div>
@@ -286,14 +320,13 @@ export class GitHistoryPanel {
       <div id="bottom-panel">
         <div id="commit-table-container">
           <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | path:name | after:2024-01-01 | last:7days">
+            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | path:name | after:2024-01-01 | last:2weeks">
             <button id="regex-toggle-btn" class="regex-toggle-btn" title="Toggle regex search mode (Ctrl+Shift+X)">.*</button>
             <button id="diff-search-btn" class="diff-search-btn" title="Search within diff content">🔍 diff</button>
             <button id="clear-all-filters-btn" class="clear-all-filters-btn" title="Clear all filters (Ctrl+Alt+Q)">Clear All</button>
             <div class="date-filter-buttons">
-              <button id="today-filter-btn" class="date-filter-btn" title="Show commits from today (last:1day)">Today</button>
-              <button id="this-week-filter-btn" class="date-filter-btn" title="Show commits from this week (last:7days)">Week</button>
-              <button id="this-month-filter-btn" class="date-filter-btn" title="Show commits from this month (last:1month)">Month</button>
+              <button id="today-filter-btn" class="date-filter-btn" title="Show commits from the last 24 hours (last:1day)">Today</button>
+              <button id="sprint-filter-btn" class="date-filter-btn" title="Show commits from the last N weeks (last:Nweeks)">Last ${sprintLengthWeeks} week${sprintLengthWeeks !== 1 ? 's' : ''}</button>
             </div>
             <div id="commit-count" class="commit-count"></div>
           </div>
@@ -301,8 +334,8 @@ export class GitHistoryPanel {
             <thead>
               <tr>
                 <th class="hash-col">Hash</th>
-                <th class="author-col">Author</th>
-                <th class="date-col">Date</th>
+                <th class="author-col sortable" data-sort="author">Author</th>
+                <th class="date-col sortable" data-sort="date">Date</th>
                 <th class="message-col">Message</th>
               </tr>
             </thead>

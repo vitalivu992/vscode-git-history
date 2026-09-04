@@ -16,13 +16,11 @@
         <button id="side-by-side-btn">Side by Side</button>
       </div>
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
-      <button id="ignore-ws-btn" class="ignore-ws-btn" title="Toggle ignore whitespace (Ctrl+Shift+J)">W</button>
+      <button id="ignore-ws-btn" class="ignore-ws-btn" title="Toggle ignore whitespace (Ctrl+Shift+Alt+J)">W</button>
       <button id="context-lines-btn" class="context-lines-btn" title="Diff context lines (Ctrl+Shift+/)">
         <span id="context-lines-value">3</span>
       </button>
-      <button id="sort-btn" class="sort-btn" title="Sort: Newest first (Ctrl+Shift+3 to cycle)">&#x2193; Newest</button>
       <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits (Ctrl+Shift+Q)">No Merge</button>
-      <button id="signatures-toggle-btn" class="signatures-toggle-btn active" title="GPG signatures visible (Ctrl+Shift+Alt+S to toggle)">Signatures</button>
       <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>
       <button id="refresh-btn" title="Refresh (F5 or Ctrl+Shift+R)">&#x21bb;</button>
     </div>
@@ -34,13 +32,12 @@
       <div id="bottom-panel">
         <div id="commit-table-container">
           <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | path:name | after:2024-01-01 | last:7days">
+            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | path:name | after:2024-01-01 | last:2weeks">
             <button id="regex-toggle-btn" class="regex-toggle-btn" title="Toggle regex search mode (Ctrl+Shift+X)">.*</button>
             <button id="clear-all-filters-btn" class="clear-all-filters-btn" title="Clear all filters (Ctrl+Alt+Q)">Clear All</button>
             <div class="date-filter-buttons">
-              <button id="today-filter-btn" class="date-filter-btn" title="Show commits from today (last:1day)">Today</button>
-              <button id="this-week-filter-btn" class="date-filter-btn" title="Show commits from this week (last:7days)">Week</button>
-              <button id="this-month-filter-btn" class="date-filter-btn" title="Show commits from this month (last:1month)">Month</button>
+              <button id="today-filter-btn" class="date-filter-btn" title="Show commits from the last 24 hours (last:1day)">Today</button>
+              <button id="sprint-filter-btn" class="date-filter-btn" title="Show commits from the last weeks (last:Nweeks)">Last 2 weeks</button>
             </div>
             <div id="commit-count" class="commit-count"></div>
           </div>
@@ -48,8 +45,8 @@
             <thead>
               <tr>
                 <th class="hash-col">Hash</th>
-                <th class="author-col">Author</th>
-                <th class="date-col">Date</th>
+                <th class="author-col sortable" data-sort="author">Author</th>
+                <th class="date-col sortable" data-sort="date">Date</th>
                 <th class="message-col">Message</th>
               </tr>
             </thead>

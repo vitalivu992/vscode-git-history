@@ -186,7 +186,7 @@ suite('HTML Parity Tests', () => {
 
     const toolbarButtonIds = [
       'unified-btn', 'side-by-side-btn',
-      'word-wrap-btn', 'sort-btn', 'merge-toggle-btn', 'refresh-btn'
+      'word-wrap-btn', 'merge-toggle-btn', 'refresh-btn'
     ];
 
     for (const id of toolbarButtonIds) {

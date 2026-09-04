@@ -17,8 +17,8 @@ function simulateIgnoreWhitespaceToggle(initialState: boolean): { newState: bool
   }
 
   const buttonTitle = ignoreWhitespace
-    ? 'Ignore whitespace enabled (Ctrl+Shift+J to toggle)'
-    : 'Toggle ignore whitespace (Ctrl+Shift+J)';
+    ? 'Ignore whitespace enabled (Ctrl+Shift+Alt+J to toggle)'
+    : 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
 
   return { newState: ignoreWhitespace, buttonClasses, buttonTitle };
 }
@@ -29,7 +29,7 @@ suite('Ignore Whitespace E2E Logic Tests', () => {
     assert.strictEqual(result.newState, true);
     assert.ok(result.buttonClasses.includes('active'), 'Should add active class to button');
     assert.ok(result.buttonTitle.includes('enabled'), 'Title should indicate enabled state');
-    assert.ok(result.buttonTitle.includes('Ctrl+Shift+J'), 'Title should include shortcut');
+    assert.ok(result.buttonTitle.includes('Ctrl+Shift+Alt+J'), 'Title should include shortcut');
   });
 
   test('toggle from enabled to disabled removes active class', () => {
@@ -37,7 +37,7 @@ suite('Ignore Whitespace E2E Logic Tests', () => {
     assert.strictEqual(result.newState, false);
     assert.ok(!result.buttonClasses.includes('active'), 'Should not have active class on button');
     assert.ok(result.buttonTitle.includes('Toggle'), 'Title should indicate toggle state');
-    assert.ok(result.buttonTitle.includes('Ctrl+Shift+J'), 'Title should include shortcut');
+    assert.ok(result.buttonTitle.includes('Ctrl+Shift+Alt+J'), 'Title should include shortcut');
   });
 
   test('toggling twice returns to initial state', () => {
@@ -75,7 +75,7 @@ suite('Ignore Whitespace E2E Source Integration Tests', () => {
     assert.ok(stylesSource.includes('.ignore-ws-btn.active'), 'styles.css should have active button styling');
   });
 
-  test('keyboard shortcut Ctrl+Shift+J triggers same function as button click', () => {
+  test('keyboard shortcut Ctrl+Shift+Alt+J triggers same function as button click', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
     const kdStart = source.indexOf('function handleKeyDown');

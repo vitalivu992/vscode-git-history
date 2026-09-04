@@ -70,6 +70,10 @@ export async function handleMessage(
       await handleCopyCommitUrl(message.hash, panel);
       break;
 
+    case 'openCommitUrl':
+      await handleOpenCommitUrl(message.hash, panel);
+      break;
+
     case 'copyAuthorEmail':
       handleCopyAuthorEmail(message.hash, panel);
       break;
@@ -118,8 +122,12 @@ export async function handleMessage(
       await handleDiffSearch(message.query, message.commitHashes, panel);
       break;
 
+    case 'loadMoreCommits':
+      await panel.loadMoreCommits();
+      break;
+
     case 'saveSettings':
-      await handleSaveSettings(message.settings, settingsService);
+      await handleSaveSettings(message.settings, settingsService, panel);
       break;
 
     case 'requestBranchHashes':
@@ -160,11 +168,6 @@ export async function handleMessage(
 
     case 'dismissFirstRunTip':
       await handleDismissFirstRunTip(firstRunTipService);
-      break;
-
-    case 'changeDiffContextLines':
-      panel.setDiffContextLines(message.value);
-      await settingsService.saveSettings({ diffContextLines: message.value });
       break;
 
     default:
@@ -527,10 +530,19 @@ async function handleRequestBranchHashes(
 
 async function handleSaveSettings(
   settings: Partial<UserSettings>,
-  settingsService: SettingsService
+  settingsService: SettingsService,
+  panel?: GitHistoryPanel
 ): Promise<void> {
   try {
     await settingsService.saveSettings(settings);
+    if (panel) {
+      if (settings.ignoreWhitespace !== undefined) {
+        panel.setIgnoreWhitespace(settings.ignoreWhitespace);
+      }
+      if (settings.diffContextLines !== undefined) {
+        panel.setDiffContextLines(settings.diffContextLines);
+      }
+    }
   } catch (error) {
     console.error('Failed to save settings:', error);
   }
@@ -576,6 +588,46 @@ async function handleCopyCommitUrl(hash: string, panel: GitHistoryPanel): Promis
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to generate commit URL: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle opening a commit URL in the browser
+ * Generates platform-specific URLs based on git remote
+ */
+async function handleOpenCommitUrl(hash: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const remoteUrl = await getRemoteUrl(cwd);
+
+    if (!remoteUrl) {
+      void vscode.window.showInformationMessage(
+        'No git remote configured. Unable to open commit URL.'
+      );
+      return;
+    }
+
+    const remoteInfo = parseRemoteUrl(remoteUrl);
+    if (!remoteInfo || remoteInfo.platform === 'unknown') {
+      void vscode.window.showInformationMessage(
+        'Unable to detect git platform. Supported: GitHub, GitLab, Bitbucket, Azure DevOps.'
+      );
+      return;
+    }
+
+    const commitUrl = await getCommitUrl(hash, cwd);
+    if (!commitUrl) {
+      void vscode.window.showInformationMessage(
+        'Failed to generate commit URL.'
+      );
+      return;
+    }
+
+    await vscode.env.openExternal(vscode.Uri.parse(commitUrl));
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to open commit URL: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }

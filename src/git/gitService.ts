@@ -42,12 +42,12 @@ async function execGit(args: string[], cwd: string): Promise<string> {
 /**
  * Get git history for a file
  */
-export async function getFileHistory(filePath: string, cwd: string): Promise<CommitInfo[]> {
+export async function getFileHistory(filePath: string, cwd: string, skip: number = 0, limit?: number): Promise<CommitInfo[]> {
   // Resolve filePath against cwd first: when filePath is relative, path.relative
   // would otherwise resolve it against process.cwd() instead of the repo's cwd,
   // producing a bogus path (only correct when process.cwd() === cwd).
   const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
-  const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
+  const maxCommits = limit ?? vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   // Use %x00 as field separator for cleaner parsing
   const format = '%H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n';
@@ -61,6 +61,10 @@ export async function getFileHistory(filePath: string, cwd: string): Promise<Com
     relativePath
   ];
 
+  if (skip > 0) {
+    args.splice(-2, 0, '--skip', skip.toString());
+  }
+
   const output = await execGit(args, cwd);
   const commits = parseGitLog(output);
 
@@ -71,10 +75,13 @@ export async function getFileHistory(filePath: string, cwd: string): Promise<Com
  * Get git history for the entire repository (or a specific branch)
  * Uses the same format as getFileHistory but without a path filter
  */
-export async function getRepositoryHistory(cwd: string, branch?: string): Promise<CommitInfo[]> {
-  const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
+export async function getRepositoryHistory(cwd: string, branch?: string, skip: number = 0, limit?: number): Promise<CommitInfo[]> {
+  const maxCommits = limit ?? vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
   const format = '%H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%b%x00%d%x00%G?%x00%GS%x00---COMMIT-END---%n';
   const args = ['log', `--format=${format}`, '-n', maxCommits.toString()];
+  if (skip > 0) {
+    args.push('--skip', skip.toString());
+  }
   if (branch && branch !== 'HEAD') {
     args.push(branch);
   }
@@ -89,13 +96,12 @@ export async function getSelectionHistory(
   filePath: string,
   startLine: number,
   endLine: number,
-  cwd: string
+  cwd: string,
+  skip: number = 0,
+  limit?: number
 ): Promise<CommitInfo[]> {
-  // Resolve filePath against cwd first: when filePath is relative, path.relative
-  // would otherwise resolve it against process.cwd() instead of the repo's cwd,
-  // producing a bogus path (only correct when process.cwd() === cwd).
   const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
-  const maxCommits = vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
+  const maxCommits = limit ?? vscode.workspace.getConfiguration('gitHistory').get<number>('maxCommits', 500);
 
   const args = [
     'log',
@@ -103,6 +109,10 @@ export async function getSelectionHistory(
     `-L${startLine},${endLine}:${relativePath}`,
     '--format=%H%x00%P%x00%an%x00%ae%x00%cn%x00%ce%x00%at%x00%s%x00%d%x00%G?%x00%GS'
   ];
+
+  if (skip > 0) {
+    args.splice(2, 0, '--skip', skip.toString());
+  }
 
   const output = await execGit(args, cwd);
   return parseLineHistoryLog(output);

@@ -183,14 +183,9 @@ suite('Quick Date Filter Source Verification Tests', () => {
     assert.ok(source.includes("getElementById('today-filter-btn')"), 'main.js should reference today-filter-btn');
   });
 
-  test('main.js references this-week-filter-btn element', () => {
+  test('main.js references sprint-filter-btn element', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
-    assert.ok(source.includes("getElementById('this-week-filter-btn')"), 'main.js should reference this-week-filter-btn');
-  });
-
-  test('main.js references this-month-filter-btn element', () => {
-    const source = fs.readFileSync(mainJsPath, 'utf-8');
-    assert.ok(source.includes("getElementById('this-month-filter-btn')"), 'main.js should reference this-month-filter-btn');
+    assert.ok(source.includes("getElementById('sprint-filter-btn')"), 'main.js should reference sprint-filter-btn');
   });
 
   test('main.js binds click event on today-filter-btn', () => {
@@ -198,14 +193,9 @@ suite('Quick Date Filter Source Verification Tests', () => {
     assert.ok(source.includes("todayFilterBtn.addEventListener"), 'main.js should bind event on todayFilterBtn');
   });
 
-  test('main.js binds click event on this-week-filter-btn', () => {
+  test('main.js binds click event on sprint-filter-btn', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
-    assert.ok(source.includes("thisWeekFilterBtn.addEventListener"), 'main.js should bind event on thisWeekFilterBtn');
-  });
-
-  test('main.js binds click event on this-month-filter-btn', () => {
-    const source = fs.readFileSync(mainJsPath, 'utf-8');
-    assert.ok(source.includes("thisMonthFilterBtn.addEventListener"), 'main.js should bind event on thisMonthFilterBtn');
+    assert.ok(source.includes("sprintFilterBtn.addEventListener"), 'main.js should bind event on sprintFilterBtn');
   });
 
   test('applyQuickDateFilter uses last:1day for today', () => {
@@ -213,14 +203,9 @@ suite('Quick Date Filter Source Verification Tests', () => {
     assert.ok(source.includes("applyQuickDateFilter('last:1day')"), 'Today button should use last:1day');
   });
 
-  test('applyQuickDateFilter uses last:7days for week', () => {
+  test('applyQuickDateFilter uses last:2weeks for sprint filter', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
-    assert.ok(source.includes("applyQuickDateFilter('last:7days')"), 'Week button should use last:7days');
-  });
-
-  test('applyQuickDateFilter uses last:1month for month', () => {
-    const source = fs.readFileSync(mainJsPath, 'utf-8');
-    assert.ok(source.includes("applyQuickDateFilter('last:1month')"), 'Month button should use last:1month');
+    assert.ok(source.includes("applyQuickDateFilter(`last:${sprintLengthWeeks}week") || source.includes("applyQuickDateFilter('last:2weeks')"), 'Sprint button should use last:Nweeks');
   });
 
   test('clearAllFilters resets quick date filter buttons', () => {
@@ -256,14 +241,9 @@ suite('Quick Date Filter Source Verification Tests', () => {
     assert.ok(source.includes('id="today-filter-btn"'), 'webviewProvider.ts should include today-filter-btn');
   });
 
-  test('webviewProvider.ts includes this-week-filter-btn', () => {
+  test('webviewProvider.ts includes sprint-filter-btn', () => {
     const source = fs.readFileSync(webviewProviderPath, 'utf-8');
-    assert.ok(source.includes('id="this-week-filter-btn"'), 'webviewProvider.ts should include this-week-filter-btn');
-  });
-
-  test('webviewProvider.ts includes this-month-filter-btn', () => {
-    const source = fs.readFileSync(webviewProviderPath, 'utf-8');
-    assert.ok(source.includes('id="this-month-filter-btn"'), 'webviewProvider.ts should include this-month-filter-btn');
+    assert.ok(source.includes('id="sprint-filter-btn"'), 'webviewProvider.ts should include sprint-filter-btn');
   });
 
   test('webviewProvider.ts includes date-filter-buttons container', () => {
@@ -276,14 +256,9 @@ suite('Quick Date Filter Source Verification Tests', () => {
     assert.ok(source.includes('id="today-filter-btn"'), 'index.html should include today-filter-btn');
   });
 
-  test('index.html includes this-week-filter-btn', () => {
+  test('index.html includes sprint-filter-btn', () => {
     const source = fs.readFileSync(indexPath, 'utf-8');
-    assert.ok(source.includes('id="this-week-filter-btn"'), 'index.html should include this-week-filter-btn');
-  });
-
-  test('index.html includes this-month-filter-btn', () => {
-    const source = fs.readFileSync(indexPath, 'utf-8');
-    assert.ok(source.includes('id="this-month-filter-btn"'), 'index.html should include this-month-filter-btn');
+    assert.ok(source.includes('id="sprint-filter-btn"'), 'index.html should include sprint-filter-btn');
   });
 
   test('styles.css defines date-filter-btn class', () => {

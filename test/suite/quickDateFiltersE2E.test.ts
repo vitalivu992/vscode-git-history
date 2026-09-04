@@ -46,12 +46,8 @@ suite('Quick Date Filters E2E Tests', () => {
         'applyQuickDateFilter should use last:1day filter value for Today button'
       );
       assert.ok(
-        mainJsSource.includes("'last:7days'"),
-        'applyQuickDateFilter should use last:7days filter value for Week button'
-      );
-      assert.ok(
-        mainJsSource.includes("'last:1month'"),
-        'applyQuickDateFilter should use last:1month filter value for Month button'
+        mainJsSource.includes("last:") && mainJsSource.includes("week"),
+        'applyQuickDateFilter should use last:Nweeks filter value for Sprint button'
       );
     });
 
@@ -104,8 +100,8 @@ suite('Quick Date Filters E2E Tests', () => {
 
     test('updateQuickDateFilterButtons removes active class from all buttons', () => {
       assert.ok(
-        mainJsSource.includes('[todayFilterBtn, thisWeekFilterBtn, thisMonthFilterBtn].forEach(btn =>'),
-        'updateQuickDateFilterButtons should iterate over all three filter buttons'
+        mainJsSource.includes('[todayFilterBtn, sprintFilterBtn].forEach(btn =>'),
+        'updateQuickDateFilterButtons should iterate over both filter buttons'
       );
       assert.ok(
         mainJsSource.includes("btn.classList.remove('active')"),
@@ -123,20 +119,12 @@ suite('Quick Date Filters E2E Tests', () => {
         'updateQuickDateFilterButtons should add active class to today button when filter matches'
       );
       assert.ok(
-        mainJsSource.includes("lastFilter === 'last:7days'"),
-        'updateQuickDateFilterButtons should check for last:7days filter'
+        mainJsSource.includes("lastFilter === sprintFilterValue"),
+        'updateQuickDateFilterButtons should check for sprintFilterValue'
       );
       assert.ok(
-        mainJsSource.includes("thisWeekFilterBtn.classList.add('active')"),
-        'updateQuickDateFilterButtons should add active class to week button when filter matches'
-      );
-      assert.ok(
-        mainJsSource.includes("lastFilter === 'last:1month'"),
-        'updateQuickDateFilterButtons should check for last:1month filter'
-      );
-      assert.ok(
-        mainJsSource.includes("thisMonthFilterBtn.classList.add('active')"),
-        'updateQuickDateFilterButtons should add active class to month button when filter matches'
+        mainJsSource.includes("sprintFilterBtn.classList.add('active')"),
+        'updateQuickDateFilterButtons should add active class to sprint button when filter matches'
       );
     });
   });
@@ -149,17 +137,10 @@ suite('Quick Date Filters E2E Tests', () => {
       );
     });
 
-    test('main.js should declare thisWeekFilterBtn element reference', () => {
+    test('main.js should declare sprintFilterBtn element reference', () => {
       assert.ok(
-        mainJsSource.includes("const thisWeekFilterBtn = document.getElementById('this-week-filter-btn')"),
-        'main.js should get reference to this-week-filter-btn element'
-      );
-    });
-
-    test('main.js should declare thisMonthFilterBtn element reference', () => {
-      assert.ok(
-        mainJsSource.includes("const thisMonthFilterBtn = document.getElementById('this-month-filter-btn')"),
-        'main.js should get reference to this-month-filter-btn element'
+        mainJsSource.includes("const sprintFilterBtn = document.getElementById('sprint-filter-btn')"),
+        'main.js should get reference to sprint-filter-btn element'
       );
     });
 
@@ -171,19 +152,11 @@ suite('Quick Date Filters E2E Tests', () => {
       );
     });
 
-    test('week filter button has click event listener calling applyQuickDateFilter', () => {
+    test('sprint filter button has click event listener calling applyQuickDateFilter', () => {
       assert.ok(
-        mainJsSource.includes("thisWeekFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:7days'))") ||
-        mainJsSource.includes("thisWeekFilterBtn.addEventListener('click',function(){applyQuickDateFilter('last:7days')})"),
-        'week filter button should call applyQuickDateFilter with last:7days on click'
-      );
-    });
-
-    test('month filter button has click event listener calling applyQuickDateFilter', () => {
-      assert.ok(
-        mainJsSource.includes("thisMonthFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:1month'))") ||
-        mainJsSource.includes("thisMonthFilterBtn.addEventListener('click',function(){applyQuickDateFilter('last:1month')})"),
-        'month filter button should call applyQuickDateFilter with last:1month on click'
+        mainJsSource.includes("sprintFilterBtn.addEventListener('click', () => applyQuickDateFilter(") ||
+        mainJsSource.includes("sprintFilterBtn.addEventListener('click',function(){applyQuickDateFilter("),
+        'sprint filter button should call applyQuickDateFilter with sprint filter value on click'
       );
     });
   });
@@ -301,21 +274,12 @@ suite('Quick Date Filters E2E Tests', () => {
       );
     });
 
-    test('index.html should have this-week-filter-btn element', () => {
+    test('index.html should have sprint-filter-btn element', () => {
       const indexHtmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
       const indexHtmlSource = fs.readFileSync(indexHtmlPath, 'utf-8');
       assert.ok(
-        indexHtmlSource.includes('id="this-week-filter-btn"'),
-        'index.html should have this-week-filter-btn element'
-      );
-    });
-
-    test('index.html should have this-month-filter-btn element', () => {
-      const indexHtmlPath = path.resolve(__dirname, '../../../src/webview/panel/index.html');
-      const indexHtmlSource = fs.readFileSync(indexHtmlPath, 'utf-8');
-      assert.ok(
-        indexHtmlSource.includes('id="this-month-filter-btn"'),
-        'index.html should have this-month-filter-btn element'
+        indexHtmlSource.includes('id="sprint-filter-btn"'),
+        'index.html should have sprint-filter-btn element'
       );
     });
 
@@ -323,9 +287,9 @@ suite('Quick Date Filters E2E Tests', () => {
       const webviewProviderPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
       const webviewProviderSource = fs.readFileSync(webviewProviderPath, 'utf-8');
       assert.ok(
-        webviewProviderSource.includes('today-filter-btn') ||
-        webviewProviderSource.includes('id="today-filter-btn"'),
-        'webviewProvider.ts should have today-filter-btn for dev-mode parity'
+        webviewProviderSource.includes('sprint-filter-btn') ||
+        webviewProviderSource.includes('id="sprint-filter-btn"'),
+        'webviewProvider.ts should have sprint-filter-btn for dev-mode parity'
       );
     });
   });

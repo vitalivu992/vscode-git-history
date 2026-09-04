@@ -191,22 +191,22 @@ suite('Sort Order Source Verification', () => {
     assert.ok(toggleFn.includes('focusedIndex = -1'), 'handleSortToggle should reset focusedIndex');
   });
 
-  test('webviewProvider should include sort button in HTML', () => {
+  test('webviewProvider should include sortable table headers in HTML', () => {
     const fs = require('fs');
     const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
-    assert.ok(source.includes('id="sort-btn"'), 'HTML should include sort button');
-    assert.ok(source.includes('sort-btn'), 'HTML should have sort-btn class');
+    assert.ok(source.includes('th.sortable') || source.includes('class="sortable"'), 'HTML should include sortable th');
+    assert.ok(source.includes('sortable'), 'HTML should have sortable class');
   });
 
-  test('styles.css should have sort button styling', () => {
+  test('styles.css should have sortable th styling', () => {
     const fs = require('fs');
     const stylesPath = path.resolve(__dirname, '../../../src/webview/panel/styles.css');
     const source = fs.readFileSync(stylesPath, 'utf-8');
 
-    assert.ok(source.includes('.sort-btn'), 'styles.css should have .sort-btn styling');
-    assert.ok(source.includes('.sort-active'), 'styles.css should have .sort-active styling for toggled state');
+    assert.ok(source.includes('th.sortable'), 'styles.css should have th.sortable styling');
+    assert.ok(source.includes('.sort-asc') || source.includes('.sort-desc'), 'styles.css should have .sort-asc/.sort-desc styling for sort states');
   });
 });
 

@@ -105,27 +105,24 @@ body {
   cursor: not-allowed;
 }
 
-/* Sort toggle button */
-.sort-btn {
-  padding: 4px 10px;
-  background: transparent;
-  border: 1px solid var(--vscode-border-color);
-  border-radius: 4px;
-  color: var(--vscode-editor-foreground);
+/* Sortable table header */
+th.sortable {
   cursor: pointer;
-  font-size: 12px;
-  font-family: var(--vscode-font-family);
-  transition: background-color 0.1s;
+  user-select: none;
 }
 
-.sort-btn:hover {
-  background-color: var(--vscode-list-hoverBackground);
+th.sortable:hover {
+  color: var(--vscode-editor-foreground);
 }
 
-.sort-btn.sort-active {
-  background-color: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border-color: var(--vscode-button-background);
+th.sortable.sort-asc::after {
+  content: ' ▲';
+  font-size: 9px;
+}
+
+th.sortable.sort-desc::after {
+  content: ' ▼';
+  font-size: 9px;
 }
 
 /* Merge toggle button */
@@ -146,29 +143,6 @@ body {
 }
 
 .merge-toggle-btn.active {
-  background-color: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border-color: var(--vscode-button-background);
-}
-
-/* Signatures toggle button */
-.signatures-toggle-btn {
-  padding: 4px 10px;
-  background: transparent;
-  border: 1px solid var(--vscode-border-color);
-  border-radius: 4px;
-  color: var(--vscode-editor-foreground);
-  cursor: pointer;
-  font-size: 12px;
-  font-family: var(--vscode-font-family);
-  transition: background-color 0.1s, border-color 0.1s;
-}
-
-.signatures-toggle-btn:hover {
-  background-color: var(--vscode-list-hoverBackground);
-}
-
-.signatures-toggle-btn.active {
   background-color: var(--vscode-button-background);
   color: var(--vscode-button-foreground);
   border-color: var(--vscode-button-background);
@@ -298,7 +272,8 @@ body {
 
 /* Word wrap state for diff viewer */
 #diff-viewer.word-wrap .d2h-code-line,
-#diff-viewer.word-wrap .d2h-code-side-line {
+#diff-viewer.word-wrap .d2h-code-side-line,
+#diff-viewer.word-wrap .d2h-code-line-ctn {
   white-space: pre-wrap !important;
   word-break: break-all !important;
 }
@@ -1102,6 +1077,14 @@ body {
 }
 
 /* ─── Loading skeleton ────────────────────────────────────────────────────── */
+
+.load-more-row td {
+  border-bottom: none;
+}
+
+#load-more-btn {
+  margin: 0 auto;
+}
 
 @keyframes shimmer {
   0% { background-position: -600px 0; }

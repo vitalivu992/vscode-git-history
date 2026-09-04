@@ -18,8 +18,6 @@ export interface UserSettings {
   ignoreWhitespace: boolean;
   /** Number of context lines in diffs (1-10) */
   diffContextLines: number;
-  /** Whether to show GPG signature verification badges */
-  showSignatures: boolean;
   /** Saved search query for persistence across sessions */
   searchQuery: string;
 }
@@ -36,7 +34,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
   showMyCommitsOnly: false,
   ignoreWhitespace: false,
   diffContextLines: 3,
-  showSignatures: true,
   searchQuery: ''
 };
 

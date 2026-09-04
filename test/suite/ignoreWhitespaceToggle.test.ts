@@ -76,16 +76,16 @@ suite('Ignore Whitespace Toggle Tests', () => {
     assert.ok(toggleFn.includes('ignoreWhitespace'), 'saveSettings should include ignoreWhitespace');
   });
 
-  test('main.js should handle Ctrl+Shift+J keyboard shortcut', () => {
+  test('main.js should handle Ctrl+Shift+Alt+J keyboard shortcut', () => {
     const fs = require('fs');
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
-    assert.ok(source.includes("e.key === 'j'") && source.includes('ctrlKey') && source.includes('shiftKey'),
-      'main.js should handle Ctrl+Shift+J keyboard shortcut');
+    assert.ok(source.includes("e.key === 'j'") && source.includes('ctrlKey') && source.includes('shiftKey') && source.includes('altKey'),
+      'main.js should handle Ctrl+Shift+Alt+J keyboard shortcut');
   });
 
-  test('main.js should call handleIgnoreWhitespaceToggle on Ctrl+Shift+J', () => {
+  test('main.js should call handleIgnoreWhitespaceToggle on Ctrl+Shift+Alt+J', () => {
     const fs = require('fs');
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
@@ -93,7 +93,7 @@ suite('Ignore Whitespace Toggle Tests', () => {
     const shortcutIndex = source.indexOf("e.key === 'j'");
     const context = source.substring(shortcutIndex - 100, shortcutIndex + 150);
 
-    assert.ok(context.includes('handleIgnoreWhitespaceToggle'), 'Ctrl+Shift+J should call handleIgnoreWhitespaceToggle');
+    assert.ok(context.includes('handleIgnoreWhitespaceToggle'), 'Ctrl+Shift+Alt+J should call handleIgnoreWhitespaceToggle');
   });
 
   test('webviewProvider HTML should have ignore-ws-btn button', () => {
@@ -120,12 +120,12 @@ suite('Ignore Whitespace Toggle Tests', () => {
     assert.ok(source.includes('class="ignore-ws-btn"'), 'webviewProvider HTML should have ignore-ws-btn class on button');
   });
 
-  test('webviewProvider HTML ignore-ws-btn title should mention Ctrl+Shift+J', () => {
+  test('webviewProvider HTML ignore-ws-btn title should mention Ctrl+Shift+Alt+J', () => {
     const fs = require('fs');
     const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
-    assert.ok(source.includes('Toggle ignore whitespace (Ctrl+Shift+J)'), 'webviewProvider HTML should mention Ctrl+Shift+J in ignore-ws-btn title');
+    assert.ok(source.includes('Toggle ignore whitespace (Ctrl+Shift+Alt+J)'), 'webviewProvider HTML should mention Ctrl+Shift+Alt+J in ignore-ws-btn title');
   });
 
   test('webviewProvider HTML ignore-ws-btn should be in diff-controls toolbar', () => {
@@ -201,7 +201,7 @@ suite('Ignore Whitespace Toggle Tests', () => {
     const toggleEnd = source.indexOf('\nfunction', toggleStart + 1);
     const toggleFn = source.substring(toggleStart, toggleEnd > toggleStart ? toggleEnd : undefined);
 
-    assert.ok(toggleFn.includes('Ctrl+Shift+J'), 'handleIgnoreWhitespaceToggle title should mention Ctrl+Shift+J');
+    assert.ok(toggleFn.includes('Ctrl+Shift+Alt+J'), 'handleIgnoreWhitespaceToggle title should mention Ctrl+Shift+Alt+J');
   });
 
   test('settingsTypes.ts should include ignoreWhitespace in UserSettings', () => {

@@ -58,14 +58,14 @@ suite('Cycle Sort Mode Shortcut E2E Test Suite', () => {
       'handleSortToggle should cycle through 4 sort modes');
   });
 
-  test('sort button click handler is attached', () => {
+  test('sortable th click handler is attached via thead delegation', () => {
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
-    // Verify sort button has click listener
-    assert.ok(source.includes("sortBtn.addEventListener('click', handleSortToggle)") ||
-               source.includes('sortBtn.addEventListener("click", handleSortToggle)'),
-      'sort button should have click handler for handleSortToggle');
+    // Verify thead click delegation for sortable columns
+    assert.ok(source.includes("e.target.closest('th.sortable')") ||
+               source.includes('e.target.closest("th.sortable")'),
+      'thead should delegate click to th.sortable');
   });
 
   test('sort button updates label based on sortMode', () => {

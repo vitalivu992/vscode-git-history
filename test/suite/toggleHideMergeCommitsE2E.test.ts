@@ -158,7 +158,7 @@ suite('Toggle Hide Merge Commits E2E Source Integration Tests', () => {
     const indexSource = fs.readFileSync(indexPath, 'utf-8');
 
     const getButtonOrder = (source: string): string[] => {
-      const buttons = ['word-wrap-btn', 'sort-btn', 'merge-toggle-btn', 'refresh-btn'];
+      const buttons = ['word-wrap-btn', 'merge-toggle-btn', 'refresh-btn'];
       return buttons.filter(btn => {
         const idx = source.indexOf(`id="${btn}"`);
         return idx >= 0;

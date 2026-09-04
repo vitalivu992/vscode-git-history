@@ -28,10 +28,14 @@ let ignoreWhitespace = false; // Ignore whitespace in diffs
 let diffContextLines = 3; // Number of context lines in diffs (1-10)
 let commitFilesMap = new Map(); // hash -> CommitFileChange[]
 let firstRunTipVisible = false; // First-run tip banner visibility state
-let showSignatures = true; // Show GPG signature verification badges
+
 let diffSearchHashes = null; // null = not searching, string[] = matching hashes
 let diffSearchQuery = ''; // Current diff search query string
 let commitListDateFormat = 'relative'; // Commit list date format: 'relative' | 'short' | 'iso'
+let sprintLengthWeeks = 2; // Default sprint length for the sprint filter button
+let hasMoreCommits = false;
+let isLoadingMore = false;
+let pageSize = 500;
 
 /**
  * Parse filters from search query
@@ -217,15 +221,14 @@ function handleDiffSearchClick() {
 
 function updateQuickDateFilterButtons() {
   const { lastFilter } = parseDateFilter(searchQuery);
-  [todayFilterBtn, thisWeekFilterBtn, thisMonthFilterBtn].forEach(btn => {
+  const sprintFilterValue = `last:${sprintLengthWeeks}week${sprintLengthWeeks !== 1 ? 's' : ''}`;
+  [todayFilterBtn, sprintFilterBtn].forEach(btn => {
     if (btn) btn.classList.remove('active');
   });
   if (lastFilter === 'last:1day' && todayFilterBtn) {
     todayFilterBtn.classList.add('active');
-  } else if (lastFilter === 'last:7days' && thisWeekFilterBtn) {
-    thisWeekFilterBtn.classList.add('active');
-  } else if (lastFilter === 'last:1month' && thisMonthFilterBtn) {
-    thisMonthFilterBtn.classList.add('active');
+  } else if (lastFilter === sprintFilterValue && sprintFilterBtn) {
+    sprintFilterBtn.classList.add('active');
   }
 }
 
@@ -404,7 +407,6 @@ const sideBySideBtn = document.getElementById('side-by-side-btn');
 const fileList = document.getElementById('file-list');
 const searchInput = document.getElementById('search-input');
 const refreshBtn = document.getElementById('refresh-btn');
-const sortBtn = document.getElementById('sort-btn');
 const wordWrapBtn = document.getElementById('word-wrap-btn');
 const ignoreWsBtn = document.getElementById('ignore-ws-btn');
 const contextLinesBtn = document.getElementById('context-lines-btn');
@@ -414,8 +416,7 @@ const myCommitsBtn = document.getElementById('my-commits-btn');
 const commitCountEl = document.getElementById('commit-count');
 const clearAllFiltersBtn = document.getElementById('clear-all-filters-btn');
 const todayFilterBtn = document.getElementById('today-filter-btn');
-const thisWeekFilterBtn = document.getElementById('this-week-filter-btn');
-const thisMonthFilterBtn = document.getElementById('this-month-filter-btn');
+const sprintFilterBtn = document.getElementById('sprint-filter-btn');
 
 let isRefreshing = false;
 
@@ -517,6 +518,13 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Shift+Alt+L: Open commit URL in browser
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && e.key === 'l') {
+    e.preventDefault();
+    handleOpenUrl();
+    return;
+  }
+
   // Ctrl+Alt+S: Show branch picker
   if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 's') {
     e.preventDefault();
@@ -547,8 +555,8 @@ function handleKeyDown(e) {
     return;
   }
 
-  // Ctrl+Shift+J: Toggle ignore whitespace
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'j') {
+  // Ctrl+Shift+Alt+J: Toggle ignore whitespace
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && e.key === 'j') {
     e.preventDefault();
     handleIgnoreWhitespaceToggle();
     return;
@@ -834,39 +842,43 @@ function getOrderedCommits(filteredCommits) {
   return sorted;
 }
 
-function updateSortButton() {
-  if (!sortBtn) return;
+function updateSortHeaders() {
+  const dateHeader = document.querySelector('th.sortable[data-sort="date"]');
+  const authorHeader = document.querySelector('th.sortable[data-sort="author"]');
+  [dateHeader, authorHeader].forEach(th => { if (th) th.classList.remove('sort-asc', 'sort-desc'); });
   switch (sortMode) {
     case 0:
-      sortBtn.innerHTML = '&#x2193; Newest';
-      sortBtn.title = 'Sort: Newest first (Ctrl+Shift+3 to cycle)';
-      sortBtn.classList.remove('sort-active');
+      if (dateHeader) { dateHeader.classList.add('sort-desc'); dateHeader.title = 'Sort: Newest first (click to toggle)'; }
       break;
     case 1:
-      sortBtn.innerHTML = '&#x2191; Oldest';
-      sortBtn.title = 'Sort: Oldest first (Ctrl+Shift+3 to cycle)';
-      sortBtn.classList.add('sort-active');
+      if (dateHeader) { dateHeader.classList.add('sort-asc'); dateHeader.title = 'Sort: Oldest first (click to toggle)'; }
       break;
     case 2:
-      sortBtn.innerHTML = 'A&#x2192;Z Author';
-      sortBtn.title = 'Sort: Author A-Z (Ctrl+Shift+3 to cycle)';
-      sortBtn.classList.add('sort-active');
+      if (authorHeader) { authorHeader.classList.add('sort-asc'); authorHeader.title = 'Sort: Author A-Z (click to toggle)'; }
       break;
     case 3:
-      sortBtn.innerHTML = 'Z&#x2192;A Author';
-      sortBtn.title = 'Sort: Author Z-A (Ctrl+Shift+3 to cycle)';
-      sortBtn.classList.add('sort-active');
+      if (authorHeader) { authorHeader.classList.add('sort-desc'); authorHeader.title = 'Sort: Author Z-A (click to toggle)'; }
       break;
   }
 }
 
-function handleSortToggle() {
-  sortMode = (sortMode + 1) % 4;
-  updateSortButton();
+function handleSortClick(column) {
+  if (column === 'date') {
+    sortMode = sortMode === 0 ? 1 : 0;
+  } else if (column === 'author') {
+    sortMode = sortMode === 2 ? 3 : 2;
+  }
+  updateSortHeaders();
   focusedIndex = -1;
   renderCommits();
+  vscode.postMessage({ type: 'saveSettings', settings: { sortMode } });
+}
 
-  // Persist the setting
+function handleSortToggle() {
+  sortMode = (sortMode + 1) % 4;
+  updateSortHeaders();
+  focusedIndex = -1;
+  renderCommits();
   vscode.postMessage({ type: 'saveSettings', settings: { sortMode } });
 }
 
@@ -911,23 +923,6 @@ function handleWordWrapToggle() {
 
   // Persist the setting
   vscode.postMessage({ type: 'saveSettings', settings: { wordWrapEnabled } });
-}
-
-function handleToggleSignatures() {
-  showSignatures = !showSignatures;
-  const signaturesToggleBtn = document.getElementById('signatures-toggle-btn');
-  if (signaturesToggleBtn) {
-    if (showSignatures) {
-      signaturesToggleBtn.classList.add('active');
-      signaturesToggleBtn.title = 'GPG signatures visible (Ctrl+Shift+Alt+S to toggle)';
-    } else {
-      signaturesToggleBtn.classList.remove('active');
-      signaturesToggleBtn.title = 'Show GPG signatures (Ctrl+Shift+Alt+S)';
-    }
-  }
-  renderCommits();
-  // Persist the setting
-  vscode.postMessage({ type: 'saveSettings', settings: { showSignatures } });
 }
 
 /**
@@ -1006,10 +1001,10 @@ function handleIgnoreWhitespaceToggle() {
   if (ignoreWsBtn) {
     if (ignoreWhitespace) {
       ignoreWsBtn.classList.add('active');
-      ignoreWsBtn.title = 'Ignore whitespace enabled (Ctrl+Shift+J to toggle)';
-    } else {
-      ignoreWsBtn.classList.remove('active');
-      ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+J)';
+ignoreWsBtn.title = 'Ignore whitespace enabled (Ctrl+Shift+Alt+J to toggle)';
+          } else {
+            ignoreWsBtn.classList.remove('active');
+            ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
     }
   }
 
@@ -1328,10 +1323,6 @@ function init() {
     refreshBtn.addEventListener('click', handleRefresh);
   }
 
-  if (sortBtn) {
-    sortBtn.addEventListener('click', handleSortToggle);
-  }
-
   if (wordWrapBtn) {
     wordWrapBtn.addEventListener('click', handleWordWrapToggle);
   }
@@ -1356,11 +1347,8 @@ function init() {
   if (todayFilterBtn) {
     todayFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:1day'));
   }
-  if (thisWeekFilterBtn) {
-    thisWeekFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:7days'));
-  }
-  if (thisMonthFilterBtn) {
-    thisMonthFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:1month'));
+  if (sprintFilterBtn) {
+    sprintFilterBtn.addEventListener('click', () => applyQuickDateFilter(`last:${sprintLengthWeeks}week${sprintLengthWeeks !== 1 ? 's' : ''}`));
   }
 
   if (ignoreWsBtn) {
@@ -1374,11 +1362,6 @@ function init() {
   if (myCommitsBtn) {
     myCommitsBtn.addEventListener('click', handleMyCommitsToggle);
   }
-  const signaturesToggleBtn = document.getElementById('signatures-toggle-btn');
-  if (signaturesToggleBtn) {
-    signaturesToggleBtn.addEventListener('click', handleToggleSignatures);
-  }
-
   // Keyboard shortcuts
   document.addEventListener('keydown', handleKeyDown);
 
@@ -1427,6 +1410,17 @@ function init() {
   });
 
   initResizers();
+
+  // Sort on table header click
+  const tableHead = document.querySelector('#commit-table thead');
+  if (tableHead) {
+    tableHead.addEventListener('click', (e) => {
+      const th = e.target.closest('th.sortable');
+      if (th) {
+        handleSortClick(th.dataset.sort);
+      }
+    });
+  }
 
   window.addEventListener('message', handleMessage);
 }
@@ -1514,6 +1508,10 @@ function handleMessage(event) {
       currentBranch = message.branch || null;
       currentUser = message.currentUser || null;
       commitListDateFormat = message.commitListDateFormat || 'relative';
+      sprintLengthWeeks = message.sprintLengthWeeks || 2;
+      hasMoreCommits = message.hasMore || false;
+      pageSize = message.pageSize || 500;
+      isLoadingMore = false;
 
       // Apply user settings from persistent storage (overrides defaultDiffView)
       if (message.userSettings) {
@@ -1538,10 +1536,10 @@ function handleMessage(event) {
           }
         }
 
-        // Apply sort mode
+// Apply sort mode
         if (settings.sortMode !== undefined && settings.sortMode !== sortMode) {
           sortMode = settings.sortMode;
-          updateSortButton();
+          updateSortHeaders();
         }
 
         // Apply merge commits filter
@@ -1565,10 +1563,10 @@ function handleMessage(event) {
         if (ignoreWsBtn) {
           if (ignoreWhitespace) {
             ignoreWsBtn.classList.add('active');
-            ignoreWsBtn.title = 'Ignore whitespace enabled (Ctrl+Shift+J to toggle)';
+ignoreWsBtn.title = 'Ignore whitespace enabled (Ctrl+Shift+Alt+J to toggle)';
           } else {
             ignoreWsBtn.classList.remove('active');
-            ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+J)';
+ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
           }
         }
 
@@ -1588,11 +1586,6 @@ function handleMessage(event) {
 
         // Apply my commits only filter
         showMyCommitsOnly = settings.showMyCommitsOnly;
-
-        // Apply signature visibility from persisted settings
-        if (settings.showSignatures !== undefined) {
-          showSignatures = settings.showSignatures;
-        }
 
         renderCommits();
         updateCommitCount();
@@ -1663,6 +1656,22 @@ function handleMessage(event) {
       renderFiles(message.files, selectedFile);
       break;
 
+    case 'commitsLoaded':
+      isLoadingMore = false;
+      if (message.commits && message.commits.length > 0) {
+        const existingHashes = new Set(commits.map(c => c.hash));
+        for (const c of message.commits) {
+          if (!existingHashes.has(c.hash)) {
+            commits.push(c);
+            existingHashes.add(c.hash);
+          }
+        }
+      }
+      hasMoreCommits = message.hasMore;
+      renderCommits();
+      updateCommitCount();
+      break;
+
     case 'combinedDiff':
       currentDiff = message.diff;
       renderDiff(currentDiff);
@@ -1685,6 +1694,7 @@ function handleMessage(event) {
       break;
 
     case 'error':
+      isLoadingMore = false;
       showError(message.message);
       break;
 
@@ -1723,6 +1733,7 @@ function handleMessage(event) {
         case 'copyCherryPick': handleCopyCherryPick(); break;
         case 'copyRevert': handleCopyRevert(); break;
         case 'copyCommitUrl': handleCopyUrl(); break;
+        case 'openCommitUrl': handleOpenUrl(); break;
         case 'copyAuthorEmail': handleCopyAuthorEmail(); break;
         case 'copyAuthorName': handleCopyAuthorName(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
@@ -1740,7 +1751,6 @@ function handleMessage(event) {
         case 'toggleRegex': handleRegexToggle(); break;
         case 'toggleIgnoreWhitespace': handleIgnoreWhitespaceToggle(); break;
         case 'toggleHideMergeCommits': handleMergeToggle(); break;
-        case 'toggleSignatures': handleToggleSignatures(); break;
         case 'jumpToHash': showJumpToHashDialog(); break;
         case 'jumpToNextTag': jumpToNextTag(); break;
         case 'jumpToPreviousTag': jumpToPreviousTag(); break;
@@ -1825,7 +1835,7 @@ function renderCommits() {
 
     const mergeBadge = isMerge ? '<span class="merge-badge">merge</span>' : '';
 
-    const signatureBadge = commit.signature && showSignatures
+    const signatureBadge = commit.signature
       ? `<span class="signature-badge ${commit.signature.verified ? 'verified' : 'unverified'}"
            title="${commit.signature.verified ? 'Verified' : 'Unverified'} signature${commit.signature.signer ? ' by: ' + escapeHtml(commit.signature.signer) : ''}">
            ${commit.signature.verified ? '✓' : '✗'}
@@ -1909,6 +1919,31 @@ function renderCommits() {
 
     commitList.appendChild(tr);
   });
+
+  if (hasMoreCommits) {
+    const loadMoreTr = document.createElement('tr');
+    loadMoreTr.className = 'load-more-row';
+    const loadMoreTd = document.createElement('td');
+    loadMoreTd.colSpan = colspan;
+    loadMoreTd.style.textAlign = 'center';
+    loadMoreTd.style.padding = '12px';
+    const loadMoreBtn = document.createElement('button');
+    loadMoreBtn.id = 'load-more-btn';
+    loadMoreBtn.className = 'date-filter-btn';
+    loadMoreBtn.textContent = isLoadingMore ? 'Loading...' : `Load more`;
+    loadMoreBtn.disabled = isLoadingMore;
+    loadMoreBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isLoadingMore) return;
+      isLoadingMore = true;
+      loadMoreBtn.textContent = 'Loading...';
+      loadMoreBtn.disabled = true;
+      vscode.postMessage({ type: 'loadMoreCommits' });
+    });
+    loadMoreTd.appendChild(loadMoreBtn);
+    loadMoreTr.appendChild(loadMoreTd);
+    commitList.appendChild(loadMoreTr);
+  }
 
   updateFocusedRow();
 }
@@ -2333,6 +2368,10 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">🔗</span>
       <span class="context-menu-label">Copy commit URL</span>
     </div>
+    <div class="context-menu-item" data-action="open-url">
+      <span class="context-menu-icon">🌐</span>
+      <span class="context-menu-label">Open commit URL in browser</span>
+    </div>
     <div class="context-menu-item" data-action="copy-author-email">
       <span class="context-menu-icon">@</span>
       <span class="context-menu-label">Copy author email</span>
@@ -2392,6 +2431,8 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'revertCommit', hash: commit.hash });
       } else if (action === 'copy-url') {
         vscode.postMessage({ type: 'copyCommitUrl', hash: commit.hash });
+      } else if (action === 'open-url') {
+        vscode.postMessage({ type: 'openCommitUrl', hash: commit.hash });
       } else if (action === 'copy-author-email') {
         vscode.postMessage({ type: 'copyAuthorEmail', hash: commit.hash });
       } else if (action === 'copy-author-name') {
@@ -2647,6 +2688,19 @@ function handleCopyUrl() {
     vscode.postMessage({ type: 'copyCommitUrl', hash });
   } else {
     showError('Select a commit to copy its URL');
+  }
+}
+
+function handleOpenUrl() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    const commit = displayCommits[focusedIndex];
+    vscode.postMessage({ type: 'openCommitUrl', hash: commit.hash });
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    vscode.postMessage({ type: 'openCommitUrl', hash });
+  } else {
+    showError('Select a commit to open its URL');
   }
 }
 
@@ -3271,8 +3325,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
         { keys: [cmdKey, 'Shift', 'Alt', 'J'], description: 'Toggle ignore whitespace' },
         { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' },
-        { keys: [cmdKey, 'Shift', '3'], description: 'Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A)' },
-        { keys: [cmdKey, 'Shift', 'Alt', 'S'], description: 'Toggle GPG signatures' }
+        { keys: [cmdKey, 'Shift', '3'], description: 'Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A)' }
       ]
     },
     {
@@ -3283,6 +3336,7 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'P'], description: 'Copy cherry-pick command' },
         { keys: [cmdKey, 'Shift', 'U'], description: 'Copy revert command' },
         { keys: [cmdKey, 'Shift', 'L'], description: 'Copy commit URL' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'L'], description: 'Open commit URL in browser' },
         { keys: [cmdKey, 'Shift', 'A'], description: 'Copy author email' },
         { keys: [cmdKey, 'Shift', 'N'], description: 'Copy author name' },
         { keys: [cmdKey, 'Shift', '7'], description: 'Copy short hash' },

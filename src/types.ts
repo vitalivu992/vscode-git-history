@@ -79,6 +79,7 @@ export type WebviewAction =
   | 'copyCherryPick'
   | 'copyRevert'
   | 'copyCommitUrl'
+  | 'openCommitUrl'
   | 'copyAuthorEmail'
   | 'copyAuthorName'
   | 'copyShortHash'
@@ -100,7 +101,6 @@ export type WebviewAction =
   | 'focusSearch'
   | 'showKeyboardHelp'
   | 'clearAllFilters'
-  | 'toggleSignatures'
   | 'jumpToNextTag'
   | 'jumpToPreviousTag'
   | 'jumpToParent'
@@ -112,7 +112,8 @@ export type WebviewAction =
  * Messages from extension to webview
  */
 export type ExtToWebviewMessage =
-  | { type: 'init'; commits: CommitInfo[]; filePath: string; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; commitListDateFormat?: string; userSettings?: UserSettings; currentUser?: { name: string; email: string } | null; showFirstRunTip?: boolean }
+  | { type: 'init'; commits: CommitInfo[]; filePath: string; selection?: { startLine: number; endLine: number }; branch?: string; branches?: string[]; hideMergeCommits?: boolean; defaultDiffView?: string; commitListDateFormat?: string; userSettings?: UserSettings; currentUser?: { name: string; email: string } | null; showFirstRunTip?: boolean; sprintLengthWeeks?: number; hasMore?: boolean; pageSize?: number }
+  | { type: 'commitsLoaded'; commits: CommitInfo[]; totalLoaded: number; hasMore: boolean }
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[]; selectedFile?: string; stats?: { filesChanged: number; insertions: number; deletions: number } }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'rangeDiff'; fromHash: string; toHash: string; diff: string }
@@ -146,6 +147,7 @@ export type WebviewToExtMessage =
   | { type: 'revealInExplorer'; filePath: string }
   | { type: 'blameFile'; filePath: string }
   | { type: 'copyCommitUrl'; hash: string }
+  | { type: 'openCommitUrl'; hash: string }
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyAuthorName'; hash: string }
   | { type: 'copyShortHash'; hash: string }
@@ -162,6 +164,6 @@ export type WebviewToExtMessage =
   | { type: 'revertCommit'; hash: string }
   | { type: 'resetToCommit'; hash: string; mode: 'soft' | 'mixed' | 'hard' }
   | { type: 'requestDiffSearch'; query: string; commitHashes: string[] }
-  | { type: 'changeDiffContextLines'; value: number }
+  | { type: 'loadMoreCommits' }
   | { type: 'dismissFirstRunTip' }
   | { type: 'focusCommitList' };

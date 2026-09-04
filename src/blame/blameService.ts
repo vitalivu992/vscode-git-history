@@ -163,7 +163,7 @@ export class BlameService implements vscode.Disposable {
 
       const label = isUncommitted
         ? 'Not Committed Yet'
-        : `${bl.author}, ${dateStr}`;
+        : `${bl.shortHash} ${bl.author}, ${dateStr}`;
 
       const range = new vscode.Range(lineIndex, 0, lineIndex, 0);
       decorations.push({

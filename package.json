@@ -1,8 +1,8 @@
 {
   "name": "git-history-vsce",
-  "displayName": "Git History for selections",
+  "displayName": "Git history for selection",
   "description": "View git history for files and line selections with diff viewer",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "publisher": "vitalivu992",
   "icon": "images/icon.png",
   "repository": {
@@ -76,6 +76,11 @@
       {
         "command": "gitHistory.copyCommitUrl",
         "title": "Git History: Copy Commit URL",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.openCommitUrl",
+        "title": "Git History: Open Commit URL in Browser",
         "category": "Git History"
       },
       {
@@ -166,11 +171,6 @@
       {
         "command": "gitHistory.toggleHideMergeCommits",
         "title": "Git History: Toggle Hide Merge Commits",
-        "category": "Git History"
-      },
-      {
-        "command": "gitHistory.toggleSignatures",
-        "title": "Git History: Toggle Signatures",
         "category": "Git History"
       },
       {
@@ -304,6 +304,12 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.openCommitUrl",
+        "key": "ctrl+shift+alt+l",
+        "mac": "cmd+shift+alt+l",
+        "when": "activeWebviewPanelId == gitHistory.webview"
+      },
+      {
         "command": "gitHistory.copyAuthorEmail",
         "key": "ctrl+shift+a",
         "mac": "cmd+shift+a",
@@ -388,12 +394,6 @@
         "when": "activeWebviewPanelId == gitHistory.webview"
       },
       {
-        "command": "gitHistory.toggleSignatures",
-        "key": "ctrl+shift+alt+s",
-        "mac": "cmd+shift+alt+s",
-        "when": "activeWebviewPanelId == gitHistory.webview"
-      },
-      {
         "command": "gitHistory.jumpToHash",
         "key": "ctrl+g",
         "mac": "cmd+g",
@@ -472,7 +472,7 @@
         "gitHistory.maxCommits": {
           "type": "number",
           "default": 500,
-          "description": "Maximum number of commits to display"
+          "description": "Number of commits loaded per page (initial load and each 'Load more')"
         },
         "gitHistory.blame.dateFormat": {
           "type": "string",
@@ -515,10 +515,11 @@
           "maximum": 10,
           "description": "Number of context lines to show in diffs (1-10)"
         },
-        "gitHistory.showSignatures": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show GPG signature verification status for signed commits"
+        "gitHistory.sprintLengthWeeks": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "description": "Number of weeks used by the sprint date filter button"
         }
       }
     }

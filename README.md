@@ -106,6 +106,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 | `Ctrl+Shift+N` / `Cmd+Shift+N` | Copy author name |
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email |
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL |
+| `Ctrl+Shift+Alt+L` / `Cmd+Shift+Alt+L` | Open commit URL in browser |
 | `Ctrl+Shift+P` / `Cmd+Shift+P` | Copy cherry-pick command |
 | `Ctrl+Shift+U` / `Cmd+Shift+U` | Copy revert command |
 
@@ -118,9 +119,11 @@ A powerful VS Code extension that provides git history visualization inspired by
 | `Ctrl+Alt+K` / `Cmd+Alt+K` | Cherry-pick commit |
 | `Ctrl+Alt+R` / `Cmd+Alt+R` | Revert commit |
 | `Ctrl+Alt+X` / `Cmd+Alt+X` | Delete local branch |
+| `Ctrl+Alt+S` / `Cmd+Alt+S` | Switch (checkout) branch — searchable picker of local/remote branches; also right-click the branch badge |
 | `Ctrl+Shift+Alt+B` / `Cmd+Shift+Alt+B` | Create branch |
 | `Ctrl+Alt+I` / `Cmd+Alt+I` | Create tag |
 | `Ctrl+Alt+.` / `Cmd+Alt+.` | Delete tag |
+| Command Palette | "Git History: Rename Branch" — rename a local branch (`git branch -m`) |
 
 ## Context Menus
 
@@ -135,6 +138,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy cherry-pick command** | Copy a pre-formatted `git cherry-pick <hash>` command |
 | **Copy revert command** | Copy a pre-formatted `git revert <hash>` command |
 | **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket) for the commit |
+| **Open commit URL in browser** | Open the commit page on the git hosting platform in the default browser |
 | **Copy author email** | Copy the author email address |
 | **Copy author name** | Copy the author name |
 | **Copy short hash** | Copy the 7-character short hash |

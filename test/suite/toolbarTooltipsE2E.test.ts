@@ -23,9 +23,7 @@ suite('Toolbar Tooltips E2E', function () {
     const provider = fs.readFileSync(providerPath, 'utf-8');
 
     const buttons = [
-      { id: 'sort-btn', shortcut: 'Ctrl+Shift+3' },
       { id: 'merge-toggle-btn', shortcut: 'Ctrl+Shift+Q' },
-      { id: 'signatures-toggle-btn', shortcut: 'Ctrl+Shift+Alt+S' },
     ];
 
     for (const btn of buttons) {

@@ -20,6 +20,12 @@ How to use Git History: open history views, navigate the panel, use the right-cl
 3. Select "Git History for Selection"
 4. The history panel will show only commits that affected your selection
 
+### View Repository History
+
+1. Press `F1` (or `Ctrl+Shift+P` / `Cmd+Shift+P`) to open the Command Palette
+2. Run "Git History (Repository)"
+3. The history panel will show the full repository/branch commit log (capped by `gitHistory.maxCommits`)
+
 ### Using the History Panel
 
 - **Click a commit row** to view its diff and changed files
@@ -117,8 +123,6 @@ Right-click on commits in the commit list or files in the changed files list to 
 
 ## Keyboard Shortcuts
 
-> Bindings marked **†** are registered to two commands in `package.json` with overlapping context; VS Code resolves them by specificity and one will shadow the other. Both actions remain available via the right-click context menu.
-
 ### Global (work from any text editor)
 
 | Keybinding | Action |
@@ -126,7 +130,13 @@ Right-click on commits in the commit list or files in the changed files list to 
 | `Ctrl+Alt+H` / `Cmd+Alt+H` | Git History (File) |
 | `Ctrl+Alt+Shift+H` / `Cmd+Alt+Shift+H` | Git History for Selection |
 | `Ctrl+Shift+B` / `Cmd+Shift+B` | Toggle Blame Annotations |
-| `Ctrl+Shift+R` / `Cmd+Shift+R` | Refresh History |
+
+### Panel (active history panel)
+
+| Keybinding | Action |
+|------------|--------|
+| `F5` | Refresh history |
+| `Ctrl+Shift+R` / `Cmd+Shift+R` | Refresh history (alternative) |
 
 ### Navigation
 
@@ -176,13 +186,15 @@ Right-click on commits in the commit list or files in the changed files list to 
 
 | Keybinding | Action |
 |------------|--------|
-| `Ctrl+Alt+K` **†** | Cherry-pick commit |
+| `Ctrl+Alt+K` | Cherry-pick commit |
 | `Ctrl+Alt+R` | Revert commit |
-| `Ctrl+Shift+Alt+B` **†** | Create branch at selected commit |
+| `Ctrl+Shift+Alt+B` | Create branch at selected commit |
 | `Ctrl+Alt+I` | Create tag at selected commit |
 | `Ctrl+Alt+.` | Delete tag from selected commit |
 | `Ctrl+Alt+S` | Show branch switcher |
 | `Ctrl+Alt+X` | Delete local branch |
+
+Branch rename is available from the Command Palette ("Git History: Rename Branch"); it has no default keybinding.
 
 ### Tag navigation
 

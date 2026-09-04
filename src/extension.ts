@@ -174,6 +174,7 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyCherryPick', action: 'copyCherryPick' },
     { command: 'gitHistory.copyRevert', action: 'copyRevert' },
     { command: 'gitHistory.copyCommitUrl', action: 'copyCommitUrl' },
+    { command: 'gitHistory.openCommitUrl', action: 'openCommitUrl' },
     { command: 'gitHistory.copyAuthorEmail', action: 'copyAuthorEmail' },
     { command: 'gitHistory.copyAuthorName', action: 'copyAuthorName' },
     { command: 'gitHistory.copyShortHash', action: 'copyShortHash' },
@@ -201,7 +202,6 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.cycleDiffContextLines', action: 'cycleDiffContextLines' },
     { command: 'gitHistory.cycleSortMode', action: 'cycleSortMode' },
     { command: 'gitHistory.clearAllFilters', action: 'clearAllFilters' },
-    { command: 'gitHistory.toggleSignatures', action: 'toggleSignatures' },
   ] as const;
 
   for (const { command, action } of webviewActions) {

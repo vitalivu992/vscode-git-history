@@ -22,7 +22,7 @@ Git History automatically saves and restores your view preferences across VS Cod
 
 - **Diff Type**: Your choice of unified or side-by-side diff view
 - **Word Wrap**: Whether word wrap is enabled in the diff viewer
-- **Sort Order**: Newest-first or oldest-first commit ordering
+- **Sort Order**: Newest-first, oldest-first, author A-Z, or author Z-A commit ordering
 - **Hide Merge Commits**: Whether merge commits are filtered out
 - **Show My Commits Only**: Whether to show only commits by the current git user
 - **Regex Search Mode**: Whether regex search is enabled
