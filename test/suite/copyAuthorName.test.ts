@@ -138,7 +138,7 @@ suite('Copy Author Name Test Suite', () => {
     assert.ok(binding, 'Should have keybinding for gitHistory.copyAuthorName');
     assert.strictEqual(binding.key, 'ctrl+shift+n');
     assert.strictEqual(binding.mac, 'cmd+shift+n');
-    assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(binding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('extension.ts should register copyAuthorName webview action', () => {

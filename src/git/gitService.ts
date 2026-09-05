@@ -814,3 +814,39 @@ export async function resetToCommit(hash: string, mode: ResetMode, cwd: string):
  * @param remote Remote name (default: 'origin')
  * @returns File URL or null if unable to generate
  */
+export async function getFileUrl(
+  filePath: string,
+  hash: string,
+  cwd: string,
+  remote = 'origin'
+): Promise<string | null> {
+  const remoteUrl = await getRemoteUrl(cwd, remote);
+  if (!remoteUrl) {
+    return null;
+  }
+
+  const remoteInfo = parseRemoteUrl(remoteUrl);
+  if (!remoteInfo || remoteInfo.platform === 'unknown') {
+    return null;
+  }
+
+  // Web URLs always use forward slashes and repo-relative paths
+  let relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
+  relativePath = relativePath.replace(/\\/g, '/').replace(/^\.\//, '');
+
+  // Use short hash for URLs (7 characters)
+  const shortHash = hash.substring(0, 7);
+
+  switch (remoteInfo.platform) {
+    case 'github':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/blob/${shortHash}/${relativePath}`;
+    case 'gitlab':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/-/blob/${shortHash}/${relativePath}`;
+    case 'bitbucket':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.repo}/src/${shortHash}/${relativePath}`;
+    case 'azure':
+      return `${remoteInfo.baseUrl}/${remoteInfo.owner}/${remoteInfo.project}/_git/${remoteInfo.repo}?path=${encodeURIComponent(relativePath)}&version=GC${shortHash}`;
+    default:
+      return null;
+  }
+}

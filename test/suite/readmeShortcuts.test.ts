@@ -82,7 +82,9 @@ const REMOVED_BINDINGS = [
   'ctrl+shift+5',        // copy filter query
   'ctrl+shift+4',        // paste filter query
   'ctrl+alt+shift+l',    // copy filter as git log command
-  'ctrl+alt+p',          // quick compare with parent
+  // 'ctrl+alt+p' was on this list (quick compare with parent was removed with
+  // the commit table) but the feature was re-introduced deliberately — see
+  // gitHistory.compareWithParent — so the chord is bound again.
   'ctrl+shift+o',        // export filtered commits
   'ctrl+shift+alt+e',    // export mbox
   'ctrl+shift+0',        // save filter preset

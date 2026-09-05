@@ -53,7 +53,8 @@ function getKeyboardShortcutsData(isMac: boolean): Array<{ category: string; ite
         { keys: [cmdKey, 'Shift', 'W'], description: 'Toggle word wrap' },
         { keys: [cmdKey, 'Shift', 'M'], description: 'Toggle my commits filter' },
         { keys: [cmdKey, 'Shift', 'Alt', 'J'], description: 'Toggle ignore whitespace' },
-        { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' }
+        { keys: [cmdKey, 'Shift', '/'], description: 'Cycle diff context lines' },
+        { keys: [cmdKey, 'Shift', '3'], description: 'Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A)' }
       ]
     },
     {

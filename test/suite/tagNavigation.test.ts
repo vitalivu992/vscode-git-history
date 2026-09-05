@@ -135,7 +135,7 @@ suite('Tag Navigation Test Suite', () => {
     assert.ok(binding, 'Should have keybinding for gitHistory.jumpToNextTag');
     assert.strictEqual(binding.key, 'ctrl+]');
     assert.strictEqual(binding.mac, 'cmd+]');
-    assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(binding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('package.json should register Ctrl+[ keybinding for jumpToPreviousTag', () => {
@@ -147,7 +147,7 @@ suite('Tag Navigation Test Suite', () => {
     assert.ok(binding, 'Should have keybinding for gitHistory.jumpToPreviousTag');
     assert.strictEqual(binding.key, 'ctrl+[');
     assert.strictEqual(binding.mac, 'cmd+[');
-    assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(binding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('extension.ts should register jumpToNextTag webview action', () => {

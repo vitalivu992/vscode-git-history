@@ -84,6 +84,10 @@ export type WebviewAction =
   | 'copyAuthorName'
   | 'copyShortHash'
   | 'copySubject'
+  | 'copyShortDate'
+  | 'copyTrailers'
+  | 'copyRangeDiff'
+  | 'compareWithParent'
   | 'createBranch'
   | 'createTag'
   | 'deleteTag'
@@ -148,10 +152,14 @@ export type WebviewToExtMessage =
   | { type: 'blameFile'; filePath: string }
   | { type: 'copyCommitUrl'; hash: string }
   | { type: 'openCommitUrl'; hash: string }
+  | { type: 'openFileUrl'; hash: string; filePath: string }
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyAuthorName'; hash: string }
   | { type: 'copyShortHash'; hash: string }
   | { type: 'copySubject'; hash: string }
+  | { type: 'copyShortDate'; hash: string }
+  | { type: 'copyTrailers'; hash: string }
+  | { type: 'copyRangeDiff'; fromHash: string; toHash: string }
   | { type: 'createBranch'; hash: string }
   | { type: 'createTag'; hash: string }
   | { type: 'deleteTag'; hash: string }

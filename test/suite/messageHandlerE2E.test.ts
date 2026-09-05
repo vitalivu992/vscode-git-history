@@ -278,7 +278,7 @@ suite('Keybinding Registration E2E Tests', () => {
     for (const kb of webviewKeybindings) {
       assert.strictEqual(
         kb.when,
-        'activeWebviewPanelId == gitHistory.webview',
+        'activeWebviewViewId == gitHistory.webview',
         `Keybinding for "${kb.command}" should have when clause "activeWebviewPanelId == gitHistory.webview"`
       );
     }

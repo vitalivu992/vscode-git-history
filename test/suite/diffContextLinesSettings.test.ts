@@ -3,6 +3,9 @@ import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 
+// Since 4367a1b, diff context line changes are persisted through the
+// generic saveSettings message instead of a dedicated changeDiffContextLines
+// message; handleSaveSettings syncs the panel state and persists the value.
 suite('DiffContextLines Settings Persistence Tests', () => {
   let tempDir: string;
 
@@ -14,7 +17,7 @@ suite('DiffContextLines Settings Persistence Tests', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test('handleMessage should call saveSettings with diffContextLines when changeDiffContextLines is received', async () => {
+  test('handleMessage should persist diffContextLines via saveSettings', async () => {
     const { handleMessage } = await import('../../src/webview/messageHandler');
 
     let saveSettingsCalled = false;
@@ -50,7 +53,7 @@ suite('DiffContextLines Settings Persistence Tests', () => {
     };
 
     await handleMessage(
-      { type: 'changeDiffContextLines', value: 7 },
+      { type: 'saveSettings', settings: { diffContextLines: 7 } },
       mockPanel,
       mockSettingsService,
       mockFirstRunTipService
@@ -62,7 +65,7 @@ suite('DiffContextLines Settings Persistence Tests', () => {
     assert.deepStrictEqual(saveSettingsArg, { diffContextLines: 7 }, 'saveSettings should be called with diffContextLines: 7');
   });
 
-  test('handleMessage should call saveSettings with different diffContextLines values', async () => {
+  test('handleMessage should persist different diffContextLines values', async () => {
     const { handleMessage } = await import('../../src/webview/messageHandler');
 
     const testValues = [1, 5, 10];
@@ -92,7 +95,7 @@ suite('DiffContextLines Settings Persistence Tests', () => {
       };
 
       await handleMessage(
-        { type: 'changeDiffContextLines', value },
+        { type: 'saveSettings', settings: { diffContextLines: value } },
         mockPanel,
         mockSettingsService,
         mockFirstRunTipService

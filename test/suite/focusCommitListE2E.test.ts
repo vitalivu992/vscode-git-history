@@ -48,7 +48,7 @@ suite('focusCommitList E2E Tests', function() {
     assert.ok(keybinding, 'Keybinding should exist');
     assert.strictEqual(keybinding.key, 'ctrl+l', 'Windows/Linux key should be ctrl+l');
     assert.strictEqual(keybinding.mac, 'cmd+l', 'Mac key should be cmd+l');
-    assert.strictEqual(keybinding.when, 'activeWebviewPanelId == gitHistory.webview', 'When clause should be correct');
+    assert.strictEqual(keybinding.when, 'activeWebviewViewId == gitHistory.webview', 'When clause should be correct');
   });
 
   test('focusCommitList keyboard help should show correct keys', async function() {

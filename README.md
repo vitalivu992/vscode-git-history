@@ -1,6 +1,8 @@
 # Git History for VS Code
 
-A powerful VS Code extension that provides git history visualization inspired by IntelliJ's Git History. View file history, selection history, and explore diffs with an intuitive interface.
+A powerful VS Code extension that provides git history visualization inspired by IntelliJ's Git History. View file history, selection history, and explore diffs with an intuitive interface in the **Git History** bottom-panel tab (beside Terminal).
+
+Commits signed with GPG show GPG signature verification badges (✓ verified / ✗ unverified) inline next to the commit message; they are always displayed when git provides signature data.
 
 
 ### File History
@@ -39,12 +41,12 @@ A powerful VS Code extension that provides git history visualization inspired by
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `gitHistory.hideMergeCommits` | `false` | Hide merge commits from the commit list (No Merge button) |
-| `gitHistory.showSignatures` | `true` | Show GPG signature verification badges (verified ✓ / unverified ✗) next to commits |
 | `gitHistory.defaultDiffView` | `unified` | Default diff view: `unified` or `side-by-side` |
 | `gitHistory.diffContextLines` | `3` | Number of context lines shown around changes in diffs |
 | `gitHistory.maxCommits` | `500` | Maximum number of commits to display in the commit list |
 | `gitHistory.blame.dateFormat` | `relative` | Date format for blame annotations: `relative`, `short`, or `iso` |
 | `gitHistory.commitList.dateFormat` | `relative` | Date format for the commit list: `relative`, `short`, or `iso` |
+| `gitHistory.sprintLengthWeeks` | `2` | Number of weeks used by the sprint date-filter button |
 
 ## Keyboard Shortcuts
 
@@ -71,6 +73,7 @@ A powerful VS Code extension that provides git history visualization inspired by
 | `/` or `Ctrl+F` / `Cmd+F` | Focus search input |
 | `Ctrl+G` / `Cmd+G` | Jump to commit by hash |
 | `Ctrl+P` / `Cmd+P` | Jump to Parent commit |
+| `Ctrl+Alt+P` / `Cmd+Alt+P` | Quick compare with parent commit |
 | `Ctrl+]` / `Cmd+]` | Tag Navigation — jump to next tagged commit |
 | `Ctrl+[` / `Cmd+[` | Tag Navigation — jump to previous tagged commit |
 | `?` | Show Keyboard Help dialog |
@@ -93,7 +96,6 @@ A powerful VS Code extension that provides git history visualization inspired by
 | `Ctrl+Shift+Alt+J` / `Cmd+Shift+Alt+J` | Toggle ignore whitespace |
 | `Ctrl+Shift+/` / `Cmd+Shift+/` | Cycle diff context lines |
 | `Ctrl+Shift+3` / `Cmd+Shift+3` | Cycle sort mode (Newest/Oldest/Author A-Z/Author Z-A) |
-| `Ctrl+Shift+Alt+S` / `Cmd+Shift+Alt+S` | Toggle GPG signature verification badges |
 
 ### Copy Commands
 
@@ -103,6 +105,9 @@ A powerful VS Code extension that provides git history visualization inspired by
 | `Ctrl+Shift+7` / `Cmd+Shift+7` | Copy short hash |
 | `Ctrl+Shift+I` / `Cmd+Shift+I` | Copy commit info |
 | `Ctrl+Shift+6` / `Cmd+Shift+6` | 📌 Copy subject |
+| `Ctrl+Alt+D` / `Cmd+Alt+D` | Copy short date (YYYY-MM-DD) |
+| `Ctrl+Shift+Alt+3` / `Cmd+Shift+Alt+3` | Copy trailers (Signed-off-by etc.) |
+| `Ctrl+Shift+Alt+R` / `Cmd+Shift+Alt+R` | Copy range diff (between two selected commits) |
 | `Ctrl+Shift+N` / `Cmd+Shift+N` | Copy author name |
 | `Ctrl+Shift+A` / `Cmd+Shift+A` | Copy author email |
 | `Ctrl+Shift+L` / `Cmd+Shift+L` | Copy commit URL |

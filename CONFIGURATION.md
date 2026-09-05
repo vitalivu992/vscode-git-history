@@ -14,7 +14,7 @@ This extension contributes the following settings:
 * `gitHistory.commitList.dateFormat`: Date format for the commit list - `relative` (e.g., "Today 2:30 PM", "2 weeks ago"; hover for the absolute timestamp), `short` (your locale's date), or `iso` (e.g., "2024-03-15") (default: `relative`)
 * `gitHistory.defaultDiffView`: Default diff view mode when opening Git History - `unified` or `side-by-side` (default: `unified`). **Note**: User settings from the previous session take precedence over this configuration.
 * `gitHistory.diffContextLines`: Number of context lines to show in diffs (default: `3`, range: `1-10`). Increase for more context during code review, decrease for more focused diffs.
-* `gitHistory.showSignatures`: Show GPG signature verification status for signed commits (default: true)
+* `gitHistory.sprintLengthWeeks`: Number of weeks used by the sprint date-filter button in the commit list (default: `2`, minimum: `1`)
 
 ### Persistent User Preferences
 
@@ -28,7 +28,6 @@ Git History automatically saves and restores your view preferences across VS Cod
 - **Regex Search Mode**: Whether regex search is enabled
 - **Ignore Whitespace**: Whether to ignore whitespace in diffs
 - **Diff Context Lines**: Number of context lines shown in diffs
-- **Show GPG Signatures**: Whether GPG signature verification badges are shown
 - **Search Query**: The current search text (restored across sessions)
 
 These preferences are saved automatically when you change them in the UI, and restored the next time you open Git History. This allows you to maintain your preferred workflow without reconfiguring each time.

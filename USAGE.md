@@ -11,20 +11,20 @@ How to use Git History: open history views, navigate the panel, use the right-cl
 1. Open any file in a git repository
 2. Right-click in the editor
 3. Select "Git History (File)"
-4. The history panel will open showing all commits
+4. The **Git History** tab opens in the bottom panel (beside Terminal), showing all commits
 
 ### View Selection History
 
 1. Select one or more lines of code
 2. Right-click in the editor
 3. Select "Git History for Selection"
-4. The history panel will show only commits that affected your selection
+4. The **Git History** tab opens in the bottom panel, showing only commits that affected your selection
 
 ### View Repository History
 
 1. Press `F1` (or `Ctrl+Shift+P` / `Cmd+Shift+P`) to open the Command Palette
 2. Run "Git History (Repository)"
-3. The history panel will show the full repository/branch commit log (capped by `gitHistory.maxCommits`)
+3. The **Git History** tab opens in the bottom panel, showing the full repository/branch commit log (capped by `gitHistory.maxCommits`)
 
 ### Using the History Panel
 
@@ -97,6 +97,9 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy cherry-pick command** | Copy a pre-formatted `git cherry-pick <hash>` command |
 | **Copy revert command** | Copy a pre-formatted `git revert <hash>` command |
 | **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket) for the commit |
+| **Copy short date** | Copy the commit date as `YYYY-MM-DD` |
+| **Copy trailers** | Copy the commit message trailer block (`Signed-off-by:`, `Reviewed-by:`, …) |
+| **Copy range diff** | Copy the diff between two commits (last Shift+click range, or exactly two selected commits) |
 | **Copy author email** | Copy the author email address |
 | **Copy author name** | Copy the author name |
 | **Copy short hash** | Copy the 7-character short hash |
@@ -116,6 +119,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **View diff for this file** | Show the diff for this specific file only |
 | **Compare with working tree** | Show the diff between the file at this commit and your working tree |
 | **Blame file** | Open the file in your editor with blame annotations toggled on |
+| **Open file URL at this commit** | Open the file's permalink on your git hosting platform at this commit (GitHub/GitLab/Bitbucket/Azure DevOps) |
 | **Restore file from this commit** | Overwrite the working-tree file with the version from this commit (asks for confirmation) |
 | **Copy path** | Copy the file's absolute path |
 | **Copy relative path** | Copy the file's path relative to the repository root |
@@ -163,7 +167,6 @@ Right-click on commits in the commit list or files in the changed files list to 
 | `Ctrl+Shift+Q` | Toggle hide merge commits |
 | `Ctrl+Shift+3` | Cycle sort mode (Newest / Oldest / Author A-Z / Z-A) |
 | `Ctrl+Shift+/` | Cycle diff context lines (1–10) |
-| `Ctrl+Shift+Alt+S` | Toggle GPG signature verification badges |
 | `Ctrl+Shift+W` | Toggle word wrap in diff viewer |
 | `Ctrl+Shift+Alt+J` | Toggle ignore whitespace in diffs |
 | `Ctrl+Alt+Q` | Clear all filters |
@@ -176,9 +179,13 @@ Right-click on commits in the commit list or files in the changed files list to 
 | `Ctrl+Shift+7` | Copy short hash (7 characters) |
 | `Ctrl+Shift+I` | Copy full commit info (hash, author, date, message) |
 | `Ctrl+Shift+6` | Copy subject (commit title) |
+| `Ctrl+Alt+D` | Copy short date (`YYYY-MM-DD`) |
+| `Ctrl+Shift+Alt+3` | Copy trailers (`Signed-off-by:` etc.) |
+| `Ctrl+Shift+Alt+R` | Copy range diff (between two Shift+click-selected commits) |
 | `Ctrl+Shift+N` | Copy author name |
 | `Ctrl+Shift+A` | Copy author email |
 | `Ctrl+Shift+L` | Copy commit URL |
+| `Ctrl+Shift+Alt+L` | Open commit URL in browser |
 | `Ctrl+Shift+P` | Copy `git cherry-pick <hash>` command |
 | `Ctrl+Shift+U` | Copy `git revert <hash>` command |
 
@@ -203,5 +210,6 @@ Branch rename is available from the Command Palette ("Git History: Rename Branch
 | `Ctrl+]` | Jump to next tagged commit |
 | `Ctrl+[` | Jump to previous tagged commit |
 | `Ctrl+P` | Jump to parent commit |
+| `Ctrl+Alt+P` | Quick compare with parent commit (diff `parent..commit`) |
 | `?` | Show keyboard shortcuts help |
 

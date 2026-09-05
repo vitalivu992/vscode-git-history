@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitStats, getBranchCommitHashes, getCommitUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, renameBranch, checkoutBranch, cherryPickCommit, revertCommit, restoreFileFromCommit, diffFileWithWorkingTree, searchInDiffs, resetToCommit } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitStats, getBranchCommitHashes, getCommitUrl, getFileUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, renameBranch, checkoutBranch, cherryPickCommit, revertCommit, restoreFileFromCommit, diffFileWithWorkingTree, searchInDiffs, resetToCommit } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -74,6 +74,10 @@ export async function handleMessage(
       await handleOpenCommitUrl(message.hash, panel);
       break;
 
+    case 'openFileUrl':
+      await handleOpenFileUrl(message.hash, message.filePath, panel);
+      break;
+
     case 'copyAuthorEmail':
       handleCopyAuthorEmail(message.hash, panel);
       break;
@@ -88,6 +92,18 @@ export async function handleMessage(
 
     case 'copySubject':
       handleCopySubject(message.hash, panel);
+      break;
+
+    case 'copyShortDate':
+      handleCopyShortDate(message.hash, panel);
+      break;
+
+    case 'copyTrailers':
+      handleCopyTrailers(message.hash, panel);
+      break;
+
+    case 'copyRangeDiff':
+      await handleCopyRangeDiff(message.fromHash, message.toHash, panel);
       break;
 
     case 'openFileAtCommit':
@@ -593,6 +609,45 @@ async function handleCopyCommitUrl(hash: string, panel: GitHistoryPanel): Promis
 }
 
 /**
+ * Handle opening a file's URL at a commit in the browser (file permalink)
+ */
+async function handleOpenFileUrl(hash: string, filePath: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const remoteUrl = await getRemoteUrl(cwd);
+
+    if (!remoteUrl) {
+      void vscode.window.showInformationMessage(
+        'No git remote configured. Unable to open file URL.'
+      );
+      return;
+    }
+
+    const remoteInfo = parseRemoteUrl(remoteUrl);
+    if (!remoteInfo || remoteInfo.platform === 'unknown') {
+      void vscode.window.showInformationMessage(
+        'Unable to detect git platform. Supported: GitHub, GitLab, Bitbucket, Azure DevOps.'
+      );
+      return;
+    }
+
+    const fileUrl = await getFileUrl(filePath, hash, cwd);
+    if (!fileUrl) {
+      void vscode.window.showInformationMessage(
+        'Failed to generate file URL.'
+      );
+      return;
+    }
+
+    await vscode.env.openExternal(vscode.Uri.parse(fileUrl));
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to open file URL: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
  * Handle opening a commit URL in the browser
  * Generates platform-specific URLs based on git remote
  */
@@ -681,6 +736,98 @@ function handleCopySubject(hash: string, panel: GitHistoryPanel): void {
   const truncatedSubject = subject.length > 50 ? subject.substring(0, 47) + '...' : subject;
   void vscode.env.clipboard.writeText(subject).then(() => {
     void vscode.window.showInformationMessage(`Copied subject: ${truncatedSubject}`);
+  });
+}
+
+function handleCopyShortDate(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  // commit.date is an ISO string; YYYY-MM-DD is its first 10 characters
+  const shortDate = commit.date.substring(0, 10);
+  void vscode.env.clipboard.writeText(shortDate).then(() => {
+    void vscode.window.showInformationMessage(`Copied short date: ${shortDate}`);
+  });
+}
+
+async function handleCopyRangeDiff(
+  fromHash: string,
+  toHash: string,
+  panel: GitHistoryPanel
+): Promise<void> {
+  try {
+    const diffResult = await getCommitRangeDiff(fromHash, toHash, panel.getCwd(), undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
+    if (diffResult.isBinary) {
+      void vscode.window.showInformationMessage('Cannot copy range diff: binary file');
+      return;
+    }
+
+    const fromShort = fromHash.substring(0, 7);
+    const toShort = toHash.substring(0, 7);
+    void vscode.env.clipboard.writeText(diffResult.diff).then(() => {
+      void vscode.window.showInformationMessage(`Copied range diff: ${fromShort}..${toShort}`);
+    });
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy range diff: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Extract the trailer block (e.g. "Signed-off-by: ...", "Reviewed-by: ...")
+ * from a full commit message. Git treats the last paragraph as trailers only
+ * when every line is a "Token: value" entry (indented lines continue the
+ * previous entry); otherwise there are no trailers.
+ */
+export function extractTrailers(fullMessage: string): string {
+  const lines = fullMessage.replace(/\r\n/g, '\n').split('\n');
+  while (lines.length && lines[lines.length - 1].trim() === '') {
+    lines.pop();
+  }
+  if (!lines.length) {
+    return '';
+  }
+
+  // Only the last paragraph can be a trailer block
+  let start = lines.length - 1;
+  while (start > 0 && lines[start - 1].trim() !== '') {
+    start--;
+  }
+
+  const trailers: string[] = [];
+  for (const line of lines.slice(start)) {
+    if (/^\s+/.test(line) && trailers.length) {
+      trailers[trailers.length - 1] += '\n' + line;
+    } else if (/^[A-Za-z0-9-]+:\s+.+$/.test(line)) {
+      trailers.push(line);
+    } else {
+      return '';
+    }
+  }
+  return trailers.join('\n');
+}
+
+function handleCopyTrailers(hash: string, panel: GitHistoryPanel): void {
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  if (!commit) {
+    void vscode.window.showInformationMessage('Commit not found');
+    return;
+  }
+
+  const trailers = extractTrailers(commit.fullMessage);
+  if (!trailers) {
+    void vscode.window.showInformationMessage('Commit has no trailers');
+    return;
+  }
+
+  void vscode.env.clipboard.writeText(trailers).then(() => {
+    const firstLine = trailers.split('\n')[0];
+    const truncated = firstLine.length > 50 ? firstLine.substring(0, 47) + '...' : firstLine;
+    void vscode.window.showInformationMessage(`Copied trailers: ${truncated}`);
   });
 }
 

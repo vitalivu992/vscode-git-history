@@ -240,7 +240,7 @@ suite('Copy Commit URL Test Suite', () => {
     assert.ok(binding, 'Should have keybinding for gitHistory.copyCommitUrl');
     assert.strictEqual(binding.key, 'ctrl+shift+l');
     assert.strictEqual(binding.mac, 'cmd+shift+l');
-    assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(binding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('extension.ts should register copyCommitUrl webview action', () => {

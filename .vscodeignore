@@ -54,7 +54,7 @@ scripts/
 *.vsix
 *.log
 *.txt
-
+.sh
 # OS files
 .DS_Store
 Thumbs.db

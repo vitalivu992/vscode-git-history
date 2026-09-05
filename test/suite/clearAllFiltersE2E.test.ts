@@ -154,7 +154,7 @@ suite('Clear All Filters E2E Source Integration Tests', () => {
     assert.ok(keybinding, 'package.json should define keybinding for clearAllFilters');
     assert.strictEqual(keybinding.key, 'ctrl+alt+q');
     assert.strictEqual(keybinding.mac, 'cmd+alt+q');
-    assert.strictEqual(keybinding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(keybinding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('keyboard shortcut triggers clearAllFilters in main.js', () => {

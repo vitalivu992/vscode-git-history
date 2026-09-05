@@ -105,7 +105,7 @@ suite('Jump to Parent Test Suite', () => {
     assert.ok(binding, 'Should have keybinding for gitHistory.jumpToParent');
     assert.strictEqual(binding.key, 'ctrl+p');
     assert.strictEqual(binding.mac, 'cmd+p');
-    assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(binding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('extension.ts should register jumpToParent webview action', () => {

@@ -11,21 +11,22 @@ interface SelectionRange {
   endLine: number;
 }
 
-export class GitHistoryPanel {
+export class GitHistoryPanel implements vscode.WebviewViewProvider {
   public static currentPanel: GitHistoryPanel | undefined;
   public static readonly viewType = 'gitHistory.webview';
 
-  private readonly _panel: vscode.WebviewPanel;
+  private _view: vscode.WebviewView | undefined;
   private _disposables: vscode.Disposable[] = [];
-  private readonly _filePath: string;
-  private readonly _cwd: string;
-  private readonly _selection?: SelectionRange;
+  private _filePath: string = '';
+  private _cwd: string = '';
+  private _selection?: SelectionRange;
   private _commits: CommitInfo[] = [];
   private _branch: string | undefined;
   private _webviewReady: boolean = false;
   private _pendingInit: (() => void) | null = null;
   private readonly _settingsService: SettingsService;
   private readonly _firstRunTipService: FirstRunTipService;
+  private readonly _extensionUri: vscode.Uri;
   private readonly _context: vscode.ExtensionContext;
   private _ignoreWhitespace: boolean = false;
   private _diffContextLines: number = 3;
@@ -40,7 +41,6 @@ export class GitHistoryPanel {
     commitHash: string
   ): Promise<void> {
     await GitHistoryPanel.createOrShow(extensionUri, filePath, cwd, settingsService, firstRunTipService, context);
-    // After panel is ready, select the commit
     GitHistoryPanel.currentPanel?.postMessage({ type: 'selectCommit', hash: commitHash });
   }
 
@@ -53,65 +53,50 @@ export class GitHistoryPanel {
     context: vscode.ExtensionContext,
     selection?: SelectionRange
   ): Promise<void> {
-    const column = vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One;
-
-    // If panel already exists, reuse it only if context is the same
     if (GitHistoryPanel.currentPanel) {
-      const existingPanel = GitHistoryPanel.currentPanel;
-      const existingSel = existingPanel.getSelection();
-      const sameContext =
-        existingPanel.getFilePath() === filePath &&
-        existingPanel.getCwd() === cwd &&
-        existingSel?.startLine === selection?.startLine &&
-        existingSel?.endLine === selection?.endLine;
-
-      if (sameContext) {
-        existingPanel._panel.reveal(column);
-        await existingPanel.loadData();
-        return;
-      }
-
-      // Different context: dispose old panel and create a new one
-      existingPanel.dispose();
+      const panel = GitHistoryPanel.currentPanel;
+      panel._filePath = filePath;
+      panel._cwd = cwd;
+      panel._selection = selection;
+      await vscode.commands.executeCommand('gitHistory.webview.focus');
+      await panel.loadData();
+      return;
     }
 
-    // Create new panel
-    const panel = vscode.window.createWebviewPanel(
-      GitHistoryPanel.viewType,
-      filePath ? 'Git History' : 'Git History (Repository)',
-      column,
-      {
-        enableScripts: true,
-        retainContextWhenHidden: true,
-        localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'dist', 'webview', 'panel')]
-      }
-    );
-
-    GitHistoryPanel.currentPanel = new GitHistoryPanel(panel, extensionUri, filePath, cwd, settingsService, firstRunTipService, context, selection);
-    await GitHistoryPanel.currentPanel.loadData();
+    const panel = new GitHistoryPanel(extensionUri, settingsService, firstRunTipService, context);
+    panel._filePath = filePath;
+    panel._cwd = cwd;
+    panel._selection = selection;
+    GitHistoryPanel.currentPanel = panel;
+    await vscode.commands.executeCommand('gitHistory.webview.focus');
+    await panel.loadData();
   }
 
-  private constructor(
-    panel: vscode.WebviewPanel,
-    private readonly _extensionUri: vscode.Uri,
-    filePath: string,
-    cwd: string,
+  public constructor(
+    extensionUri: vscode.Uri,
     settingsService: SettingsService,
     firstRunTipService: FirstRunTipService,
-    context: vscode.ExtensionContext,
-    selection?: SelectionRange
+    context: vscode.ExtensionContext
   ) {
-    this._panel = panel;
-    this._filePath = filePath;
-    this._cwd = cwd;
+    this._extensionUri = extensionUri;
     this._settingsService = settingsService;
     this._firstRunTipService = firstRunTipService;
     this._context = context;
-    this._selection = selection;
+  }
 
-    this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+  public resolveWebviewView(
+    view: vscode.WebviewView,
+    _context: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken
+  ): void {
+    this._view = view;
 
-    this._panel.webview.onDidReceiveMessage(
+    view.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel')]
+    };
+
+    view.webview.onDidReceiveMessage(
       async (message) => {
         await handleMessage(message, this, this._settingsService, this._firstRunTipService);
       },
@@ -119,11 +104,17 @@ export class GitHistoryPanel {
       this._disposables
     );
 
-    this._panel.webview.html = this._getHtmlForWebview();
+    view.onDidDispose(() => {
+      this._view = undefined;
+    }, null, this._disposables);
+
+    view.webview.html = this._getHtmlForWebview();
+
+    this._webviewReady = false;
   }
 
-  public getPanel(): vscode.WebviewPanel {
-    return this._panel;
+  public getPanel(): vscode.WebviewView | undefined {
+    return this._view;
   }
 
   public getFilePath(): string {
@@ -180,6 +171,8 @@ export class GitHistoryPanel {
     if (this._pendingInit) {
       this._pendingInit();
       this._pendingInit = null;
+    } else if (this._filePath || this._cwd) {
+      void this.loadData();
     }
   }
 
@@ -215,10 +208,8 @@ export class GitHistoryPanel {
         const branches = await getAllBranches(this._cwd);
         const currentUser = await getCurrentGitUser(this._cwd);
 
-        // Get user settings from persistent storage
         const userSettings = this._settingsService.getSettings();
 
-        // Apply saved settings to panel state
         if (userSettings.ignoreWhitespace !== undefined) {
           this._ignoreWhitespace = userSettings.ignoreWhitespace;
         }
@@ -274,16 +265,20 @@ export class GitHistoryPanel {
   }
 
   public postMessage(message: any): void {
-    void this._panel.webview.postMessage(message);
+    if (this._view === undefined) {
+      return;
+    }
+    void this._view.webview.postMessage(message);
   }
 
   private _getHtmlForWebview(): string {
+    const view = this._view!;
     const nonce = this.getNonce();
     const panelDir = vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'panel');
-    const stylesUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'styles.css'));
-    const diff2htmlCssUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'diff2html.min.css'));
-    const diff2htmlJsUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'diff2html-ui.min.js'));
-    const mainJsUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'main.js'));
+    const stylesUri = view.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'styles.css'));
+    const diff2htmlCssUri = view.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'diff2html.min.css'));
+    const diff2htmlJsUri = view.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'diff2html-ui.min.js'));
+    const mainJsUri = view.webview.asWebviewUri(vscode.Uri.joinPath(panelDir, 'main.js'));
 
     const sprintLengthWeeks = vscode.workspace.getConfiguration('gitHistory').get<number>('sprintLengthWeeks', 2);
     return `<!DOCTYPE html>
@@ -291,7 +286,7 @@ export class GitHistoryPanel {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' ${this._panel.webview.cspSource}; script-src 'nonce-${nonce}' ${this._panel.webview.cspSource};">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' ${view.webview.cspSource}; script-src 'nonce-${nonce}' ${view.webview.cspSource};">
   <title>Git History</title>
   <link rel="stylesheet" href="${stylesUri}">
   <link rel="stylesheet" href="${diff2htmlCssUri}">
@@ -371,7 +366,6 @@ export class GitHistoryPanel {
 
   public dispose(): void {
     GitHistoryPanel.currentPanel = undefined;
-    this._panel.dispose();
     while (this._disposables.length) {
       const disposable = this._disposables.pop();
       if (disposable) {

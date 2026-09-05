@@ -51,7 +51,7 @@ suite('Cycle Sort Mode Shortcut Test Suite', () => {
     );
     assert.ok(keybinding, 'package.json should have gitHistory.cycleSortMode keybinding');
     assert.strictEqual(keybinding.key, 'ctrl+shift+3');
-    assert.ok(keybinding.when.includes('activeWebviewPanelId == gitHistory.webview'),
+    assert.ok(keybinding.when.includes('activeWebviewViewId == gitHistory.webview'),
       'keybinding should have correct when clause');
   });
 

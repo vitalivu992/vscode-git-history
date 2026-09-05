@@ -124,7 +124,9 @@ suite('Open Commit URL in Browser Tests', () => {
     const source = fs.readFileSync(mainJsPath, 'utf-8');
     const menuStart = source.indexOf('data-action="open-url"');
     assert.ok(menuStart >= 0, 'open-url context menu item should exist');
-    const nearby = source.substring(menuStart, menuStart + 500);
+    // The click handler for the menu items lives after the full menu markup,
+    // so search the rest of the showContextMenu function, not a fixed window.
+    const nearby = source.substring(menuStart, source.indexOf('\nfunction ', menuStart));
 
     assert.ok(nearby.includes('openCommitUrl'),
       'open-url handler should send openCommitUrl message');

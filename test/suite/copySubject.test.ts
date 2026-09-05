@@ -146,7 +146,7 @@ suite('Copy Subject Test Suite', () => {
     assert.ok(binding, 'Should have keybinding for gitHistory.copySubject');
     assert.strictEqual(binding.key, 'ctrl+shift+6');
     assert.strictEqual(binding.mac, 'cmd+shift+6');
-    assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(binding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('extension.ts should register copySubject webview action', () => {

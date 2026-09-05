@@ -131,9 +131,11 @@ suite('Blame Decoration Label Tests', () => {
     const blameServicePath = path.resolve(__dirname, '../../../src/blame/blameService.ts');
     const source = fs.readFileSync(blameServicePath, 'utf-8');
 
-    const labelLine = source.split('\n').find(line => line.includes('label ='));
-    assert.ok(labelLine, 'Should find label assignment in blameService.ts');
-    assert.ok(labelLine.includes('shortHash'), 'Blame label should include shortHash');
+    // The label is a multi-line ternary; check the whole assignment.
+    const labelStart = source.indexOf('const label =');
+    assert.ok(labelStart >= 0, 'Should find label assignment in blameService.ts');
+    const labelSection = source.substring(labelStart, source.indexOf('const range =', labelStart));
+    assert.ok(labelSection.includes('shortHash'), 'Blame label should include shortHash');
   });
 
   test('blame decoration label should include author and date', () => {

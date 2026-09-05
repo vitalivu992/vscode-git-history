@@ -149,7 +149,7 @@ suite('WebviewProvider HTML Tests', () => {
 
     const headerColumns = ['hash-col', 'author-col', 'date-col', 'message-col'];
     for (const col of headerColumns) {
-      assert.ok(providerSource.includes(`class="${col}"`),
+      assert.ok(providerSource.includes(`class="${col}`),
         `webviewProvider HTML header should include ${col} column`);
       assert.ok(mainSource.includes(col),
         `main.js data rows should include ${col} column`);

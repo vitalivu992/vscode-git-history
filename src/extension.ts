@@ -13,6 +13,14 @@ export function activate(context: vscode.ExtensionContext) {
 
   const blameService = new BlameService();
   context.subscriptions.push(blameService);
+
+  // Create and register the Git History webview view provider
+  const gitHistoryPanel = new GitHistoryPanel(context.extensionUri, settingsService, firstRunTipService, context);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(GitHistoryPanel.viewType, gitHistoryPanel, {
+      webviewOptions: { retainContextWhenHidden: true }
+    })
+  );
   const showFileHistoryCommand = vscode.commands.registerCommand(
     'gitHistory.showFileHistory',
     async () => {
@@ -179,6 +187,10 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.copyAuthorName', action: 'copyAuthorName' },
     { command: 'gitHistory.copyShortHash', action: 'copyShortHash' },
     { command: 'gitHistory.copySubject', action: 'copySubject' },
+    { command: 'gitHistory.copyShortDate', action: 'copyShortDate' },
+    { command: 'gitHistory.copyTrailers', action: 'copyTrailers' },
+    { command: 'gitHistory.copyRangeDiff', action: 'copyRangeDiff' },
+    { command: 'gitHistory.compareWithParent', action: 'compareWithParent' },
     { command: 'gitHistory.createBranch', action: 'createBranch' },
     { command: 'gitHistory.createTag', action: 'createTag' },
     { command: 'gitHistory.deleteTag', action: 'deleteTag' },

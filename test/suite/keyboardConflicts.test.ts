@@ -24,7 +24,7 @@ suite('Keyboard Shortcuts Conflicts Tests', () => {
 
 			// Only check bindings that are active in the gitHistory webview
 			// (ignore global shortcuts that might overlap with context-specific ones)
-			if (!when.includes('activeWebviewPanelId == gitHistory.webview')) {
+			if (!when.includes('activeWebviewViewId == gitHistory.webview')) {
 				continue;
 			}
 
@@ -50,7 +50,7 @@ suite('Keyboard Shortcuts Conflicts Tests', () => {
 	test('Verify fixed conflicts have correct shortcuts', () => {
 		const keybindings = packageJson.contributes?.keybindings || [];
 		const webviewBindings = keybindings.filter((b: any) =>
-			b.when?.includes('activeWebviewPanelId == gitHistory.webview')
+			b.when?.includes('activeWebviewViewId == gitHistory.webview')
 		);
 
 		// Helper to find shortcut for a command

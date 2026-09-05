@@ -147,7 +147,7 @@ suite('Extension Keybindings Tests', () => {
     for (const kb of webviewKeybindings) {
       assert.strictEqual(
         kb.when,
-        'activeWebviewPanelId == gitHistory.webview',
+        'activeWebviewViewId == gitHistory.webview',
         `Keybinding for "${kb.command}" should have correct when clause`
       );
     }
@@ -213,5 +213,38 @@ suite('Extension Keybindings Tests', () => {
     const duplicates = [...keyMap.entries()].filter(([_, cmds]) => cmds.length > 1);
     assert.strictEqual(duplicates.length, 0,
       `Found duplicate keybindings: ${JSON.stringify(duplicates)}`);
+  });
+
+  test('package.json contributes viewsContainers.panel with gitHistoryContainer', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    const containers = packageJson.contributes?.viewsContainers?.panel || [];
+    const container = containers.find((c: any) => c.id === 'gitHistoryContainer');
+    assert.ok(container, 'viewsContainers.panel should include gitHistoryContainer');
+    assert.strictEqual(container.id, 'gitHistoryContainer');
+    assert.strictEqual(container.title, 'Git History');
+    assert.ok(container.icon, 'gitHistoryContainer should have an icon');
+  });
+
+  test('package.json contributes views.gitHistoryContainer with gitHistory.webview', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    const views = packageJson.contributes?.views?.gitHistoryContainer || [];
+    const viewEntry = views.find((v: any) => v.id === 'gitHistory.webview');
+    assert.ok(viewEntry, 'views.gitHistoryContainer should include gitHistory.webview');
+    assert.strictEqual(viewEntry.type, 'webview');
+    assert.strictEqual(viewEntry.name, 'Git History');
+  });
+
+  test('package.json activationEvents includes onView:gitHistory.webview', () => {
+    const packageJsonPath = path.resolve(__dirname, '../../../package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    assert.ok(
+      packageJson.activationEvents.includes('onView:gitHistory.webview'),
+      'activationEvents should include onView:gitHistory.webview'
+    );
   });
 });

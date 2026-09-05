@@ -35,15 +35,15 @@ suite('Author Sort E2E Tests', () => {
     const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
 
     assert.ok(fnBody.includes('sortMode = (sortMode + 1) % 4'), 'Should cycle through 4 modes');
-    assert.ok(fnBody.includes('updateSortButton'), 'Should call updateSortButton');
+    assert.ok(fnBody.includes('updateSortHeaders'), 'Should call updateSortHeaders');
     assert.ok(fnBody.includes('saveSettings'), 'Should save settings');
   });
 
-  test('updateSortButton labels match sort modes', () => {
+  test('updateSortHeaders labels match sort modes', () => {
     const mainJsPath = path.resolve(__dirname, '../../../src/webview/panel/main.js');
     const source = fs.readFileSync(mainJsPath, 'utf-8');
 
-    const fnStart = source.indexOf('function updateSortButton');
+    const fnStart = source.indexOf('function updateSortHeaders');
     const fnEnd = source.indexOf('\nfunction', fnStart + 1);
     const fnBody = source.substring(fnStart, fnEnd > fnStart ? fnEnd : undefined);
 
@@ -76,7 +76,7 @@ suite('Author Sort E2E Tests', () => {
     const sortKeybinding = keybindings.find((kb: any) => kb.command === 'gitHistory.cycleSortMode');
     assert.ok(sortKeybinding, 'Should have keybinding for cycleSortMode');
     assert.ok(
-      sortKeybinding.when === 'activeWebviewPanelId == gitHistory.webview',
+      sortKeybinding.when === 'activeWebviewViewId == gitHistory.webview',
       'Keybinding should be scoped to webview panel'
     );
   });

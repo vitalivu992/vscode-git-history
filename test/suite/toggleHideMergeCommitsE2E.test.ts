@@ -124,7 +124,7 @@ suite('Toggle Hide Merge Commits E2E Source Integration Tests', () => {
     assert.ok(keybinding, 'package.json should define keybinding for toggleHideMergeCommits');
     assert.strictEqual(keybinding.key, 'ctrl+shift+q');
     assert.strictEqual(keybinding.mac, 'cmd+shift+q');
-    assert.strictEqual(keybinding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(keybinding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('keyboard shortcut triggers handleMergeToggle in main.js', () => {

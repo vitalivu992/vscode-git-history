@@ -196,7 +196,7 @@ suite('Sort Order Source Verification', () => {
     const providerPath = path.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
     const source = fs.readFileSync(providerPath, 'utf-8');
 
-    assert.ok(source.includes('th.sortable') || source.includes('class="sortable"'), 'HTML should include sortable th');
+    assert.ok(source.includes('class="author-col sortable"') || source.includes('class="date-col sortable"'), 'HTML should include sortable th');
     assert.ok(source.includes('sortable'), 'HTML should have sortable class');
   });
 

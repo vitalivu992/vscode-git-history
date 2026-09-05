@@ -8,11 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Git History now opens as a bottom-panel tab ("Git History") beside Terminal instead of an editor tab
 - Open commit URL in browser (`Ctrl+Shift+Alt+L` / `Cmd+Shift+Alt+L`), available via context menu and keyboard shortcut
 - Include short commit hash in blame decorations for quick line-to-commit tracing
+- Copy short date (`Ctrl+Alt+D` / `Cmd+Alt+D`) — copies the commit date as `YYYY-MM-DD`, also in the commit context menu
+- Copy trailers (`Ctrl+Shift+Alt+3` / `Cmd+Shift+Alt+3`) — copies the commit message trailer block (`Signed-off-by:` etc.), also in the commit context menu
+- Copy range diff (`Ctrl+Shift+Alt+R` / `Cmd+Shift+Alt+R`) — copies the diff between two Shift+click-selected commits
+- Open file URL at this commit (changed-files context menu) — opens the file's permalink on GitHub/GitLab/Bitbucket/Azure DevOps
+- Quick compare with parent (`Ctrl+Alt+P` / `Cmd+Alt+P`) — shows the diff between the focused commit and its first parent
 
 ### Fixed
 - Fix ignore-whitespace shortcut mismatch: webview handler now requires `Alt` key (`Ctrl+Shift+Alt+J`), and all tooltips show the correct chord
+- Remove placeholder keyboard-conflict tests that advertised unimplemented copy shortcuts (copy short date, copy trailers, copy range diff); each feature now lands with its own real tests
 
 ### Changed
 - Fix extension display name casing; reconstruct this changelog for v1.1.4–v1.2.0

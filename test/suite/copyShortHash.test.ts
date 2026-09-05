@@ -138,7 +138,7 @@ suite('Copy Short Hash Test Suite', () => {
     assert.ok(binding, 'Should have keybinding for gitHistory.copyShortHash');
     assert.strictEqual(binding.key, 'ctrl+shift+7');
     assert.strictEqual(binding.mac, 'cmd+shift+7');
-    assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(binding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   test('extension.ts should register copyShortHash webview action', () => {

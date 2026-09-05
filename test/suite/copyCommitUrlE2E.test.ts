@@ -325,7 +325,7 @@ suite('Copy Commit URL E2E Tests', () => {
       (k: any) => k.command === 'gitHistory.copyCommitUrl'
     );
     assert.ok(binding, 'Should have keybinding for gitHistory.copyCommitUrl');
-    assert.strictEqual(binding.when, 'activeWebviewPanelId == gitHistory.webview',
+    assert.strictEqual(binding.when, 'activeWebviewViewId == gitHistory.webview',
       'Keybinding should only work when webview is active');
   });
 

@@ -2,7 +2,7 @@
   "name": "git-history-vsce",
   "displayName": "Git history for selection",
   "description": "View git history for files and line selections with diff viewer",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "publisher": "vitalivu992",
   "icon": "images/icon.png",
   "repository": {
@@ -20,10 +20,29 @@
     "onCommand:gitHistory.showSelectionHistory",
     "onCommand:gitHistory.showRepositoryHistory",
     "onCommand:gitHistory.toggleBlame",
-    "onCommand:gitHistory.showBlameCommit"
+    "onCommand:gitHistory.showBlameCommit",
+    "onView:gitHistory.webview"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "gitHistoryContainer",
+          "title": "Git History",
+          "icon": "images/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "gitHistoryContainer": [
+        {
+          "type": "webview",
+          "id": "gitHistory.webview",
+          "name": "Git History"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "gitHistory.showFileHistory",
@@ -101,6 +120,26 @@
       {
         "command": "gitHistory.copySubject",
         "title": "Git History: Copy Commit Subject",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyShortDate",
+        "title": "Git History: Copy Short Date",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyTrailers",
+        "title": "Git History: Copy Commit Trailers",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.copyRangeDiff",
+        "title": "Git History: Copy Range Diff",
+        "category": "Git History"
+      },
+      {
+        "command": "gitHistory.compareWithParent",
+        "title": "Git History: Compare with Parent",
         "category": "Git History"
       },
       {
@@ -265,205 +304,229 @@
       {
         "command": "gitHistory.refresh",
         "key": "f5",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.refresh",
         "key": "ctrl+shift+r",
         "mac": "cmd+shift+r",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copyCommitHash",
         "key": "ctrl+shift+h",
         "mac": "cmd+shift+h",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copyCommitInfo",
         "key": "ctrl+shift+i",
         "mac": "cmd+shift+i",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copyCherryPick",
         "key": "ctrl+shift+p",
         "mac": "cmd+shift+p",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copyRevert",
         "key": "ctrl+shift+u",
         "mac": "cmd+shift+u",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copyCommitUrl",
         "key": "ctrl+shift+l",
         "mac": "cmd+shift+l",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.openCommitUrl",
         "key": "ctrl+shift+alt+l",
         "mac": "cmd+shift+alt+l",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copyAuthorEmail",
         "key": "ctrl+shift+a",
         "mac": "cmd+shift+a",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copyAuthorName",
         "key": "ctrl+shift+n",
         "mac": "cmd+shift+n",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copyShortHash",
         "key": "ctrl+shift+7",
         "mac": "cmd+shift+7",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.copySubject",
         "key": "ctrl+shift+6",
         "mac": "cmd+shift+6",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyShortDate",
+        "key": "ctrl+alt+d",
+        "mac": "cmd+alt+d",
+        "when": "activeWebviewViewId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyTrailers",
+        "key": "ctrl+shift+alt+3",
+        "mac": "cmd+shift+alt+3",
+        "when": "activeWebviewViewId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.copyRangeDiff",
+        "key": "ctrl+shift+alt+r",
+        "mac": "cmd+shift+alt+r",
+        "when": "activeWebviewViewId == gitHistory.webview"
+      },
+      {
+        "command": "gitHistory.compareWithParent",
+        "key": "ctrl+alt+p",
+        "mac": "cmd+alt+p",
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.clearAllFilters",
         "key": "ctrl+alt+q",
         "mac": "cmd+alt+q",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.deleteBranch",
         "key": "ctrl+alt+x",
         "mac": "cmd+alt+x",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.checkoutBranch",
         "key": "ctrl+alt+s",
         "mac": "cmd+alt+s",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.cherryPickCommit",
         "key": "ctrl+alt+k",
         "mac": "cmd+alt+k",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.revertCommit",
         "key": "ctrl+alt+r",
         "mac": "cmd+alt+r",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.toggleMyCommits",
         "key": "ctrl+shift+m",
         "mac": "cmd+shift+m",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.toggleWordWrap",
         "key": "ctrl+shift+w",
         "mac": "cmd+shift+w",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.toggleRegex",
         "key": "ctrl+shift+x",
         "mac": "cmd+shift+x",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.toggleIgnoreWhitespace",
         "key": "ctrl+shift+alt+j",
         "mac": "cmd+shift+alt+j",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.toggleHideMergeCommits",
         "key": "ctrl+shift+q",
         "mac": "cmd+shift+q",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.jumpToHash",
         "key": "ctrl+g",
         "mac": "cmd+g",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.jumpToNextTag",
         "key": "ctrl+]",
         "mac": "cmd+]",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.jumpToPreviousTag",
         "key": "ctrl+[",
         "mac": "cmd+[",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.jumpToParent",
         "key": "ctrl+p",
         "mac": "cmd+p",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.focusSearch",
         "key": "ctrl+f",
         "mac": "cmd+f",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.focusCommitList",
         "key": "ctrl+l",
         "mac": "cmd+l",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.showKeyboardHelp",
         "key": "shift+/",
         "mac": "shift+/",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.cycleDiffContextLines",
         "key": "ctrl+shift+/",
         "mac": "cmd+shift+/",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.cycleSortMode",
         "key": "ctrl+shift+3",
         "mac": "cmd+shift+3",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.createBranch",
         "key": "ctrl+shift+alt+b",
         "mac": "cmd+shift+alt+b",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.createTag",
         "key": "ctrl+alt+i",
         "mac": "cmd+alt+i",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
         "command": "gitHistory.deleteTag",
         "key": "ctrl+alt+.",
         "mac": "cmd+alt+.",
-        "when": "activeWebviewPanelId == gitHistory.webview"
+        "when": "activeWebviewViewId == gitHistory.webview"
       }
     ],
     "configuration": {

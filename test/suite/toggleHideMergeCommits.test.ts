@@ -248,7 +248,7 @@ suite('Toggle Hide Merge Commits Unit Tests', () => {
     assert.ok(keybinding, 'package.json should define keybinding for toggleHideMergeCommits');
     assert.strictEqual(keybinding.key, 'ctrl+shift+q');
     assert.strictEqual(keybinding.mac, 'cmd+shift+q');
-    assert.strictEqual(keybinding.when, 'activeWebviewPanelId == gitHistory.webview');
+    assert.strictEqual(keybinding.when, 'activeWebviewViewId == gitHistory.webview');
   });
 
   suite('README Documentation Verification', () => {

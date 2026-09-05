@@ -441,6 +441,13 @@ function getAuthorInitials(author) {
 // ─── Keyboard Navigation ───────────────────────────────────────────────────
 
 function handleKeyDown(e) {
+  // Ctrl+Shift+Alt+R: Copy range diff (must precede the plain Ctrl+Shift+R refresh handler)
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && e.key === 'r') {
+    e.preventDefault();
+    handleCopyRangeDiff();
+    return;
+  }
+
   // Ctrl+Shift+R: Refresh
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'r') {
     e.preventDefault();
@@ -534,6 +541,20 @@ function handleKeyDown(e) {
     return;
   }
 
+  // Ctrl+Alt+D: Copy short date (YYYY-MM-DD)
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'd') {
+    e.preventDefault();
+    handleCopyShortDate();
+    return;
+  }
+
+  // Ctrl+Alt+P: Quick compare with parent
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'p') {
+    e.preventDefault();
+    handleCompareWithParent();
+    return;
+  }
+
   // Ctrl+Shift+M: Toggle my commits filter
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'm') {
     e.preventDefault();
@@ -559,6 +580,13 @@ function handleKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && e.key === 'j') {
     e.preventDefault();
     handleIgnoreWhitespaceToggle();
+    return;
+  }
+
+  // Ctrl+Shift+Alt+3: Copy trailers (must precede the plain Ctrl+Shift+3 sort handler)
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && e.key === '3') {
+    e.preventDefault();
+    handleCopyTrailers();
     return;
   }
 
@@ -1738,6 +1766,10 @@ ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
         case 'copyAuthorName': handleCopyAuthorName(); break;
         case 'copyShortHash': handleCopyShortHash(); break;
         case 'copySubject': handleCopySubject(); break;
+        case 'copyShortDate': handleCopyShortDate(); break;
+        case 'copyTrailers': handleCopyTrailers(); break;
+        case 'copyRangeDiff': handleCopyRangeDiff(); break;
+        case 'compareWithParent': handleCompareWithParent(); break;
         case 'createBranch': handleCreateBranch(); break;
         case 'createTag': handleCreateTag(); break;
         case 'deleteTag': handleDeleteTag(); break;
@@ -2256,6 +2288,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">🕵</span>
       <span class="context-menu-label">Blame file</span>
     </div>
+    <div class="context-menu-item" data-action="open-file-url">
+      <span class="context-menu-icon">🌐</span>
+      <span class="context-menu-label">Open file URL at this commit</span>
+    </div>
     <div class="context-menu-item" data-action="restore-from-commit">
       <span class="context-menu-icon">⏪</span>
       <span class="context-menu-label">Restore file from this commit</span>
@@ -2301,6 +2337,8 @@ function showFileContextMenu(event, filePath, commitHash) {
         vscode.postMessage({ type: 'compareFileWithWorkingTree', hash: commitHash, filePath: filePath });
       } else if (action === 'blame-file') {
         vscode.postMessage({ type: 'blameFile', filePath: filePath });
+      } else if (action === 'open-file-url') {
+        vscode.postMessage({ type: 'openFileUrl', hash: commitHash, filePath: filePath });
       } else if (action === 'restore-from-commit') {
         vscode.postMessage({ type: 'restoreFileFromCommit', hash: commitHash, filePath: filePath });
       } else if (action === 'copy-path') {
@@ -2388,6 +2426,14 @@ function showCommitContextMenu(event, commit) {
       <span class="context-menu-icon">📌</span>
       <span class="context-menu-label">Copy subject</span>
     </div>
+    <div class="context-menu-item" data-action="copy-short-date">
+      <span class="context-menu-icon">📅</span>
+      <span class="context-menu-label">Copy short date (YYYY-MM-DD)</span>
+    </div>
+    <div class="context-menu-item" data-action="copy-trailers">
+      <span class="context-menu-icon">🏷</span>
+      <span class="context-menu-label">Copy trailers</span>
+    </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" data-action="create-branch">
       <span class="context-menu-icon">🌿</span>
@@ -2441,6 +2487,10 @@ function showCommitContextMenu(event, commit) {
         vscode.postMessage({ type: 'copyShortHash', hash: commit.hash });
       } else if (action === 'copy-subject') {
         vscode.postMessage({ type: 'copySubject', hash: commit.hash });
+      } else if (action === 'copy-short-date') {
+        vscode.postMessage({ type: 'copyShortDate', hash: commit.hash });
+      } else if (action === 'copy-trailers') {
+        vscode.postMessage({ type: 'copyTrailers', hash: commit.hash });
       } else if (action === 'create-branch') {
         handleCreateBranch();
       } else if (action === 'create-tag') {
@@ -2798,6 +2848,112 @@ function handleCopySubject() {
     type: 'copySubject',
     hash: targetCommit.hash
   });
+}
+
+
+function handleCopyShortDate() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy short date');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyShortDate',
+    hash: targetCommit.hash
+  });
+}
+
+
+function handleCopyTrailers() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to copy trailers');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyTrailers',
+    hash: targetCommit.hash
+  });
+}
+
+
+function handleCopyRangeDiff() {
+  // Prefer the last Shift+click range selection endpoints; otherwise exactly
+  // two selected commits define the range.
+  let fromHash = rangeSelectionAnchor;
+  let toHash = rangeSelectionTarget;
+
+  if (!fromHash || !toHash) {
+    if (selectedCommits.size === 2) {
+      const displayCommits = getOrderedCommits(getFilteredCommits());
+      const ordered = displayCommits.filter(c => selectedCommits.has(c.hash));
+      if (ordered.length === 2) {
+        fromHash = ordered[0].hash;
+        toHash = ordered[1].hash;
+      }
+    }
+  }
+
+  if (!fromHash || !toHash) {
+    showError('Select two commits (Shift+click) to copy the range diff');
+    return;
+  }
+
+  vscode.postMessage({
+    type: 'copyRangeDiff',
+    fromHash,
+    toHash
+  });
+}
+
+
+function handleCompareWithParent() {
+  const displayCommits = getOrderedCommits(getFilteredCommits());
+  let targetCommit = null;
+
+  // Prioritize focused row, then selected commit
+  if (focusedIndex >= 0 && focusedIndex < displayCommits.length) {
+    targetCommit = displayCommits[focusedIndex];
+  } else if (selectedCommits.size === 1) {
+    const hash = [...selectedCommits][0];
+    targetCommit = displayCommits.find(c => c.hash === hash);
+  }
+
+  if (!targetCommit) {
+    showError('Select a commit to compare with its parent');
+    return;
+  }
+
+  const parentHash = targetCommit.parentHashes && targetCommit.parentHashes[0];
+  if (!parentHash) {
+    showError('Commit has no parent (root commit)');
+    return;
+  }
+
+  // Diff parent..commit through the existing range-diff plumbing
+  requestRangeDiff(parentHash, targetCommit.hash);
 }
 
 
@@ -3291,6 +3447,7 @@ function showKeyboardHelpDialog() {
       category: 'Navigation',
       items: [
         { keys: [cmdKey, 'L'], description: 'Focus commit list for navigation' },
+        { keys: [cmdKey, 'Alt', 'P'], description: 'Quick compare with parent commit' },
         { keys: ['↑', '↓'], description: 'Navigate up/down through commits' },
         { keys: ['Home'], description: 'Jump to first commit' },
         { keys: ['End'], description: 'Jump to last commit' },
@@ -3340,7 +3497,10 @@ function showKeyboardHelpDialog() {
         { keys: [cmdKey, 'Shift', 'A'], description: 'Copy author email' },
         { keys: [cmdKey, 'Shift', 'N'], description: 'Copy author name' },
         { keys: [cmdKey, 'Shift', '7'], description: 'Copy short hash' },
-        { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' }
+        { keys: [cmdKey, 'Shift', '6'], description: 'Copy commit subject' },
+        { keys: [cmdKey, 'Alt', 'D'], description: 'Copy short date (YYYY-MM-DD)' },
+        { keys: [cmdKey, 'Shift', 'Alt', '3'], description: 'Copy commit trailers' },
+        { keys: [cmdKey, 'Shift', 'Alt', 'R'], description: 'Copy range diff (between two selected commits)' }
       ]
     },
     {
