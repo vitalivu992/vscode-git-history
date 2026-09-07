@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { GitHistoryPanel } from './webview/webviewProvider';
+import { GitHistoryPanel, GitHistoryDiffPanel } from './webview/webviewProvider';
 import { getGitRoot } from './git/gitService';
 import { BlameService } from './blame/blameService';
 import { GitHistoryContentProvider } from './gitHistoryContentProvider';
@@ -216,9 +216,22 @@ export function activate(context: vscode.ExtensionContext) {
     { command: 'gitHistory.clearAllFilters', action: 'clearAllFilters' },
   ] as const;
 
+  // Diff-surface actions: routed to the editor-area diff panel when it is
+  // open (the list panel has no diff viewer after the split). Refresh hits
+  // both surfaces (list reload + diff re-request); the diff-view toggles fall
+  // back to the list panel when no diff panel is open.
+  const diffSurfaceActions = new Set(['toggleWordWrap', 'toggleIgnoreWhitespace', 'cycleDiffContextLines']);
+
   for (const { command, action } of webviewActions) {
     context.subscriptions.push(
       vscode.commands.registerCommand(command, () => {
+        const diffPanel = GitHistoryDiffPanel.instance;
+        if (diffPanel && (diffSurfaceActions.has(action) || action === 'refresh')) {
+          diffPanel.postMessage({ type: 'triggerAction', action });
+          if (diffSurfaceActions.has(action)) {
+            return;
+          }
+        }
         GitHistoryPanel.currentPanel?.postMessage({ type: 'triggerAction', action });
       })
     );
@@ -227,4 +240,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   GitHistoryPanel.currentPanel?.dispose();
+  GitHistoryDiffPanel.instance?.dispose();
 }

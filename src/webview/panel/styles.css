@@ -39,7 +39,8 @@ body {
 
 /* ─── Toolbar ─────────────────────────────────────────────────────────────── */
 
-#diff-controls {
+#diff-controls,
+#panel-toolbar {
   display: flex;
   gap: 8px;
   padding: 6px 12px;
@@ -299,6 +300,12 @@ th.sortable.sort-desc::after {
   padding: 8px;
   position: relative;
   z-index: 0;
+}
+
+/* In the editor-area diff surface the viewer is the only content */
+body[data-mode="diff"] #diff-viewer {
+  height: auto;
+  flex: 1;
 }
 
 /* ─── Resizers ────────────────────────────────────────────────────────────── */

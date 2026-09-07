@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { GitHistoryPanel } from './webviewProvider';
+import { GitHistoryPanel, GitHistoryDiffPanel } from './webviewProvider';
 import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitStats, getBranchCommitHashes, getCommitUrl, getFileUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, renameBranch, checkoutBranch, cherryPickCommit, revertCommit, restoreFileFromCommit, diffFileWithWorkingTree, searchInDiffs, resetToCommit } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
@@ -48,6 +48,10 @@ export async function handleMessage(
 
     case 'requestRefresh':
       await panel.loadData();
+      // Refresh the editor-area diff panel too (if open with a current commit)
+      if (GitHistoryDiffPanel.instance && GitHistoryDiffPanel.instance.getCurrentHash()) {
+        await handleRequestDiff(GitHistoryDiffPanel.instance.getCurrentHash()!, panel);
+      }
       break;
 
     case 'copyCommitHash':
@@ -195,30 +199,80 @@ function isValidMessage(message: unknown): message is { type: string; [key: stri
   return typeof message === 'object' && message !== null && 'type' in message;
 }
 
+/**
+ * Return the editor-area diff panel, creating it on first use. Falls back to
+ * undefined when the panel cannot be created (e.g. mock panels in tests), in
+ * which case callers post to the list panel as before the split.
+ */
+function ensureDiffPanel(panel: GitHistoryPanel): GitHistoryDiffPanel | undefined {
+  if (GitHistoryDiffPanel.instance) {
+    return GitHistoryDiffPanel.instance;
+  }
+  try {
+    return GitHistoryDiffPanel.createOrShow(panel.getContext().extensionUri, panel.getSettingsService());
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Post a diff-rendering message ('diff'/'combinedDiff'/'rangeDiff') to the
+ * editor-area diff surface, creating it if needed. Falls back to the list
+ * panel when the diff panel is unavailable (legacy single-surface behavior).
+ */
+function postToDiffSurface(panel: GitHistoryPanel, message: ExtToWebviewMessage): void {
+  const diffPanel = ensureDiffPanel(panel);
+  if (diffPanel) {
+    diffPanel.postMessage(message);
+  } else {
+    panel.postMessage(message);
+  }
+}
+
+/**
+ * Update the diff tab title for the commit whose diff is being shown.
+ */
+function setDiffTitleForCommit(panel: GitHistoryPanel, hash: string): void {
+  const diffPanel = ensureDiffPanel(panel);
+  if (!diffPanel) {
+    return;
+  }
+  const commit = panel.getCommits().find(c => c.hash === hash);
+  const shortHash = commit ? commit.shortHash : hash.substring(0, 7);
+  const subject = commit ? commit.message : '';
+  diffPanel.setCommit(hash, shortHash, subject);
+}
+
 async function handleRequestDiff(hash: string, panel: GitHistoryPanel): Promise<void> {
   try {
     const diffResult = await getCommitDiff(hash, panel.getCwd(), undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
     if (diffResult.isBinary) {
-      panel.postMessage({
+      postToDiffSurface(panel, {
         type: 'diff',
         hash,
         diff: 'Binary file - cannot display diff',
         files: []
       });
+      setDiffTitleForCommit(panel, hash);
+      panel.postMessage({ type: 'commitFiles', hash, files: [] });
       return;
     }
 
     const files = await getCommitFiles(hash, panel.getCwd());
     const stats = await getCommitStats(hash, panel.getCwd());
 
-    panel.postMessage({
+    // Diff renders in the editor-area diff panel; the changed-files list
+    // stays in the panel's commit detail.
+    postToDiffSurface(panel, {
       type: 'diff',
       hash,
       diff: diffResult.diff,
       files,
       stats
     });
+    setDiffTitleForCommit(panel, hash);
+    panel.postMessage({ type: 'commitFiles', hash, files });
   } catch (error) {
     panel.postMessage({
       type: 'error',
@@ -234,8 +288,13 @@ async function handleRequestCombinedDiff(
   try {
     const diffResult = await getCombinedDiff(hashes, panel.getCwd(), undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
+    const diffPanel = ensureDiffPanel(panel);
+    if (diffPanel) {
+      diffPanel.setTitleForCombined(hashes.length);
+    }
+
     if (diffResult.isBinary) {
-      panel.postMessage({
+      postToDiffSurface(panel, {
         type: 'combinedDiff',
         hashes,
         diff: 'Binary file - cannot display diff'
@@ -243,7 +302,7 @@ async function handleRequestCombinedDiff(
       return;
     }
 
-    panel.postMessage({
+    postToDiffSurface(panel, {
       type: 'combinedDiff',
       hashes,
       diff: diffResult.diff
@@ -264,22 +323,27 @@ async function handleRequestRangeDiff(
   try {
     const diffResult = await getCommitRangeDiff(fromHash, toHash, panel.getCwd(), undefined, panel.getIgnoreWhitespace(), panel.getDiffContextLines());
 
-    if (diffResult.isBinary) {
-      panel.postMessage({
-        type: 'rangeDiff',
-        fromHash,
-        toHash,
-        diff: 'Binary file - cannot display diff'
-      });
-      return;
+    const diffPanel = ensureDiffPanel(panel);
+    if (diffPanel) {
+      diffPanel.setCurrentHash(toHash);
+      const fromCommit = panel.getCommits().find(c => c.hash === fromHash);
+      const toCommit = panel.getCommits().find(c => c.hash === toHash);
+      diffPanel.setTitleForRange(
+        fromCommit ? fromCommit.shortHash : fromHash.substring(0, 7),
+        toCommit ? toCommit.shortHash : toHash.substring(0, 7)
+      );
     }
 
-    panel.postMessage({
-      type: 'rangeDiff',
-      fromHash,
-      toHash,
-      diff: diffResult.diff
-    });
+    const rangeMessage = diffResult.isBinary
+      ? { type: 'rangeDiff' as const, fromHash, toHash, diff: 'Binary file - cannot display diff' }
+      : { type: 'rangeDiff' as const, fromHash, toHash, diff: diffResult.diff };
+
+    // The diff renders in the editor-area panel; the list panel also receives
+    // the message to update its "Comparing: a..b" commit detail header.
+    postToDiffSurface(panel, rangeMessage);
+    if (diffPanel) {
+      panel.postMessage(rangeMessage);
+    }
   } catch (error) {
     panel.postMessage({
       type: 'error',
@@ -318,19 +382,20 @@ async function handleRequestFileDiff(
 
     if (diffResult.isBinary) {
       const files = await getCommitFiles(hash, cwd);
-      panel.postMessage({
+      postToDiffSurface(panel, {
         type: 'diff',
         hash,
         diff: 'Binary file - cannot display diff',
         files,
         selectedFile: filePath
       });
+      panel.postMessage({ type: 'commitFiles', hash, files, selectedFile: filePath });
       return;
     }
 
     const files = await getCommitFiles(hash, cwd);
     const stats = await getCommitStats(hash, cwd);
-    panel.postMessage({
+    postToDiffSurface(panel, {
       type: 'diff',
       hash,
       diff: diffResult.diff,
@@ -338,6 +403,7 @@ async function handleRequestFileDiff(
       selectedFile: filePath,
       stats
     });
+    panel.postMessage({ type: 'commitFiles', hash, files, selectedFile: filePath });
   } catch (error) {
     panel.postMessage({
       type: 'error',
@@ -461,13 +527,14 @@ async function handleCompareFileWithWorkingTree(hash: string, filePath: string, 
     const diffResult = await diffFileWithWorkingTree(hash, filePath, panel.getCwd(), panel.getIgnoreWhitespace(), panel.getDiffContextLines());
     const files = await getCommitFiles(hash, panel.getCwd());
     if (diffResult.isBinary) {
-      panel.postMessage({ type: 'diff', hash, diff: 'Binary file - cannot display diff', files, selectedFile: filePath });
+      postToDiffSurface(panel, { type: 'diff', hash, diff: 'Binary file - cannot display diff', files, selectedFile: filePath });
     } else if (!diffResult.diff.trim()) {
-      panel.postMessage({ type: 'diff', hash, diff: 'No changes — file is identical to this commit version', files, selectedFile: filePath });
+      postToDiffSurface(panel, { type: 'diff', hash, diff: 'No changes — file is identical to this commit version', files, selectedFile: filePath });
     } else {
       const stats = await getCommitStats(hash, panel.getCwd());
-      panel.postMessage({ type: 'diff', hash, diff: diffResult.diff, files, selectedFile: filePath, stats });
+      postToDiffSurface(panel, { type: 'diff', hash, diff: diffResult.diff, files, selectedFile: filePath, stats });
     }
+    panel.postMessage({ type: 'commitFiles', hash, files, selectedFile: filePath });
   } catch (error) {
     panel.postMessage({ type: 'error', message: error instanceof Error ? error.message : String(error) });
   }

@@ -268,18 +268,19 @@ suite('Keybinding Registration E2E Tests', () => {
       expectedWebviewActions.some((a) => a.command === kb.command)
     );
 
-    // gitHistory.refresh has two keybindings (F5 and Ctrl+Shift+R), so the count is len+1
+    // gitHistory.refresh is bound on both surfaces (F5 + Ctrl+Shift+R each),
+    // and toggleWordWrap is bound on the diff panel only, so the count is len+3
     assert.strictEqual(
       webviewKeybindings.length,
-      expectedWebviewActions.length + 1,
-      `Should have ${expectedWebviewActions.length + 1} webview keybindings (refresh has 2)`
+      expectedWebviewActions.length + 3,
+      `Should have ${expectedWebviewActions.length + 3} webview keybindings (refresh has 4, toggleWordWrap is diff-panel only)`
     );
 
     for (const kb of webviewKeybindings) {
-      assert.strictEqual(
-        kb.when,
-        'activeWebviewViewId == gitHistory.webview',
-        `Keybinding for "${kb.command}" should have when clause "activeWebviewPanelId == gitHistory.webview"`
+      assert.ok(
+        kb.when === 'activeWebviewViewId == gitHistory.webview' ||
+        kb.when === 'activeWebviewPanelId == gitHistory.diffView',
+        `Keybinding for "${kb.command}" should target the list view or the diff panel`
       );
     }
   });

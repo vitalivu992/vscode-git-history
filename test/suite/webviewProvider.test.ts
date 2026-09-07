@@ -5,6 +5,7 @@ import * as path from 'path';
 suite('WebviewProvider HTML Tests', () => {
   let panel: vscode.WebviewPanel;
   let html: string;
+  let diffHtml: string;
 
   suiteSetup(() => {
     const extensionUri = vscode.Uri.file(path.resolve(__dirname, '../../../'));
@@ -24,7 +25,7 @@ suite('WebviewProvider HTML Tests', () => {
     const stylesUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'dist', 'webview', 'panel', 'styles.css'));
     const mainJsUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'dist', 'webview', 'panel', 'main.js'));
 
-    html = `<!DOCTYPE html>
+    const head = (body: string) => `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -34,7 +35,14 @@ suite('WebviewProvider HTML Tests', () => {
   <link rel="stylesheet" href="${stylesUri}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/css/diff2html.min.css">
 </head>
-<body>
+<body ${body}
+  <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/js/diff2html-ui.min.js"></script>
+  <script nonce="${nonce}" src="${mainJsUri}"></script>
+</body>
+</html>`;
+
+    // Mirrors getDiffHtml() in webviewProvider.ts (editor-area diff surface)
+    const diffHtmlCopy = head(`data-mode="diff">
   <div id="app">
     <div id="diff-controls">
       <div class="segmented-control">
@@ -42,19 +50,31 @@ suite('WebviewProvider HTML Tests', () => {
         <button id="side-by-side-btn">Side by Side</button>
       </div>
       <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
-      <button id="word-wrap-btn" class="word-wrap-btn" title="Toggle word wrap (Ctrl+Shift+W)">Wrap</button>
-      <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits">No Merge</button>
-      <button id="refresh-btn" title="Refresh (F5 or Ctrl+Shift+R)">&#x21bb;</button>
+      <button id="ignore-ws-btn" class="ignore-ws-btn" title="Toggle ignore whitespace (Ctrl+Shift+Alt+J)">W</button>
+      <button id="context-lines-btn" class="context-lines-btn" title="Diff context lines (Ctrl+Shift+/)">
+        <span id="context-lines-value">3</span>
+      </button>
     </div>
 
     <div id="main-content">
       <div id="diff-viewer"></div>
-      <div id="vertical-resizer"></div>
+    </div>
+  </div>`);
 
+    // Mirrors getListHtml() in webviewProvider.ts (bottom-panel list surface)
+    const listHtml = head(`data-mode="list">
+  <div id="app">
+    <div id="panel-toolbar">
+      <button id="merge-toggle-btn" class="merge-toggle-btn" title="Hide merge commits (Ctrl+Shift+Q)">No Merge</button>
+      <button id="my-commits-btn" class="my-commits-btn" title="Show only my commits (Ctrl+Shift+M)">My Commits</button>
+      <button id="refresh-btn" title="Refresh (F5 or Ctrl+Shift+R)">&#x21bb;</button>
+    </div>
+
+    <div id="main-content">
       <div id="bottom-panel">
         <div id="commit-table-container">
           <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | after:2024-01-01 | last:7days">
+            <input type="text" id="search-input" placeholder="Search: message, author, email, hash, tag | author:name | tag:name | branch:name | path:name | after:2024-01-01 | last:2weeks">
             <button id="regex-toggle-btn" class="regex-toggle-btn" title="Toggle regex search mode (Ctrl+Shift+X)">.*</button>
             <div id="commit-count" class="commit-count"></div>
           </div>
@@ -81,13 +101,11 @@ suite('WebviewProvider HTML Tests', () => {
         </div>
       </div>
     </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.47/bundles/js/diff2html-ui.min.js"></script>
-  <script nonce="${nonce}" src="${mainJsUri}"></script>
-</body>
-</html>`;
+  </div>`);
 
-    panel.webview.html = html;
+    html = listHtml;
+    diffHtml = diffHtmlCopy;
+    panel.webview.html = listHtml;
   });
 
   suiteTeardown(() => {
@@ -131,12 +149,34 @@ suite('WebviewProvider HTML Tests', () => {
   });
 
   test('HTML should contain expected structural elements', () => {
-    assert.ok(html.includes('id="app"'), 'Should have #app');
-    assert.ok(html.includes('id="main-content"'), 'Should have #main-content');
-    assert.ok(html.includes('id="bottom-panel"'), 'Should have #bottom-panel');
-    assert.ok(html.includes('id="diff-viewer"'), 'Should have #diff-viewer');
-    assert.ok(html.includes('id="commit-list"'), 'Should have #commit-list');
-    assert.ok(html.includes('id="file-list"'), 'Should have #file-list');
+    const fs = require('fs');
+    const pathMod = require('path');
+    const providerPath = pathMod.resolve(__dirname, '../../../src/webview/webviewProvider.ts');
+    const source = fs.readFileSync(providerPath, 'utf-8');
+
+    // Both builders share the same assets/head via wrapHtml
+    assert.ok(source.includes('function getDiffHtml'), 'webviewProvider should have a diff HTML builder');
+    assert.ok(source.includes('function getListHtml'), 'webviewProvider should have a list HTML builder');
+
+    // The two surfaces are mutually exclusive: the diff builder (first in the
+    // source) has the diff viewer and controls; the list builder has the
+    // commit table, search, and commit detail — never the diff viewer.
+    const diffIdx = source.indexOf('data-mode="diff"');
+    const listIdx = source.indexOf('data-mode="list"');
+    assert.ok(diffIdx > 0, 'diff HTML builder should set data-mode="diff"');
+    assert.ok(listIdx > diffIdx, 'list HTML builder should set data-mode="list"');
+
+    const diffSection = source.substring(diffIdx, listIdx);
+    const listSection = source.substring(listIdx);
+
+    for (const el of ['id="diff-controls"', 'id="diff-viewer"', 'id="unified-btn"', 'id="word-wrap-btn"', 'id="ignore-ws-btn"', 'id="context-lines-btn"']) {
+      assert.ok(diffSection.includes(el), `diff HTML should contain ${el}`);
+      assert.ok(!listSection.includes(el), `list HTML must NOT contain ${el}`);
+    }
+    for (const el of ['id="panel-toolbar"', 'id="bottom-panel"', 'id="commit-table-container"', 'id="search-input"', 'id="commit-list"', 'id="commit-detail"', 'id="file-list"', 'id="refresh-btn"']) {
+      assert.ok(listSection.includes(el), `list HTML should contain ${el}`);
+      assert.ok(!diffSection.includes(el), `diff HTML must NOT contain ${el}`);
+    }
   });
 
   test('HTML table header columns should match data row columns', () => {
@@ -158,6 +198,14 @@ suite('WebviewProvider HTML Tests', () => {
 
   test('main.js script tag should have nonce attribute', () => {
     assert.ok(html.includes('nonce="test-nonce-12345"'), 'main.js script should have nonce');
+    assert.ok(diffHtml.includes('nonce="test-nonce-12345"'), 'diff surface main.js script should have nonce');
+  });
+
+  test('diff surface HTML copy carries the diff viewer and controls only', () => {
+    assert.ok(diffHtml.includes('id="diff-viewer"'), 'diff HTML should have #diff-viewer');
+    assert.ok(diffHtml.includes('id="diff-controls"'), 'diff HTML should have #diff-controls');
+    assert.ok(!diffHtml.includes('id="commit-list"'), 'diff HTML must not have the commit list');
+    assert.ok(!diffHtml.includes('id="search-input"'), 'diff HTML must not have the search input');
   });
 
   test('main.js should not call non-existent diff2html methods', () => {

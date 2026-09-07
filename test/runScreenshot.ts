@@ -12,7 +12,12 @@ async function main() {
       extensionTestsPath,
       launchArgs: [
         workspacePath,
-        '--disable-extensions'
+        '--disable-extensions',
+        // Electron must run on X11 under Xvfb (CI/headless): without these,
+        // Electron probes Wayland first and exits with SIGTRAP.
+        '--no-sandbox',
+        '--disable-gpu',
+        '--ozone-platform=x11'
       ]
     });
   } catch (err) {

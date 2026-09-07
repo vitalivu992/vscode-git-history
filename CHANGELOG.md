@@ -20,8 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix ignore-whitespace shortcut mismatch: webview handler now requires `Alt` key (`Ctrl+Shift+Alt+J`), and all tooltips show the correct chord
 - Remove placeholder keyboard-conflict tests that advertised unimplemented copy shortcuts (copy short date, copy trailers, copy range diff); each feature now lands with its own real tests
+- Fix the commit table never populating when the Git History tab is opened directly: the view-provider instance now binds the `GitHistoryPanel.currentPanel` singleton on resolve, and loading defaults the working directory to the first workspace folder
 
 ### Changed
+- Split the Git History UI into two surfaces: the bottom-panel "Git History" tab keeps the commit list and changed-files detail, while a commit's diff now opens in a reusable editor-area tab (titled `<shortHash> <subject>`) created without stealing focus from the panel. The diff controls (Unified/Side by Side, Wrap, ignore-whitespace, context lines) moved to the diff tab; their shortcuts (`Ctrl+Shift+W`, `Ctrl+Shift+Alt+J`, `Ctrl+Shift+/`) and refresh now also work while the diff tab is focused
 - Fix extension display name casing; reconstruct this changelog for v1.1.4–v1.2.0
 
 ## [1.2.0] - 2026-08-22

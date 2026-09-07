@@ -28,6 +28,8 @@ How to use Git History: open history views, navigate the panel, use the right-cl
 
 ### Using the History Panel
 
+The UI is split into two surfaces: the **Git History** bottom-panel tab shows the commit list (search, filters, toolbar) and the changed-files detail for the selected commit; clicking a commit opens its diff in a reusable **editor-area tab** (titled with the short hash and subject). The diff tab's toolbar holds the Unified/Side-by-Side toggle, word wrap, ignore-whitespace, and context-line controls; the panel keeps focus while the diff opens beside your editor.
+
 - **Click a commit row** to view its diff and changed files
 - **Shift+click two commits** to compare any two commits and see what changed between them (e.g., compare v1.0 to v2.0)
 - **Ctrl+click** to multi-select non-consecutive commits for a combined diff
@@ -65,8 +67,8 @@ How to use Git History: open history views, navigate the panel, use the right-cl
 - **Toggle sort order** with the sort button to cycle through newest-first, oldest-first, author A-Z, and author Z-A ordering
 - **Hide merge commits** with the "No Merge" button to focus on actual work commits; the count indicator shows "X of Y" when filters are active
 - **Show my commits only** with the "My Commits" button to quickly filter commits authored by you (based on `git config user.name` and `user.email`). The button is disabled if git user is not configured.
-- **Toggle view mode** between Unified and Side-by-Side
-- **Scroll the diff viewer** to see all changes
+- **Toggle view mode** between Unified and Side-by-Side in the diff tab's toolbar
+- **Scroll the diff tab** to see all changes
 
 ### First-Run Tip
 
@@ -139,8 +141,20 @@ Right-click on commits in the commit list or files in the changed files list to 
 
 | Keybinding | Action |
 |------------|--------|
-| `F5` | Refresh history |
+| `F5` | Refresh history (list and diff tab) |
 | `Ctrl+Shift+R` / `Cmd+Shift+R` | Refresh history (alternative) |
+
+### Diff tab (active diff panel)
+
+These shortcuts work while the editor-area diff tab is focused:
+
+| Keybinding | Action |
+|------------|--------|
+| `F5` | Refresh history (list and diff tab) |
+| `Ctrl+Shift+R` / `Cmd+Shift+R` | Refresh history (alternative) |
+| `Ctrl+Shift+W` | Toggle word wrap in diff viewer |
+| `Ctrl+Shift+Alt+J` | Toggle ignore whitespace in diffs |
+| `Ctrl+Shift+/` | Cycle diff context lines (1–10) |
 
 ### Navigation
 
@@ -166,9 +180,6 @@ Right-click on commits in the commit list or files in the changed files list to 
 | `Ctrl+Shift+M` | Toggle "Show my commits only" filter |
 | `Ctrl+Shift+Q` | Toggle hide merge commits |
 | `Ctrl+Shift+3` | Cycle sort mode (Newest / Oldest / Author A-Z / Z-A) |
-| `Ctrl+Shift+/` | Cycle diff context lines (1–10) |
-| `Ctrl+Shift+W` | Toggle word wrap in diff viewer |
-| `Ctrl+Shift+Alt+J` | Toggle ignore whitespace in diffs |
 | `Ctrl+Alt+Q` | Clear all filters |
 
 ### Copy

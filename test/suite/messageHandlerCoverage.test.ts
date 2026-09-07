@@ -103,7 +103,7 @@ suite('Message Handler Switch Case Coverage', () => {
       const match = line.match(/(?:await\s+)?(\w+)\(/);
       if (match && match[1] !== 'panel' && match[1] !== 'switch' && match[1] !== 'case' && match[1] !== 'break' && match[1] !== 'saveSettings') {
         const lineTrimmed = line.trim();
-        if (!lineTrimmed.startsWith('panel.') && !lineTrimmed.startsWith('await panel.')) {
+        if (!lineTrimmed.startsWith('panel.') && !lineTrimmed.startsWith('await panel.') && !line.includes('GitHistoryDiffPanel')) {
           handlerNames.push(match[1]);
         }
       }

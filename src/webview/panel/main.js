@@ -1,6 +1,14 @@
 // VS Code API
 const vscode = acquireVsCodeApi();
 
+// Surface mode: the bottom panel loads with data-mode="list" (commit list +
+// commit detail), the editor-area diff panel with data-mode="diff" (diff
+// viewer + diff controls). The index.html dev preview has no data-mode and
+// wires both surfaces like the legacy combined view.
+const MODE = document.body.dataset.mode;
+const isListMode = MODE !== 'diff';
+const isDiffMode = MODE !== 'list';
+
 // State
 let commits = [];
 let selectedCommits = new Set();
@@ -440,7 +448,53 @@ function getAuthorInitials(author) {
 
 // ─── Keyboard Navigation ───────────────────────────────────────────────────
 
+/**
+ * Diff-surface keyboard shortcuts (when the editor-area diff tab is focused):
+ * refresh, word wrap, ignore whitespace, and diff context lines.
+ */
+function handleDiffModeKeyDown(e) {
+  // Ctrl+Shift+Alt+J: Toggle ignore whitespace (must precede plain r/j handlers)
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && e.key === 'j') {
+    e.preventDefault();
+    handleIgnoreWhitespaceToggle();
+    return;
+  }
+
+  // Ctrl+Shift+R: Refresh
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey && e.key === 'r') {
+    e.preventDefault();
+    handleRefresh();
+    return;
+  }
+
+  // F5: Refresh
+  if (e.key === 'F5') {
+    e.preventDefault();
+    handleRefresh();
+    return;
+  }
+
+  // Ctrl+Shift+W: Toggle word wrap
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'w') {
+    e.preventDefault();
+    handleWordWrapToggle();
+    return;
+  }
+
+  // Ctrl+Shift+/: Cycle diff context lines
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === '/' || e.key === '?')) {
+    e.preventDefault();
+    handleDiffContextLinesCycle();
+    return;
+  }
+}
+
 function handleKeyDown(e) {
+  if (MODE === 'diff') {
+    handleDiffModeKeyDown(e);
+    return;
+  }
+
   // Ctrl+Shift+Alt+R: Copy range diff (must precede the plain Ctrl+Shift+R refresh handler)
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.altKey && e.key === 'r') {
     e.preventDefault();
@@ -1341,58 +1395,65 @@ function handleFocusCommitList() {
 function init() {
   vscode.postMessage({ type: 'ready' });
 
-  unifiedBtn.addEventListener('click', () => setDiffType('unified'));
-  sideBySideBtn.addEventListener('click', () => setDiffType('side-by-side'));
-  if (searchInput) {
-    searchInput.addEventListener('input', handleSearch);
+  if (isDiffMode) {
+    if (unifiedBtn) {
+      unifiedBtn.addEventListener('click', () => setDiffType('unified'));
+    }
+    if (sideBySideBtn) {
+      sideBySideBtn.addEventListener('click', () => setDiffType('side-by-side'));
+    }
+    if (wordWrapBtn) {
+      wordWrapBtn.addEventListener('click', handleWordWrapToggle);
+    }
+    if (ignoreWsBtn) {
+      ignoreWsBtn.addEventListener('click', handleIgnoreWhitespaceToggle);
+    }
+    if (contextLinesBtn) {
+      contextLinesBtn.addEventListener('click', handleDiffContextLinesCycle);
+    }
   }
 
-  if (refreshBtn) {
-    refreshBtn.addEventListener('click', handleRefresh);
-  }
+  if (isListMode) {
+    if (searchInput) {
+      searchInput.addEventListener('input', handleSearch);
+    }
 
-  if (wordWrapBtn) {
-    wordWrapBtn.addEventListener('click', handleWordWrapToggle);
-  }
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', handleRefresh);
+    }
 
-  if (mergeToggleBtn) {
-    mergeToggleBtn.addEventListener('click', handleMergeToggle);
-  }
+    if (mergeToggleBtn) {
+      mergeToggleBtn.addEventListener('click', handleMergeToggle);
+    }
 
-  if (regexToggleBtn) {
-    regexToggleBtn.addEventListener('click', handleRegexToggle);
-  }
+    if (regexToggleBtn) {
+      regexToggleBtn.addEventListener('click', handleRegexToggle);
+    }
 
-  if (clearAllFiltersBtn) {
-    clearAllFiltersBtn.addEventListener('click', clearAllFilters);
-  }
+    if (clearAllFiltersBtn) {
+      clearAllFiltersBtn.addEventListener('click', clearAllFilters);
+    }
 
-  const diffSearchBtn = document.getElementById('diff-search-btn');
-  if (diffSearchBtn) {
-    diffSearchBtn.addEventListener('click', handleDiffSearchClick);
-  }
+    const diffSearchBtn = document.getElementById('diff-search-btn');
+    if (diffSearchBtn) {
+      diffSearchBtn.addEventListener('click', handleDiffSearchClick);
+    }
 
-  if (todayFilterBtn) {
-    todayFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:1day'));
-  }
-  if (sprintFilterBtn) {
-    sprintFilterBtn.addEventListener('click', () => applyQuickDateFilter(`last:${sprintLengthWeeks}week${sprintLengthWeeks !== 1 ? 's' : ''}`));
-  }
+    if (todayFilterBtn) {
+      todayFilterBtn.addEventListener('click', () => applyQuickDateFilter('last:1day'));
+    }
+    if (sprintFilterBtn) {
+      sprintFilterBtn.addEventListener('click', () => applyQuickDateFilter(`last:${sprintLengthWeeks}week${sprintLengthWeeks !== 1 ? 's' : ''}`));
+    }
 
-  if (ignoreWsBtn) {
-    ignoreWsBtn.addEventListener('click', handleIgnoreWhitespaceToggle);
-  }
-
-  if (contextLinesBtn) {
-    contextLinesBtn.addEventListener('click', handleDiffContextLinesCycle);
-  }
-
-  if (myCommitsBtn) {
-    myCommitsBtn.addEventListener('click', handleMyCommitsToggle);
+    if (myCommitsBtn) {
+      myCommitsBtn.addEventListener('click', handleMyCommitsToggle);
+    }
   }
   // Keyboard shortcuts
   document.addEventListener('keydown', handleKeyDown);
 
+  if (isListMode && commitList) {
   // Hash chip copy-on-click and message expand (event delegation)
   commitList.addEventListener('click', (e) => {
     if (e.target.classList.contains('hash-chip')) {
@@ -1436,18 +1497,21 @@ function init() {
       renderFilterBadges();
     }
   });
+  }
 
-  initResizers();
+  if (isListMode) {
+    initResizers();
 
-  // Sort on table header click
-  const tableHead = document.querySelector('#commit-table thead');
-  if (tableHead) {
-    tableHead.addEventListener('click', (e) => {
-      const th = e.target.closest('th.sortable');
-      if (th) {
-        handleSortClick(th.dataset.sort);
-      }
-    });
+    // Sort on table header click
+    const tableHead = document.querySelector('#commit-table thead');
+    if (tableHead) {
+      tableHead.addEventListener('click', (e) => {
+        const th = e.target.closest('th.sortable');
+        if (th) {
+          handleSortClick(th.dataset.sort);
+        }
+      });
+    }
   }
 
   window.addEventListener('message', handleMessage);
@@ -1462,44 +1526,49 @@ function initResizers() {
   const bottomPanel = document.getElementById('bottom-panel');
   const commitTableContainer = document.getElementById('commit-table-container');
 
-  // Vertical resizer (between diff-viewer and bottom-panel)
+  // Vertical resizer (between diff-viewer and bottom-panel) — diff surface /
+  // legacy combined view only
   let isResizingV = false;
   let vStartY = 0;
   let vStartHeight = 0;
 
-  verticalResizer.addEventListener('mousedown', (e) => {
-    isResizingV = true;
-    vStartY = e.clientY;
-    vStartHeight = diffViewer.getBoundingClientRect().height;
-    verticalResizer.classList.add('active');
-    document.body.style.cursor = 'row-resize';
-    document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
+  if (verticalResizer) {
+    verticalResizer.addEventListener('mousedown', (e) => {
+      isResizingV = true;
+      vStartY = e.clientY;
+      vStartHeight = diffViewer.getBoundingClientRect().height;
+      verticalResizer.classList.add('active');
+      document.body.style.cursor = 'row-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+  }
 
   // Horizontal resizer (between commit table and detail panel)
   let isResizingH = false;
   let hStartX = 0;
   let hStartWidth = 0;
 
-  horizontalResizer.addEventListener('mousedown', (e) => {
-    isResizingH = true;
-    hStartX = e.clientX;
-    hStartWidth = commitTableContainer.getBoundingClientRect().width;
-    horizontalResizer.classList.add('active');
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
+  if (horizontalResizer) {
+    horizontalResizer.addEventListener('mousedown', (e) => {
+      isResizingH = true;
+      hStartX = e.clientX;
+      hStartWidth = commitTableContainer.getBoundingClientRect().width;
+      horizontalResizer.classList.add('active');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+  }
 
   document.addEventListener('mousemove', (e) => {
-    if (isResizingV) {
+    if (isResizingV && diffViewer) {
       const delta = e.clientY - vStartY;
       const totalH = mainContent.getBoundingClientRect().height;
       const newHeight = Math.max(60, Math.min(vStartHeight + delta, totalH - 80));
       diffViewer.style.height = newHeight + 'px';
     }
-    if (isResizingH) {
+    if (isResizingH && commitTableContainer) {
       const delta = e.clientX - hStartX;
       const totalW = bottomPanel.getBoundingClientRect().width;
       const newWidth = Math.max(120, Math.min(hStartWidth + delta, totalW - 120));
@@ -1509,13 +1578,13 @@ function initResizers() {
   });
 
   document.addEventListener('mouseup', () => {
-    if (isResizingV) {
+    if (isResizingV && verticalResizer) {
       isResizingV = false;
       verticalResizer.classList.remove('active');
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     }
-    if (isResizingH) {
+    if (isResizingH && horizontalResizer) {
       isResizingH = false;
       horizontalResizer.classList.remove('active');
       document.body.style.cursor = '';
@@ -1526,8 +1595,68 @@ function initResizers() {
 
 // ─── Message handler ─────────────────────────────────────────────────────────
 
+/**
+ * Diff surface init: apply only the diff-relevant settings (diff type, word
+ * wrap, ignore whitespace, context lines). The list surface consumes the full
+ * init message with commit data.
+ */
+function applyDiffSurfaceSettings(message) {
+  if (message.userSettings) {
+    const settings = message.userSettings;
+    if (settings.diffType === 'side-by-side' || settings.diffType === 'unified') {
+      setDiffType(settings.diffType);
+    } else if (message.defaultDiffView === 'side-by-side') {
+      setDiffType('side-by-side');
+    }
+
+    if (settings.wordWrapEnabled && settings.wordWrapEnabled !== wordWrapEnabled) {
+      wordWrapEnabled = settings.wordWrapEnabled;
+      const dv = document.getElementById('diff-viewer');
+      if (dv) {
+        dv.classList.add('word-wrap');
+      }
+      if (wordWrapBtn) {
+        wordWrapBtn.classList.add('active');
+        wordWrapBtn.title = 'Word wrap enabled (Ctrl+Shift+W to toggle)';
+      }
+    }
+
+    ignoreWhitespace = settings.ignoreWhitespace;
+    if (ignoreWsBtn) {
+      if (ignoreWhitespace) {
+        ignoreWsBtn.classList.add('active');
+        ignoreWsBtn.title = 'Ignore whitespace enabled (Ctrl+Shift+Alt+J to toggle)';
+      } else {
+        ignoreWsBtn.classList.remove('active');
+        ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
+      }
+    }
+
+    if (settings.diffContextLines !== undefined) {
+      diffContextLines = settings.diffContextLines;
+      if (contextLinesBtn) {
+        const valueSpan = contextLinesBtn.querySelector('#context-lines-value');
+        if (valueSpan) {
+          valueSpan.textContent = diffContextLines;
+        } else {
+          contextLinesBtn.innerHTML = `<span id="context-lines-value">${diffContextLines}</span>`;
+        }
+        contextLinesBtn.title = `Diff context lines: ${diffContextLines} (Ctrl+Shift+/ to change)`;
+      }
+    }
+  } else if (message.defaultDiffView === 'side-by-side') {
+    setDiffType('side-by-side');
+  }
+}
+
 function handleMessage(event) {
   const message = event.data;
+
+  // Diff surface: consume init for its diff-relevant settings only
+  if (MODE === 'diff' && message.type === 'init') {
+    applyDiffSurfaceSettings(message);
+    return;
+  }
 
   switch (message.type) {
     case 'init':
@@ -1678,13 +1807,21 @@ ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
 
     case 'diff':
       currentDiff = message.diff;
+      if (message.hash) {
+        currentCommitHash = message.hash;
+      }
       selectedFile = message.selectedFile || null;
-      renderDiffStats(message.stats);
-      renderDiff(currentDiff);
-      renderFiles(message.files, selectedFile);
+      if (isDiffMode) {
+        renderDiffStats(message.stats);
+        renderDiff(currentDiff);
+      }
+      if (isListMode) {
+        renderFiles(message.files, selectedFile);
+      }
       break;
 
     case 'commitsLoaded':
+      if (isListMode) {
       isLoadingMore = false;
       if (message.commits && message.commits.length > 0) {
         const existingHashes = new Set(commits.map(c => c.hash));
@@ -1698,27 +1835,36 @@ ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
       hasMoreCommits = message.hasMore;
       renderCommits();
       updateCommitCount();
+      }
       break;
 
     case 'combinedDiff':
       currentDiff = message.diff;
-      renderDiff(currentDiff);
+      if (isDiffMode) {
+        renderDiff(currentDiff);
+      }
       break;
 
     case 'rangeDiff':
       currentDiff = message.diff;
-      renderDiff(currentDiff);
-      // Update header to show range comparison
-      updateCommitDetailHeaderForRange(message.fromHash, message.toHash);
+      if (isDiffMode) {
+        renderDiff(currentDiff);
+      }
+      if (isListMode) {
+        // Update header to show range comparison
+        updateCommitDetailHeaderForRange(message.fromHash, message.toHash);
+      }
       break;
 
     case 'commitFiles':
+      if (isListMode) {
       // Cache the files for filtering
       if (message.hash) {
         commitFilesMap.set(message.hash, message.files);
       }
-      renderFiles(message.files);
+      renderFiles(message.files, message.selectedFile || null);
       renderCommits(); // Re-render commit list to re-evaluate path filter
+      }
       break;
 
     case 'error':
@@ -1727,6 +1873,7 @@ ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
       break;
 
     case 'branchHashes':
+      if (isListMode) {
       // Build a map of branch names to commit hash sets
       if (message.hashes) {
         branchCommitHashes = {};
@@ -1734,21 +1881,26 @@ ignoreWsBtn.title = 'Toggle ignore whitespace (Ctrl+Shift+Alt+J)';
           branchCommitHashes[branchName.toLowerCase()] = new Set(hashList);
         }
       }
+      }
       break;
 
     case 'diffSearchResults':
+      if (isListMode) {
       diffSearchHashes = message.matchingHashes;
       diffSearchQuery = message.query;
       renderFilterBadges();
       renderCommits();
+      }
       break;
 
     case 'selectCommit':
+      if (isListMode) {
       handleSelectCommit(message.hash);
+      }
       break;
 
     case 'showFirstRunTip':
-      if (message.showFirstRunTip) {
+      if (isListMode && message.showFirstRunTip) {
         showFirstRunTipBanner();
       }
       break;
@@ -2059,6 +2211,7 @@ function updateSelectedRows() {
 // ─── Diff loading skeleton ────────────────────────────────────────────────────
 
 function showDiffLoading() {
+  if (!diffViewer) { return; }
   const widths = ['38%', '100%', '100%', '72%', '100%', '100%', '55%', '100%', '85%', '100%'];
   const lines = widths.map(w => `<div class="skeleton-line" style="width:${w}"></div>`).join('');
   diffViewer.innerHTML = `<div class="diff-loading">${lines}</div>`;
@@ -2118,6 +2271,7 @@ function requestRangeDiff(fromHash, toHash) {
 // ─── Diff rendering ───────────────────────────────────────────────────────────
 
 function renderDiffStats(stats) {
+  if (!diffViewer) { return; }
   let statsBar = document.getElementById('diff-stats-bar');
   if (!stats) {
     if (statsBar) { statsBar.remove(); }
@@ -2137,6 +2291,7 @@ function renderDiffStats(stats) {
 }
 
 function renderDiff(diffText) {
+  if (!diffViewer) { return; }
   if (!diffText || diffText.trim() === '') {
     diffViewer.innerHTML = `
       <div class="empty-state">
@@ -2166,6 +2321,7 @@ function renderDiff(diffText) {
 }
 
 function clearDiff() {
+  if (!diffViewer) { return; }
   diffViewer.innerHTML = `
     <div class="empty-state">
       <div class="empty-state-icon">📊</div>
@@ -2177,12 +2333,14 @@ function clearDiff() {
 function setDiffType(type) {
   currentDiffType = type;
 
-  if (type === 'unified') {
-    unifiedBtn.classList.add('active');
-    sideBySideBtn.classList.remove('active');
-  } else {
-    unifiedBtn.classList.remove('active');
-    sideBySideBtn.classList.add('active');
+  if (unifiedBtn && sideBySideBtn) {
+    if (type === 'unified') {
+      unifiedBtn.classList.add('active');
+      sideBySideBtn.classList.remove('active');
+    } else {
+      unifiedBtn.classList.remove('active');
+      sideBySideBtn.classList.add('active');
+    }
   }
 
   if (currentDiff) {
@@ -2196,6 +2354,7 @@ function setDiffType(type) {
 // ─── File list ────────────────────────────────────────────────────────────────
 
 function renderFiles(files, activeFile) {
+  if (!fileList) { return; }
   fileList.innerHTML = '';
 
   if (!files || files.length === 0) {
@@ -2637,6 +2796,14 @@ function escapeHtml(text) {
 }
 
 function showError(message) {
+  // List surface has no #diff-viewer — surface errors in the changed-files area
+  if (!diffViewer) {
+    const listFallback = document.getElementById('file-list');
+    if (listFallback) {
+      listFallback.innerHTML = `<li class="empty-state-text" style="padding:8px">⚠️ ${escapeHtml(message)}</li>`;
+    }
+    return;
+  }
   diffViewer.innerHTML = `
     <div class="empty-state">
       <div class="empty-state-icon">⚠️</div>

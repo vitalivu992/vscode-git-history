@@ -1,6 +1,6 @@
 # Git History for VS Code
 
-A powerful VS Code extension that provides git history visualization inspired by IntelliJ's Git History. View file history, selection history, and explore diffs with an intuitive interface in the **Git History** bottom-panel tab (beside Terminal).
+A powerful VS Code extension that provides git history visualization inspired by IntelliJ's Git History. View file history, selection history, and explore diffs with an intuitive split layout: the commit list and changed-files detail live in the **Git History** bottom-panel tab (beside Terminal), and selecting a commit opens its diff in a reusable editor-area tab (with Unified/Side-by-Side, word wrap, ignore-whitespace, and context-line controls).
 
 Commits signed with GPG show GPG signature verification badges (✓ verified / ✗ unverified) inline next to the commit message; they are always displayed when git provides signature data.
 

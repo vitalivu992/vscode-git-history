@@ -2,7 +2,7 @@
   "name": "git-history-vsce",
   "displayName": "Git history for selection",
   "description": "View git history for files and line selections with diff viewer",
-  "version": "1.2.3",
+  "version": "1.2.6",
   "publisher": "vitalivu992",
   "icon": "images/icon.png",
   "repository": {
@@ -313,6 +313,17 @@
         "when": "activeWebviewViewId == gitHistory.webview"
       },
       {
+        "command": "gitHistory.refresh",
+        "key": "f5",
+        "when": "activeWebviewPanelId == gitHistory.diffView"
+      },
+      {
+        "command": "gitHistory.refresh",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r",
+        "when": "activeWebviewPanelId == gitHistory.diffView"
+      },
+      {
         "command": "gitHistory.copyCommitHash",
         "key": "ctrl+shift+h",
         "mac": "cmd+shift+h",
@@ -436,7 +447,7 @@
         "command": "gitHistory.toggleWordWrap",
         "key": "ctrl+shift+w",
         "mac": "cmd+shift+w",
-        "when": "activeWebviewViewId == gitHistory.webview"
+        "when": "activeWebviewPanelId == gitHistory.diffView"
       },
       {
         "command": "gitHistory.toggleRegex",
@@ -448,7 +459,7 @@
         "command": "gitHistory.toggleIgnoreWhitespace",
         "key": "ctrl+shift+alt+j",
         "mac": "cmd+shift+alt+j",
-        "when": "activeWebviewViewId == gitHistory.webview"
+        "when": "activeWebviewPanelId == gitHistory.diffView"
       },
       {
         "command": "gitHistory.toggleHideMergeCommits",
@@ -502,7 +513,7 @@
         "command": "gitHistory.cycleDiffContextLines",
         "key": "ctrl+shift+/",
         "mac": "cmd+shift+/",
-        "when": "activeWebviewViewId == gitHistory.webview"
+        "when": "activeWebviewPanelId == gitHistory.diffView"
       },
       {
         "command": "gitHistory.cycleSortMode",

@@ -130,13 +130,20 @@ suite('Extension Keybindings Tests', () => {
       (a) => !noKeybindingActions.has(a.action)
     );
 
+    // Diff-view actions target the editor-area diff panel; everything else
+    // targets the bottom-panel list view. Refresh is bound on BOTH surfaces
+    // (F5 + Ctrl+Shift+R each appear once per surface).
+    const listViewWhen = 'activeWebviewViewId == gitHistory.webview';
+    const diffPanelWhen = 'activeWebviewPanelId == gitHistory.diffView';
+    const diffSurfaceActions = new Set(['toggleWordWrap', 'toggleIgnoreWhitespace', 'cycleDiffContextLines']);
+
     const keybindings = packageJson.contributes?.keybindings || [];
     const webviewKeybindings = keybindings.filter((kb: any) =>
       derivedWebviewActions.some((a) => a.command === kb.command)
     );
 
-    // gitHistory.refresh has two keybindings (F5 and Ctrl+Shift+R),
-    // so the keybinding count is one more than the action count.
+    // gitHistory.refresh has four keybindings (F5 and Ctrl+Shift+R, once per
+    // surface), so the keybinding count is three more than the action count.
     const uniqueKeybindingCommands = new Set(webviewKeybindings.map((kb: any) => kb.command));
     assert.strictEqual(
       uniqueKeybindingCommands.size,
@@ -145,12 +152,33 @@ suite('Extension Keybindings Tests', () => {
     );
 
     for (const kb of webviewKeybindings) {
-      assert.strictEqual(
-        kb.when,
-        'activeWebviewViewId == gitHistory.webview',
-        `Keybinding for "${kb.command}" should have correct when clause`
-      );
+      const action = derivedWebviewActions.find((a) => a.command === kb.command)!.action;
+      if (diffSurfaceActions.has(action)) {
+        assert.strictEqual(
+          kb.when,
+          diffPanelWhen,
+          `Diff-surface keybinding for "${kb.command}" should target the diff panel`
+        );
+      } else if (action === 'refresh') {
+        assert.ok(
+          kb.when === listViewWhen || kb.when === diffPanelWhen,
+          `Keybinding for "gitHistory.refresh" should target either surface, got "${kb.when}"`
+        );
+      } else {
+        assert.strictEqual(
+          kb.when,
+          listViewWhen,
+          `Keybinding for "${kb.command}" should have correct when clause`
+        );
+      }
     }
+
+    // Refresh must be bound on both surfaces
+    const refreshWhens = webviewKeybindings
+      .filter((kb: any) => kb.command === 'gitHistory.refresh')
+      .map((kb: any) => kb.when);
+    assert.ok(refreshWhens.includes(listViewWhen), 'refresh should be bound in the list view');
+    assert.ok(refreshWhens.includes(diffPanelWhen), 'refresh should be bound in the diff panel');
   });
 
   test('all keybindings reference valid commands', () => {

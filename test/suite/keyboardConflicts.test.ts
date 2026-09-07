@@ -49,8 +49,9 @@ suite('Keyboard Shortcuts Conflicts Tests', () => {
 
 	test('Verify fixed conflicts have correct shortcuts', () => {
 		const keybindings = packageJson.contributes?.keybindings || [];
+		// Actions may be bound on either surface (list view or diff panel)
 		const webviewBindings = keybindings.filter((b: any) =>
-			b.when?.includes('activeWebviewViewId == gitHistory.webview')
+			b.command?.startsWith('gitHistory.')
 		);
 
 		// Helper to find shortcut for a command

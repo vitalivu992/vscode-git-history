@@ -121,7 +121,7 @@ export type ExtToWebviewMessage =
   | { type: 'diff'; hash: string; diff: string; files: CommitFileChange[]; selectedFile?: string; stats?: { filesChanged: number; insertions: number; deletions: number } }
   | { type: 'combinedDiff'; hashes: string[]; diff: string }
   | { type: 'rangeDiff'; fromHash: string; toHash: string; diff: string }
-  | { type: 'commitFiles'; hash: string; files: CommitFileChange[] }
+  | { type: 'commitFiles'; hash: string; files: CommitFileChange[]; selectedFile?: string }
   | { type: 'error'; message: string }
   | { type: 'selectCommit'; hash: string }
   | { type: 'branchHashes'; hashes: Record<string, string[]> }
