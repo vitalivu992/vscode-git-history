@@ -138,13 +138,16 @@ export async function getCommitDiff(
     args.push(`-U${diffContextLines}`);
   }
 
+  // Changed-file paths are repo-root-relative, so run from the repo root when
+  // a pathspec filter is used (the workspace cwd may be a subdirectory).
+  const gitCwd = filePath ? await getRepoRoot(cwd) : cwd;
+
   args.push(hash);
   if (filePath) {
-    const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
-    args.push('--', relativePath);
+    args.push('--', toRepoRelative(filePath, gitCwd));
   }
 
-  const output = await execGit(args, cwd);
+  const output = await execGit(args, gitCwd);
 
   // Remove the header lines (commit info, keep only the diff)
   const diffStart = output.indexOf('diff --git');
@@ -237,6 +240,10 @@ export async function getCombinedDiff(
   const earliest = sortedHashes[0];
   const latest = sortedHashes[sortedHashes.length - 1];
 
+  // Changed-file paths are repo-root-relative, so run from the repo root when
+  // a pathspec filter is used (the workspace cwd may be a subdirectory).
+  const gitCwd = filePath ? await getRepoRoot(cwd) : cwd;
+
   // Determine the base for the diff range. When earliest is a root commit
   // (no parent), earliest~1 fails — compute the empty tree hash dynamically.
   let base: string;
@@ -266,12 +273,11 @@ export async function getCombinedDiff(
   args.push(`${base}..${latest}`);
 
   if (filePath) {
-    const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
-    args.push('--', relativePath);
+    args.push('--', toRepoRelative(filePath, gitCwd));
   }
 
   try {
-    const output = await execGit(args, cwd);
+    const output = await execGit(args, gitCwd);
 
     return {
       diff: output,
@@ -292,11 +298,10 @@ export async function getCombinedDiff(
 
     args2.push(`${EMPTY_TREE_HASH}..${latest}`);
     if (filePath) {
-      const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
-      args2.push('--', relativePath);
+      args2.push('--', toRepoRelative(filePath, gitCwd));
     }
 
-    const output = await execGit(args2, cwd);
+    const output = await execGit(args2, gitCwd);
     return {
       diff: output,
       filePath,
@@ -402,6 +407,29 @@ export async function getGitRoot(filePath: string): Promise<string> {
 }
 
 /**
+ * Get the repository root for a working directory, falling back to the
+ * working directory itself when git cannot answer (keeps the previous
+ * cwd-relative behavior in that case).
+ */
+export async function getRepoRoot(cwd: string): Promise<string> {
+  try {
+    const output = await execGit(['rev-parse', '--show-toplevel'], cwd);
+    return output.trim() || cwd;
+  } catch {
+    return cwd;
+  }
+}
+
+/**
+ * Changed-file paths from `git show --name-status` (getCommitFiles) are
+ * relative to the repository root, while the workspace may be opened at a
+ * subdirectory. Normalize a changed-file path to repo-root-relative form.
+ */
+function toRepoRelative(filePath: string, repoRoot: string): string {
+  return path.isAbsolute(filePath) ? path.relative(repoRoot, filePath) : filePath;
+}
+
+/**
  * Get the current git user from git config
  * Returns name and email from user.name and user.email config
  */
@@ -490,21 +518,23 @@ export async function getFileContentAtCommit(
   commitHash: string,
   cwd: string
 ): Promise<string> {
-  // Resolve filePath against cwd first: when filePath is relative, path.relative
-  // would otherwise resolve it against process.cwd() instead of the repo's cwd,
-  // producing a bogus path (only correct when process.cwd() === cwd).
-  const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
+  // `git show <hash>:<path>` expects a repo-root-relative path; resolve the
+  // changed-file path against the repo root (not the workspace cwd, which may
+  // be a subdirectory of the repository).
+  const repoRoot = await getRepoRoot(cwd);
+  const relativePath = toRepoRelative(filePath, repoRoot);
   const output = await execGit(['show', `${commitHash}:${relativePath}`], cwd);
   return output;
 }
 
 /**
  * Restore a single file from a commit into the working tree
- * Uses git checkout <hash> -- <file>
+ * Uses git checkout <hash> -- <file>; runs from the repo root so the
+ * repo-root-relative pathspec matches regardless of the workspace cwd
  */
 export async function restoreFileFromCommit(filePath: string, commitHash: string, cwd: string): Promise<void> {
-  const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
-  await execGit(['checkout', commitHash, '--', relativePath], cwd);
+  const repoRoot = await getRepoRoot(cwd);
+  await execGit(['checkout', commitHash, '--', toRepoRelative(filePath, repoRoot)], repoRoot);
 }
 
 /**
@@ -518,12 +548,14 @@ export async function diffFileWithWorkingTree(
   ignoreWhitespace?: boolean,
   diffContextLines?: number
 ): Promise<DiffResult> {
-  const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
+  // Run from the repo root so the repo-root-relative pathspec matches
+  // regardless of the workspace cwd.
+  const repoRoot = await getRepoRoot(cwd);
   const args = ['diff', '--no-color'];
   if (ignoreWhitespace) { args.push('-w'); }
   if (diffContextLines !== undefined && diffContextLines !== 3) { args.push(`-U${diffContextLines}`); }
-  args.push(hash, '--', relativePath);
-  const output = await execGit(args, cwd);
+  args.push(hash, '--', toRepoRelative(filePath, repoRoot));
+  const output = await execGit(args, repoRoot);
   return { diff: output, filePath, isBinary: isBinaryFile(output) };
 }
 
@@ -549,14 +581,17 @@ export async function getCommitRangeDiff(
     args.push(`-U${diffContextLines}`);
   }
 
+  // Changed-file paths are repo-root-relative, so run from the repo root when
+  // a pathspec filter is used (the workspace cwd may be a subdirectory).
+  const gitCwd = filePath ? await getRepoRoot(cwd) : cwd;
+
   args.push(`${fromHash}..${toHash}`);
 
   if (filePath) {
-    const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
-    args.push('--', relativePath);
+    args.push('--', toRepoRelative(filePath, gitCwd));
   }
 
-  const output = await execGit(args, cwd);
+  const output = await execGit(args, gitCwd);
 
   return {
     diff: output,
@@ -808,7 +843,7 @@ export async function resetToCommit(hash: string, mode: ResetMode, cwd: string):
 /**
  * Generate a web URL for browsing a file at a specific commit
  * Auto-detects the git remote and generates platform-specific file URLs
- * @param filePath The file path (absolute or relative to cwd)
+ * @param filePath The file path (absolute or repo-root-relative)
  * @param hash The commit hash
  * @param cwd Working directory
  * @param remote Remote name (default: 'origin')
@@ -830,8 +865,11 @@ export async function getFileUrl(
     return null;
   }
 
-  // Web URLs always use forward slashes and repo-relative paths
-  let relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
+  // Web URLs always use forward slashes and repo-relative paths; resolve the
+  // changed-file path against the repo root (not the workspace cwd, which may
+  // be a subdirectory of the repository).
+  const repoRoot = await getRepoRoot(cwd);
+  let relativePath = toRepoRelative(filePath, repoRoot);
   relativePath = relativePath.replace(/\\/g, '/').replace(/^\.\//, '');
 
   // Use short hash for URLs (7 characters)

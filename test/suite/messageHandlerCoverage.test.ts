@@ -44,7 +44,7 @@ suite('Message Handler Switch Case Coverage', () => {
     const messageTypes = extractMessageTypesFromTypes();
     const switchCases = extractSwitchCases();
 
-    const missingCases = messageTypes.filter(t => !switchCases.includes(t)).filter(t => t !== 'focusCommitList');
+    const missingCases = messageTypes.filter(t => !switchCases.includes(t));
     assert.strictEqual(
       missingCases.length,
       0,

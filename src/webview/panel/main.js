@@ -2451,6 +2451,10 @@ function showFileContextMenu(event, filePath, commitHash) {
       <span class="context-menu-icon">🌐</span>
       <span class="context-menu-label">Open file URL at this commit</span>
     </div>
+    <div class="context-menu-item" data-action="copy-file-url">
+      <span class="context-menu-icon">🔗</span>
+      <span class="context-menu-label">Copy file URL at this commit</span>
+    </div>
     <div class="context-menu-item" data-action="restore-from-commit">
       <span class="context-menu-icon">⏪</span>
       <span class="context-menu-label">Restore file from this commit</span>
@@ -2498,6 +2502,8 @@ function showFileContextMenu(event, filePath, commitHash) {
         vscode.postMessage({ type: 'blameFile', filePath: filePath });
       } else if (action === 'open-file-url') {
         vscode.postMessage({ type: 'openFileUrl', hash: commitHash, filePath: filePath });
+      } else if (action === 'copy-file-url') {
+        vscode.postMessage({ type: 'copyFileUrl', hash: commitHash, filePath: filePath });
       } else if (action === 'restore-from-commit') {
         vscode.postMessage({ type: 'restoreFileFromCommit', hash: commitHash, filePath: filePath });
       } else if (action === 'copy-path') {

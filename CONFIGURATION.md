@@ -8,7 +8,7 @@ Git History is configured through VS Code settings and remembers your in-panel p
 
 This extension contributes the following settings:
 
-* `gitHistory.maxCommits`: Maximum number of commits to display (default: 500)
+* `gitHistory.maxCommits`: Number of commits loaded per page (initial load and each "Load more") (default: 500)
 * `gitHistory.hideMergeCommits`: Hide merge commits in the history view (default: false)
 * `gitHistory.blame.dateFormat`: Date format for blame annotations - `relative` (e.g., "2 days ago"), `short` (e.g., "2024-03-15"), or `iso` (e.g., "2024-03-15T10:30:00Z") (default: `relative`)
 * `gitHistory.commitList.dateFormat`: Date format for the commit list - `relative` (e.g., "Today 2:30 PM", "2 weeks ago"; hover for the absolute timestamp), `short` (your locale's date), or `iso` (e.g., "2024-03-15") (default: `relative`)

@@ -153,6 +153,7 @@ export type WebviewToExtMessage =
   | { type: 'copyCommitUrl'; hash: string }
   | { type: 'openCommitUrl'; hash: string }
   | { type: 'openFileUrl'; hash: string; filePath: string }
+  | { type: 'copyFileUrl'; hash: string; filePath: string }
   | { type: 'copyAuthorEmail'; hash: string }
   | { type: 'copyAuthorName'; hash: string }
   | { type: 'copyShortHash'; hash: string }
@@ -173,5 +174,4 @@ export type WebviewToExtMessage =
   | { type: 'resetToCommit'; hash: string; mode: 'soft' | 'mixed' | 'hard' }
   | { type: 'requestDiffSearch'; query: string; commitHashes: string[] }
   | { type: 'loadMoreCommits' }
-  | { type: 'dismissFirstRunTip' }
-  | { type: 'focusCommitList' };
+  | { type: 'dismissFirstRunTip' };

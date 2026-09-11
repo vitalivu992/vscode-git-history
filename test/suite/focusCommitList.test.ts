@@ -13,12 +13,21 @@ suite('focusCommitList Unit Tests', function() {
     assert.ok(webviewActionMatch, 'types.ts should have focusCommitList in WebviewAction');
   });
 
-  test('types.ts should have focusCommitList message type', function() {
+  test('types.ts should not define a focusCommitList message type', function() {
     const typesPath = path.join(__dirname, '..', '..', '..', 'src', 'types.ts');
     const source = fs.readFileSync(typesPath, 'utf-8');
 
-    // Check that focusCommitList message type is defined
-    assert.ok(source.includes("type: 'focusCommitList'"), 'types.ts should define focusCommitList message type');
+    // The webview-to-extension flow goes through triggerAction + the
+    // focusCommitList WebviewAction; a dedicated message type would be dead
+    // protocol surface with no handler case in messageHandler.ts.
+    assert.strictEqual(source.includes("type: 'focusCommitList'"), false,
+      'types.ts should not declare a focusCommitList WebviewToExtMessage type');
+
+    // The WebviewAction must stay — extension.ts maps the command onto it.
+    const webviewActionMatch = source.match(/WebviewAction[^=]*=[^]*?;/);
+    assert.ok(webviewActionMatch, 'types.ts should define WebviewAction');
+    assert.ok(webviewActionMatch[0].includes("'focusCommitList'"),
+      'WebviewAction should keep the focusCommitList action');
   });
 
   test('package.json should have gitHistory.focusCommitList command', function() {

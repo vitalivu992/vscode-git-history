@@ -2,7 +2,7 @@
   "name": "git-history-vsce",
   "displayName": "Git history for selection",
   "description": "View git history for files and line selections with diff viewer",
-  "version": "1.2.6",
+  "version": "1.2.8",
   "publisher": "vitalivu992",
   "icon": "images/icon.png",
   "repository": {

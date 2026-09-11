@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GitHistoryPanel, GitHistoryDiffPanel } from './webviewProvider';
-import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitStats, getBranchCommitHashes, getCommitUrl, getFileUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, renameBranch, checkoutBranch, cherryPickCommit, revertCommit, restoreFileFromCommit, diffFileWithWorkingTree, searchInDiffs, resetToCommit } from '../git/gitService';
+import { getCommitDiff, getCombinedDiff, getCommitRangeDiff, getCommitFiles, getCommitStats, getBranchCommitHashes, getCommitUrl, getFileUrl, getRemoteUrl, parseRemoteUrl, createBranchFromCommit, createTagFromCommit, deleteTagFromCommit, deleteBranch, renameBranch, checkoutBranch, cherryPickCommit, revertCommit, restoreFileFromCommit, diffFileWithWorkingTree, searchInDiffs, resetToCommit, getRepoRoot } from '../git/gitService';
 import { ExtToWebviewMessage, CommitInfo } from '../types';
 import { SettingsService, UserSettings } from '../settings';
 import { FirstRunTipService } from '../firstRunTip';
@@ -80,6 +80,9 @@ export async function handleMessage(
 
     case 'openFileUrl':
       await handleOpenFileUrl(message.hash, message.filePath, panel);
+      break;
+    case 'copyFileUrl':
+      await handleCopyFileUrl(message.hash, message.filePath, panel);
       break;
 
     case 'copyAuthorEmail':
@@ -480,11 +483,12 @@ async function handleOpenFileAtCommit(
 ): Promise<void> {
   try {
     const cwd = panel.getCwd();
-    const relativePath = path.relative(cwd, filePath);
-
+    // Changed-file paths from getCommitFiles are repo-root-relative; the git
+    // history content provider resolves them against the repo root, so don't
+    // re-relativize against the workspace cwd here.
     const uri = vscode.Uri.from({
       scheme: 'git-history',
-      path: `/${relativePath}`,
+      path: `/${filePath}`,
       query: `commit=${hash}&cwd=${encodeURIComponent(cwd)}`
     });
 
@@ -541,11 +545,21 @@ async function handleCompareFileWithWorkingTree(hash: string, filePath: string, 
 }
 
 /**
+ * Resolve a repo-root-relative changed-file path to an absolute working-tree
+ * path. Changed-file paths come from `git show --name-status` and are relative
+ * to the repository root, which may differ from the workspace cwd.
+ */
+async function resolveWorkingTreePath(filePath: string, panel: GitHistoryPanel): Promise<string> {
+  const repoRoot = await getRepoRoot(panel.getCwd());
+  return path.isAbsolute(filePath) ? filePath : path.join(repoRoot, filePath);
+}
+
+/**
  * Handle copy file path
  */
-function handleCopyFilePath(filePath: string, relative: boolean, panel: GitHistoryPanel): void {
+async function handleCopyFilePath(filePath: string, relative: boolean, panel: GitHistoryPanel): Promise<void> {
   const cwd = panel.getCwd();
-  const fullPath = path.resolve(cwd, filePath);
+  const fullPath = await resolveWorkingTreePath(filePath, panel);
   const toCopy = relative ? path.relative(cwd, fullPath) : fullPath;
   void vscode.env.clipboard.writeText(toCopy).then(() => {
     void vscode.window.showInformationMessage(`Copied: ${toCopy}`);
@@ -556,8 +570,7 @@ function handleCopyFilePath(filePath: string, relative: boolean, panel: GitHisto
  * Handle reveal in file explorer
  */
 async function handleRevealInExplorer(filePath: string, panel: GitHistoryPanel): Promise<void> {
-  const cwd = panel.getCwd();
-  const fullPath = path.resolve(cwd, filePath);
+  const fullPath = await resolveWorkingTreePath(filePath, panel);
   const uri = vscode.Uri.file(fullPath);
   await vscode.commands.executeCommand('revealFileInOS', uri);
 }
@@ -567,8 +580,7 @@ async function handleRevealInExplorer(filePath: string, panel: GitHistoryPanel):
  * blame annotations for it
  */
 async function handleBlameFile(filePath: string, panel: GitHistoryPanel): Promise<void> {
-  const cwd = panel.getCwd();
-  const fullPath = path.resolve(cwd, filePath);
+  const fullPath = await resolveWorkingTreePath(filePath, panel);
 
   if (!fs.existsSync(fullPath)) {
     void vscode.window.showErrorMessage(
@@ -710,6 +722,46 @@ async function handleOpenFileUrl(hash: string, filePath: string, panel: GitHisto
   } catch (error) {
     void vscode.window.showErrorMessage(
       `Failed to open file URL: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Handle copying a file's URL at a commit to the clipboard (file permalink)
+ */
+async function handleCopyFileUrl(hash: string, filePath: string, panel: GitHistoryPanel): Promise<void> {
+  try {
+    const cwd = panel.getCwd();
+    const remoteUrl = await getRemoteUrl(cwd);
+
+    if (!remoteUrl) {
+      void vscode.window.showInformationMessage(
+        'No git remote configured. Unable to generate file URL.'
+      );
+      return;
+    }
+
+    const remoteInfo = parseRemoteUrl(remoteUrl);
+    if (!remoteInfo || remoteInfo.platform === 'unknown') {
+      void vscode.window.showInformationMessage(
+        'Unable to detect git platform. Supported: GitHub, GitLab, Bitbucket, Azure DevOps.'
+      );
+      return;
+    }
+
+    const fileUrl = await getFileUrl(filePath, hash, cwd);
+    if (!fileUrl) {
+      void vscode.window.showInformationMessage(
+        'Failed to generate file URL.'
+      );
+      return;
+    }
+
+    await vscode.env.clipboard.writeText(fileUrl);
+    void vscode.window.showInformationMessage('File URL copied to clipboard');
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      `Failed to copy file URL: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }

@@ -24,7 +24,7 @@ How to use Git History: open history views, navigate the panel, use the right-cl
 
 1. Press `F1` (or `Ctrl+Shift+P` / `Cmd+Shift+P`) to open the Command Palette
 2. Run "Git History (Repository)"
-3. The **Git History** tab opens in the bottom panel, showing the full repository/branch commit log (capped by `gitHistory.maxCommits`)
+3. The **Git History** tab opens in the bottom panel, showing the repository/branch commit log, loaded in pages of `gitHistory.maxCommits` commits (a "Load more" row fetches the next page)
 
 ### Using the History Panel
 
@@ -37,7 +37,7 @@ The UI is split into two surfaces: the **Git History** bottom-panel tab shows th
   - `after:2024-01-01` - show commits after a specific date
   - `before:2024-06-01` - show commits before a specific date
   - `last:7days` or `last:2weeks` or `last:1month` - show commits within a recent time period
-  - Quick date buttons: Click "Today" (`last:1day`), "Week" (`last:7days`), or "Month" (`last:1month`) for one-click filtering
+  - Quick date buttons: Click "Today" (`last:1day`) or "Last 2 weeks" (`last:Nweeks`, where N comes from the `gitHistory.sprintLengthWeeks` setting) for one-click filtering
   - Combine filters: `bug fix after:2024-01-01` - search for "bug fix" in commits after January 1st
 - **Filter by author** using `author:` prefix or click any author name in the commit list:
   - `author:Alice` - show commits by author name (case-insensitive)
@@ -98,10 +98,9 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Copy commit info** | Copy full commit information (hash, author, date, message) |
 | **Copy cherry-pick command** | Copy a pre-formatted `git cherry-pick <hash>` command |
 | **Copy revert command** | Copy a pre-formatted `git revert <hash>` command |
-| **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket) for the commit |
+| **Copy commit URL** | Copy the web URL (GitHub/GitLab/Bitbucket/Azure DevOps) for the commit |
 | **Copy short date** | Copy the commit date as `YYYY-MM-DD` |
 | **Copy trailers** | Copy the commit message trailer block (`Signed-off-by:`, `Reviewed-by:`, …) |
-| **Copy range diff** | Copy the diff between two commits (last Shift+click range, or exactly two selected commits) |
 | **Copy author email** | Copy the author email address |
 | **Copy author name** | Copy the author name |
 | **Copy short hash** | Copy the 7-character short hash |
@@ -122,6 +121,7 @@ Right-click on commits in the commit list or files in the changed files list to 
 | **Compare with working tree** | Show the diff between the file at this commit and your working tree |
 | **Blame file** | Open the file in your editor with blame annotations toggled on |
 | **Open file URL at this commit** | Open the file's permalink on your git hosting platform at this commit (GitHub/GitLab/Bitbucket/Azure DevOps) |
+| **Copy file URL at this commit** | Copy the file's permalink to the clipboard (GitHub/GitLab/Bitbucket/Azure DevOps) |
 | **Restore file from this commit** | Overwrite the working-tree file with the version from this commit (asks for confirmation) |
 | **Copy path** | Copy the file's absolute path |
 | **Copy relative path** | Copy the file's path relative to the repository root |

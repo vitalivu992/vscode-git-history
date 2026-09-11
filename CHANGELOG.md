@@ -7,8 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- Remove the unused `focusCommitList` webview-to-extension message type from the protocol (the `Ctrl+L` focus action goes through the `triggerAction` message and was never affected)
+
+## [1.2.7] - 2026-09-10
+
+### Added
+- Copy file URL at this commit (changed-files context menu) — copies the file's permalink (GitHub/GitLab/Bitbucket/Azure DevOps) to the clipboard
+
+### Fixed
+- Fix changed-files actions in workspaces opened at a repository subdirectory: file paths are now resolved against the repository root instead of the workspace folder, so open-at-commit, restore, compare with working tree, blame, copy/reveal path, and file permalinks all target the right file
+
+## [1.2.6] - 2026-09-07
+
+CI and publishing workflow updates only (no functional changes).
+
+## [1.2.5] - 2026-09-07
+
+### Fixed
+- Fix the commit table never populating when the Git History tab is opened directly: the view-provider instance now binds the `GitHistoryPanel.currentPanel` singleton on resolve, and loading defaults the working directory to the first workspace folder
+
+## [1.2.4] - 2026-09-06
+
+### Changed
+- Split the Git History UI into two surfaces: the bottom-panel "Git History" tab keeps the commit list and changed-files detail, while a commit's diff now opens in a reusable editor-area tab (titled `<shortHash> <subject>`) created without stealing focus from the panel. The diff controls (Unified/Side by Side, Wrap, ignore-whitespace, context lines) moved to the diff tab; their shortcuts (`Ctrl+Shift+W`, `Ctrl+Shift+Alt+J`, `Ctrl+Shift+/`) and refresh now also work while the diff tab is focused
+
+## [1.2.3] - 2026-09-05
+
 ### Added
 - Git History now opens as a bottom-panel tab ("Git History") beside Terminal instead of an editor tab
+- Quick date-filter buttons: "Today" and a configurable "Last N weeks" sprint button (`gitHistory.sprintLengthWeeks`, default 2)
+- Sort the commit list via the clickable Author/Date column headers (Newest, Oldest, Author A-Z, Author Z-A) and cycle modes with `Ctrl+Shift+3`
 - Open commit URL in browser (`Ctrl+Shift+Alt+L` / `Cmd+Shift+Alt+L`), available via context menu and keyboard shortcut
 - Include short commit hash in blame decorations for quick line-to-commit tracing
 - Copy short date (`Ctrl+Alt+D` / `Cmd+Alt+D`) — copies the commit date as `YYYY-MM-DD`, also in the commit context menu
@@ -16,14 +45,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Copy range diff (`Ctrl+Shift+Alt+R` / `Cmd+Shift+Alt+R`) — copies the diff between two Shift+click-selected commits
 - Open file URL at this commit (changed-files context menu) — opens the file's permalink on GitHub/GitLab/Bitbucket/Azure DevOps
 - Quick compare with parent (`Ctrl+Alt+P` / `Cmd+Alt+P`) — shows the diff between the focused commit and its first parent
+- Commit-list pagination — commits beyond `gitHistory.maxCommits` load in batches via a "Load more" row at the bottom of the list
 
 ### Fixed
 - Fix ignore-whitespace shortcut mismatch: webview handler now requires `Alt` key (`Ctrl+Shift+Alt+J`), and all tooltips show the correct chord
 - Remove placeholder keyboard-conflict tests that advertised unimplemented copy shortcuts (copy short date, copy trailers, copy range diff); each feature now lands with its own real tests
-- Fix the commit table never populating when the Git History tab is opened directly: the view-provider instance now binds the `GitHistoryPanel.currentPanel` singleton on resolve, and loading defaults the working directory to the first workspace folder
+
+### Removed
+- Remove the Signatures toggle (button, `gitHistory.toggleSignatures` command/keybinding, and setting); GPG signature badges now always render
+
+## [1.2.2] - 2026-08-22
+
+Documentation and audit fixes only (no functional changes).
+
+## [1.2.1] - 2026-08-22
 
 ### Changed
-- Split the Git History UI into two surfaces: the bottom-panel "Git History" tab keeps the commit list and changed-files detail, while a commit's diff now opens in a reusable editor-area tab (titled `<shortHash> <subject>`) created without stealing focus from the panel. The diff controls (Unified/Side by Side, Wrap, ignore-whitespace, context lines) moved to the diff tab; their shortcuts (`Ctrl+Shift+W`, `Ctrl+Shift+Alt+J`, `Ctrl+Shift+/`) and refresh now also work while the diff tab is focused
 - Fix extension display name casing; reconstruct this changelog for v1.1.4–v1.2.0
 
 ## [1.2.0] - 2026-08-22
@@ -32,7 +69,8 @@ Version bump; no functional changes since 1.1.10.
 
 ## [1.1.10] - 2026-08-22
 
-No user-facing changes (CI and publishing workflow updates only).
+### Added
+- Register webview actions as commands for keybinding discoverability: jump to hash, jump to next/previous tag, jump to parent, focus search, show keyboard help, toggle My Commits, clear all filters, and cycle sort mode (`Ctrl+Shift+3`)
 
 ## [1.1.9] - 2026-08-22
 
@@ -116,7 +154,13 @@ No user-facing changes (CI workflow updates only).
 ### Added
 - Initial stable release
 
-[Unreleased]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.7...HEAD
+[1.2.7]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.6...v1.2.7
+[1.2.6]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.5...v1.2.6
+[1.2.5]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.4...v1.2.5
+[1.2.4]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.3...v1.2.4
+[1.2.3]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.2...v1.2.3
+[1.2.2]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/vitalivu992/vscode-git-history/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/vitalivu992/vscode-git-history/compare/v1.1.10...v1.2.0
 [1.1.10]: https://github.com/vitalivu992/vscode-git-history/compare/v1.1.9...v1.1.10
