@@ -5,6 +5,31 @@ import { BlameService } from './blame/blameService';
 import { GitHistoryContentProvider } from './gitHistoryContentProvider';
 import { SettingsService } from './settings';
 import { FirstRunTipService } from './firstRunTip';
+import { setBlameVisibleContext } from './contextKeys';
+
+/**
+ * Resolve the editor a blame command should act on. Editor and line-number
+ * context menus pass the document URI as the first argument; the Command
+ * Palette and status bar pass nothing. When a URI is supplied it must match a
+ * visible editor: falling back to the active editor could pair one file's
+ * commit hash with a different file.
+ */
+function resolveBlameEditor(uriArg: unknown): vscode.TextEditor | undefined {
+  const uriString =
+    uriArg instanceof vscode.Uri
+      ? uriArg.toString()
+      : typeof uriArg === 'string'
+        ? uriArg
+        : undefined;
+
+  if (uriString) {
+    return vscode.window.visibleTextEditors.find(
+      e => e.document.uri.toString() === uriString
+    );
+  }
+
+  return vscode.window.activeTextEditor;
+}
 
 export function activate(context: vscode.ExtensionContext) {
   // Initialize settings service
@@ -13,6 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const blameService = new BlameService();
   context.subscriptions.push(blameService);
+  setBlameVisibleContext(false);
 
   // Create and register the Git History webview view provider
   const gitHistoryPanel = new GitHistoryPanel(context.extensionUri, settingsService, firstRunTipService, context);
@@ -118,7 +144,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const toggleBlameCommand = vscode.commands.registerCommand(
     'gitHistory.toggleBlame',
-    async () => {
+    async (_uri?: unknown, _lineNumber?: unknown) => {
       const activeEditor = vscode.window.activeTextEditor;
       if (!activeEditor) {
         vscode.window.showWarningMessage('No active editor found');
@@ -134,26 +160,63 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const showBlameCommitCommand = vscode.commands.registerCommand(
-    'gitHistory.showBlameCommit',
-    async () => {
-      const activeEditor = vscode.window.activeTextEditor;
-      if (!activeEditor) {
+  const showBlameCommand = vscode.commands.registerCommand(
+    'gitHistory.showBlame',
+    async (uri?: unknown) => {
+      const editor = resolveBlameEditor(uri);
+      if (!editor) {
         vscode.window.showWarningMessage('No active editor found');
         return;
       }
-      const bl = blameService.getBlameForLine(
-        activeEditor.document.uri,
-        activeEditor.selection.active.line
-      );
-      if (!bl || /^0+$/.test(bl.hash)) {
+      try {
+        await blameService.showBlame(editor);
+      } catch (error) {
+        vscode.window.showErrorMessage(
+          `Failed to show blame: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    }
+  );
+
+  const hideBlameCommand = vscode.commands.registerCommand(
+    'gitHistory.hideBlame',
+    (uri?: unknown) => {
+      const editor = resolveBlameEditor(uri);
+      if (!editor) {
+        vscode.window.showWarningMessage('No active editor found');
+        return;
+      }
+      blameService.hideBlame(editor);
+    }
+  );
+
+  const showBlameCommitCommand = vscode.commands.registerCommand(
+    'gitHistory.showBlameCommit',
+    async (uriArg?: unknown, hashArg?: unknown) => {
+      const editor = resolveBlameEditor(uriArg);
+      if (!editor) {
+        vscode.window.showWarningMessage('No active editor found');
+        return;
+      }
+
+      let hash = typeof hashArg === 'string' && hashArg ? hashArg : undefined;
+      if (!hash) {
+        const bl = blameService.getBlameForLine(
+          editor.document.uri,
+          editor.selection.active.line
+        );
+        hash = bl?.hash;
+      }
+
+      if (!hash || /^0+$/.test(hash)) {
         vscode.window.showInformationMessage('No committed blame info for this line');
         return;
       }
+
       try {
-        const filePath = activeEditor.document.uri.fsPath;
+        const filePath = editor.document.uri.fsPath;
         const cwd = await getGitRoot(filePath);
-        await GitHistoryPanel.showCommitDiff(context.extensionUri, filePath, cwd, settingsService, firstRunTipService, context, bl.hash);
+        await GitHistoryPanel.showCommitDiff(context.extensionUri, filePath, cwd, settingsService, firstRunTipService, context, hash);
       } catch (error) {
         vscode.window.showErrorMessage(
           `Failed to show commit: ${error instanceof Error ? error.message : String(error)}`
@@ -167,6 +230,8 @@ export function activate(context: vscode.ExtensionContext) {
     showSelectionHistoryCommand,
     showRepositoryHistoryCommand,
     toggleBlameCommand,
+    showBlameCommand,
+    hideBlameCommand,
     showBlameCommitCommand,
     vscode.workspace.registerTextDocumentContentProvider(
       GitHistoryContentProvider.scheme,

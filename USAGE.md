@@ -79,10 +79,12 @@ The tip is automatically saved using VS Code's global state, so you won't see it
 ### Using Blame Annotations
 
 1. Open any file in a git repository
-2. Press `Ctrl+Shift+B` / `Cmd+Shift+B` or right-click and select "Toggle Blame Annotations"
-3. Inline decorations appear showing the author and date for each line's last commit
-4. The status bar shows commit details for the current line
-5. Click the status bar or use "Git: Show Blame Commit" to view the full commit diff
+2. Right-click a line number and choose **Show Git Blame Annotations** (or press `Ctrl+Shift+B` / `Cmd+Shift+B`, or right-click in the editor)
+3. Each change block shows the **author and short date** trailing the line's code, padded to start exactly at the `gitHistory.blame.annotationOffset` column (default `160`). Lines longer than the column hide the annotation so it stays aligned and never covers the code
+4. Select a line to see commit details for it in the status bar
+5. Hover an annotation and click **Show commit details** — or click the status bar item — to open the full commit (details and changed files) in the Git History panel
+6. Right-click a line number and choose **Hide Git Blame Annotations** to turn them off
+7. Adjust `gitHistory.blame.dateFormat` and `gitHistory.blame.annotationOffset` in Settings to change the annotation's date format and column
 
 **Note**: The "Show Blame Commit" command requires an active text editor. If triggered without an active editor, a warning message "No active editor found" will be displayed.
 

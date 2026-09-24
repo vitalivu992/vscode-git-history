@@ -3,7 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { getFileBlame } from '../../src/git/gitService';
-import { formatRelativeTime } from '../../src/blame/blameService';
+import { formatRelativeTime, formatBlameLabel, escapeMarkdown, computeBlameAnnotationGap } from '../../src/blame/blameService';
+import { BlameLineInfo } from '../../src/types';
 
 suite('Blame Service Integration Tests', () => {
   let tempDir: string;
@@ -127,26 +128,81 @@ suite('formatRelativeTime Tests', () => {
 });
 
 suite('Blame Decoration Label Tests', () => {
-  test('blame decoration label should include short hash', () => {
-    const blameServicePath = path.resolve(__dirname, '../../../src/blame/blameService.ts');
-    const source = fs.readFileSync(blameServicePath, 'utf-8');
+  const committedLine: BlameLineInfo = {
+    hash: 'abc1234abc1234abc1234abc1234abc1234abcd',
+    shortHash: 'abc1234',
+    author: 'Test User',
+    authorEmail: 'test@example.com',
+    authorTime: Date.UTC(2024, 2, 15, 10, 30) / 1000,
+    summary: 'Do a thing',
+    lineNumber: 1,
+    originalLineNumber: 1,
+    filename: 'test.txt'
+  };
 
-    // The label is a multi-line ternary; check the whole assignment.
-    const labelStart = source.indexOf('const label =');
-    assert.ok(labelStart >= 0, 'Should find label assignment in blameService.ts');
-    const labelSection = source.substring(labelStart, source.indexOf('const range =', labelStart));
-    assert.ok(labelSection.includes('shortHash'), 'Blame label should include shortHash');
+  test('label shows author and a short date, without the commit hash', () => {
+    const label = formatBlameLabel(committedLine, 'short');
+
+    assert.ok(label.startsWith('Test User, '), 'Label should start with the author');
+    assert.ok(!label.includes(committedLine.shortHash), 'Label should not include the short hash');
   });
 
-  test('blame decoration label should include author and date', () => {
-    const blameServicePath = path.resolve(__dirname, '../../../src/blame/blameService.ts');
-    const source = fs.readFileSync(blameServicePath, 'utf-8');
+  test('iso date format renders YYYY-MM-DD', () => {
+    assert.strictEqual(formatBlameLabel(committedLine, 'iso'), 'Test User, 2024-03-15');
+  });
 
-    const labelSection = source.substring(
-      source.indexOf('const label ='),
-      source.indexOf('const range =')
-    );
-    assert.ok(labelSection.includes('author'), 'Blame label should include author');
-    assert.ok(labelSection.includes('dateStr'), 'Blame label should include dateStr');
+  test('relative date format renders a relative time', () => {
+    const recent: BlameLineInfo = {
+      ...committedLine,
+      authorTime: Math.floor(Date.now() / 1000) - 120
+    };
+
+    assert.strictEqual(formatBlameLabel(recent, 'relative'), 'Test User, 2 minutes ago');
+  });
+
+  test('uncommitted lines are labelled instead of attributed', () => {
+    const uncommitted: BlameLineInfo = {
+      ...committedLine,
+      hash: '0'.repeat(40),
+      shortHash: '0000000'
+    };
+
+    assert.strictEqual(formatBlameLabel(uncommitted, 'short'), 'Not Committed Yet');
+  });
+});
+
+suite('Blame Annotation Offset Tests', () => {
+  test('short lines are padded out to the configured offset column', () => {
+    assert.strictEqual(computeBlameAnnotationGap(20, 160), 140);
+    assert.strictEqual(computeBlameAnnotationGap(0, 160), 160);
+  });
+
+  test('a line exactly at the offset column is padded with no gap', () => {
+    assert.strictEqual(computeBlameAnnotationGap(160, 160), 0);
+  });
+
+  test('lines longer than the offset hide the annotation', () => {
+    assert.strictEqual(computeBlameAnnotationGap(161, 160), undefined);
+    assert.strictEqual(computeBlameAnnotationGap(300, 160), undefined);
+  });
+});
+
+suite('Blame Hover Escaping Tests', () => {
+  test('escapes command links so commit metadata cannot inject commands', () => {
+    const escaped = escapeMarkdown('[click](command:gitHistory.deleteBranch?["main"])');
+
+    assert.ok(!escaped.includes(']('), 'Link syntax should be neutralized');
+    assert.ok(escaped.includes('\\['), 'Opening bracket should be escaped');
+  });
+
+  test('escapes image syntax so commit metadata cannot load remote resources', () => {
+    const escaped = escapeMarkdown('![x](https://example.com/tracker.png)');
+
+    assert.ok(escaped.startsWith('\\!'), 'Leading image marker should be escaped');
+    assert.ok(!escaped.includes(']('), 'Image link syntax should be neutralized');
+  });
+
+  test('leaves plain author and summary text intact', () => {
+    assert.strictEqual(escapeMarkdown('Jane Doe — fix thing'), 'Jane Doe — fix thing');
   });
 });

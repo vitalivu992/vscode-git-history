@@ -2379,7 +2379,9 @@ function renderFiles(files, activeFile) {
     const li = document.createElement('li');
 
     const statusClass = getStatusClass(file.status);
+    const statusIcon = getStatusIcon(file.status);
     const statusLabel = getStatusLabel(file.status);
+    const statusContent = statusIcon || escapeHtml(statusLabel);
 
     let displayPath = file.path;
     if (file.previousPath && file.status === 'R') {
@@ -2391,7 +2393,7 @@ function renderFiles(files, activeFile) {
     }
 
     li.innerHTML = `
-      <span class="file-status ${statusClass}">${statusLabel}</span>
+      <span class="file-status ${statusClass}">${statusContent}</span>
       <span class="file-path" title="${escapeHtml(displayPath)}">${escapeHtml(displayPath)}</span>
     `;
 
@@ -2737,6 +2739,36 @@ function getStatusClass(status) {
     case 'C': return 'copied';
     default: return '';
   }
+}
+
+/**
+ * GitHub-style file-status icon: a document outline with a status mark
+ * (`+` added, `-` deleted, `+`/`-` modified, `→` renamed, two documents
+ * copied). Returns null for unknown statuses, which keep the letter badge.
+ */
+function getStatusIcon(status) {
+  const mark = {
+    A: '<path d="M5.75 10h4.5M8 7.75v4.5"/>',
+    D: '<path d="M5.75 10h4.5"/>',
+    M: '<path d="M6.1 7.75h3.8M8 5.85v3.8M6.1 12.25h3.8"/>',
+    R: '<path d="M5.6 10h4.7M8.4 8.1l1.9 1.9-1.9 1.9"/>',
+    C: '<path d="M5 11V7.4a.9.9 0 0 1 .9-.9h3.6"/>' +
+       '<path d="M7.5 8.2h2.7a.9.9 0 0 1 .9.9v2.7a.9.9 0 0 1-.9.9H7.5a.9.9 0 0 1-.9-.9V9.1a.9.9 0 0 1 .9-.9z"/>'
+  }[status];
+
+  if (!mark) { return null; }
+
+  return (
+    '<svg class="file-status-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">' +
+    '<g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round">' +
+    '<path d="M3.5 1.5H8.5L12.5 5.5V14.5H3.5Z"/>' +
+    '<path d="M8.5 1.5V5.5H12.5"/>' +
+    '</g>' +
+    '<g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">' +
+    mark +
+    '</g>' +
+    '</svg>'
+  );
 }
 
 function getStatusLabel(status) {

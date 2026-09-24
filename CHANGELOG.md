@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Move blame annotations from the left of the code (next to the line number) to trailing the line: annotations render after the text and are padded to start exactly at the `gitHistory.blame.annotationOffset` column (default `160`); lines longer than the offset hide the annotation so it stays aligned and never renders over the code
+
 ### Removed
 - Remove the unused `focusCommitList` webview-to-extension message type from the protocol (the `Ctrl+L` focus action goes through the `triggerAction` message and was never affected)
 

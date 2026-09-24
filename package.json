@@ -2,7 +2,7 @@
   "name": "git-history-vsce",
   "displayName": "Git history for selection",
   "description": "View git history for files and line selections with diff viewer",
-  "version": "1.2.8",
+  "version": "1.2.10",
   "publisher": "vitalivu992",
   "icon": "images/icon.png",
   "repository": {
@@ -20,6 +20,8 @@
     "onCommand:gitHistory.showSelectionHistory",
     "onCommand:gitHistory.showRepositoryHistory",
     "onCommand:gitHistory.toggleBlame",
+    "onCommand:gitHistory.showBlame",
+    "onCommand:gitHistory.hideBlame",
     "onCommand:gitHistory.showBlameCommit",
     "onView:gitHistory.webview"
   ],
@@ -62,6 +64,14 @@
       {
         "command": "gitHistory.toggleBlame",
         "title": "Git: Toggle Blame Annotations"
+      },
+      {
+        "command": "gitHistory.showBlame",
+        "title": "Git: Show Blame Annotations"
+      },
+      {
+        "command": "gitHistory.hideBlame",
+        "title": "Git: Hide Blame Annotations"
       },
       {
         "command": "gitHistory.showBlameCommit",
@@ -259,6 +269,18 @@
       }
     ],
     "menus": {
+      "editor/lineNumber/context": [
+        {
+          "command": "gitHistory.showBlame",
+          "group": "git",
+          "when": "!gitHistory.blameVisible"
+        },
+        {
+          "command": "gitHistory.hideBlame",
+          "group": "git",
+          "when": "gitHistory.blameVisible"
+        }
+      ],
       "editor/context": [
         {
           "command": "gitHistory.showFileHistory",
@@ -276,9 +298,14 @@
           "when": "editorHasSelection"
         },
         {
-          "command": "gitHistory.toggleBlame",
+          "command": "gitHistory.showBlame",
           "group": "git",
-          "when": "editorTextFocus"
+          "when": "editorTextFocus && !gitHistory.blameVisible"
+        },
+        {
+          "command": "gitHistory.hideBlame",
+          "group": "git",
+          "when": "editorTextFocus && gitHistory.blameVisible"
         }
       ]
     },
@@ -550,13 +577,20 @@
         },
         "gitHistory.blame.dateFormat": {
           "type": "string",
-          "default": "relative",
+          "default": "short",
           "enum": [
             "relative",
             "short",
             "iso"
           ],
-          "description": "Date format for blame annotations"
+          "description": "Date format shown after the author in blame annotations"
+        },
+        "gitHistory.blame.annotationOffset": {
+          "type": "number",
+          "default": 160,
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Character column at which trailing blame annotations start (default 160). Annotations are padded to start exactly at this column; lines longer than the column hide the annotation so it never covers the code"
         },
         "gitHistory.commitList.dateFormat": {
           "type": "string",

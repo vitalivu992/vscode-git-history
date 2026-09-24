@@ -44,7 +44,8 @@ Commits signed with GPG show GPG signature verification badges (âœ“ verified / â
 | `gitHistory.defaultDiffView` | `unified` | Default diff view: `unified` or `side-by-side` |
 | `gitHistory.diffContextLines` | `3` | Number of context lines shown around changes in diffs |
 | `gitHistory.maxCommits` | `500` | Number of commits loaded per page (initial load and each "Load more") |
-| `gitHistory.blame.dateFormat` | `relative` | Date format for blame annotations: `relative`, `short`, or `iso` |
+| `gitHistory.blame.dateFormat` | `short` | Date format shown after the author in blame annotations: `relative`, `short`, or `iso` |
+| `gitHistory.blame.annotationOffset` | `160` | Character column where trailing blame annotations start; lines longer than the column hide the annotation so it never covers the code |
 | `gitHistory.commitList.dateFormat` | `relative` | Date format for the commit list: `relative`, `short`, or `iso` |
 | `gitHistory.sprintLengthWeeks` | `2` | Number of weeks used by the sprint date-filter button |
 

@@ -990,28 +990,29 @@ body[data-mode="diff"] #diff-viewer {
   flex-shrink: 0;
 }
 
+.file-status-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
 .file-status.added {
-  background-color: rgba(78, 201, 176, 0.25);
   color: var(--vscode-gitDecoration-addedResourceForeground, #4ec9b0);
 }
 
 .file-status.modified {
-  background-color: rgba(220, 220, 170, 0.25);
   color: var(--vscode-gitDecoration-modifiedResourceForeground, #dcdcaa);
 }
 
 .file-status.deleted {
-  background-color: rgba(244, 135, 113, 0.25);
   color: var(--vscode-gitDecoration-deletedResourceForeground, #f48771);
 }
 
 .file-status.renamed {
-  background-color: rgba(86, 156, 214, 0.25);
   color: #569cd6;
 }
 
 .file-status.copied {
-  background-color: rgba(197, 134, 192, 0.25);
   color: #c586c0;
 }
 

@@ -10,7 +10,8 @@ This extension contributes the following settings:
 
 * `gitHistory.maxCommits`: Number of commits loaded per page (initial load and each "Load more") (default: 500)
 * `gitHistory.hideMergeCommits`: Hide merge commits in the history view (default: false)
-* `gitHistory.blame.dateFormat`: Date format for blame annotations - `relative` (e.g., "2 days ago"), `short` (e.g., "2024-03-15"), or `iso` (e.g., "2024-03-15T10:30:00Z") (default: `relative`)
+* `gitHistory.blame.dateFormat`: Date format shown after the author in blame annotations - `relative` (e.g., "2 days ago"), `short` (e.g., "3/15/2024"), or `iso` (e.g., "2024-03-15") (default: `short`)
+* `gitHistory.blame.annotationOffset`: Character column at which trailing blame annotations start (default: `160`, range: `1-1000`). Annotations render after the line's text and are padded to start exactly at this column; lines longer than the column hide the annotation so it never covers the code
 * `gitHistory.commitList.dateFormat`: Date format for the commit list - `relative` (e.g., "Today 2:30 PM", "2 weeks ago"; hover for the absolute timestamp), `short` (your locale's date), or `iso` (e.g., "2024-03-15") (default: `relative`)
 * `gitHistory.defaultDiffView`: Default diff view mode when opening Git History - `unified` or `side-by-side` (default: `unified`). **Note**: User settings from the previous session take precedence over this configuration.
 * `gitHistory.diffContextLines`: Number of context lines to show in diffs (default: `3`, range: `1-10`). Increase for more context during code review, decrease for more focused diffs.
